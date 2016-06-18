@@ -1,0 +1,11 @@
+buildbot==0.9.0b7
+buildbot-pkg==0.9.0b7
+buildbot-console-view==0.9.0b7
+buildbot-slave==0.9.0b7
+buildbot-waterfall-view==0.9.0b7
+buildbot-www==0.9.0b7
+paramiko
+pyaml
+python-novaclient==2.35
+requests[security]
+service_identity
