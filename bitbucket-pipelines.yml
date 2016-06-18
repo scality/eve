@@ -6,8 +6,5 @@ pipelines:
         script:
           - apt-get -qq update
           - DEBIAN_FRONTEND=noninteractive apt-get -qq install -y python-pip python-dev git
-          - pip install -qr requirements.txt
-          - mkdir /root/.ssh/
-          - buildbot create-master master
-          - mv master/master.cfg.sample master/master.cfg
-          - buildbot start master
+          - pip install tox
+          - tox

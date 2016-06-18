@@ -1,9 +1,10 @@
-buildbot==0.9.0b7
-buildbot-pkg==0.9.0b7
-buildbot-console-view==0.9.0b7
-buildbot-slave==0.9.0b7
-buildbot-waterfall-view==0.9.0b7
-buildbot-www==0.9.0b7
+flake8
+buildbot[tls]==0.9.0b9
+buildbot-pkg==0.9.0b9
+buildbot-console-view==0.9.0b9
+buildbot-slave==0.9.0b9
+buildbot-waterfall-view==0.9.0b9
+buildbot-www==0.9.0b9
 paramiko
 pyaml
 python-novaclient==2.35
