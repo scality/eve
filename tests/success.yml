@@ -1,0 +1,26 @@
+stages:
+  main:
+    steps:
+      - ShellCommand:
+          command: "ls -l"
+      - TriggerStages:
+          stage_names:
+            - compile
+            - test
+          waitForFinish: True
+      - TriggerStages:
+          stage_names:
+            - finalize
+          waitForFinish: True
+  compile:
+    steps:
+      - ShellCommand:
+          command: "sleep 2"
+  test:
+    steps:
+      - ShellCommand:
+          command: "sleep 3"
+  finalize:
+    steps:
+      - ShellCommand:
+          command: "sleep 5"
