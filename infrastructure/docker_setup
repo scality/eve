@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # init
-MY_DOCKER_SERVER_IP=104.130.169.228
 MY_DOCKER_SERVER_INTERNAL_IP=10.176.197.44
+MY_DOCKER_SERVER_IP=104.130.169.228
 MY_DOCKER_SERVER_HOST=buildfaster.devsca.com
 
 
@@ -36,6 +36,8 @@ service docker restart
 # test:
 # this should fail
 docker run hello-world
+# this should work
+docker --tlsverify --tlscacert=ca.pem --tlscert=cert.pem --tlskey=key.pem -H=${MY_DOCKER_SERVER_INTERNAL_IP}:2376 run hello-world
 # this should work
 docker --tlsverify --tlscacert=ca.pem --tlscert=cert.pem --tlskey=key.pem -H=${MY_DOCKER_SERVER_IP}:2376 run hello-world
 # this should work
