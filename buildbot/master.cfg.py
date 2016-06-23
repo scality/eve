@@ -10,6 +10,7 @@ from buildbot.schedulers.triggerable import Triggerable
 from buildbot.steps.shell import SetPropertyFromCommand
 from buildbot.steps.trigger import Trigger
 from buildbot.worker.local import LocalWorker
+from buildbot.worker.docker import DockerLatentWorker
 from twisted.python.reflect import namedModule
 
 # GIT REPO
@@ -94,9 +95,25 @@ c['buildbotURL'] = "http://localhost:8020/"
 # The 'workers' list defines the set of recognized buildworkers. Each element
 # is a Buildworker object, specifying a unique worker name and password.
 # The same worker name and password must be configured on the worker.
+
+import docker
+from os import path
+CERTS = path.join(path.expanduser('~'), '.docker', 'machine', 'machines', 'default')
+tls_config = docker.tls.TLSConfig(
+    client_cert=(path.join(CERTS, 'cert.pem'), path.join(CERTS,'key.pem')),
+    ca_cert=path.join(CERTS, 'ca.pem'),
+    verify=True
+)
 c['workers'] = [
     LocalWorker('local-worker1'),
     LocalWorker('local-worker2'),
+    DockerLatentWorker(
+        name='latent-docker-worker-1',
+        password='pwd',
+        docker_host='tcp://192.168.99.100:2376',
+        tls=tls_config,
+        image='latent-docker-worker-1'
+    )
 ]
 
 # The following lines are a workaround for a bug
@@ -167,13 +184,16 @@ triggered_factory.addStep(StepExtractor())
 c['builders'] = []
 c['builders'].append(
     util.BuilderConfig(name="b-bootstrap",
-                       workernames=['local-worker1', 'local-worker2'],
+                       workernames=[
+                           'local-worker1',
+                           'local-worker2',
+                            'latent-docker-worker-1'],
                        factory=bootstrap_factory))
 
 c['builders'].append(
     util.BuilderConfig(
         name="b-triggerable",
-        workernames=['local-worker1', 'local-worker2'],
+        workernames=['local-worker1', 'local-worker2', 'latent-docker-worker-1'],
         # nextSlave=latent_worker_chooser,
         factory=triggered_factory
     ))

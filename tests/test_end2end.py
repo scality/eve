@@ -1,6 +1,7 @@
 import os
 import subprocess
 import time
+import tempfile
 import unittest
 from subprocess import check_output as cmd
 
@@ -28,7 +29,7 @@ def run_buildbot():
     except subprocess.CalledProcessError as e:
         with open('/tmp/buildbot-master/twistd.log') as logfile:
             print(logfile.read())
-        print "Ping stdout output:\n", e.output
+        print "output:\n", e.output
         raise
 
 
@@ -84,7 +85,6 @@ class BuildbotDataAPi():
 
 class TestEnd2End(unittest.TestCase):
     def setUp(self):
-        import tempfile
         d = tempfile.mkdtemp()
         cmd(['mkdir', d + '/.buildbot'])
         cmd(['cp', 'tests/success.yml', d + '/.buildbot/main.yaml'])
@@ -115,3 +115,34 @@ class TestEnd2End(unittest.TestCase):
                 break
         assert state == 'finished'
         assert build['results'] == 0  # SUCCESS
+
+class TestUnit(unittest.TestCase):
+    def test_docker(self):
+        with open('tests/Dockerfile.template') as f:
+            dockerfile = f.read().format(
+                master_hostname='192.168.99.1',
+                workername='latent-docker-worker-1',
+                workerpassword='pwd'
+            )
+
+        with open('tests/Dockerfile', 'w') as f:
+            f.write(dockerfile)
+
+        #cmd(['docker', 'build', '--tag', 'latent-docker-worker-1', 'tests'])
+        import docker
+        from os import path
+        CERTS = path.join(path.expanduser('~'), '.docker', 'machine', 'machines', 'default')
+        tls_config = docker.tls.TLSConfig(
+            client_cert=(path.join(CERTS, 'cert.pem'), path.join(CERTS,'key.pem')),
+            ca_cert=path.join(CERTS, 'ca.pem'),
+            verify=True
+        )
+
+        docker_socket = 'tcp://192.168.99.100:2376'
+        client = docker.client.Client(base_url=docker_socket, tls=tls_config)
+        worker_image= 'latent-docker-worker-1'
+        container = client.create_container(worker_image)
+        client.start(container['Id'])
+        client.stop(container['Id'])
+        client.wait(container['Id'])
+
