@@ -2,6 +2,7 @@
 
 # init
 MY_DOCKER_SERVER_IP=104.130.169.228
+MY_DOCKER_SERVER_INTERNAL_IP=10.176.197.44
 MY_DOCKER_SERVER_HOST=buildfaster.devsca.com
 
 
@@ -21,7 +22,7 @@ openssl genrsa -aes256 -out ca-key.pem 4096
 openssl req -new -x509 -days 365 -key ca-key.pem -sha256 -out ca.pem
 openssl genrsa -out server-key.pem 4096
 openssl req -subj "/CN=${MY_DOCKER_SERVER_HOST}" -sha256 -new -key server-key.pem -out server.csr
-echo subjectAltName = IP:${MY_DOCKER_SERVER_IP},IP:127.0.0.1 > extfile.cnf
+echo subjectAltName = IP:${MY_DOCKER_SERVER_IP},IP:${MY_DOCKER_SERVER_INTERNAL_IP},IP:127.0.0.1 > extfile.cnf
 openssl x509 -req -days 365 -sha256 -in server.csr -CA ca.pem -CAkey ca-key.pem -CAcreateserial -out server-cert.pem -extfile extfile.cnf
 openssl genrsa -out key.pem 4096
 openssl req -subj '/CN=client' -new -key key.pem -out client.csr
