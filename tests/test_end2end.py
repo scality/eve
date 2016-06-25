@@ -1,41 +1,42 @@
 import os
+import shutil
 import subprocess
-import time
+import sys
 import tempfile
+import time
 import unittest
-from subprocess import check_output as cmd
 
 import requests
 
+os.environ['GIT_REPO'] = 'git@bitbucket.org:scality/test_buildbot.git'
 
-def run_buildbot():
-    try:
-        cmd(['buildbot', 'stop', '/tmp/buildbot-master'])
-        cmd(['rm', '-rf', '/tmp/buildbot-master'])
-    except subprocess.CalledProcessError:
-        pass
-    cmd(['cp', '-r', 'buildbot', '/tmp/buildbot-master'])
-    cmd(['mv', '/tmp/buildbot-master/master.cfg.py',
-         '/tmp/buildbot-master/master.cfg'])
-    cmd(['buildbot', 'create-master', '/tmp/buildbot-master'])
 
-    cfg_file = '/tmp/buildbot-master/master.cfg'
-    with open(cfg_file, "rb") as f:
-        compile(f.read(), cfg_file, 'exec')
+def cmd(command, ignore_exception=False):
+    print('\nCOMMAND : %s' % command)
+    process = subprocess.Popen(command, shell=True,
+                               stdout=subprocess.PIPE,
+                               stderr=subprocess.STDOUT)
 
-    try:
-        cmd(['buildbot', 'start', '/tmp/buildbot-master'])
-        return True
-    except subprocess.CalledProcessError as e:
-        with open('/tmp/buildbot-master/twistd.log') as logfile:
-            print(logfile.read())
-        print "output:\n", e.output
-        raise
+    # Poll process for new output until finished
+    while True:
+        nextline = process.stdout.readline()
+        if nextline == '' and process.poll() is not None:
+            break
+        sys.stdout.write(' | ' + nextline)
+        sys.stdout.flush()
+    print(u' L________')
+
+    output = process.communicate()[0]
+    exitCode = process.returncode
+
+    if exitCode == 0 or ignore_exception:
+        return output
+    raise subprocess.CalledProcessError(exitCode, command)
 
 
 class BuildbotDataAPi():
-    def __init__(self):
-        self.base_url = 'http://localhost:8020/api/v2/'
+    def __init__(self, base_url):
+        self.base_url = base_url
         self.headers = {
             'Content-Type': 'application/json',
             'Accept': 'application/json, text/plain, */*',
@@ -79,70 +80,80 @@ class BuildbotDataAPi():
             'branch': '',
             'revision': ''
         }
-        print params
-        self.post('forceschedulers/force', 'force', params=params)
+        self.post('forceschedulers/force-bootstrap', 'force', params=params)
 
 
 class TestEnd2End(unittest.TestCase):
-    def setUp(self):
-        d = tempfile.mkdtemp()
-        cmd(['mkdir', d + '/.buildbot'])
-        cmd(['cp', 'tests/success.yml', d + '/.buildbot/main.yaml'])
-        old_dir = os.getcwd()
-        os.chdir(d)
-        cmd(['git', 'init'])
-        cmd(['git', 'config', 'user.email', 'john@example.com'])
-        cmd(['git', 'config', 'user.name', 'john'])
-        cmd(['git', 'add', '.buildbot/main.yaml'])
-        cmd(['git', 'commit', '-m', 'first commit'])
-        os.environ['GIT_REPO'] = d
-        os.chdir(old_dir)
-        run_buildbot()
-        self.api = BuildbotDataAPi()
 
-    def test_run(self):
-        bootstrap_builder_id = self.api.get_element_id_from_name(
-            'builders',
-            'b-bootstrap',
-            'builderid')
-        self.api.force_build(bootstrap_builder_id)
-        for i in range(120):
+    def setup_buildbot(self):
+        cmd('docker build -t eve eve')
+        cmd('docker rm -f $(docker ps -aq)', ignore_exception=True)
+        cmd('docker run -d -e GIT_REPO=%s ' % os.environ['GIT_REPO'] +
+            '-p 8000:8000 -p 9989:9989 --name=eve eve')
+        self.api = BuildbotDataAPi(
+            'http://buildfaster.devsca.com:8000/api/v2/')
+        for i in range(10):
+            try:
+                print('checking buildbot\'s webserver response')
+                builds = self.api.get('builds')
+                assert builds['meta']['total'] == 0
+                break
+            except requests.ConnectionError:
+                time.sleep(1)
+            else:
+                raise Exception('Could not connect to API')
+
+    def setup_git(self):
+        c = 'four_stages_sleep'
+        old_dir = os.getcwd()
+        this_dir = os.path.dirname(os.path.abspath(__file__))
+        src_ctxt = os.path.join(this_dir, 'contexts', c)
+        os.chdir(tempfile.mkdtemp())
+        cmd('git clone git@bitbucket.org:scality/test_buildbot.git')
+        os.chdir('test_buildbot')
+
+        shutil.rmtree('.buildbot')
+        shutil.copytree(src_ctxt, '.buildbot')
+        cmd('git config user.email "john.doe@example.com"')
+        cmd('git config user.name "John Doe"')
+        cmd('git config push.default simple')
+        cmd('git add -A')
+        cmd('git commit --allow-empty -m "changed build context to %s"' % c)
+        cmd('git push')
+        os.chdir(old_dir)
+
+    def check_build_success(self, build_id, timeout=120):
+        state = None
+        for i in range(timeout):
             time.sleep(1)
-            build = self.api.get('builds/1')['builds'][0]
+            log = subprocess.check_output(
+                'docker exec eve cat master/twistd.log', shell=True)
+            if 'Traceback (most recent call last):' in log:
+                cmd('docker exec eve cat master/twistd.log')
+                raise Exception('Found an Exception Traceback in twistd.log')
+            try:
+                build = self.api.get('builds/%d' % build_id)['builds'][0]
+            except requests.HTTPError as e:
+                print 'Build did not start yet. API responded: %s' % e.message
+                continue
             state = build['state_string']
-            print state
+            print('API responded: BUILD STATE = %s' % state)
             if state != 'starting':
                 break
         assert state == 'finished'
         assert build['results'] == 0  # SUCCESS
 
-class TestUnit(unittest.TestCase):
-    def test_docker(self):
-        with open('tests/Dockerfile.template') as f:
-            dockerfile = f.read().format(
-                master_hostname='192.168.99.1',
-                workername='latent-docker-worker-1',
-                workerpassword='pwd'
-            )
+    def test_git_poll(self):
+        self.setup_buildbot()
+        self.setup_git()
+        self.check_build_success(build_id=1)
 
-        with open('tests/Dockerfile', 'w') as f:
-            f.write(dockerfile)
-
-        #cmd(['docker', 'build', '--tag', 'latent-docker-worker-1', 'tests'])
-        import docker
-        from os import path
-        CERTS = path.join(path.expanduser('~'), '.docker', 'machine', 'machines', 'default')
-        tls_config = docker.tls.TLSConfig(
-            client_cert=(path.join(CERTS, 'cert.pem'), path.join(CERTS,'key.pem')),
-            ca_cert=path.join(CERTS, 'ca.pem'),
-            verify=True
-        )
-
-        docker_socket = 'tcp://192.168.99.100:2376'
-        client = docker.client.Client(base_url=docker_socket, tls=tls_config)
-        worker_image= 'latent-docker-worker-1'
-        container = client.create_container(worker_image)
-        client.start(container['Id'])
-        client.stop(container['Id'])
-        client.wait(container['Id'])
-
+    def test_force_build(self):
+        self.setup_git()
+        self.setup_buildbot()
+        bootstrap_builder_id = self.api.get_element_id_from_name(
+            'builders',
+            'bootstrap',
+            'builderid')
+        self.api.force_build(bootstrap_builder_id)
+        self.check_build_success(build_id=1)

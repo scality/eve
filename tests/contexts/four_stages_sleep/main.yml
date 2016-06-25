@@ -1,6 +1,8 @@
 stages:
   main:
-    image: docker/centos6:v1
+    image:
+        type: docker
+        path: ubuntu-trusty-ctxt
     steps:
       - ShellCommand:
           command: "ls -l"
@@ -14,14 +16,23 @@ stages:
             - finalize
           waitForFinish: True
   compile:
+    image:
+        type: docker
+        path: ubuntu-trusty-ctxt
+    steps:
+      - ShellCommand:
+          command: "sleep 1"
+  test:
+    image:
+        type: docker
+        path: ubuntu-trusty-ctxt
     steps:
       - ShellCommand:
           command: "sleep 2"
-  test:
-    steps:
-      - ShellCommand:
-          command: "sleep 3"
   finalize:
+    image:
+      type: docker
+      path: ubuntu-trusty-ctxt
     steps:
       - ShellCommand:
-          command: "sleep 5"
+          command: "sleep 4"
