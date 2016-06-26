@@ -7,11 +7,28 @@ import time
 import unittest
 
 import requests
+from requests.auth import HTTPBasicAuth
 
-os.environ['GIT_REPO'] = 'git@bitbucket.org:scality/test_buildbot.git'
+# API_BASE_URL = 'http://buildfaster.devsca.com:8000/api/v2/'
+ENV_VARS = [
+    'GIT_REPO',
+    'GIT_CERT_KEY_BASE64',
+    'DOCKER_HOST',
+    'DOCKER_CERT_PATH',
+    'DOCKER_TLS_VERIFY',
+    'EVE_LOGIN',
+    'EVE_PWD',
+]
+
+for v in ENV_VARS:
+    assert os.environ[v]
+
+MASTER_FQDN = os.environ['DOCKER_HOST'].replace('tcp://', '').split(':')[0]
+API_BASE_URL = 'http://%s:8000/api/v2/' % MASTER_FQDN
 
 
 def cmd(command, ignore_exception=False):
+    log = ''
     print('\nCOMMAND : %s' % command)
     process = subprocess.Popen(command, shell=True,
                                stdout=subprocess.PIPE,
@@ -24,14 +41,21 @@ def cmd(command, ignore_exception=False):
             break
         sys.stdout.write(' | ' + nextline)
         sys.stdout.flush()
+        log += nextline
+
     print(u' L________')
 
-    output = process.communicate()[0]
+    process.communicate()
     exitCode = process.returncode
 
     if exitCode == 0 or ignore_exception:
-        return output
+        return log
     raise subprocess.CalledProcessError(exitCode, command)
+
+
+cmd('mkdir -p eve/docker_worker/docker_certs')
+cmd('cp -vfp %s/* eve/docker_worker/docker_certs/' % os.environ[
+    'DOCKER_CERT_PATH'])
 
 
 class BuildbotDataAPi():
@@ -41,6 +65,9 @@ class BuildbotDataAPi():
             'Content-Type': 'application/json',
             'Accept': 'application/json, text/plain, */*',
         }
+        self.auth = HTTPBasicAuth(
+            os.environ['EVE_LOGIN'],
+            os.environ['EVE_PWD'])
 
     def post(self, route, method, params={}):
         data = {
@@ -50,7 +77,8 @@ class BuildbotDataAPi():
             'params': params
         }
         res = requests.post(self.base_url + route, json=data,
-                            headers=self.headers)
+                            headers=self.headers,
+                            auth=self.auth)
         print res.json()
         res.raise_for_status()
         return res.json()
@@ -84,14 +112,19 @@ class BuildbotDataAPi():
 
 
 class TestEnd2End(unittest.TestCase):
-
     def setup_buildbot(self):
         cmd('docker build -t eve eve')
         cmd('docker rm -f $(docker ps -aq)', ignore_exception=True)
         cmd('docker run -d -e GIT_REPO=%s ' % os.environ['GIT_REPO'] +
+            '-e GIT_CERT_KEY_BASE64=%s ' % os.environ['GIT_CERT_KEY_BASE64'] +
+            '-e DOCKER_HOST=%s ' % os.environ['DOCKER_HOST'] +
+            '-e EVE_LOGIN=%s ' % os.environ['EVE_LOGIN'] +
+            '-e EVE_PWD=%s ' % os.environ['EVE_PWD'] +
+            '-e MASTER_FQDN=%s ' % MASTER_FQDN +
+            '-e DOCKER_TLS_VERIFY=%s ' % os.environ['DOCKER_TLS_VERIFY'] +
             '-p 8000:8000 -p 9989:9989 --name=eve eve')
         self.api = BuildbotDataAPi(
-            'http://buildfaster.devsca.com:8000/api/v2/')
+            API_BASE_URL)
         for i in range(10):
             try:
                 print('checking buildbot\'s webserver response')
@@ -112,8 +145,8 @@ class TestEnd2End(unittest.TestCase):
         cmd('git clone git@bitbucket.org:scality/test_buildbot.git')
         os.chdir('test_buildbot')
 
-        shutil.rmtree('.buildbot')
-        shutil.copytree(src_ctxt, '.buildbot')
+        shutil.rmtree('eve')
+        shutil.copytree(src_ctxt, 'eve')
         cmd('git config user.email "john.doe@example.com"')
         cmd('git config user.name "John Doe"')
         cmd('git config push.default simple')
@@ -121,6 +154,9 @@ class TestEnd2End(unittest.TestCase):
         cmd('git commit --allow-empty -m "changed build context to %s"' % c)
         cmd('git push')
         os.chdir(old_dir)
+
+    def tearDown(self):
+        cmd('docker exec eve cat master/twistd.log')
 
     def check_build_success(self, build_id, timeout=120):
         state = None
@@ -138,7 +174,7 @@ class TestEnd2End(unittest.TestCase):
                 continue
             state = build['state_string']
             print('API responded: BUILD STATE = %s' % state)
-            if state != 'starting':
+            if state not in ('starting', 'created'):
                 break
         assert state == 'finished'
         assert build['results'] == 0  # SUCCESS
@@ -148,7 +184,7 @@ class TestEnd2End(unittest.TestCase):
         self.setup_git()
         self.check_build_success(build_id=1)
 
-    def test_force_build(self):
+    def dtest_force_build(self):
         self.setup_git()
         self.setup_buildbot()
         bootstrap_builder_id = self.api.get_element_id_from_name(
