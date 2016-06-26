@@ -5,3 +5,5 @@ id_rsa
 *.pyc
 *.pub
 config.env
+certs
+carina

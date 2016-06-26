@@ -9,13 +9,21 @@ from buildbot.config import BuilderConfig
 from buildbot.plugins import steps
 from buildbot.process.buildstep import BuildStep
 from buildbot.process.factory import BuildFactory
+from buildbot.process.properties import Interpolate
 from buildbot.process.results import FAILURE, SUCCESS
 from buildbot.scheduler import AnyBranchScheduler
 from buildbot.schedulers.forcesched import ForceScheduler
 from buildbot.schedulers.triggerable import Triggerable
+from buildbot.steps.http import HTTPStep
+from buildbot.steps.shell import ShellCommand
+from buildbot.steps.source.base import Source
 from buildbot.worker.docker import DockerLatentWorker, _handle_stream_line
 from buildbot.worker.local import LocalWorker
+from buildbot.www.auth import UserPasswordAuth
+from buildbot.www.authz import Authz, endpointmatchers, roles
+from requests.auth import HTTPBasicAuth
 from twisted.internet import defer
+from twisted.python import log
 from twisted.python.reflect import namedModule
 
 ##########################
@@ -27,12 +35,10 @@ BOOTSTRAP_SCHEDULER_NAME = 's-bootstrap'
 TRIGGERABLE_BUILDER_NAME = 'triggerable'
 TRIGGERABLE_SCHEDULER_NAME = 's-triggerable'
 MAX_DOCKER_WORKERS = 10
-MASTER_FQDN = 'buildfaster.devsca.com'
 MASTER_WEB_PORT = 8000
-EVE_FOLDER = '.buildbot'
+EVE_FOLDER = 'eve'
 EVE_MAIN_YAML = 'main.yml'
 EVE_MAIN_YAML_FULL_PATH = '%s/%s' % (EVE_FOLDER, EVE_MAIN_YAML)
-
 
 ##########################
 # Set/Check environment variables
@@ -43,20 +49,27 @@ assert GIT_REPO
 GIT_KEY_PATH = '/root/.ssh/id_rsa'
 # docker
 assert 'tcp://' in environ['DOCKER_HOST']
+MASTER_FQDN = os.environ['MASTER_FQDN']
+if not MASTER_FQDN:
+    MASTER_FQDN = os.environ['DOCKER_HOST'].replace('tcp://', '').split(':')[0]
+
 DOCKER_CERT_PATH = environ.get('DOCKER_CERT_PATH')
-assert path.isdir(DOCKER_CERT_PATH)
 DOCKER_CERT_PATH_CA = os.path.join(DOCKER_CERT_PATH, 'ca.pem')
 DOCKER_CERT_PATH_KEY = os.path.join(DOCKER_CERT_PATH, 'key.pem')
 DOCKER_CERT_PATH_CERT = os.path.join(DOCKER_CERT_PATH, 'cert.pem')
-assert path.isfile(DOCKER_CERT_PATH_CA)
-assert path.isfile(DOCKER_CERT_PATH_KEY)
-assert path.isfile(DOCKER_CERT_PATH_CERT)
+assert path.isdir(DOCKER_CERT_PATH), DOCKER_CERT_PATH
+assert path.isfile(DOCKER_CERT_PATH_CA), DOCKER_CERT_PATH_CA
+assert path.isfile(DOCKER_CERT_PATH_KEY), DOCKER_CERT_PATH_KEY
+assert path.isfile(DOCKER_CERT_PATH_CERT), DOCKER_CERT_PATH_CERT
 
+EVE_LOGIN = environ.get('EVE_LOGIN')
+EVE_PWD = environ.get('EVE_PWD')
+assert EVE_LOGIN
+assert EVE_PWD
 
 # database
 # TODO : for prod, use something like 'mysql://user@pass:mysqlserver/buildbot'
 DB_URL = environ.get('DB_URL', 'sqlite:///state.sqlite')
-
 
 ##########################
 # Project Identity
@@ -73,10 +86,39 @@ c['buildbotURL'] = 'http://%s:%d/' % (MASTER_FQDN, MASTER_WEB_PORT)
 # --master option)
 c['protocols'] = {'pb': {'port': 9989}}
 
-# minimalistic config to activate new web UI
-c['www'] = dict(port=MASTER_WEB_PORT, plugins=dict(
-    waterfall_view={},
-    console_view={}))
+
+##########################
+# Web UI
+##########################
+# Limit write operations to the developer account
+class RolesFromUsername(roles.RolesFromBase):
+    def __init__(self, username, role):
+        self.username = username
+        self.role = role
+
+    def getRolesFromUser(self, userDetails):
+        if 'username' in userDetails:
+            if userDetails['username'] == self.username:
+                return [self.role]
+        return []
+
+authz = Authz(
+    allowRules=[
+        endpointmatchers.StopBuildEndpointMatcher(role='admin'),
+        endpointmatchers.ForceBuildEndpointMatcher(role='admin'),
+        endpointmatchers.RebuildBuildEndpointMatcher(role='admin'),
+    ],
+    roleMatchers=[
+        RolesFromUsername(username='developer', role='admin')
+    ]
+)
+# Create a basic auth website with the waterfall view and the console view
+c['www'] = dict(port=MASTER_WEB_PORT,
+                auth=UserPasswordAuth({EVE_LOGIN: EVE_PWD}),
+                authz=authz,
+                plugins=dict(
+                    waterfall_view={},
+                    console_view={}))
 
 # DB URL
 # TODO: Replace with a MySQL database
@@ -85,7 +127,6 @@ c['db'] = {
     # You can leave this at its default for all but the largest installations.
     'db_url': DB_URL,
 }
-
 
 # #########################
 # Reporters
@@ -103,7 +144,7 @@ tls_config = docker.tls.TLSConfig(
         DOCKER_CERT_PATH_CERT,
         DOCKER_CERT_PATH_KEY),
     ca_cert=DOCKER_CERT_PATH_CA,
-    verify=True)
+    verify=False)
 docker_workers = []
 for i in range(MAX_DOCKER_WORKERS):
     docker_workers.append(
@@ -118,11 +159,6 @@ for i in range(MAX_DOCKER_WORKERS):
             masterFQDN=MASTER_FQDN))
 c['workers'].extend(docker_workers)
 
-# The following lines are a workaround for a bug
-for w in c['workers']:
-    w.path_module = namedModule("posixpath")
-
-
 ##########################
 # Change Sources
 ##########################
@@ -132,9 +168,12 @@ for w in c['workers']:
 c['change_source'] = []
 c['change_source'].append(GitPoller(
     GIT_REPO,
-    workdir='gitpoller-workdir', branch='master',
+    workdir='gitpoller-workdir',
+    branches=True,
     pollinterval=60,
-    pollAtLaunch=True))
+    pollAtLaunch=True,
+    buildPushesWithNoCommits=True,
+))
 
 
 ##########################
@@ -150,6 +189,7 @@ class ReadConfFromYaml(steps.SetPropertyFromCommand):
             name='Read config from %s' % EVE_MAIN_YAML_FULL_PATH,
             command='cat %s' % EVE_MAIN_YAML_FULL_PATH,
             property='conf',
+            haltOnFailure=True,
             **kwargs)
 
     def commandComplete(self, cmd):
@@ -192,6 +232,28 @@ class StepExtractor(BuildStep):
                     _cls = getattr(steps, step_type)
                 except AttributeError:
                     raise Exception('Could not load step %s' % step_type)
+
+            log.msg('%s with params : %s' % (step_type, params))
+
+            # Add the ability to interpret properties from the command
+            # parameters usually used in ShellCommand steps
+            # TODO: See if we can generalize this behaviour to all parameters
+            if 'command' in params:
+                params['command'] = Interpolate(params['command'])
+
+            # hack to prevent displaying passwords stored in env variables
+            # on the web interface
+            if issubclass(_cls, ShellCommand) or issubclass(_cls, Source):
+                params['logEnviron'] = False
+
+            # hack to avoid putting clear passwords into the YAML file
+            # for the HTTP step
+            if issubclass(_cls, HTTPStep):
+                pwd = params['auth'][1].replace('$', '')
+                if pwd in os.environ:
+                    params['auth'] = HTTPBasicAuth(
+                        params['auth'][0], os.environ[pwd])
+
             step = _cls(**params)
             self.build.addStepsAfterLastStep([step])
         return SUCCESS
@@ -268,7 +330,6 @@ c['schedulers'].append(ForceScheduler(
     name="force-bootstrap",
     builderNames=[BOOTSTRAP_BUILDER_NAME]))
 
-
 # #########################
 # Bootstrap Sequence: Build step factory
 # #########################
@@ -282,7 +343,6 @@ bootstrap_factory.addStep(ReadConfFromYaml())
 # Extract steps from conf
 bootstrap_factory.addStep(StepExtractor())
 
-
 # #########################
 # Bootstrap Sequence: Builders
 # #########################
@@ -293,7 +353,6 @@ c['builders'].append(
         workernames=[LOCAL_WORKER_NAME],
         factory=bootstrap_factory))
 
-
 # #########################
 # Triggerable Sequence: Schedulers
 # #########################
@@ -301,14 +360,12 @@ c['schedulers'].append(Triggerable(
     name=TRIGGERABLE_SCHEDULER_NAME,
     builderNames=[TRIGGERABLE_BUILDER_NAME]))
 
-
 # #########################
 # Triggerable Sequence: Build step factory
 # #########################
 triggered_factory = BuildFactory()
 # Extract steps from conf
 triggered_factory.addStep(StepExtractor())
-
 
 # #########################
 # Triggerable Sequence: Builders
@@ -320,7 +377,6 @@ c['builders'].append(
         factory=triggered_factory
     ))
 
-
 # #########################
 # Hacks/Bugfixes
 # #########################
@@ -329,3 +385,7 @@ c['builders'].append(
 # must be called with Builder instance as first
 # argument (got BuildMaster instance instead)
 c['collapseRequests'] = False
+
+# Hack to fix a bug stating that LocalWorkers do not have a valid path_module
+for w in c['workers']:
+    w.path_module = namedModule("posixpath")

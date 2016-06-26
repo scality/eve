@@ -12,3 +12,4 @@ isort==4.2.5
 python-novaclient==2.35
 requests[security]==2.10.0
 service_identity==16.0.0
+txrequests # required by the HTTPStep
