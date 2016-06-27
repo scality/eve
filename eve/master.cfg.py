@@ -9,10 +9,14 @@ from buildbot.config import BuilderConfig
 from buildbot.plugins import steps
 from buildbot.process.buildstep import BuildStep
 from buildbot.process.factory import BuildFactory
+from buildbot.process.properties import Interpolate
 from buildbot.process.results import FAILURE, SUCCESS
 from buildbot.scheduler import AnyBranchScheduler
 from buildbot.schedulers.forcesched import ForceScheduler
 from buildbot.schedulers.triggerable import Triggerable
+from buildbot.steps.http import HTTPStep
+from buildbot.steps.shell import ShellCommand
+from buildbot.steps.source.base import Source
 from buildbot.worker.docker import DockerLatentWorker, _handle_stream_line
 from buildbot.worker.local import LocalWorker
 from buildbot.www.auth import UserPasswordAuth
@@ -24,6 +28,9 @@ from twisted.python import log
 from requests.auth import HTTPBasicAuth
 from buildbot.steps.shell import ShellCommand
 from buildbot.steps.source.base import Source
+from requests.auth import HTTPBasicAuth
+from twisted.internet import defer
+from twisted.python import log
 from twisted.python.reflect import namedModule
 
 ##########################

@@ -3,7 +3,7 @@ image: python:2.7
 pipelines:
   default:
     - step:
-      script:
+        script:
           - mkdir $HOME/.ssh
           - echo $GIT_CERT_KEY_BASE64 | base64 --decode > $HOME/.ssh/id_rsa
           - chmod 600 $HOME/.ssh/id_rsa
