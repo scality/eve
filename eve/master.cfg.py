@@ -318,6 +318,10 @@ class StepExtractor(BuildStep):
                     params['auth'] = HTTPBasicAuth(
                         params['auth'][0], os.environ[pwd])
 
+            # Hack! Buildbot does not accept unicode step names
+            if 'name' in params and isinstance(params['name'], unicode):
+                params['name'] = str(params['name'])
+
             step = _cls(**params)
             self.build.addStepsAfterLastStep([step])
         return SUCCESS
