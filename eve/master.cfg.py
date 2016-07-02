@@ -1,5 +1,6 @@
 import os
 import shutil
+from fnmatch import fnmatch
 from os import environ, getcwd, path
 
 import docker
@@ -21,13 +22,6 @@ from buildbot.worker.docker import DockerLatentWorker, _handle_stream_line
 from buildbot.worker.local import LocalWorker
 from buildbot.www.auth import UserPasswordAuth
 from buildbot.www.authz import Authz, endpointmatchers, roles
-from twisted.internet import defer
-from buildbot.process.properties import Interpolate
-from buildbot.steps.http import HTTPStep
-from twisted.python import log
-from requests.auth import HTTPBasicAuth
-from buildbot.steps.shell import ShellCommand
-from buildbot.steps.source.base import Source
 from requests.auth import HTTPBasicAuth
 from twisted.internet import defer
 from twisted.python import log
@@ -213,14 +207,27 @@ class StepExtractor(BuildStep):
     name = 'step extractor'
 
     def run(self):
-        stage_name = self.getProperty('stage_name', 'main')
+
         conf = self.getProperty('conf')
+        stage_name = self.getProperty('stage_name')
+        if stage_name is None:
+            branch = self.getProperty('branch', 'default')
+            for branch_pattern, branch_conf in conf['branches'].items():
+                log.msg('Checking if <%s> matches <%s>' % (branch,
+                                                           branch_pattern))
+                if fnmatch(branch, branch_pattern):
+                    stage_name = branch_conf['stage']
+                    log.msg('<%s> matched <%s>' % (branch, branch_pattern))
+                    break
+            else:
+                log.msg('No branch match. Using default branch config.')
+                stage_name = conf['branches']['default']['stage']
+        log.msg('stage name = %s' % stage_name)
         stage_conf = conf['stages'][stage_name]
         docker_path = stage_conf['image']['path']
-        full_docker_path = 'workers/%s/%s/build/%s/%s' % (
+        full_docker_path = 'workers/%s/%s/build/%s' % (
             LOCAL_WORKER_NAME,
             BOOTSTRAP_BUILDER_NAME,
-            EVE_FOLDER,
             docker_path)
 
         step = BuildDockerImage(
@@ -242,11 +249,8 @@ class StepExtractor(BuildStep):
 
             log.msg('%s with params : %s' % (step_type, params))
 
-            # Add the ability to interpret properties from the command
-            # parameters usually used in ShellCommand steps
-            # TODO: See if we can generalize this behaviour to all parameters
-            if 'command' in params:
-                params['command'] = Interpolate(params['command'])
+            # Replace the %(prop:*)s in the text with an Interpolate obj
+            params = replace_with_interpolate(params)
 
             # hack to prevent displaying passwords stored in env variables
             # on the web interface
@@ -396,3 +400,17 @@ c['collapseRequests'] = False
 # Hack to fix a bug stating that LocalWorkers do not have a valid path_module
 for w in c['workers']:
     w.path_module = namedModule("posixpath")
+
+
+# #########################
+# Utils
+# #########################
+def replace_with_interpolate(obj):
+    if isinstance(obj, dict):
+        return {k: replace_with_interpolate(v) for k, v in obj.items()}
+    elif isinstance(obj, list):
+        return [replace_with_interpolate(elem) for elem in obj]
+    elif isinstance(obj, str) and 'prop:' in obj:
+        return Interpolate(obj)
+    else:
+        return obj
