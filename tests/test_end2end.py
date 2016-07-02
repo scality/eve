@@ -12,10 +12,10 @@ import requests
 from requests.auth import HTTPBasicAuth
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
+SUCCESS = 0
+FAILURE = 2
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
-
-# API_BASE_URL = 'http://buildfaster.devsca.com:8000/api/v2/'
 ENV_VARS = [
     'GIT_REPO',
     'GIT_CERT_KEY_BASE64',
@@ -152,7 +152,11 @@ class Docker:
             self.check_output(resp)
 
     def rm_all(self, force=False):
-        for c in self.client.containers():
+        for c in self.client.containers(all=True):
+            container_name = c.get('Names')[0]
+            if 'eve' not in container_name and 'build' not in container_name:
+                continue
+            print('Removing Container %s' % container_name)
             self.rm(c.get('Id'), force=force)
 
     def run(self, name):
@@ -181,8 +185,7 @@ class TestEnd2End(unittest.TestCase):
         self.docker = Docker('eve')
         self.docker.rm_all(force=True)
         self.docker.run('eve')
-        self.api = BuildbotDataAPi(
-            API_BASE_URL)
+        self.api = BuildbotDataAPi(API_BASE_URL)
         for i in range(10):
             try:
                 print('checking buildbot\'s webserver response')
@@ -194,36 +197,42 @@ class TestEnd2End(unittest.TestCase):
             else:
                 raise Exception('Could not connect to API')
 
-    def setup_git(self):
-        c = 'four_stages_sleep'
+    def setup_git(self, eve_dir):
         old_dir = os.getcwd()
         this_dir = os.path.dirname(os.path.abspath(__file__))
-        src_ctxt = os.path.join(this_dir, 'contexts', c)
+
         os.chdir(tempfile.mkdtemp())
         cmd('git clone git@bitbucket.org:scality/test_buildbot.git')
         os.chdir('test_buildbot')
 
-        shutil.rmtree('eve')
+        try:
+            shutil.rmtree('eve')
+        except OSError:
+            pass
+
+        src_ctxt = os.path.join(this_dir, 'contexts')
         shutil.copytree(src_ctxt, 'eve')
+
+        eve_yaml_file = os.path.join(this_dir, 'yaml', eve_dir, 'main.yml')
+        shutil.copy(eve_yaml_file, 'eve')
+
         cmd('git config user.email "john.doe@example.com"')
         cmd('git config user.name "John Doe"')
         cmd('git config push.default simple')
         cmd('git add -A')
-        cmd('git commit --allow-empty -m "changed build context to %s"' % c)
+        cmd('git commit --allow-empty -m "changed build ctxt to %s"' % eve_dir)
         cmd('git push')
         os.chdir(old_dir)
 
     def tearDown(self):
         print self.docker.execute('eve', 'cat master/twistd.log')
 
-    def check_build_success(self, build_id, timeout=120):
+    def get_build_status(self, build_id, timeout=120):
         state = None
         for i in range(timeout):
 
             time.sleep(1)
             log = self.docker.execute('eve', 'cat master/twistd.log')
-            # log = subprocess.check_output(
-            #    'docker exec eve cat master/twistd.log', shell=True)
             if 'Traceback (most recent call last):' in log:
                 print log
                 raise Exception('Found an Exception Traceback in twistd.log')
@@ -237,19 +246,21 @@ class TestEnd2End(unittest.TestCase):
             if state not in ('starting', 'created'):
                 break
         assert state == 'finished'
-        assert build['results'] == 0  # SUCCESS
+        return build['results']
 
-    def test_git_poll(self):
+    def test_git_poll_success_failure(self):
         self.setup_buildbot()
-        self.setup_git()
-        self.check_build_success(build_id=1)
+        self.setup_git('expected_fail')
+        self.assertEqual(FAILURE, self.get_build_status(build_id=1))
+        self.setup_git('four_stages_sleep')
+        self.assertEqual(SUCCESS, self.get_build_status(build_id=2))
 
     def dtest_force_build(self):
-        self.setup_git()
+        self.setup_git('four_stages_sleep')
         self.setup_buildbot()
         bootstrap_builder_id = self.api.get_element_id_from_name(
             'builders',
             'bootstrap',
             'builderid')
         self.api.force_build(bootstrap_builder_id)
-        self.check_build_success(build_id=1)
+        self.assertEqual(SUCCESS, self.get_build_status(build_id=1))
