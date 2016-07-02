@@ -141,7 +141,7 @@ class BitbucketBuildStatusPush(HttpStatusPushBase):
 
     @defer.inlineCallbacks
     def send(self, build):
-        log.msg('SENDING BUILD STATUS TO BITBUCKET %s' % build)
+        # log.msg('SENDING BUILD STATUS TO BITBUCKET %s' % build)
         sha1 = build['buildset']['sourcestamps'][0]['revision']
         params = {
             'repo_owner': 'scality',
@@ -180,7 +180,7 @@ class BitbucketBuildStatusPush(HttpStatusPushBase):
         #
         auth = HTTPBasicAuth(EVE_LOGIN, EVE_PWD)
         response = yield self.session.post(url, data, auth=auth)
-        if response.status_code != 200:
+        if response.status_code != 201:
             log.msg("%s: unable to upload status: %s" %
                     (response.status_code, response.content))
 

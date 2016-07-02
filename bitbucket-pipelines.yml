@@ -9,9 +9,6 @@ pipelines:
           - chmod 600 $HOME/.ssh/id_rsa
           - ssh-keyscan bitbucket.org >> $HOME/.ssh/known_hosts
           - eval $(python infrastructure/carina_setup_env.py eve_cluster_test)
-          - apt-get -qq update
-          - DEBIAN_FRONTEND=noninteractive apt-get -qq install -y python-pip python-dev git
-          - curl -sSL https://get.docker.com/ | sh
           - pip install tox
           - tox
   branches:

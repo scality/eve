@@ -1,3 +1,4 @@
+import json
 import os
 import shutil
 import subprocess
@@ -6,8 +7,13 @@ import tempfile
 import time
 import unittest
 
+import docker
 import requests
 from requests.auth import HTTPBasicAuth
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
+
+requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+
 
 # API_BASE_URL = 'http://buildfaster.devsca.com:8000/api/v2/'
 ENV_VARS = [
@@ -24,6 +30,7 @@ for v in ENV_VARS:
     assert os.environ[v]
 
 MASTER_FQDN = os.environ['DOCKER_HOST'].replace('tcp://', '').split(':')[0]
+os.environ['MASTER_FQDN'] = MASTER_FQDN
 API_BASE_URL = 'http://%s:8000/api/v2/' % MASTER_FQDN
 
 
@@ -111,18 +118,69 @@ class BuildbotDataAPi():
         self.post('forceschedulers/force-bootstrap', 'force', params=params)
 
 
+class Docker:
+    def __init__(self, tag):
+        certp = os.environ['DOCKER_CERT_PATH']
+        del os.environ['DOCKER_CERT_PATH']
+        tls_config = docker.tls.TLSConfig(
+            client_cert=(
+                os.path.join(certp, 'cert.pem'),
+                os.path.join(certp, 'key.pem')),
+            ca_cert=os.path.join(certp, 'ca.pem')
+        )
+        self.client = docker.AutoVersionClient(
+            base_url=os.environ['DOCKER_HOST'],
+            tls=tls_config)
+        resp = self.client.build(path='eve', tag=tag)
+        self.check_output(resp)
+        self.tag = tag
+
+    def check_output(self, response):
+        for line in response:
+            line = json.loads(line)
+            if 'error' in line:
+                output = "ERROR: " + line['error']
+                print output
+                raise Exception(output)
+            for line in line.get('stream', '').split('\n'):
+                if line:
+                    print line
+
+    def rm(self, name, force=False):
+        resp = self.client.remove_container(name, force=force)
+        if resp:
+            self.check_output(resp)
+
+    def rm_all(self, force=False):
+        for c in self.client.containers():
+            self.rm(c.get('Id'), force=force)
+
+    def run(self, name):
+        c = self.client.create_container(
+            image=self.tag,
+            environment=dict(os.environ),
+            host_config=self.client.create_host_config(port_bindings={
+                8000: 8000,
+                9989: 9989}),
+            name=name
+        )
+        resp = self.client.start(container=c.get('Id'))
+        if resp:
+            self.check_output(resp)
+
+    def execute(self, name, command):
+        e = self.client.exec_create(
+            container=name,
+            cmd=command,
+        )
+        return self.client.exec_start(exec_id=e)
+
+
 class TestEnd2End(unittest.TestCase):
     def setup_buildbot(self):
-        cmd('docker build -t eve eve')
-        cmd('docker rm -f $(docker ps -aq)', ignore_exception=True)
-        cmd('docker run -d -e GIT_REPO=%s ' % os.environ['GIT_REPO'] +
-            '-e GIT_CERT_KEY_BASE64=%s ' % os.environ['GIT_CERT_KEY_BASE64'] +
-            '-e DOCKER_HOST=%s ' % os.environ['DOCKER_HOST'] +
-            '-e EVE_LOGIN=%s ' % os.environ['EVE_LOGIN'] +
-            '-e EVE_PWD=%s ' % os.environ['EVE_PWD'] +
-            '-e MASTER_FQDN=%s ' % MASTER_FQDN +
-            '-e DOCKER_TLS_VERIFY=%s ' % os.environ['DOCKER_TLS_VERIFY'] +
-            '-p 8000:8000 -p 9989:9989 --name=eve eve')
+        self.docker = Docker('eve')
+        self.docker.rm_all(force=True)
+        self.docker.run('eve')
         self.api = BuildbotDataAPi(
             API_BASE_URL)
         for i in range(10):
@@ -156,16 +214,18 @@ class TestEnd2End(unittest.TestCase):
         os.chdir(old_dir)
 
     def tearDown(self):
-        cmd('docker exec eve cat master/twistd.log')
+        print self.docker.execute('eve', 'cat master/twistd.log')
 
     def check_build_success(self, build_id, timeout=120):
         state = None
         for i in range(timeout):
+
             time.sleep(1)
-            log = subprocess.check_output(
-                'docker exec eve cat master/twistd.log', shell=True)
+            log = self.docker.execute('eve', 'cat master/twistd.log')
+            # log = subprocess.check_output(
+            #    'docker exec eve cat master/twistd.log', shell=True)
             if 'Traceback (most recent call last):' in log:
-                cmd('docker exec eve cat master/twistd.log')
+                print log
                 raise Exception('Found an Exception Traceback in twistd.log')
             try:
                 build = self.api.get('builds/%d' % build_id)['builds'][0]
