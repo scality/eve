@@ -11,7 +11,9 @@ from buildbot.plugins import steps
 from buildbot.process.buildstep import BuildStep
 from buildbot.process.factory import BuildFactory
 from buildbot.process.properties import Interpolate
-from buildbot.process.results import FAILURE, SUCCESS
+from buildbot.process.results import (FAILURE, SKIPPED, SUCCESS, WARNINGS,
+                                      Results)
+from buildbot.reporters.http import HttpStatusPushBase
 from buildbot.scheduler import AnyBranchScheduler
 from buildbot.schedulers.forcesched import ForceScheduler
 from buildbot.schedulers.triggerable import Triggerable
@@ -129,12 +131,61 @@ c['db'] = {
     'db_url': DB_URL,
 }
 
+
 # #########################
 # Reporters
 # #########################
 # mail / hipchat / web notifications
-# c['reporters'] = []
+class BitbucketBuildStatusPush(HttpStatusPushBase):
+    name = "BitbucketBuildStatusPush"
 
+    @defer.inlineCallbacks
+    def send(self, build):
+        log.msg('SENDING BUILD STATUS TO BITBUCKET %s' % build)
+        sha1 = build['buildset']['sourcestamps'][0]['revision']
+        params = {
+            'repo_owner': 'scality',
+            'repo_name': 'test_buildbot',
+            'sha1': sha1
+        }
+        url = 'https://api.bitbucket.org/2.0/repositories/' \
+              '%(repo_owner)s/%(repo_name)s/commit/%(sha1)s/statuses/build' \
+              % params
+
+        # props = Properties.fromDict(build['properties'])
+        # stage_name = yield props.render('%(prop:scheduler)s')
+        stage_name = build['properties']['stage_name'][0]
+        message = '%s build#%d ' % (stage_name, build['buildid'])
+        if build['complete']:
+            results = build['results']
+            if results in (SUCCESS, SKIPPED, WARNINGS):
+                state = 'SUCCESSFUL'
+            else:
+                state = 'FAILED'
+            message += Results[results]
+            d = (build['complete_at'] - build['started_at']).total_seconds()
+            message += ' in %d seconds' % d
+
+        else:
+            state = 'INPROGRESS'
+            message += ' is in progress...'
+
+        data = {
+            'state': state,
+            'key': stage_name,
+            "name": message,
+            "url": build['url'],
+            "description": '%s' % build
+        }
+        #
+        auth = HTTPBasicAuth(EVE_LOGIN, EVE_PWD)
+        response = yield self.session.post(url, data, auth=auth)
+        if response.status_code != 200:
+            log.msg("%s: unable to upload status: %s" %
+                    (response.status_code, response.content))
+
+sp = BitbucketBuildStatusPush(builders=['bootstrap'], wantProperties=True)
+c['services'] = [sp]
 
 ##########################
 # Workers
@@ -171,7 +222,7 @@ c['change_source'].append(GitPoller(
     GIT_REPO,
     workdir='gitpoller-workdir',
     branches=True,
-    pollinterval=60,
+    pollinterval=10,
     pollAtLaunch=True,
     buildPushesWithNoCommits=True,
 ))
@@ -222,6 +273,8 @@ class StepExtractor(BuildStep):
             else:
                 log.msg('No branch match. Using default branch config.')
                 stage_name = conf['branches']['default']['stage']
+            self.setProperty('stage_name', stage_name, source='StepExtractor')
+
         log.msg('stage name = %s' % stage_name)
         stage_conf = conf['stages'][stage_name]
         docker_path = stage_conf['image']['path']
