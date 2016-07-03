@@ -8,6 +8,7 @@ import docker
 
 
 class Docker:
+
     def __init__(self, tag, docker_host, docker_cert_path, docker_use_tls):
         self.tag = tag
         tls_config = docker.tls.TLSConfig(

@@ -9,6 +9,7 @@ from deploy.docker_api_client import Docker
 
 
 class EveMaster:
+
     def __init__(self,
                  bitbucket_git_repo,
                  bitbucket_git_cert_key_baser64,

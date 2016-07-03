@@ -144,10 +144,10 @@ class BitbucketBuildStatusPush(HttpStatusPushBase):
         return 'https://api.bitbucket.org/2.0/repositories/' \
                '%(repo_owner)s/%(repo_name)s/commit/%(sha1)s/statuses/build' \
                % {
-                    'repo_owner': owner,
-                    'repo_name': repo,
-                    'sha1': sha1
-                }
+                   'repo_owner': owner,
+                   'repo_name': repo,
+                   'sha1': sha1
+               }
 
     @staticmethod
     def forge_messages(stage_name, build):
@@ -344,6 +344,7 @@ class StepExtractor(BuildStep):
 
 
 class BuildDockerImage(BuildStep):
+
     def __init__(self, path, **kwargs):
         BuildStep.__init__(self, **kwargs)
         self.path = path
