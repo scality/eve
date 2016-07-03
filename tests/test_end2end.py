@@ -12,6 +12,8 @@ from deploy.deploy_eve_master import EveMaster
 
 SUCCESS = 0
 FAILURE = 2
+EVE_WEB_LOGIN = 'test',
+EVE_WEB_PASSWORD = 'testpwd',
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 
@@ -26,10 +28,10 @@ class TestEnd2End(unittest.TestCase):
             bitbucket_git_repo=self.git_repo,
             bitbucket_git_cert_key_baser64=os.environ['GIT_CERT_KEY_BASE64'],
             master_fqdn=master_fqdn,
-            eve_bitbucket_login=os.environ['EVE_LOGIN'],
-            eve_bitbucket_pwd=os.environ['EVE_PWD'],
-            eve_web_login='admin',
-            eve_web_password='testpwd',
+            eve_bitbucket_login=os.environ['EVE_BITBUCKET_LOGIN'],
+            eve_bitbucket_pwd=os.environ['EVE_BITBUCKET_PWD'],
+            eve_web_login=EVE_WEB_LOGIN,
+            eve_web_password=EVE_WEB_PASSWORD,
             worker_docker_host=os.environ['DOCKER_HOST'],
             worker_docker_cert_path=os.environ['DOCKER_CERT_PATH'],
             worker_docker_use_tls=os.environ['DOCKER_TLS_VERIFY'],
@@ -93,7 +95,7 @@ class TestEnd2End(unittest.TestCase):
         assert state == 'finished'
         return build['results']
 
-    def test_git_poll_success_failure(self):
+    def test_git_poll_success_and_failure(self):
         self.setup_eve_master()
         self.setup_git('expected_fail')
         self.assertEqual(FAILURE, self.get_build_status(build_id=1))
@@ -101,7 +103,7 @@ class TestEnd2End(unittest.TestCase):
         self.assertEqual(SUCCESS, self.get_build_status(build_id=2))
 
     def dtest_force_build(self):
-        self.setup_git('four_stages_sleep')
+        # self.setup_git('four_stages_sleep')
         self.setup_eve_master()
         bootstrap_builder_id = self.eve.api.get_element_id_from_name(
             'builders',

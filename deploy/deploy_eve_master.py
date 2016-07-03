@@ -88,8 +88,8 @@ def main():
     eve = EveMaster(
         bitbucket_git_repo=args.git_repo,
         master_fqdn=args.fqdn,
-        eve_bitbucket_login=os.environ['EVE_LOGIN'],
-        eve_bitbucket_pwd=os.environ['EVE_PWD'],
+        eve_bitbucket_login=os.environ['EVE_BITBUCKET_LOGIN'],
+        eve_bitbucket_pwd=os.environ['EVE_BITBUCKET_PWD'],
         worker_docker_host=os.environ['DOCKER_HOST'],
         worker_docker_cert_path=os.environ['DOCKER_CERT_PATH'],
         worker_docker_use_tls=os.environ['DOCKER_TLS_VERIFY'],

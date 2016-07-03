@@ -67,10 +67,11 @@ assert path.isfile(DOCKER_CERT_PATH_KEY), DOCKER_CERT_PATH_KEY
 assert path.isfile(DOCKER_CERT_PATH_CERT), DOCKER_CERT_PATH_CERT
 assert path.isfile('/root/.ssh/id_rsa'), 'Did not find git RSA cert'
 
-EVE_LOGIN = environ.get('EVE_BITBUCKET_LOGIN')
-EVE_PWD = environ.get('EVE_BITBUCKET_PWD')
-assert EVE_LOGIN
-assert EVE_PWD
+EVE_BITBUCKET_LOGIN = environ.get('EVE_BITBUCKET_LOGIN')
+EVE_BITBUCKET_PWD = environ.get('EVE_BITBUCKET_PWD')
+
+EVE_WEB_LOGIN = environ.get('EVE_WEB_LOGIN')
+EVE_WEB_PWD = environ.get('EVE_WEB_PWD')
 
 # database
 # TODO : for prod, use something like 'mysql://user@pass:mysqlserver/buildbot'
@@ -114,12 +115,12 @@ authz = Authz(
         endpointmatchers.RebuildBuildEndpointMatcher(role='admin'),
     ],
     roleMatchers=[
-        RolesFromUsername(username='developer', role='admin')
+        RolesFromUsername(username=EVE_WEB_LOGIN, role='admin')
     ]
 )
 # Create a basic auth website with the waterfall view and the console view
 c['www'] = dict(port=MASTER_WEB_PORT,
-                auth=UserPasswordAuth({EVE_LOGIN: EVE_PWD}),
+                auth=UserPasswordAuth({EVE_WEB_LOGIN: EVE_WEB_PWD}),
                 authz=authz,
                 plugins=dict(
                     waterfall_view={},
@@ -180,7 +181,7 @@ class BitbucketBuildStatusPush(HttpStatusPushBase):
             "description": '%s' % build
         }
         #
-        auth = HTTPBasicAuth(EVE_LOGIN, EVE_PWD)
+        auth = HTTPBasicAuth(EVE_BITBUCKET_LOGIN, EVE_BITBUCKET_PWD)
         response = yield self.session.post(url, data, auth=auth)
         if response.status_code != 201:
             log.msg("%s: unable to upload status: %s" %
