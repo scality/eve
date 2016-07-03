@@ -4,8 +4,6 @@ from fnmatch import fnmatch
 from os import environ, getcwd, path
 
 import docker
-from requests.auth import HTTPBasicAuth
-
 import yaml
 from buildbot.changes.gitpoller import GitPoller
 from buildbot.config import BuilderConfig
@@ -20,12 +18,15 @@ from buildbot.scheduler import AnyBranchScheduler
 from buildbot.schedulers.forcesched import ForceScheduler
 from buildbot.schedulers.triggerable import Triggerable
 from buildbot.steps.http import HTTPStep
-from buildbot.steps.shell import ShellCommand
+from buildbot.steps.shell import SetPropertyFromCommand, ShellCommand
 from buildbot.steps.source.base import Source
+from buildbot.steps.source.git import Git
+from buildbot.steps.trigger import Trigger
 from buildbot.worker.docker import DockerLatentWorker, _handle_stream_line
 from buildbot.worker.local import LocalWorker
 from buildbot.www.auth import UserPasswordAuth
 from buildbot.www.authz import Authz, endpointmatchers, roles
+from requests.auth import HTTPBasicAuth
 from twisted.internet import defer
 from twisted.python import log
 from twisted.python.reflect import namedModule
@@ -246,12 +247,12 @@ c['change_source'].append(GitPoller(
 ##########################
 # Custom Build Steps
 ##########################
-class ReadConfFromYaml(steps.SetPropertyFromCommand):
+class ReadConfFromYaml(SetPropertyFromCommand):
     """This step reads the YAML file and converts it to
      a 'conf' property to be available to the next steps."""
 
     def __init__(self, **kwargs):
-        steps.SetPropertyFromCommand.__init__(
+        SetPropertyFromCommand.__init__(
             self,
             name='Read config from %s' % EVE_MAIN_YAML_FULL_PATH,
             command='cat %s' % EVE_MAIN_YAML_FULL_PATH,
@@ -259,7 +260,7 @@ class ReadConfFromYaml(steps.SetPropertyFromCommand):
             haltOnFailure=True,
             **kwargs)
 
-    def commandComplete(self, cmd):
+    def commandComplete(self, cmd):  # NOQA flake8 to ignore camelCase
         if cmd.didFail():
             return
         yaml_result = yaml.load(self.observer.getStdout())
@@ -383,7 +384,7 @@ class BuildDockerImage(BuildStep):
         self.finished(SUCCESS)
 
 
-class TriggerStages(steps.Trigger):
+class TriggerStages(Trigger):
     """ This is a step that allows to start with the properties specified
         in the schedulerNames argument (tuple) instead of using the properties
         given in the set_properties/copy_properties parameters.
@@ -392,9 +393,9 @@ class TriggerStages(steps.Trigger):
     """
 
     def __init__(self, stage_names, **kwargs):
-        steps.Trigger.__init__(self, schedulerNames=stage_names, **kwargs)
+        Trigger.__init__(self, schedulerNames=stage_names, **kwargs)
 
-    def getSchedulersAndProperties(self):
+    def getSchedulersAndProperties(self):   # NOQA flake8 to ignore camelCase
         conf = self.getProperty('conf')
         return [
             (TRIGGERABLE_SCHEDULER_NAME, {
@@ -422,7 +423,7 @@ c['schedulers'].append(ForceScheduler(
 # #########################
 bootstrap_factory = BuildFactory()
 # Check out the source
-bootstrap_factory.addStep(steps.Git(
+bootstrap_factory.addStep(Git(
     repourl=GIT_REPO,
     mode='incremental'))
 # Read conf from yaml file

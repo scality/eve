@@ -21,8 +21,8 @@ def cmd(command, ignore_exception=False):
     print(u' L________')
 
     process.communicate()
-    exitCode = process.returncode
+    exit_code = process.returncode
 
-    if exitCode == 0 or ignore_exception:
+    if exit_code == 0 or ignore_exception:
         return log
-    raise subprocess.CalledProcessError(exitCode, command)
+    raise subprocess.CalledProcessError(exit_code, command)

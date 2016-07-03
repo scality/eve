@@ -5,7 +5,7 @@ from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 
-class BuildbotDataAPi():
+class BuildbotDataAPi(object):
 
     def __init__(self, base_url):
         self.base_url = base_url
@@ -14,7 +14,7 @@ class BuildbotDataAPi():
             'Accept': 'application/json, text/plain, */*',
         }
 
-    def post(self, route, method, params={}):
+    def post(self, route, method, params=None):
         data = {
             'id': 1,
             'jsonrpc': '2.0',

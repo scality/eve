@@ -1,8 +1,11 @@
+from __future__ import print_function
 import os
 import shutil
 import tempfile
 import time
 import unittest
+
+
 
 import requests
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
@@ -28,18 +31,17 @@ class TestEnd2End(unittest.TestCase):
             bitbucket_git_repo=self.git_repo,
             bitbucket_git_cert_key_baser64=os.environ['GIT_CERT_KEY_BASE64'],
             master_fqdn=master_fqdn,
-            eve_bitbucket_login=os.environ['EVE_BITBUCKET_LOGIN'],
-            eve_bitbucket_pwd=os.environ['EVE_BITBUCKET_PWD'],
-            eve_web_login=EVE_WEB_LOGIN,
-            eve_web_pwd=EVE_WEB_PWD,
+
             worker_docker_host=os.environ['DOCKER_HOST'],
-            worker_docker_cert_path=os.environ['DOCKER_CERT_PATH'],
-            worker_docker_use_tls=os.environ['DOCKER_TLS_VERIFY'],
         )
+        self.eve.set_bitbucket_credentials(
+            os.environ['EVE_BITBUCKET_LOGIN'],
+            os.environ['EVE_BITBUCKET_PWD'])
+        self.eve.set_web_credentials(EVE_WEB_LOGIN, EVE_WEB_PWD)
         self.eve.deploy(
             master_docker_host=os.environ['DOCKER_HOST'],
             master_docker_cert_path=os.environ['DOCKER_CERT_PATH'],
-            master_docker_use_tls=os.environ['DOCKER_TLS_VERIFY'],
+            worker_docker_cert_path=os.environ['DOCKER_CERT_PATH']
         )
         self.eve.wait()
 
@@ -71,21 +73,21 @@ class TestEnd2End(unittest.TestCase):
         os.chdir(old_dir)
 
     def tearDown(self):
-        pass
-        print self.eve.docker.execute('eve', 'cat master/twistd.log')
+        print(self.eve.docker.execute('eve', 'cat master/twistd.log'))
 
     def get_build_status(self, build_id, timeout=120):
         state = None
-        for i in range(timeout):
+        for _ in range(timeout):
             time.sleep(1)
             log = self.eve.docker.execute('eve', 'cat master/twistd.log')
             if 'Traceback (most recent call last):' in log:
-                print log
+                print(log)
                 raise Exception('Found an Exception Traceback in twistd.log')
             try:
                 build = self.eve.api.get('builds/%d' % build_id)['builds'][0]
-            except requests.HTTPError as e:
-                print 'Build did not start yet. API responded: %s' % e.message
+            except requests.HTTPError as exp:
+                print('Build did not start yet. API responded: %s' %
+                      exp.message)
                 continue
             state = build['state_string']
             print('API responded: BUILD STATE = %s' % state)

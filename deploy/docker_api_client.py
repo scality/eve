@@ -7,9 +7,9 @@ from os.path import join
 import docker
 
 
-class Docker:
+class Docker(object):
 
-    def __init__(self, tag, docker_host, docker_cert_path, docker_use_tls):
+    def __init__(self, tag, docker_host, docker_cert_path):
         self.tag = tag
         tls_config = docker.tls.TLSConfig(
             client_cert=(
@@ -54,7 +54,7 @@ class Docker:
             print('Removing Container %s' % container_name)
             self.rm(c.get('Id'), force=force)
 
-    def run(self, name, env_vars={}):
+    def run(self, name, env_vars=None):
 
         # cmd('mkdir -p eve/docker_worker/docker_certs')
         # cmd('cp -vfp %s/* eve/docker_worker/docker_certs/' %
