@@ -12,7 +12,7 @@ from buildbot.config import BuilderConfig
 from buildbot.plugins import steps
 from buildbot.process.buildstep import BuildStep
 from buildbot.process.factory import BuildFactory
-from buildbot.process.properties import Interpolate
+from buildbot.process.properties import Interpolate, Property
 from buildbot.process.results import (FAILURE, SKIPPED, SUCCESS, WARNINGS,
                                       Results)
 from buildbot.reporters.http import HttpStatusPushBase
@@ -96,26 +96,25 @@ c['protocols'] = {'pb': {'port': 9989}}
 ##########################
 # Web UI
 ##########################
-# Limit write operations to the EVE account
-authz = Authz(
-    allowRules=[
-        endpointmatchers.StopBuildEndpointMatcher(role='admin'),
-        endpointmatchers.ForceBuildEndpointMatcher(role='admin'),
-        endpointmatchers.RebuildBuildEndpointMatcher(role='admin'),
-    ],
-    roleMatchers=[
-        roles.RolesFromEmails(admin=[EVE_WEB_LOGIN])
-    ]
-)
 # Create a basic auth website with the waterfall view and the console view
 c['www'] = dict(port=MASTER_WEB_PORT,
                 auth=UserPasswordAuth({EVE_WEB_LOGIN: EVE_WEB_PWD}),
-                # authz=authz,
                 plugins=dict(
                     waterfall_view={},
                     console_view={}))
 
+# Limit write operations to the EVE_WEB_LOGIN account execpt for tests
 if EVE_WEB_LOGIN != 'test':
+    authz = Authz(
+        allowRules=[
+            endpointmatchers.StopBuildEndpointMatcher(role='admin'),
+            endpointmatchers.ForceBuildEndpointMatcher(role='admin'),
+            endpointmatchers.RebuildBuildEndpointMatcher(role='admin'),
+        ],
+        roleMatchers=[
+            roles.RolesFromEmails(admin=[EVE_WEB_LOGIN])
+        ]
+    )
     c['www']['authz'] = authz
 
 # DB URL
@@ -130,62 +129,83 @@ c['db'] = {
 # #########################
 # Reporters
 # #########################
-# mail / hipchat / web notifications
+# Reporters send the build status when finished
+
 class BitbucketBuildStatusPush(HttpStatusPushBase):
+    """Send build result to bitbucket build status API"""
     name = "BitbucketBuildStatusPush"
 
-    @defer.inlineCallbacks
-    def send(self, build):
-        # log.msg('SENDING BUILD STATUS TO BITBUCKET %s' % build)
+    @staticmethod
+    def forge_url(build):
+        """Forge the BB API URL on which the build status will be posted"""
         sha1 = build['buildset']['sourcestamps'][0]['revision']
-        params = {
-            'repo_owner': 'scality',
-            'repo_name': 'test_buildbot',
-            'sha1': sha1
-        }
-        url = 'https://api.bitbucket.org/2.0/repositories/' \
-              '%(repo_owner)s/%(repo_name)s/commit/%(sha1)s/statuses/build' \
-              % params
+        repository = build['properties']['repository'][0]
+        owner, repo = repository.split(':')[1].split('/', 1)
+        return 'https://api.bitbucket.org/2.0/repositories/' \
+               '%(repo_owner)s/%(repo_name)s/commit/%(sha1)s/statuses/build' \
+               % {
+                    'repo_owner': owner,
+                    'repo_name': repo,
+                    'sha1': sha1
+                }
 
-        # props = Properties.fromDict(build['properties'])
-        # stage_name = yield props.render('%(prop:scheduler)s')
-        stage_name = build['properties']['stage_name'][0]
+    @staticmethod
+    def forge_messages(stage_name, build):
+        """Forge the BB messages that will be displayed on the BB site"""
         message = '%s build#%d ' % (stage_name, build['buildid'])
         if build['complete']:
             results = build['results']
             if results in (SUCCESS, SKIPPED, WARNINGS):
-                state = 'SUCCESSFUL'
+                bitbucket_state = 'SUCCESSFUL'
             else:
-                state = 'FAILED'
+                bitbucket_state = 'FAILED'
             message += Results[results]
             d = (build['complete_at'] - build['started_at']).total_seconds()
             message += ' in %d seconds' % d
 
         else:
-            state = 'INPROGRESS'
+            # This code is never reached. Buildbot does not call a reporter
+            # To announce the start of a build
+            bitbucket_state = 'INPROGRESS'
             message += ' is in progress...'
+        # TODO: add a clever description
+        description = '<todo>'
+        return bitbucket_state, message, description
 
+    @defer.inlineCallbacks
+    def send(self, build):
+        """Send build status to Bitbucket"""
+
+        # Uncomment the following line to see build variable contents in log
+        log.msg('SENDING BUILD STATUS TO BITBUCKET %s' % build)
+
+        stage_name = build['properties']['stage_name'][0]
+        state, message, description = self.forge_messages(stage_name, build)
         data = {
             'state': state,
             'key': stage_name,
             "name": message,
             "url": build['url'],
-            "description": '%s' % build
+            "description": description
         }
-        #
         auth = HTTPBasicAuth(EVE_BITBUCKET_LOGIN, EVE_BITBUCKET_PWD)
-        response = yield self.session.post(url, data, auth=auth)
+        response = yield self.session.post(
+            self.forge_url(build), data, auth=auth)
         if response.status_code != 201:
             log.msg("%s: unable to upload status: %s" %
                     (response.status_code, response.content))
 
+# The status push works only on the main builder (bootstrap)
 sp = BitbucketBuildStatusPush(builders=['bootstrap'], wantProperties=True)
 c['services'] = [sp]
 
 ##########################
 # Workers
 ##########################
+# Create One Local Worker that will bootstrap all the jobs
 c['workers'] = [LocalWorker(LOCAL_WORKER_NAME)]
+
+# Then create MAX_DOCKER_WORKERS Docker Workers that will do the real job
 tls_config = docker.tls.TLSConfig(
     client_cert=(
         DOCKER_CERT_PATH_CERT,
@@ -197,10 +217,10 @@ for i in range(MAX_DOCKER_WORKERS):
     docker_workers.append(
         DockerLatentWorker(
             name='latent-docker-worker-%d' % i,
-            password='pwd%d' % i,
+            password='pwd%d' % i,  # fixme: stronger passwords
             docker_host=environ['DOCKER_HOST'],
             tls=tls_config,
-            image='build_docker_image_ubuntu-trusty-ctxt',
+            image=Property('docker_image'),
             networking_config=None,
             followStartupLogs=True,
             masterFQDN=MASTER_FQDN))
@@ -273,13 +293,14 @@ class StepExtractor(BuildStep):
         log.msg('stage name = %s' % stage_name)
         stage_conf = conf['stages'][stage_name]
         docker_path = stage_conf['image']['path']
+
         full_docker_path = 'workers/%s/%s/build/%s' % (
             LOCAL_WORKER_NAME,
             BOOTSTRAP_BUILDER_NAME,
             docker_path)
 
         step = BuildDockerImage(
-            name=str('build_docker_image_%s' % docker_path),
+            name=str('build docker image from %s' % docker_path),
             path=full_docker_path)
         self.build.addStepsAfterCurrentStep([step])
         for step in stage_conf['steps']:
@@ -347,7 +368,8 @@ class BuildDockerImage(BuildStep):
         assert path.exists(self.path), \
             '%s does not exist in %s' % (self.path, getcwd())
         shutil.copy(GIT_KEY_PATH, self.path)
-        for line in docker_client.build(path=self.path, tag=self.name):
+        img = self.getProperty('docker_image')
+        for line in docker_client.build(path=self.path, tag=img):
             for streamline in _handle_stream_line(line):
                 if 'ERROR: ' in streamline:
                     stdio.addStderr(streamline + '\n')
@@ -376,6 +398,7 @@ class TriggerStages(steps.Trigger):
         return [
             (TRIGGERABLE_SCHEDULER_NAME, {
                 'stage_name': stage_name,
+                'docker_image': conf['stages'][stage_name]['image']['path'],
                 'conf': conf
             }) for stage_name in self.schedulerNames]
 
@@ -458,6 +481,10 @@ for w in c['workers']:
 # Utils
 # #########################
 def replace_with_interpolate(obj):
+    """Read step arguments from the yaml file and replaces them with
+    interpolate objects when relevant so they can be replaced with
+    properties when run"""
+
     if isinstance(obj, dict):
         return {k: replace_with_interpolate(v) for k, v in obj.items()}
     elif isinstance(obj, list):

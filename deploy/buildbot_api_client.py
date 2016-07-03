@@ -23,7 +23,6 @@ class BuildbotDataAPi():
 
         res = requests.post(self.base_url + route, json=data,
                             headers=self.headers)
-        print res.json()
         res.raise_for_status()
         return res.json()
 
@@ -42,12 +41,12 @@ class BuildbotDataAPi():
             raise Exception('element not found')
         return _id
 
-    def force_build(self, builderid):
+    def force_build(self, builderid, repo):
         params = {
             'builderid': str(builderid),
             'username': '',
             'reason': 'force build',
-            'repository': '',
+            'repository': repo,
             'project': '',
             'branch': '',
             'revision': ''

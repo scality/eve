@@ -72,7 +72,7 @@ class TestEnd2End(unittest.TestCase):
 
     def tearDown(self):
         pass
-        # print self.eve.docker.execute('eve', 'cat master/twistd.log')
+        print self.eve.docker.execute('eve', 'cat master/twistd.log')
 
     def get_build_status(self, build_id, timeout=120):
         state = None
@@ -110,5 +110,5 @@ class TestEnd2End(unittest.TestCase):
             'builders',
             'bootstrap',
             'builderid')
-        self.eve.api.force_build(bootstrap_builder_id)
+        self.eve.api.force_build(bootstrap_builder_id, self.git_repo)
         self.assertEqual(SUCCESS, self.get_build_status(build_id=1))
