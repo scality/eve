@@ -67,11 +67,11 @@ assert path.isfile(DOCKER_CERT_PATH_KEY), DOCKER_CERT_PATH_KEY
 assert path.isfile(DOCKER_CERT_PATH_CERT), DOCKER_CERT_PATH_CERT
 assert path.isfile('/root/.ssh/id_rsa'), 'Did not find git RSA cert'
 
-EVE_BITBUCKET_LOGIN = environ.get('EVE_BITBUCKET_LOGIN')
-EVE_BITBUCKET_PWD = environ.get('EVE_BITBUCKET_PWD')
+EVE_BITBUCKET_LOGIN = environ['EVE_BITBUCKET_LOGIN']
+EVE_BITBUCKET_PWD = environ['EVE_BITBUCKET_PWD']
 
-EVE_WEB_LOGIN = environ.get('EVE_WEB_LOGIN')
-EVE_WEB_PWD = environ.get('EVE_WEB_PWD')
+EVE_WEB_LOGIN = environ['EVE_WEB_LOGIN']
+EVE_WEB_PWD = environ['EVE_WEB_PWD']
 
 # database
 # TODO : for prod, use something like 'mysql://user@pass:mysqlserver/buildbot'
@@ -96,18 +96,7 @@ c['protocols'] = {'pb': {'port': 9989}}
 ##########################
 # Web UI
 ##########################
-# Limit write operations to the developer account
-class RolesFromUsername(roles.RolesFromBase):
-    def __init__(self, username, role):
-        self.username = username
-        self.role = role
-
-    def getRolesFromUser(self, userDetails):
-        if 'username' in userDetails:
-            if userDetails['username'] == self.username:
-                return [self.role]
-        return []
-
+# Limit write operations to the EVE account
 authz = Authz(
     allowRules=[
         endpointmatchers.StopBuildEndpointMatcher(role='admin'),
@@ -115,16 +104,19 @@ authz = Authz(
         endpointmatchers.RebuildBuildEndpointMatcher(role='admin'),
     ],
     roleMatchers=[
-        RolesFromUsername(username=EVE_WEB_LOGIN, role='admin')
+        roles.RolesFromEmails(admin=[EVE_WEB_LOGIN])
     ]
 )
 # Create a basic auth website with the waterfall view and the console view
 c['www'] = dict(port=MASTER_WEB_PORT,
                 auth=UserPasswordAuth({EVE_WEB_LOGIN: EVE_WEB_PWD}),
-                authz=authz,
+                # authz=authz,
                 plugins=dict(
                     waterfall_view={},
                     console_view={}))
+
+if EVE_WEB_LOGIN != 'test':
+    c['www']['authz'] = authz
 
 # DB URL
 # TODO: Replace with a MySQL database

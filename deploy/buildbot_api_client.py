@@ -1,5 +1,4 @@
 import requests
-from requests.auth import HTTPBasicAuth
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 # Hack to remove a lot of warnings in stdout while testing
@@ -7,13 +6,12 @@ requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 
 class BuildbotDataAPi():
-    def __init__(self, base_url, login, password):
+    def __init__(self, base_url):
         self.base_url = base_url
         self.headers = {
             'Content-Type': 'application/json',
             'Accept': 'application/json, text/plain, */*',
         }
-        self.auth = HTTPBasicAuth(login, password)
 
     def post(self, route, method, params={}):
         data = {
@@ -22,9 +20,9 @@ class BuildbotDataAPi():
             'method': method,
             'params': params
         }
+
         res = requests.post(self.base_url + route, json=data,
-                            headers=self.headers,
-                            auth=self.auth)
+                            headers=self.headers)
         print res.json()
         res.raise_for_status()
         return res.json()

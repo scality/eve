@@ -12,8 +12,8 @@ from deploy.deploy_eve_master import EveMaster
 
 SUCCESS = 0
 FAILURE = 2
-EVE_WEB_LOGIN = 'test',
-EVE_WEB_PASSWORD = 'testpwd',
+EVE_WEB_LOGIN = 'test'
+EVE_WEB_PWD = 'testpwd'
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 
@@ -31,7 +31,7 @@ class TestEnd2End(unittest.TestCase):
             eve_bitbucket_login=os.environ['EVE_BITBUCKET_LOGIN'],
             eve_bitbucket_pwd=os.environ['EVE_BITBUCKET_PWD'],
             eve_web_login=EVE_WEB_LOGIN,
-            eve_web_password=EVE_WEB_PASSWORD,
+            eve_web_pwd=EVE_WEB_PWD,
             worker_docker_host=os.environ['DOCKER_HOST'],
             worker_docker_cert_path=os.environ['DOCKER_CERT_PATH'],
             worker_docker_use_tls=os.environ['DOCKER_TLS_VERIFY'],
@@ -71,13 +71,12 @@ class TestEnd2End(unittest.TestCase):
         os.chdir(old_dir)
 
     def tearDown(self):
-        self.eve.docker.execute('eve', 'cat master/twistd.log')
         pass
+        # print self.eve.docker.execute('eve', 'cat master/twistd.log')
 
     def get_build_status(self, build_id, timeout=120):
         state = None
         for i in range(timeout):
-
             time.sleep(1)
             log = self.eve.docker.execute('eve', 'cat master/twistd.log')
             if 'Traceback (most recent call last):' in log:
@@ -93,6 +92,8 @@ class TestEnd2End(unittest.TestCase):
             if state not in ('starting', 'created'):
                 break
         assert state == 'finished'
+        # Bitbucket API bug. Happens sometimes!
+        assert build['results'] is not None, 'finished but no results => bug'
         return build['results']
 
     def test_git_poll_success_and_failure(self):
@@ -102,8 +103,8 @@ class TestEnd2End(unittest.TestCase):
         self.setup_git('four_stages_sleep')
         self.assertEqual(SUCCESS, self.get_build_status(build_id=2))
 
-    def dtest_force_build(self):
-        # self.setup_git('four_stages_sleep')
+    def test_force_build(self):
+        self.setup_git('four_stages_sleep')
         self.setup_eve_master()
         bootstrap_builder_id = self.eve.api.get_element_id_from_name(
             'builders',

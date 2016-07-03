@@ -16,7 +16,7 @@ class EveMaster:
                  eve_bitbucket_login,
                  eve_bitbucket_pwd,
                  eve_web_login,
-                 eve_web_password,
+                 eve_web_pwd,
                  worker_docker_host,
                  worker_docker_cert_path,
                  worker_docker_use_tls):
@@ -26,7 +26,7 @@ class EveMaster:
             'EVE_BITBUCKET_LOGIN': eve_bitbucket_login,
             'EVE_BITBUCKET_PWD': eve_bitbucket_pwd,
             'EVE_WEB_LOGIN': eve_web_login,
-            'EVE_WEB_PASSWORD': eve_web_password,
+            'EVE_WEB_PWD': eve_web_pwd,
             'DOCKER_HOST': worker_docker_host,
             'DOCKER_USE_TLS': worker_docker_use_tls,
             'MASTER_FQDN': master_fqdn,
@@ -34,11 +34,7 @@ class EveMaster:
         }
 
         api_base_url = 'http://%s:8000/api/v2/' % master_fqdn
-        self.api = BuildbotDataAPi(
-            api_base_url,
-            login=eve_web_login,
-            password=eve_web_password,
-        )
+        self.api = BuildbotDataAPi(api_base_url)
 
     def deploy(self,
                master_docker_host,
