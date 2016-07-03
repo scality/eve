@@ -18,8 +18,8 @@ COPY requirements.txt requirements.txt
 RUN pip install -r requirements.txt
 
 ## COPY worker docker context and certificates
-COPY docker_worker master/docker_worker
-ENV DOCKER_CERT_PATH /master/docker_worker/docker_certs
+COPY worker_docker_certs master/worker_docker_certs
+ENV DOCKER_CERT_PATH /master/worker_docker_certs
 
 # Create buildbot folder
 RUN buildbot create-master master
@@ -27,7 +27,7 @@ RUN buildbot create-master master
 # Copy buildbot configuration
 COPY master.cfg.py master/master.cfg
 
-CMD echo $GIT_CERT_KEY_BASE64 | base64 --decode > $HOME/.ssh/id_rsa \
-         && chmod 600 $HOME/.ssh/id_rsa \
+CMD echo $GIT_CERT_KEY_BASE64 | base64 --decode > /root/.ssh/id_rsa \
+         && chmod 600 /root/.ssh/id_rsa \
          && ssh-keyscan bitbucket.org >> /root/.ssh/known_hosts \
          && buildbot start master ; tail -f master/twistd.log

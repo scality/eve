@@ -4,6 +4,8 @@ from fnmatch import fnmatch
 from os import environ, getcwd, path
 
 import docker
+from requests.auth import HTTPBasicAuth
+
 import yaml
 from buildbot.changes.gitpoller import GitPoller
 from buildbot.config import BuilderConfig
@@ -24,7 +26,6 @@ from buildbot.worker.docker import DockerLatentWorker, _handle_stream_line
 from buildbot.worker.local import LocalWorker
 from buildbot.www.auth import UserPasswordAuth
 from buildbot.www.authz import Authz, endpointmatchers, roles
-from requests.auth import HTTPBasicAuth
 from twisted.internet import defer
 from twisted.python import log
 from twisted.python.reflect import namedModule
@@ -64,9 +65,10 @@ assert path.isdir(DOCKER_CERT_PATH), DOCKER_CERT_PATH
 assert path.isfile(DOCKER_CERT_PATH_CA), DOCKER_CERT_PATH_CA
 assert path.isfile(DOCKER_CERT_PATH_KEY), DOCKER_CERT_PATH_KEY
 assert path.isfile(DOCKER_CERT_PATH_CERT), DOCKER_CERT_PATH_CERT
+assert path.isfile('/root/.ssh/id_rsa'), 'Did not find git RSA cert'
 
-EVE_LOGIN = environ.get('EVE_LOGIN')
-EVE_PWD = environ.get('EVE_PWD')
+EVE_LOGIN = environ.get('EVE_BITBUCKET_LOGIN')
+EVE_PWD = environ.get('EVE_BITBUCKET_PWD')
 assert EVE_LOGIN
 assert EVE_PWD
 

@@ -4,17 +4,21 @@ pipelines:
   default:
     - step:
         script:
+          # Setting up the SSH key to interact with git
           - mkdir $HOME/.ssh
           - echo $GIT_CERT_KEY_BASE64 | base64 --decode > $HOME/.ssh/id_rsa
           - chmod 600 $HOME/.ssh/id_rsa
           - ssh-keyscan bitbucket.org >> $HOME/.ssh/known_hosts
-          - eval $(python infrastructure/carina_setup_env.py eve_cluster_test)
+          # Setting up CARINA Docker environement and variables
+          - eval $(python deploy/carina_setup_env.py eve_cluster_test)
+          # Launching tests
           - pip install tox
           - tox
   branches:
     development/*:
       - step:
           script:
+            # Setting up CARINA Docker environement and variables
             - eval $(python infrastructure/carina_setup_env.py eve_cluster_prod)
             - cp -rp $DOCKER_CERT_PATH eve/docker_worker/docker_certs
             - apt-get -qq update
