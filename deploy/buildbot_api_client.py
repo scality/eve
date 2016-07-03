@@ -1,3 +1,7 @@
+# -*- coding: utf-8 -*-
+"""Buildbot REST API client. for more info on the API, see
+buildbot http://docs.buildbot.net/latest/developer/rest.html"""
+
 import requests
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
@@ -6,6 +10,7 @@ requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 
 class BuildbotDataAPi(object):
+    """Class to interact with a Buildbot master through its REST API"""
 
     def __init__(self, base_url):
         self.base_url = base_url
@@ -15,6 +20,7 @@ class BuildbotDataAPi(object):
         }
 
     def post(self, route, method, params=None):
+        """Post data to the REST API"""
         data = {
             'id': 1,
             'jsonrpc': '2.0',
@@ -28,21 +34,24 @@ class BuildbotDataAPi(object):
         return res.json()
 
     def get(self, route):
+        """Get data from the REST API"""
         res = requests.get(self.base_url + route, headers=self.headers)
         res.raise_for_status()
         return res.json()
 
     def get_element_id_from_name(self, route, name, id_key, name_key='name'):
+        """Get the ID of an entity using its name"""
         elements = self.get(route)[route]
-        for e in elements:
-            if e[name_key] == name:
-                _id = e[id_key]
+        for elem in elements:
+            if elem[name_key] == name:
+                _id = elem[id_key]
                 break
         else:
             raise Exception('element not found')
         return _id
 
     def force_build(self, builderid, repo):
+        """Force launch a build"""
         params = {
             'builderid': str(builderid),
             'username': '',

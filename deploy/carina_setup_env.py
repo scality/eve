@@ -1,3 +1,7 @@
+# -*- coding: utf-8 -*-
+"""Generate CARINA environment variables required by docker clients"""
+from __future__ import print_function
+
 import os
 import sys
 from subprocess import check_output
@@ -9,6 +13,9 @@ CARINA_BIN_URL = 'https://download.getcarina.com/carina/latest/' \
 
 
 def generate_carina_environment(carina_cluster):
+    """Generate CARINA environment variables using cluster name and
+    CARINA credentials
+    """
     if not os.path.isfile('carina'):
         check_output('curl -L %s' % CARINA_BIN_URL, shell=True)
         check_output('chmod u+x ./carina', shell=True)
@@ -21,5 +28,5 @@ if __name__ == '__main__':
     # get the cluster name from args and print the env variables required by
     # docker to stdout. Use eval $(python carina_setup_env.py <cluster_name>)
     # to export these env vars to you shell
-    carina_cluster_name = sys.argv[1]
-    print(generate_carina_environment(carina_cluster_name))
+    CARINA_CLUSTER_NAME = sys.argv[1]
+    print(generate_carina_environment(CARINA_CLUSTER_NAME))

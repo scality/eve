@@ -1,11 +1,12 @@
+# -*- coding: utf-8 -*-
+"""This test suite checks end-to-end operation of EVE"""
 from __future__ import print_function
+
 import os
 import shutil
 import tempfile
 import time
 import unittest
-
-
 
 import requests
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
@@ -21,9 +22,14 @@ requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 
 class TestEnd2End(unittest.TestCase):
+    """Tests the whole loop including bitbucket and the docker provider"""
     git_repo = 'git@bitbucket.org:scality/test_buildbot.git'
+    eve = None
 
     def setup_eve_master(self):
+        """Spawns a EVE docker master and wait for it till it
+        is up and running"""
+
         docker_host = os.environ['DOCKER_HOST']
         master_fqdn = docker_host.replace('tcp://', '').split(':')[0]
 
@@ -46,6 +52,7 @@ class TestEnd2End(unittest.TestCase):
         self.eve.wait()
 
     def setup_git(self, eve_dir):
+        """push the yaml file and the docker context to bitbucket"""
         old_dir = os.getcwd()
         this_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -73,9 +80,13 @@ class TestEnd2End(unittest.TestCase):
         os.chdir(old_dir)
 
     def tearDown(self):
+        """Writes the contents of twistd.log after every test"""
         print(self.eve.docker.execute('eve', 'cat master/twistd.log'))
 
     def get_build_status(self, build_id, timeout=120):
+        """Wait for the build to finish and get build status from buildbot.
+        build statuses described in
+        http://docs.buildbot.net/latest/developer/results.html"""
         state = None
         for _ in range(timeout):
             time.sleep(1)
@@ -98,7 +109,10 @@ class TestEnd2End(unittest.TestCase):
         assert build['results'] is not None, 'finished but no results => bug'
         return build['results']
 
-    def test_git_poll_success_and_failure(self):
+    def test_git_poll_success_failure(self):
+        """Spawns EVE, sends a YAML that will fail and check that it fails.
+        Then, sends a good YAML with 3 steps (with parallelization) and
+        checks that it succeeds"""
         self.setup_eve_master()
         self.setup_git('expected_fail')
         self.assertEqual(FAILURE, self.get_build_status(build_id=1))
@@ -106,6 +120,7 @@ class TestEnd2End(unittest.TestCase):
         self.assertEqual(SUCCESS, self.get_build_status(build_id=2))
 
     def test_force_build(self):
+        """Sets up a git, Forces a build and check that it succeeds"""
         self.setup_git('four_stages_sleep')
         self.setup_eve_master()
         bootstrap_builder_id = self.eve.api.get_element_id_from_name(
