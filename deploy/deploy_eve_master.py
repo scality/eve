@@ -8,8 +8,8 @@ from argparse import ArgumentParser
 
 import requests
 
-from deploy.buildbot_api_client import BuildbotDataAPi
-from deploy.docker_api_client import Docker
+from buildbot_api_client import BuildbotDataAPi
+from docker_api_client import Docker
 
 
 class EveMaster(object):
@@ -76,7 +76,7 @@ class EveMaster(object):
 
 def main():
     """Allows to spwan EVE from the command line."""
-    parser = ArgumentParser(description='Deploy am EVE master.')
+    parser = ArgumentParser(description='Deploy an EVE master.')
 
     parser.add_argument(
         'git_repo',
