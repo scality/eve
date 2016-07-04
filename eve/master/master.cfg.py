@@ -371,13 +371,20 @@ class BuildDockerImage(BuildStep):
             '%s does not exist in %s' % (self.path, getcwd())
         shutil.copy(GIT_KEY_PATH, self.path)
         img = self.getProperty('docker_image')
+        import simplejson
         for line in docker_client.build(path=self.path, tag=img):
-            for streamline in _handle_stream_line(line):
+            log.msg(line)
+            try:
+                streamlines = _handle_stream_line(line)
+            except simplejson.scanner.JSONDecodeError:
+                continue
+            for streamline in streamlines:
                 if 'ERROR: ' in streamline:
                     stdio.addStderr(streamline + '\n')
                     fail = True
                 else:
                     stdio.addStdout(streamline + '\n')
+
         stdio.finish()
         if fail:
             self.finished(FAILURE)

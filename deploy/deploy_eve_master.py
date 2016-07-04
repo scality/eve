@@ -68,11 +68,10 @@ class EveMaster(object):
                 print('checking buildbot\'s webserver response')
                 builds = self.api.get('builds')
                 assert builds['meta']['total'] == 0
-                break
+                return
             except requests.ConnectionError:
                 time.sleep(1)
-            else:
-                raise Exception('Could not connect to API')
+        raise Exception('Could not connect to API')
 
 
 def main():

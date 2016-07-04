@@ -6,7 +6,7 @@ stages:
   pre-merge:
     image:
         type: docker
-        path: eve/ubuntu-trusty-ctxt
+        path: eve/centos7-ctxt
     steps:
       - ShellCommand:
           name: exit 1

@@ -7,6 +7,7 @@ RUN yum -y install -y \
    python-pip \
    git
 
+RUN yum group install "Development Tools"
 RUN pip install --upgrade pip
 RUN pip install buildbot-worker==0.9.0b9
 RUN groupadd -r buildbot && useradd -r -g buildbot buildbot

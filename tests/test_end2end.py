@@ -109,7 +109,7 @@ class TestEnd2End(unittest.TestCase):
         assert build['results'] is not None, 'finished but no results => bug'
         return build['results']
 
-    def test_git_poll_success_failure(self):
+    def dtest_git_poll_success_failure(self):
         """Spawns EVE, sends a YAML that will fail and check that it fails.
         Then, sends a good YAML with 3 steps (with parallelization) and
         checks that it succeeds"""
