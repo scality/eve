@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+#coding: utf-8
 """A thin layer above docker-py to simplify interaction with docker"""
 from __future__ import print_function
 
@@ -66,11 +66,6 @@ class Docker(object):
 
     def run(self, name, env_vars=None):
         """Run EVE in a docker instance"""
-
-        # cmd('mkdir -p eve/docker_worker/docker_certs')
-        # cmd('cp -vfp %s/* eve/docker_worker/docker_certs/' %
-        #    master_docker_cert_path)
-
         container = self.client.create_container(
             image=self.tag,
             environment=env_vars,

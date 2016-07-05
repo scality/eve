@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+#coding: utf-8
 """Deploy an EVE instance"""
 from __future__ import print_function
 
@@ -8,7 +8,7 @@ from argparse import ArgumentParser
 
 import requests
 
-from deploy.buildbot_api_client import BuildbotDataAPi
+from deploy.buildbot_api_client import BuildbotDataAPI
 from deploy.docker_api_client import Docker
 
 
@@ -28,7 +28,7 @@ class EveMaster(object):
         }
 
         api_base_url = 'http://%s:8000/api/v2/' % master_fqdn
-        self.api = BuildbotDataAPi(api_base_url)
+        self.api = BuildbotDataAPI(api_base_url)
         self.docker = None
 
     def set_bitbucket_credentials(

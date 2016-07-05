@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+#coding: utf-8
 """Buildbot REST API client. for more info on the API, see
 buildbot http://docs.buildbot.net/latest/developer/rest.html"""
 
@@ -9,7 +9,7 @@ from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 
-class BuildbotDataAPi(object):
+class BuildbotDataAPI(object):
     """Class to interact with a Buildbot master through its REST API"""
 
     def __init__(self, base_url):

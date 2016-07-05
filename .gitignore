@@ -2,7 +2,6 @@
 id_rsa
 *.pyc
 *.pem
-*.pyc
 *.pub
 config.env
 certs

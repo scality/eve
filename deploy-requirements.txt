@@ -1,3 +1,0 @@
-flake8==2.6.0
-docker-py==1.8.1
-isort==4.2.5

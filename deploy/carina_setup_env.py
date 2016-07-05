@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+#coding: utf-8
 """Generate CARINA environment variables required by docker clients"""
 from __future__ import print_function
 
@@ -9,7 +9,7 @@ from subprocess import check_output
 assert os.environ['CARINA_USERNAME']
 assert os.environ['CARINA_APIKEY']
 CARINA_BIN_URL = 'https://download.getcarina.com/carina/latest/' \
-                 '$(uname -s)/$(uname -m)/carina -o carina'
+                 '$(uname -s)/$(uname -m)/carina'
 
 
 def generate_carina_environment(carina_cluster):
@@ -17,7 +17,7 @@ def generate_carina_environment(carina_cluster):
     CARINA credentials
     """
     if not os.path.isfile('carina'):
-        check_output('curl -L %s' % CARINA_BIN_URL, shell=True)
+        check_output('curl -L %s  -o carina' % CARINA_BIN_URL, shell=True)
         check_output('chmod u+x ./carina', shell=True)
 
     if carina_cluster not in check_output('./carina ls', shell=True):

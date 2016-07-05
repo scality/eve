@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+#coding: utf-8
 """A set of utilities used by EVE deployment tools"""
 from __future__ import print_function
 

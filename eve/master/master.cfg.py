@@ -1,9 +1,12 @@
+#coding: utf-8
 import os
 import shutil
 from fnmatch import fnmatch
 from os import environ, getcwd, path
+from random import randint
 
 import docker
+import simplejson
 import yaml
 from buildbot.changes.gitpoller import GitPoller
 from buildbot.config import BuilderConfig
@@ -30,7 +33,6 @@ from requests.auth import HTTPBasicAuth
 from twisted.internet import defer
 from twisted.python import log
 from twisted.python.reflect import namedModule
-import simplejson
 
 ##########################
 # Constants
@@ -105,7 +107,7 @@ c['www'] = dict(port=MASTER_WEB_PORT,
                     waterfall_view={},
                     console_view={}))
 
-# Limit write operations to the EVE_WEB_LOGIN account execpt for tests
+# Limit write operations to the EVE_WEB_LOGIN account except for tests
 if EVE_WEB_LOGIN != 'test':
     authz = Authz(
         allowRules=[
@@ -398,24 +400,28 @@ class TriggerStages(BuildStep):
     def run(self):
         conf = self.getProperty('conf')
         stages = []
-        for stage_name in self.stage_names:
+
+        build_image_steps = []
+
+        for stage_name in reversed(self.stage_names):
             docker_path = conf['stages'][stage_name]['image']['path']
             full_docker_path = 'workers/%s/%s/build/%s' % (
                 LOCAL_WORKER_NAME,
                 BOOTSTRAP_BUILDER_NAME,
                 docker_path)
-            from random import randint
             image_name = '%s-%06d' % (docker_path, randint(0, 999999))
             step = BuildDockerImage(
                 name=str('build docker image from %s' % docker_path),
                 image_name=image_name,
                 path=full_docker_path)
-            self.build.addStepsAfterCurrentStep([step])
+            build_image_steps.append(step)
             stages.append((stage_name, image_name))
 
         step = TriggerStagesOld(
             stage_names=stages, **self.kwargs)
-        self.build.addStepsAfterLastStep([step])
+        self.build.addStepsAfterCurrentStep([step])
+        self.build.addStepsAfterCurrentStep(build_image_steps)
+
         return SUCCESS
 
 
