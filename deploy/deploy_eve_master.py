@@ -8,8 +8,8 @@ from argparse import ArgumentParser
 
 import requests
 
-from buildbot_api_client import BuildbotDataAPi
-from docker_api_client import Docker
+from deploy.buildbot_api_client import BuildbotDataAPi
+from deploy.docker_api_client import Docker
 
 
 class EveMaster(object):

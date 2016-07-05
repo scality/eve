@@ -81,6 +81,8 @@ class TestEnd2End(unittest.TestCase):
 
     def tearDown(self):
         """Writes the contents of twistd.log after every test"""
+        if not hasattr(self.eve, 'docker'):
+            return
         print(self.eve.docker.execute('eve', 'cat master/twistd.log'))
 
     def get_build_status(self, build_id, timeout=120):

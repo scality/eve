@@ -30,6 +30,7 @@ from requests.auth import HTTPBasicAuth
 from twisted.internet import defer
 from twisted.python import log
 from twisted.python.reflect import namedModule
+import simplejson
 
 ##########################
 # Constants
@@ -263,8 +264,23 @@ class ReadConfFromYaml(SetPropertyFromCommand):
     def commandComplete(self, cmd):  # NOQA flake8 to ignore camelCase
         if cmd.didFail():
             return
-        yaml_result = yaml.load(self.observer.getStdout())
-        self.setProperty(self.property, yaml_result, "ReadConfFromYaml Step")
+        conf = yaml.load(self.observer.getStdout())
+        self.setProperty(self.property, conf, "ReadConfFromYaml Step")
+
+        # Find the stage name from the branch name
+        branch = self.getProperty('branch', 'default')
+        for branch_pattern, branch_conf in conf['branches'].items():
+            log.msg('Checking if <%s> matches <%s>' % (branch,
+                                                       branch_pattern))
+            if fnmatch(branch, branch_pattern):
+                stage_name = branch_conf['stage']
+                log.msg('<%s> matched <%s>' % (branch, branch_pattern))
+                break
+        else:
+            log.msg('No branch match. Using default branch config.')
+            stage_name = conf['branches']['default']['stage']
+        self.setProperty('stage_name', stage_name, source='ReadConfFromYaml')
+        self.build.addStepsAfterCurrentStep([TriggerStages([stage_name])])
 
 
 class StepExtractor(BuildStep):
@@ -277,33 +293,8 @@ class StepExtractor(BuildStep):
 
         conf = self.getProperty('conf')
         stage_name = self.getProperty('stage_name')
-        if stage_name is None:
-            branch = self.getProperty('branch', 'default')
-            for branch_pattern, branch_conf in conf['branches'].items():
-                log.msg('Checking if <%s> matches <%s>' % (branch,
-                                                           branch_pattern))
-                if fnmatch(branch, branch_pattern):
-                    stage_name = branch_conf['stage']
-                    log.msg('<%s> matched <%s>' % (branch, branch_pattern))
-                    break
-            else:
-                log.msg('No branch match. Using default branch config.')
-                stage_name = conf['branches']['default']['stage']
-            self.setProperty('stage_name', stage_name, source='StepExtractor')
-
         log.msg('stage name = %s' % stage_name)
         stage_conf = conf['stages'][stage_name]
-        docker_path = stage_conf['image']['path']
-
-        full_docker_path = 'workers/%s/%s/build/%s' % (
-            LOCAL_WORKER_NAME,
-            BOOTSTRAP_BUILDER_NAME,
-            docker_path)
-
-        step = BuildDockerImage(
-            name=str('build docker image from %s' % docker_path),
-            path=full_docker_path)
-        self.build.addStepsAfterCurrentStep([step])
         for step in stage_conf['steps']:
             step_type, params = dict.popitem(step)
             try:
@@ -346,9 +337,10 @@ class StepExtractor(BuildStep):
 
 class BuildDockerImage(BuildStep):
 
-    def __init__(self, path, **kwargs):
+    def __init__(self, path, image_name, **kwargs):
         BuildStep.__init__(self, **kwargs)
-        self.path = path
+        self.full_path = path
+        self.image_name = image_name
         self.haltOnFailure = True
 
     def start(self):
@@ -364,15 +356,16 @@ class BuildDockerImage(BuildStep):
             tls=tls_config
         )
         stdio.addHeader('Building docker image %s fom %s\n' % (
-            self.name, self.path))
+            self.name, self.full_path))
         fail = False
         # assert the directory containing the dockerfile exists
-        assert path.exists(self.path), \
-            '%s does not exist in %s' % (self.path, getcwd())
-        shutil.copy(GIT_KEY_PATH, self.path)
-        img = self.getProperty('docker_image')
-        import simplejson
-        for line in docker_client.build(path=self.path, tag=img):
+        assert path.exists(self.full_path), \
+            '%s does not exist in %s' % (self.full_path, getcwd())
+        shutil.copy(GIT_KEY_PATH, self.full_path)
+        self.setProperty('docker_image', self.image_name)
+        for line in docker_client.build(
+                path=self.full_path,
+                tag=self.image_name):
             log.msg(line)
             try:
                 streamlines = _handle_stream_line(line)
@@ -391,7 +384,42 @@ class BuildDockerImage(BuildStep):
         self.finished(SUCCESS)
 
 
-class TriggerStages(Trigger):
+class TriggerStages(BuildStep):
+
+    def __init__(self, stage_names, **kwargs):
+        self.stage_names = stage_names
+        BuildStep.__init__(self)
+        self.kwargs = kwargs
+        if 'waitForFinish' not in kwargs:
+            kwargs['waitForFinish'] = True
+
+        self.name = 'trigger stage(s) %s' % ','.join(stage_names)
+
+    def run(self):
+        conf = self.getProperty('conf')
+        stages = []
+        for stage_name in self.stage_names:
+            docker_path = conf['stages'][stage_name]['image']['path']
+            full_docker_path = 'workers/%s/%s/build/%s' % (
+                LOCAL_WORKER_NAME,
+                BOOTSTRAP_BUILDER_NAME,
+                docker_path)
+            from random import randint
+            image_name = '%s-%06d' % (docker_path, randint(0, 999999))
+            step = BuildDockerImage(
+                name=str('build docker image from %s' % docker_path),
+                image_name=image_name,
+                path=full_docker_path)
+            self.build.addStepsAfterCurrentStep([step])
+            stages.append((stage_name, image_name))
+
+        step = TriggerStagesOld(
+            stage_names=stages, **self.kwargs)
+        self.build.addStepsAfterLastStep([step])
+        return SUCCESS
+
+
+class TriggerStagesOld(Trigger):
     """ This is a step that allows to start with the properties specified
         in the schedulerNames argument (tuple) instead of using the properties
         given in the set_properties/copy_properties parameters.
@@ -407,9 +435,9 @@ class TriggerStages(Trigger):
         return [
             (TRIGGERABLE_SCHEDULER_NAME, {
                 'stage_name': stage_name,
-                'docker_image': conf['stages'][stage_name]['image']['path'],
+                'docker_image': docker_image,
                 'conf': conf
-            }) for stage_name in self.schedulerNames]
+            }) for stage_name, docker_image in self.schedulerNames]
 
 
 # #########################
@@ -435,8 +463,6 @@ bootstrap_factory.addStep(Git(
     mode='incremental'))
 # Read conf from yaml file
 bootstrap_factory.addStep(ReadConfFromYaml())
-# Extract steps from conf
-bootstrap_factory.addStep(StepExtractor())
 
 # #########################
 # Bootstrap Sequence: Builders

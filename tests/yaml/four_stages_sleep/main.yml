@@ -35,7 +35,7 @@ stages:
   test:
     image:
         type: docker
-        path: eve/ubuntu-trusty-ctxt
+        path: eve/centos7-ctxt
     steps:
       - ShellCommand:
           name: sleep 2
