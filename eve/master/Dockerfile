@@ -5,7 +5,7 @@ EXPOSE :8000
 EXPOSE :9989
 
 # Install buildbot and its dependencies
-RUN apt-get update
+RUN apt-get update -y
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y \
     python-pip \
     python-dev \
