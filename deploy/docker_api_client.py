@@ -42,9 +42,7 @@ class Docker(object):
         for line in response:
             line = json.loads(line)
             if 'error' in line:
-                output = "ERROR: " + line['error']
-                print(output)
-                raise Exception(output)
+                raise Exception("ERROR: " + line['error'])
             for line in line.get('stream', '').split('\n'):
                 if line:
                     print(line)
