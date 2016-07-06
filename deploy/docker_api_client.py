@@ -52,9 +52,7 @@ class Docker(object):
 
     def remove(self, name, force=False):
         """Remove a docker instance, even if it is stopped"""
-        resp = self.client.remove_container(name, force=force)
-        if resp:
-            self.check_output(resp)
+        self.client.remove_container(name, force=force)
 
     def rm_all(self, force=False):
         """Remove all docker instances whose names contain 'eve' or 'build'"""
@@ -75,9 +73,7 @@ class Docker(object):
                 9989: 9989}),
             name=name
         )
-        resp = self.client.start(container=container.get('Id'))
-        if resp:
-            self.check_output(resp)
+        self.client.start(container=container.get('Id'))
 
     def execute(self, name, command):
         """Execute a command into a running docker container"""
