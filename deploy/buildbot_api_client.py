@@ -41,6 +41,18 @@ class BuildbotDataAPI(object):
 
     def get_element_id_from_name(self, route, name, id_key, name_key='name'):
         """Get the ID of an entity using its name"""
+        # The top level of every response is an object whose keys are the
+        # plural name of the resource types (hence the get(route)[route]).
+        # e.g. GET api/v2/schedulers
+        # {
+        #     "meta": {
+        #         "total": 2
+        #     },
+        #     "schedulers": [
+        #         {...},
+        #         {...}
+        #     ]
+        # }
         elements = self.get(route)[route]
         for elem in elements:
             if elem[name_key] == name:
