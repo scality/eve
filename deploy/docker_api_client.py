@@ -1,5 +1,5 @@
 #coding: utf-8
-"""A thin layer above docker-py to simplify interaction with docker"""
+"""A thin layer above docker-py to simplify interaction with docker."""
 from __future__ import print_function
 
 import json
@@ -11,7 +11,7 @@ import docker
 
 
 class Docker(object):
-    """A class barely representing a docker image instance"""
+    """A class barely representing a docker image instance."""
 
     def __init__(self, tag, docker_host, docker_cert_path):
         self.tag = tag
@@ -26,7 +26,7 @@ class Docker(object):
             tls=tls_config)
 
     def build_image(self, worker_cert_path):
-        """Build EVE docker image"""
+        """Build EVE docker image."""
         try:
             docker_path = os.path.join(tempfile.mkdtemp(), 'eve')
             shutil.copytree('eve/master', docker_path)
@@ -40,8 +40,11 @@ class Docker(object):
 
     @staticmethod
     def check_output(response):
-        """Check the output of a docker command and raise exception if docker
-        is reporting errors"""
+        """Check the output of a docker command.
+
+        This method will raise an Exception if docker is reporting any
+        error.
+        """
         for line in response:
             line = json.loads(line)
             if 'error' in line:
@@ -51,11 +54,11 @@ class Docker(object):
                     print(line)
 
     def remove(self, name, force=False):
-        """Remove a docker instance, even if it is stopped"""
+        """Remove a docker instance, even if it is stopped."""
         self.client.remove_container(name, force=force)
 
     def rm_all(self, force=False):
-        """Remove all docker instances whose names contain 'eve' or 'build'"""
+        """Remove all docker instances whose names contain 'eve' or 'build'."""
         for container in self.client.containers(all=True):
             container_name = container.get('Names')[0]
             if 'eve' not in container_name and 'build' not in container_name:
@@ -64,7 +67,7 @@ class Docker(object):
             self.remove(container.get('Id'), force=force)
 
     def run(self, name, env_vars=None):
-        """Run EVE in a docker instance"""
+        """Run EVE in a docker instance."""
         container = self.client.create_container(
             image=self.tag,
             environment=env_vars,
@@ -76,7 +79,7 @@ class Docker(object):
         self.client.start(container=container.get('Id'))
 
     def execute(self, name, command):
-        """Execute a command into a running docker container"""
+        """Execute a command into a running docker container."""
         handle = self.client.exec_create(
             container=name,
             cmd=command,

@@ -1,5 +1,5 @@
 #coding: utf-8
-"""Deploy an EVE instance"""
+"""Deploy an EVE instance."""
 from __future__ import print_function
 
 import os
@@ -13,7 +13,7 @@ from deploy.docker_api_client import Docker
 
 
 class EveMaster(object):
-    """Gathers all the parameters and deploys an EVE instance"""
+    """Gathers all the parameters and deploys an EVE instance."""
 
     def __init__(self,
                  bitbucket_git_repo,
@@ -35,7 +35,7 @@ class EveMaster(object):
             self,
             eve_bitbucket_login,
             eve_bitbucket_pwd):
-        """Sets bitbucket credentials to be used by EVE"""
+        """Sets bitbucket credentials to be used by EVE."""
         self.eve_env_vars['EVE_BITBUCKET_LOGIN'] = eve_bitbucket_login
         self.eve_env_vars['EVE_BITBUCKET_PWD'] = eve_bitbucket_pwd
 
@@ -43,7 +43,7 @@ class EveMaster(object):
             self,
             eve_web_login,
             eve_web_pwd):
-        """Sets credentials that will allow to connect to the Web/API"""
+        """Sets credentials that will allow to connect to the Web/API."""
         self.eve_env_vars['EVE_WEB_LOGIN'] = eve_web_login
         self.eve_env_vars['EVE_WEB_PWD'] = eve_web_pwd
 
@@ -51,7 +51,7 @@ class EveMaster(object):
                master_docker_host,
                master_docker_cert_path,
                worker_docker_cert_path):
-        """Deploy an EVE instance on docker"""
+        """Deploy an EVE instance on docker."""
         self.docker = Docker(
             'eve',
             docker_host=master_docker_host,
@@ -61,7 +61,7 @@ class EveMaster(object):
         self.docker.run('eve', env_vars=self.eve_env_vars)
 
     def wait(self):
-        """Polls the REST API of an EVE instance until it responds"""
+        """Polls the REST API of an EVE instance until it responds."""
 
         for _ in range(10):
             try:

@@ -136,12 +136,12 @@ c['db'] = {
 # Reporters send the build status when finished
 
 class BitbucketBuildStatusPush(HttpStatusPushBase):
-    """Send build result to bitbucket build status API"""
+    """Send build result to bitbucket build status API."""
     name = "BitbucketBuildStatusPush"
 
     @staticmethod
     def forge_url(build):
-        """Forge the BB API URL on which the build status will be posted"""
+        """Forge the BB API URL on which the build status will be posted."""
         sha1 = build['buildset']['sourcestamps'][0]['revision']
         repository = build['properties']['repository'][0]
         owner, repo = repository.split(':')[1].split('/', 1)
@@ -155,7 +155,7 @@ class BitbucketBuildStatusPush(HttpStatusPushBase):
 
     @staticmethod
     def forge_messages(stage_name, build):
-        """Forge the BB messages that will be displayed on the BB site"""
+        """Forge the BB messages that will be displayed on the BB site."""
         message = '%s build#%d ' % (stage_name, build['buildid'])
         if build['complete']:
             results = build['results']
@@ -178,7 +178,7 @@ class BitbucketBuildStatusPush(HttpStatusPushBase):
 
     @defer.inlineCallbacks
     def send(self, build):
-        """Send build status to Bitbucket"""
+        """Send build status to Bitbucket."""
 
         # Uncomment the following line to see build variable contents in log
         log.msg('SENDING BUILD STATUS TO BITBUCKET %s' % build)
@@ -251,8 +251,11 @@ c['change_source'].append(GitPoller(
 # Custom Build Steps
 ##########################
 class ReadConfFromYaml(SetPropertyFromCommand):
-    """This step reads the YAML file and converts it to
-     a 'conf' property to be available to the next steps."""
+    """Load the YAML file to `conf` property.
+
+    This step Reads the YAML file and converts it to a `conf` property which
+    is made available to the following steps.
+    """
 
     def __init__(self, **kwargs):
         SetPropertyFromCommand.__init__(
@@ -286,8 +289,10 @@ class ReadConfFromYaml(SetPropertyFromCommand):
 
 
 class StepExtractor(BuildStep):
-    """This step extracts the build steps from the 'conf' property and adds
-    them to the current builder. It also adds a step to build an image.
+    """Extracts and adds the build steps to the current builder.
+
+    This step extracts the build steps from the `conf` property and adds them
+    to the current builder. It also adds a step to build an image.
     """
     name = 'step extractor'
 
@@ -426,11 +431,11 @@ class TriggerStages(BuildStep):
 
 
 class TriggerStagesOld(Trigger):
-    """ This is a step that allows to start with the properties specified
-        in the schedulerNames argument (tuple) instead of using the properties
-        given in the set_properties/copy_properties parameters.
+    """Allows to give specific parameter to every scheduler.
 
-        This allows to give specific parameter to every scheduler.
+    This is a step that allows to start with the properties specified in the
+    schedulerNames argument (tuple) instead of using the properties given in
+    the set_properties/copy_properties parameters.
     """
 
     def __init__(self, stage_names, **kwargs):
@@ -522,9 +527,12 @@ for w in c['workers']:
 # Utils
 # #########################
 def replace_with_interpolate(obj):
-    """Read step arguments from the yaml file and replaces them with
+    """Interpolate nested %(prop:obj)s in step arguments.
+
+    Read step arguments from the yaml file and replaces them with
     interpolate objects when relevant so they can be replaced with
-    properties when run"""
+    properties when run.
+    """
 
     if isinstance(obj, dict):
         return {k: replace_with_interpolate(v) for k, v in obj.items()}

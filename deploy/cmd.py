@@ -1,5 +1,5 @@
 #coding: utf-8
-"""A set of utilities used by EVE deployment tools"""
+"""A set of utilities used by EVE deployment tools."""
 from __future__ import print_function
 
 import subprocess
@@ -7,7 +7,7 @@ import sys
 
 
 def cmd(command, ignore_exception=False):
-    """Execute a shell command and display output in a readable manner"""
+    """Execute a shell command and display output in a readable manner."""
     log = ''
     print('\nCOMMAND : %s' % command)
     process = subprocess.Popen(command, shell=True,

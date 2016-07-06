@@ -1,5 +1,5 @@
 #coding: utf-8
-"""Generate CARINA environment variables required by docker clients"""
+"""Generate CARINA environment variables required by docker clients."""
 from __future__ import print_function
 
 import os
@@ -13,8 +13,9 @@ CARINA_BIN_URL = 'https://download.getcarina.com/carina/latest/' \
 
 
 def generate_carina_environment(carina_cluster):
-    """Generate CARINA environment variables using cluster name and
-    CARINA credentials
+    """Generate CARINA environment variables.
+
+    It uses the cluster name and the CARINA credentials.
     """
     if not os.path.isfile('carina'):
         check_output('curl -L %s  -o carina' % CARINA_BIN_URL, shell=True)
