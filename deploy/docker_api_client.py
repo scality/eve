@@ -27,13 +27,16 @@ class Docker(object):
 
     def build_image(self, worker_cert_path):
         """Build EVE docker image"""
-        docker_path = os.path.join(tempfile.mkdtemp(), 'eve')
-        shutil.copytree('eve/master', docker_path)
-        shutil.copytree(worker_cert_path, os.path.join(
-            docker_path,
-            'worker_docker_certs'))
-        resp = self.client.build(path=docker_path, tag=self.tag)
-        self.check_output(resp)
+        try:
+            docker_path = os.path.join(tempfile.mkdtemp(), 'eve')
+            shutil.copytree('eve/master', docker_path)
+            shutil.copytree(worker_cert_path, os.path.join(
+                docker_path,
+                'worker_docker_certs'))
+            resp = self.client.build(path=docker_path, tag=self.tag)
+            self.check_output(resp)
+        finally:
+            shutil.rmtree(docker_path)
 
     @staticmethod
     def check_output(response):
