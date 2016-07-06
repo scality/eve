@@ -22,7 +22,7 @@ class BuildbotDataAPI(object):
     def post(self, route, method, params=None):
         """Post data to the REST API"""
         data = {
-            'id': 1,
+            'id': 1,  # sequence number doesn't matter for synchronous requests
             'jsonrpc': '2.0',
             'method': method,
             'params': params
