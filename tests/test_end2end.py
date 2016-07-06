@@ -1,7 +1,6 @@
 #coding: utf-8
 """This test suite checks end-to-end operation of EVE."""
-from __future__ import print_function
-
+import logging
 import os
 import shutil
 import tempfile
@@ -13,6 +12,9 @@ from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 from deploy.cmd import cmd
 from deploy.deploy_eve_master import EveMaster
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(format='[%(levelname)s] %(message)s', level=logging.INFO)
 
 SUCCESS = 0
 FAILURE = 2
@@ -86,7 +88,7 @@ class TestEnd2End(unittest.TestCase):
         """Writes the contents of twistd.log after every test."""
         if not hasattr(self.eve, 'docker'):
             return
-        print(self.eve.docker.execute('eve', 'cat master/twistd.log'))
+        logger.debug(self.eve.docker.execute('eve', 'cat master/twistd.log'))
 
     def get_build_status(self, build_id, timeout=120):
         """Wait for the build to finish and get build status from buildbot.
@@ -101,16 +103,16 @@ class TestEnd2End(unittest.TestCase):
             time.sleep(1)
             log = self.eve.docker.execute('eve', 'cat master/twistd.log')
             if 'Traceback (most recent call last):' in log:
-                print(log)
+                logger.error(log)
                 raise Exception('Found an Exception Traceback in twistd.log')
             try:
                 build = self.eve.api.get('builds/%d' % build_id)['builds'][0]
             except requests.HTTPError as exp:
-                print('Build did not start yet. API responded: %s' %
-                      exp.message)
+                logger.debug('Build did not start yet. API responded: %s',
+                             exp.message)
                 continue
             state = build['state_string']
-            print('API responded: BUILD STATE = %s' % state)
+            logger.debug('API responded: BUILD STATE = %s', state)
             if state not in ('starting', 'created'):
                 break
         assert state == 'finished'

@@ -1,8 +1,7 @@
 #coding: utf-8
 """Deploy an EVE instance."""
-from __future__ import print_function
-
 from argparse import ArgumentParser
+import logging
 import os
 import time
 
@@ -10,6 +9,11 @@ import requests
 
 from deploy.buildbot_api_client import BuildbotDataAPI
 from deploy.docker_api_client import Docker
+
+logger = logging.getLogger(__name__)
+logging.getLogger('requests').setLevel(logging.WARNING)
+
+MAX_EVE_API_TRIES = 10
 
 
 class EveMaster(object):
@@ -67,9 +71,10 @@ class EveMaster(object):
     def wait(self):
         """Polls the REST API of an EVE instance until it responds."""
 
-        for _ in range(10):
+        for i in range(MAX_EVE_API_TRIES):
             try:
-                print('checking buildbot\'s webserver response')
+                logger.info('Checking buildbot\'s webserver response (retry %d/%d)',
+                            i + 1, MAX_EVE_API_TRIES)
                 builds = self.api.get('builds')
                 assert builds['meta']['total'] == 0
                 return
@@ -81,17 +86,24 @@ class EveMaster(object):
 def main():
     """Allows to spwan EVE from the command line."""
     parser = ArgumentParser(description='Deploy an EVE master.')
-
-    parser.add_argument(
-        'git_repo',
-        help='The git repo. e.g., git@example.org:repo.git')
-
-    parser.add_argument(
-        'fqdn',
-        help='The fully qualified domain name to be used for the web URL'
-             '. e.g., example.com')
-
+    parser.add_argument('git_repo',
+                        help='The git repo. e.g., git@example.org:repo.git')
+    parser.add_argument('fqdn',
+                        help='The fully qualified domain name to be used for '
+                             'the web URL (e.g. example.com)')
+    parser.add_argument('-v', '--verbose', action='count', default=0,
+                        help='increase verbosity (may be supplied two times)')
     args = parser.parse_args()
+
+    # Set up basic logging according to selected verbosity
+    logging.basicConfig(
+        format='%(message)s',
+        level={
+            0: logging.WARNING,
+            1: logging.INFO,
+            2: logging.DEBUG,
+        }[args.verbose],
+    )
 
     if not args.fqdn:
         docker_host = os.environ['DOCKER_HOST']

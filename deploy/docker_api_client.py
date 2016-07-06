@@ -1,13 +1,14 @@
 #coding: utf-8
 """A thin layer above docker-py to simplify interaction with docker."""
-from __future__ import print_function
-
 import json
+import logging
 import os
 import shutil
 import tempfile
 
 import docker
+
+logger = logging.getLogger(__name__)
 
 
 class Docker(object):
@@ -51,7 +52,7 @@ class Docker(object):
                 raise Exception("ERROR: " + line['error'])
             for line in line.get('stream', '').split('\n'):
                 if line:
-                    print(line)
+                    logger.info(line)
 
     def remove(self, name, force=False):
         """Remove a docker instance, even if it is stopped."""
@@ -63,7 +64,7 @@ class Docker(object):
             container_name = container.get('Names')[0]
             if 'eve' not in container_name and 'build' not in container_name:
                 continue
-            print('Removing Container %s' % container_name)
+            logger.info('Removing Container %s', container_name)
             self.remove(container.get('Id'), force=force)
 
     def run(self, name, env_vars=None):

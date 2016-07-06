@@ -1,15 +1,15 @@
 #coding: utf-8
 """A set of utilities used by EVE deployment tools."""
-from __future__ import print_function
-
+import logging
 import subprocess
-import sys
+
+logger = logging.getLogger(__name__)
 
 
 def cmd(command, ignore_exception=False):
     """Execute a shell command and display output in a readable manner."""
-    log = ''
-    print('\nCOMMAND : %s' % command)
+    output = ''
+    logger.info('COMMAND : %s', command)
     process = subprocess.Popen(command, shell=True,
                                stdout=subprocess.PIPE,
                                stderr=subprocess.STDOUT)
@@ -17,17 +17,17 @@ def cmd(command, ignore_exception=False):
     # Poll process for new output until finished
     while True:
         nextline = process.stdout.readline()
-        if nextline == '' and process.poll() is not None:
+        if nextline:
+            logger.info(' │ %s', nextline.strip())
+            output += nextline
+        elif process.poll() is not None:
             break
-        sys.stdout.write(' | ' + nextline)
-        sys.stdout.flush()
-        log += nextline
 
-    print(u' L________')
+    logger.info(u' └────────')
 
     process.communicate()
     exit_code = process.returncode
 
     if exit_code == 0 or ignore_exception:
-        return log
+        return output
     raise subprocess.CalledProcessError(exit_code, command)
