@@ -19,12 +19,16 @@ class EveMaster(object):
                  bitbucket_git_repo,
                  bitbucket_git_cert_key_baser64,
                  master_fqdn,
-                 worker_docker_host):
+                 worker_docker_host,
+                 project_name,
+                 project_url):
         self.eve_env_vars = {
             'GIT_REPO': bitbucket_git_repo,
             'DOCKER_HOST': worker_docker_host,
             'MASTER_FQDN': master_fqdn,
             'GIT_CERT_KEY_BASE64': bitbucket_git_cert_key_baser64,
+            'PROJECT_NAME': project_name,
+            'PROJECT_URL': project_url,
         }
 
         api_base_url = 'http://%s:8000/api/v2/' % master_fqdn
@@ -98,6 +102,8 @@ def main():
         bitbucket_git_cert_key_baser64=os.environ['GIT_CERT_KEY_BASE64'],
         master_fqdn=args.fqdn,
         worker_docker_host=os.environ['DOCKER_HOST'],
+        project_name=os.environ['PROJECT_NAME'],
+        project_url=os.environ['PROJECT_URL'],
     )
     eve.set_bitbucket_credentials(
         os.environ['EVE_BITBUCKET_LOGIN'],

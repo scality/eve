@@ -78,6 +78,9 @@ EVE_BITBUCKET_PWD = environ['EVE_BITBUCKET_PWD']
 EVE_WEB_LOGIN = environ['EVE_WEB_LOGIN']
 EVE_WEB_PWD = environ['EVE_WEB_PWD']
 
+PROJECT_NAME = environ['PROJECT_NAME']
+PROJECT_URL = environ['PROJECT_URL']
+
 # database
 # TODO : for prod, use something like 'mysql://user@pass:mysqlserver/buildbot'
 DB_URL = environ.get('DB_URL', 'sqlite:///state.sqlite')
@@ -86,8 +89,8 @@ DB_URL = environ.get('DB_URL', 'sqlite:///state.sqlite')
 # Project Identity
 ##########################
 c = BuildmasterConfig = {}
-c['title'] = "Eve"
-c['titleURL'] = "http://www.scality.com/"
+c['title'] = "Eve: pipeline of the %s project" % PROJECT_NAME
+c['titleURL'] = PROJECT_URL
 c['buildbotURL'] = 'http://%s:%d/' % (MASTER_FQDN, MASTER_WEB_PORT)
 
 # 'protocols' contains information about protocols which master will use for
