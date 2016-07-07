@@ -181,7 +181,6 @@ class BitbucketBuildStatusPush(HttpStatusPushBase):
     def send(self, build):
         """Send build status to Bitbucket."""
 
-        # Uncomment the following line to see build variable contents in log
         log.msg('SENDING BUILD STATUS TO BITBUCKET %s' % build)
 
         stage_name = build['properties']['stage_name'][0]
