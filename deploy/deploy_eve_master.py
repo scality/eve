@@ -102,7 +102,7 @@ def main():
     eve.set_bitbucket_credentials(
         os.environ['EVE_BITBUCKET_LOGIN'],
         os.environ['EVE_BITBUCKET_PWD'])
-    eve.set_bitbucket_credentials(
+    eve.set_web_credentials(
         os.environ['EVE_WEB_LOGIN'],
         os.environ['EVE_WEB_PWD'])
     eve.deploy(
