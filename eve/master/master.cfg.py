@@ -1,13 +1,10 @@
 #coding: utf-8
-import os
-import shutil
 from fnmatch import fnmatch
+import os
 from os import environ, getcwd, path
 from random import randint
+import shutil
 
-import docker
-import simplejson
-import yaml
 from buildbot.changes.gitpoller import GitPoller
 from buildbot.config import BuilderConfig
 from buildbot.plugins import steps
@@ -29,10 +26,14 @@ from buildbot.worker.docker import DockerLatentWorker, _handle_stream_line
 from buildbot.worker.local import LocalWorker
 from buildbot.www.auth import UserPasswordAuth
 from buildbot.www.authz import Authz, endpointmatchers, roles
+import docker
 from requests.auth import HTTPBasicAuth
+import simplejson
 from twisted.internet import defer
 from twisted.python import log
 from twisted.python.reflect import namedModule
+import yaml
+
 
 ##########################
 # Constants
