@@ -1,5 +1,7 @@
 #coding: utf-8
 """A thin layer above docker-py to simplify interaction with docker."""
+import base64
+import hashlib
 import json
 import logging
 import os
@@ -7,6 +9,7 @@ import shutil
 import tempfile
 
 import docker
+from jinja2 import Template
 
 logger = logging.getLogger(__name__)
 
@@ -14,8 +17,11 @@ logger = logging.getLogger(__name__)
 class Docker(object):
     """A class barely representing a docker image instance."""
 
-    def __init__(self, tag, docker_host, docker_cert_path):
+    def __init__(self, tag, fqdn, login, pwd, docker_host, docker_cert_path):
         self.tag = tag
+        self.fqdn = fqdn
+        self.login = login
+        self.pwd = pwd
         tls_config = docker.tls.TLSConfig(
             client_cert=(
                 os.path.join(docker_cert_path, 'cert.pem'),
@@ -35,6 +41,24 @@ class Docker(object):
             shutil.copytree(worker_cert_path, os.path.join(
                 docker_path,
                 'worker_docker_certs'))
+            shutil.copytree('etc', os.path.join(docker_path, 'etc'))
+
+            # Generate reverse proxy config
+            nginx_conf = os.path.join(docker_path, 'etc', 'nginx-eve.conf')
+            with open(nginx_conf, 'w') as conf_file:
+                template = Template(open(nginx_conf + '.j2', 'r').read())
+                conf_file.write(template.render(fqdn=self.fqdn))
+
+            # Generate htpasswd file
+            htpasswd = os.path.join(docker_path, 'etc', 'htpasswd')
+            with open(htpasswd, 'w') as conf_file:
+                salt = os.urandom(4)
+                sha1 = hashlib.sha1(self.pwd)
+                sha1.update(salt)
+                ssha = base64.b64encode(sha1.digest() + salt)
+                template = Template(open(htpasswd + '.j2', 'r').read())
+                conf_file.write(template.render(login=self.login, ssha=ssha))
+
             resp = self.client.build(path=docker_path, tag=self.tag)
             self.check_output(resp)
         finally:
@@ -74,7 +98,8 @@ class Docker(object):
             image=self.tag,
             environment=env_vars,
             host_config=self.client.create_host_config(port_bindings={
-                8000: 8000,
+                80: 80,
+                443: 443,
                 9989: 9989}),
             name=name
         )

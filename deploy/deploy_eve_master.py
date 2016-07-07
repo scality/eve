@@ -35,7 +35,7 @@ class EveMaster(object):
             'PROJECT_URL': project_url,
         }
 
-        api_base_url = 'http://%s:8000/api/v2/' % master_fqdn
+        api_base_url = 'https://%s/api/v2/' % master_fqdn
         self.api = BuildbotDataAPI(api_base_url)
         self.docker = None
 
@@ -54,6 +54,7 @@ class EveMaster(object):
         """Sets credentials that will allow to connect to the Web/API."""
         self.eve_env_vars['EVE_WEB_LOGIN'] = eve_web_login
         self.eve_env_vars['EVE_WEB_PWD'] = eve_web_pwd
+        self.api.add_auth(eve_web_login, eve_web_pwd)
 
     def deploy(self,
                master_docker_host,
@@ -62,6 +63,9 @@ class EveMaster(object):
         """Deploy an EVE instance on docker."""
         self.docker = Docker(
             'eve',
+            fqdn=self.eve_env_vars['MASTER_FQDN'],
+            login=self.eve_env_vars['EVE_WEB_LOGIN'],
+            pwd=self.eve_env_vars['EVE_WEB_PWD'],
             docker_host=master_docker_host,
             docker_cert_path=master_docker_cert_path)
         self.docker.build_image(worker_cert_path=worker_docker_cert_path)

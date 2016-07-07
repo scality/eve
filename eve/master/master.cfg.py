@@ -43,7 +43,6 @@ BOOTSTRAP_SCHEDULER_NAME = 's-bootstrap'
 TRIGGERABLE_BUILDER_NAME = 'triggerable'
 TRIGGERABLE_SCHEDULER_NAME = 's-triggerable'
 MAX_DOCKER_WORKERS = 10
-MASTER_WEB_PORT = 8000
 EVE_FOLDER = 'eve'
 EVE_MAIN_YAML = 'main.yml'
 EVE_MAIN_YAML_FULL_PATH = '%s/%s' % (EVE_FOLDER, EVE_MAIN_YAML)
@@ -90,7 +89,7 @@ DB_URL = environ.get('DB_URL', 'sqlite:///state.sqlite')
 c = BuildmasterConfig = {}
 c['title'] = "Eve: pipeline of the %s project" % PROJECT_NAME
 c['titleURL'] = PROJECT_URL
-c['buildbotURL'] = 'http://%s:%d/' % (MASTER_FQDN, MASTER_WEB_PORT)
+c['buildbotURL'] = 'https://%s/' % MASTER_FQDN
 
 # 'protocols' contains information about protocols which master will use for
 # communicating with workers. You must define at least 'port' option that
@@ -104,7 +103,7 @@ c['protocols'] = {'pb': {'port': 9989}}
 # Web UI
 ##########################
 # Create a basic auth website with the waterfall view and the console view
-c['www'] = dict(port=MASTER_WEB_PORT,
+c['www'] = dict(port="unix:/run/buildbot.sock",
                 auth=UserPasswordAuth({EVE_WEB_LOGIN: EVE_WEB_PWD}),
                 plugins=dict(
                     waterfall_view={},
