@@ -310,7 +310,7 @@ class StepExtractor(BuildStep):
                 # try to see if the required step is imported or
                 # defined in the current context
                 _cls = globals()[step_type]
-            except:
+            except KeyError:
                 # otherwise import the step from standars buildbot steps
                 try:
                     _cls = getattr(steps, step_type)
