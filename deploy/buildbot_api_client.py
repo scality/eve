@@ -70,7 +70,7 @@ class BuildbotDataAPI(object):
     def force_build(self, builderid, repo):
         """Force launch a build."""
         params = {
-            'builderid': str(builderid),
+            'builderid': builderid,
             'username': '',
             'reason': 'force build',
             'repository': repo,
