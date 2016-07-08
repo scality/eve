@@ -324,7 +324,7 @@ class StepExtractor(BuildStep):
 
             # hack to prevent displaying passwords stored in env variables
             # on the web interface
-            if issubclass(_cls, ShellCommand) or issubclass(_cls, Source):
+            if issubclass(_cls, (ShellCommand, Source)):
                 params['logEnviron'] = False
 
             # hack to avoid putting clear passwords into the YAML file
