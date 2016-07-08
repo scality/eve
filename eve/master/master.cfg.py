@@ -29,7 +29,7 @@ from buildbot.www.authz import Authz, endpointmatchers, roles
 import docker
 from requests.auth import HTTPBasicAuth
 import simplejson
-from twisted.internet import defer
+from twisted.internet.defer import inlineCallbacks, returnValue, succeed
 from twisted.python import log
 from twisted.python.reflect import namedModule
 import yaml
@@ -180,7 +180,7 @@ class BitbucketBuildStatusPush(HttpStatusPushBase):
         description = '<todo>'
         return bitbucket_state, message, description
 
-    @defer.inlineCallbacks
+    @inlineCallbacks
     def send(self, build):
         """Send build status to Bitbucket."""
 
@@ -300,7 +300,6 @@ class StepExtractor(BuildStep):
     name = 'step extractor'
 
     def run(self):
-
         conf = self.getProperty('conf')
         stage_name = self.getProperty('stage_name')
         log.msg('stage name = %s' % stage_name)
@@ -342,7 +341,7 @@ class StepExtractor(BuildStep):
 
             step = _cls(**params)
             self.build.addStepsAfterLastStep([step])
-        return SUCCESS
+        return succeed(SUCCESS)
 
 
 class BuildDockerImage(BuildStep):
@@ -353,12 +352,8 @@ class BuildDockerImage(BuildStep):
         self.image_name = image_name
         self.haltOnFailure = True
 
-    def start(self):
-        d = self.build_docker_image()
-        d.addErrback(self.failed)
-
-    @defer.inlineCallbacks
-    def build_docker_image(self):
+    @inlineCallbacks
+    def run(self):
         # Capture the output of the docker build command in a log object
         stdio = yield self.addLog('stdio')
         docker_client = docker.Client(
@@ -390,8 +385,8 @@ class BuildDockerImage(BuildStep):
 
         stdio.finish()
         if fail:
-            self.finished(FAILURE)
-        self.finished(SUCCESS)
+            returnValue(FAILURE)
+        returnValue(SUCCESS)
 
 
 class TriggerStages(BuildStep):
@@ -430,7 +425,7 @@ class TriggerStages(BuildStep):
         self.build.addStepsAfterCurrentStep([step])
         self.build.addStepsAfterCurrentStep(build_image_steps)
 
-        return SUCCESS
+        return succeed(SUCCESS)
 
 
 class TriggerStagesOld(Trigger):
