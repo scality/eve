@@ -337,7 +337,7 @@ class StepExtractor(BuildStep):
 
             # Hack! Buildbot does not accept unicode step names
             if 'name' in params and isinstance(params['name'], unicode):
-                params['name'] = str(params['name'])
+                params['name'] = params['name'].encode('utf-8')
 
             step = _cls(**params)
             self.build.addStepsAfterLastStep([step])
