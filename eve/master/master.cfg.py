@@ -308,7 +308,7 @@ class StepExtractor(BuildStep):
         for step in stage_conf['steps']:
             step_type, params = dict.popitem(step)
             try:
-                # try to see in the required step is imported or
+                # try to see if the required step is imported or
                 # defined in the current context
                 _cls = globals()[step_type]
             except:
