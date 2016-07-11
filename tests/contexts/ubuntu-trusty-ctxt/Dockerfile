@@ -5,6 +5,7 @@ RUN apt-get update && apt-get install -y \
    python-pip \
    git
 
+RUN pip install --upgrade pip
 RUN pip install buildbot-worker==0.9.0b9
 RUN groupadd -r buildbot && useradd -r -g buildbot buildbot
 RUN mkdir /worker && chown buildbot:buildbot /worker
