@@ -11,8 +11,7 @@ from buildbot.plugins import steps
 from buildbot.process.buildstep import BuildStep
 from buildbot.process.factory import BuildFactory
 from buildbot.process.properties import Interpolate, Property
-from buildbot.process.results import (FAILURE, SKIPPED, SUCCESS, WARNINGS,
-                                      Results)
+from buildbot.process.results import FAILURE, SUCCESS, WARNINGS, Results
 from buildbot.reporters.http import HttpStatusPushBase
 from buildbot.scheduler import AnyBranchScheduler
 from buildbot.schedulers.forcesched import ForceScheduler
@@ -163,7 +162,7 @@ class BitbucketBuildStatusPush(HttpStatusPushBase):
         message = '%s build#%d ' % (stage_name, build['buildid'])
         if build['complete']:
             results = build['results']
-            if results in (SUCCESS, SKIPPED, WARNINGS):
+            if results in (SUCCESS, WARNINGS):
                 bitbucket_state = 'SUCCESSFUL'
             else:
                 bitbucket_state = 'FAILED'
