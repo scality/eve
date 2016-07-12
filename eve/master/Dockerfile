@@ -1,6 +1,5 @@
 FROM ubuntu
 
-RUN mkdir /root/.ssh/
 EXPOSE :8000
 EXPOSE :9989
 
@@ -27,7 +26,10 @@ RUN buildbot create-master master
 # Copy buildbot configuration
 COPY master.cfg.py master/master.cfg
 
+# Copy over private key and set permissions
+RUN mkdir /root/.ssh/
+RUN ssh-keyscan bitbucket.org >> /root/.ssh/known_hosts 2> /dev/null
+
 CMD echo $GIT_CERT_KEY_BASE64 | base64 --decode > /root/.ssh/id_rsa \
-         && chmod 600 /root/.ssh/id_rsa \
-         && ssh-keyscan bitbucket.org >> /root/.ssh/known_hosts \
-         && buildbot start master ; tail -f master/twistd.log
+    && chmod 600 /root/.ssh/id_rsa \
+    && buildbot start master ; tail -f master/twistd.log
