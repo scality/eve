@@ -273,6 +273,7 @@ class ReadConfFromYaml(SetPropertyFromCommand):
             return
         conf = yaml.load(self.observer.getStdout())
         self.setProperty(self.property, conf, "ReadConfFromYaml Step")
+        self.property_changes[self.property] = conf
 
         # Find the stage name from the branch name
         branch = self.getProperty('branch', 'default')
@@ -287,6 +288,7 @@ class ReadConfFromYaml(SetPropertyFromCommand):
             log.msg('No branch match. Using default branch config.')
             stage_name = conf['branches']['default']['stage']
         self.setProperty('stage_name', stage_name, 'ReadConfFromYaml Step')
+        self.property_changes['stage_name'] = stage_name
         self.build.addStepsAfterCurrentStep([TriggerStages([stage_name])])
 
 
