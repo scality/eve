@@ -286,7 +286,7 @@ class ReadConfFromYaml(SetPropertyFromCommand):
         else:
             log.msg('No branch match. Using default branch config.')
             stage_name = conf['branches']['default']['stage']
-        self.setProperty('stage_name', stage_name, source='ReadConfFromYaml')
+        self.setProperty('stage_name', stage_name, 'ReadConfFromYaml Step')
         self.build.addStepsAfterCurrentStep([TriggerStages([stage_name])])
 
 
