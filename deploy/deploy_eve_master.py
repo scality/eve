@@ -64,12 +64,14 @@ class EveMaster(object):
         """Deploy an EVE instance on docker."""
         self.docker = Docker(
             'eve',
+            docker_host=master_docker_host,
+            docker_cert_path=master_docker_cert_path)
+        self.docker.build_image(
             fqdn=self.eve_env_vars['MASTER_FQDN'],
             login=self.eve_env_vars['EVE_WEB_LOGIN'],
             pwd=self.eve_env_vars['EVE_WEB_PWD'],
-            docker_host=master_docker_host,
-            docker_cert_path=master_docker_cert_path)
-        self.docker.build_image(worker_cert_path=worker_docker_cert_path)
+            worker_cert_path=worker_docker_cert_path
+        )
         self.docker.rm_all(force=True)
         self.docker.run('eve', env_vars=self.eve_env_vars)
 
@@ -119,9 +121,10 @@ def main():
         bitbucket_git_cert_key_baser64=os.environ['GIT_CERT_KEY_BASE64'],
         master_fqdn=args.fqdn,
         worker_docker_host=os.environ['DOCKER_HOST'],
-        project_name=os.environ['PROJECT_NAME'],
-        project_url=os.environ['PROJECT_URL'],
     )
+    eve.set_project_infos(
+        os.environ['PROJECT_NAME'],
+        os.environ['PROJECT_URL'])
     eve.set_bitbucket_credentials(
         os.environ['EVE_BITBUCKET_LOGIN'],
         os.environ['EVE_BITBUCKET_PWD'])

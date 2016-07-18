@@ -42,9 +42,10 @@ class TestEnd2End(unittest.TestCase):
             bitbucket_git_cert_key_baser64=os.environ['GIT_CERT_KEY_BASE64'],
             master_fqdn=master_fqdn,
             worker_docker_host=os.environ['DOCKER_HOST'],
-            project_name=os.environ['PROJECT_NAME'],
-            project_url=os.environ['PROJECT_URL'],
         )
+        self.eve.set_project_infos(
+            os.environ['PROJECT_NAME'],
+            os.environ['PROJECT_URL'])
         self.eve.set_bitbucket_credentials(
             os.environ['EVE_BITBUCKET_LOGIN'],
             os.environ['EVE_BITBUCKET_PWD'])
