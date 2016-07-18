@@ -174,8 +174,7 @@ class BitbucketBuildStatusPush(HttpStatusPushBase):
             # To announce the start of a build
             bitbucket_state = 'INPROGRESS'
             message += ' is in progress...'
-        # TODO: add a clever description
-        description = '<todo>'
+        description = ''  # XXX: If we have more infos, here is the place
         return bitbucket_state, message, description
 
     @inlineCallbacks
