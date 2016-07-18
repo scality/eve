@@ -1,4 +1,4 @@
-#coding: utf-8
+# coding: utf-8
 """This test suite checks end-to-end operation of EVE."""
 import logging
 import os

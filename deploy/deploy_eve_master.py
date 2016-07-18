@@ -1,4 +1,4 @@
-#coding: utf-8
+# coding: utf-8
 """Deploy an EVE instance."""
 from argparse import ArgumentParser
 import logging
@@ -23,21 +23,22 @@ class EveMaster(object):
                  bitbucket_git_repo,
                  bitbucket_git_cert_key_baser64,
                  master_fqdn,
-                 worker_docker_host,
-                 project_name,
-                 project_url):
+                 worker_docker_host):
         self.eve_env_vars = {
             'GIT_REPO': bitbucket_git_repo,
             'DOCKER_HOST': worker_docker_host,
             'MASTER_FQDN': master_fqdn,
             'GIT_CERT_KEY_BASE64': bitbucket_git_cert_key_baser64,
-            'PROJECT_NAME': project_name,
-            'PROJECT_URL': project_url,
         }
 
         api_base_url = 'https://%s/api/v2/' % master_fqdn
         self.api = BuildbotDataAPI(api_base_url)
         self.docker = None
+
+    def set_project_infos(self, project_name, project_url):
+        """Sets basic infos on the project watched by this eve instance."""
+        self.eve_env_vars['PROJECT_NAME'] = project_name
+        self.eve_env_vars['PROJECT_URL'] = project_url
 
     def set_bitbucket_credentials(
             self,
@@ -77,8 +78,8 @@ class EveMaster(object):
 
         for i in range(MAX_EVE_API_TRIES):
             try:
-                logger.info('Checking buildbot\'s webserver response (retry %d/%d)',
-                            i + 1, MAX_EVE_API_TRIES)
+                logger.info('Checking buildbot\'s webserver response '
+                            '(retry %d/%d)', i + 1, MAX_EVE_API_TRIES)
                 builds = self.api.get('builds')
                 assert builds['meta']['total'] == 0
                 return

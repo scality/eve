@@ -1,4 +1,4 @@
-#coding: utf-8
+# coding: utf-8
 """Buildbot REST API client.
 
 for more info on the API, see `buildbot REST API documentation`_

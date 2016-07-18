@@ -1,4 +1,4 @@
-#coding: utf-8
+# coding: utf-8
 """A thin layer above docker-py to simplify interaction with docker."""
 import base64
 import hashlib

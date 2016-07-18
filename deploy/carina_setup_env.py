@@ -1,4 +1,4 @@
-#coding: utf-8
+# coding: utf-8
 """Generate CARINA environment variables required by docker clients."""
 from __future__ import print_function
 
