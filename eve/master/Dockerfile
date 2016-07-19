@@ -8,6 +8,7 @@ EXPOSE :9989
 RUN apt-get update -y
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y \
     python-pip \
+    wget \
     python-dev \
     libssl-dev \
     libffi-dev \
@@ -15,9 +16,10 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y \
     nginx \
     git
 
-RUN pip install --upgrade pip
+RUN wget --no-verbose --tries=3 --timeout=30 https://bootstrap.pypa.io/get-pip.py
+RUN python get-pip.py pip==8.1.2
 COPY requirements.txt requirements.txt
-RUN pip install -r requirements.txt
+RUN /usr/local/bin/pip install -r requirements.txt
 
 # Configure nginx as a reverse proxy
 COPY etc/ssl/* /etc/nginx/ssl/
