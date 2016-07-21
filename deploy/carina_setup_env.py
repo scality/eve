@@ -25,9 +25,10 @@ def generate_carina_environment(carina_cluster):
         check_output('./carina create --wait %s' % carina_cluster, shell=True)
     return check_output('./carina env %s' % carina_cluster, shell=True)
 
+
 if __name__ == '__main__':
     # get the cluster name from args and print the env variables required by
     # docker to stdout. Use eval $(python carina_setup_env.py <cluster_name>)
-    # to export these env vars to you shell
+    # to export these env vars to your shell
     CARINA_CLUSTER_NAME = sys.argv[1]
     print(generate_carina_environment(CARINA_CLUSTER_NAME))
