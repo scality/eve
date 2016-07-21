@@ -29,7 +29,7 @@ import docker
 from requests.auth import HTTPBasicAuth
 import simplejson
 from twisted.internet.defer import inlineCallbacks, returnValue, succeed
-from twisted.python import log
+from twisted.logger import Logger
 from twisted.python.reflect import namedModule
 import yaml
 
@@ -140,6 +140,7 @@ c['db'] = {
 class BitbucketBuildStatusPush(HttpStatusPushBase):
     """Send build result to bitbucket build status API."""
     name = "BitbucketBuildStatusPush"
+    logger = Logger('eve.steps.BitbucketBuildStatusPush')
 
     @staticmethod
     def forge_url(build):
@@ -181,7 +182,8 @@ class BitbucketBuildStatusPush(HttpStatusPushBase):
     def send(self, build):
         """Send build status to Bitbucket."""
 
-        log.msg('SENDING BUILD STATUS TO BITBUCKET %s' % build)
+        self.logger.debug('Sending build status to Bitbucket: {buildstatus}',
+                          buildstatus=build)
 
         stage_name = build['properties']['stage_name'][0]
         state, message, description = self.forge_messages(stage_name, build)
@@ -196,8 +198,9 @@ class BitbucketBuildStatusPush(HttpStatusPushBase):
         response = yield self.session.post(
             self.forge_url(build), data, auth=auth)
         if response.status_code != 201:
-            log.msg("%s: unable to upload status: %s" %
-                    (response.status_code, response.content))
+            self.logger.error("{response.status_code}: unable to send status "
+                              "to bitbucket:\n{response.content}",
+                              response=response)
 
 # The status push works only on the main builder (bootstrap)
 sp = BitbucketBuildStatusPush(builders=['bootstrap'], wantProperties=True)
@@ -256,6 +259,7 @@ class ReadConfFromYaml(SetPropertyFromCommand):
     This step Reads the YAML file and converts it to a `conf` property which
     is made available to the following steps.
     """
+    logger = Logger('eve.steps.ReadConfFromYaml')
 
     def __init__(self, **kwargs):
         SetPropertyFromCommand.__init__(
@@ -276,14 +280,15 @@ class ReadConfFromYaml(SetPropertyFromCommand):
         # Find the stage name from the branch name
         branch = self.getProperty('branch', 'default')
         for branch_pattern, branch_conf in conf['branches'].items():
-            log.msg('Checking if <%s> matches <%s>' % (branch,
-                                                       branch_pattern))
+            self.logger.debug('Checking if <{branch}> matches <{pattern}>',
+                              branch=branch, pattern=branch_pattern)
             if fnmatch(branch, branch_pattern):
                 stage_name = branch_conf['stage']
-                log.msg('<%s> matched <%s>' % (branch, branch_pattern))
+                self.logger.debug('<{branch}> matched <{branch_pattern}>',
+                                  branch=branch, branch_pattern=branch_pattern)
                 break
         else:
-            log.msg('No branch match. Using default branch config.')
+            self.logger.debug('No branch match. Using default branch config.')
             stage_name = conf['branches']['default']['stage']
         self.setProperty('stage_name', stage_name, 'ReadConfFromYaml Step')
         self.property_changes['stage_name'] = stage_name
@@ -297,11 +302,11 @@ class StepExtractor(BuildStep):
     to the current builder. It also adds a step to build an image.
     """
     name = 'step extractor'
+    logger = Logger('eve.steps.StepExtractor')
 
     def run(self):
         conf = self.getProperty('conf')
         stage_name = self.getProperty('stage_name')
-        log.msg('stage name = %s' % stage_name)
         stage_conf = conf['stages'][stage_name]
         for step in stage_conf['steps']:
             step_type, params = dict.popitem(step)
@@ -315,8 +320,6 @@ class StepExtractor(BuildStep):
                     _cls = getattr(steps, step_type)
                 except AttributeError:
                     raise Exception('Could not load step %s' % step_type)
-
-            log.msg('%s with params : %s' % (step_type, params))
 
             # Replace the %(prop:*)s in the text with an Interpolate obj
             params = replace_with_interpolate(params)
@@ -340,10 +343,13 @@ class StepExtractor(BuildStep):
 
             step = _cls(**params)
             self.build.addStepsAfterLastStep([step])
+            self.logger.debug('Add {step} with params : {params}',
+                              step=step_type, params=params)
         return succeed(SUCCESS)
 
 
 class BuildDockerImage(BuildStep):
+    logger = Logger('eve.steps.BuildDockerImage')
 
     def __init__(self, path, image_name, **kwargs):
         BuildStep.__init__(self, **kwargs)
@@ -370,7 +376,7 @@ class BuildDockerImage(BuildStep):
         for line in docker_client.build(
                 path=self.full_path,
                 tag=self.image_name):
-            log.msg(line)
+            self.logger.debug(line)
             try:
                 streamlines = _handle_stream_line(line)
             except simplejson.scanner.JSONDecodeError:
