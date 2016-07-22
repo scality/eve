@@ -33,11 +33,9 @@ class Docker(object):
         """Build EVE docker image."""
         try:
             tmp_dir = tempfile.mkdtemp()
-            docker_path = os.path.join(tmp_dir, 'eve')
+            docker_path = os.path.join(tmp_dir, fqdn)
             shutil.copytree('eve/master', docker_path)
-            shutil.copytree(worker_cert_path, os.path.join(
-                docker_path,
-                'worker_docker_certs'))
+            shutil.copytree('certs', os.path.join(docker_path, 'certs'))
             shutil.copytree('etc', os.path.join(docker_path, 'etc'))
 
             # Generate reverse proxy config
@@ -100,7 +98,11 @@ class Docker(object):
                 9989: 9989}),
             name=name
         )
-        self.client.start(container=container.get('Id'))
+        cont_id = container.get('Id')
+        self.client.start(container=cont_id)
+        return cont_id
+
+
 
     def execute(self, name, command):
         """Execute a command into a running docker container."""

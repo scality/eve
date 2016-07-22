@@ -18,24 +18,9 @@ pipelines:
     development/*:
       - step:
           script:
-            # Setting up CARINA Docker environment and variables
-            - eval $(python infrastructure/carina_setup_env.py eve_cluster_prod)
-            - cp -rp $DOCKER_CERT_PATH eve/docker_worker/docker_certs
-            - apt-get --assume-yes -qq update
-            - DEBIAN_FRONTEND=noninteractive apt-get -qq install -y python-pip python-dev git
-            - curl -sSL https://get.docker.com/ | sh
-            - docker build -t eve eve
-            - docker rm -f eve || true
-            - docker run
-              -e EVE_BITBUCKET_LOGIN="$EVE_BITBUCKET_LOGIN"
-              -e EVE_BITBUCKET_PWD="$EVE_BITBUCKET_PWD"
-              -e EVE_WEB_LOGIN="$EVE_WEB_LOGIN"
-              -e EVE_WEB_PWD="$EVE_WEB_PWD"
-              -e GIT_CERT_KEY_BASE64="$GIT_CERT_KEY_BASE64"
-              -e GIT_REPO=git@bitbucket.org:scality/wall-e.git
-              -e DOCKER_HOST="$DOCKER_HOST"
-              -e MASTER_FQDN="$MASTER_FQDN"
-              -e DOCKER_TLS_VERIFY="$DOCKER_TLS_VERIFY"
-              -e BB_WALL_E_PWD="$BB_WALL_E_PWD"
-              -e BB_EVE_PWD="$BB_EVE_PWD"
-              -p 8000:8000 -p 9989:9989 --name=eve eve
+            python deploy/deploy_eve_master.py scality wall-e
+  branches:
+    release/*:
+      - step:
+          script:
+            python deploy/deploy_eve_master.py scality ring
