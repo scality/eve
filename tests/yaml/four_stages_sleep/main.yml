@@ -1,0 +1,59 @@
+branches:
+  default:
+    stage: pre-merge
+  development/*:
+    stage: post-merge
+
+stages:
+  pre-merge:
+    image:
+        type: docker
+        path: eve/ubuntu-trusty-ctxt
+    steps:
+      - ShellCommand:
+          name: echo revision and branch name
+          command: echo REVISION=%(prop:got_revision)s BRANCH=%(prop:branch)s $DOCKER_HOST
+      - TriggerStages:
+          name: trigger compilation and test stages simultaneously
+          stage_names:
+            - compile
+            - test
+          waitForFinish: True
+      - TriggerStages:
+          name: trigger finalize stage
+          stage_names:
+            - finalize
+          waitForFinish: True
+  compile:
+    image:
+        type: docker
+        path: eve/ubuntu-trusty-ctxt
+    steps:
+      - ShellCommand:
+          name: sleep 1
+          command: "sleep 1"
+  test:
+    image:
+        type: docker
+        path: eve/centos7-ctxt
+    steps:
+      - ShellCommand:
+          name: sleep 2
+          command: "sleep 2"
+  finalize:
+    image:
+      type: docker
+      path: eve/ubuntu-trusty-ctxt
+    steps:
+      - ShellCommand:
+          name: sleep 4
+          command: "sleep 4"
+
+  post-merge:
+    image:
+        type: docker
+        path: eve/ubuntu-trusty-ctxt
+    steps:
+      - ShellCommand:
+          name: directory listing
+          command: "ls -l"
