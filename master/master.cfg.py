@@ -1,10 +1,12 @@
 # coding: utf-8
+import json
+import shutil
 from fnmatch import fnmatch
-import os
 from os import environ, getcwd, path
 from random import randint
-import shutil
 
+import docker
+import yaml
 from buildbot.changes.gitpoller import GitPoller
 from buildbot.config import BuilderConfig
 from buildbot.plugins import steps
@@ -21,23 +23,19 @@ from buildbot.steps.shell import SetPropertyFromCommand, ShellCommand
 from buildbot.steps.source.base import Source
 from buildbot.steps.source.git import Git
 from buildbot.steps.trigger import Trigger
-from buildbot.worker.docker import DockerLatentWorker, _handle_stream_line
+from buildbot.worker.docker import DockerLatentWorker
 from buildbot.worker.local import LocalWorker
 from buildbot.www.auth import UserPasswordAuth
 from buildbot.www.authz import Authz, endpointmatchers, roles
-import docker
 from requests.auth import HTTPBasicAuth
-import simplejson
 from twisted.internet.defer import inlineCallbacks, returnValue, succeed
 from twisted.logger import Logger
 from twisted.python.reflect import namedModule
-import yaml
-
 
 ##########################
 # Constants
 ##########################
-LOCAL_WORKER_NAME = 'local-worker'
+LOCAL_WORKER_NAME = 'lw-001'
 BOOTSTRAP_BUILDER_NAME = 'bootstrap'
 BOOTSTRAP_SCHEDULER_NAME = 's-bootstrap'
 TRIGGERABLE_BUILDER_NAME = 'triggerable'
@@ -46,6 +44,7 @@ MAX_DOCKER_WORKERS = 10
 EVE_FOLDER = 'eve'
 EVE_MAIN_YAML = 'main.yml'
 EVE_MAIN_YAML_FULL_PATH = '%s/%s' % (EVE_FOLDER, EVE_MAIN_YAML)
+PB_PORT = environ.get('PB_PORT', 9000)
 
 ##########################
 # Set/Check environment variables
@@ -53,23 +52,40 @@ EVE_MAIN_YAML_FULL_PATH = '%s/%s' % (EVE_FOLDER, EVE_MAIN_YAML)
 # git
 GIT_REPO = environ['GIT_REPO']
 assert GIT_REPO
-GIT_KEY_PATH = '/root/.ssh/id_rsa'
+GIT_KEY_PATH = environ['GIT_KEY_PATH']
+assert path.isfile(GIT_KEY_PATH), 'Did not find git RSA cert in %s' %\
+                                  GIT_KEY_PATH
+
 # docker
-assert 'tcp://' in environ['DOCKER_HOST']
-MASTER_FQDN = os.environ['MASTER_FQDN']
-if not MASTER_FQDN:
-    MASTER_FQDN = os.environ['DOCKER_HOST'].replace('tcp://', '').split(':')[0]
+assert '//' in environ['DOCKER_HOST']
+DOCKER_HOST = environ['DOCKER_HOST']
+EXTERNAL_URL = environ['EXTERNAL_URL']
+assert EXTERNAL_URL
+MASTER_DOCKER_NAME = environ['MASTER_DOCKER_NAME']
+assert MASTER_DOCKER_NAME
+MASTER_ADDRESS = MASTER_DOCKER_NAME
 
-DOCKER_CERT_PATH = environ.get('DOCKER_CERT_PATH')
-DOCKER_CERT_PATH_CA = os.path.join(DOCKER_CERT_PATH, 'ca.pem')
-DOCKER_CERT_PATH_KEY = os.path.join(DOCKER_CERT_PATH, 'key.pem')
-DOCKER_CERT_PATH_CERT = os.path.join(DOCKER_CERT_PATH, 'cert.pem')
-assert path.isdir(DOCKER_CERT_PATH), DOCKER_CERT_PATH
-assert path.isfile(DOCKER_CERT_PATH_CA), DOCKER_CERT_PATH_CA
-assert path.isfile(DOCKER_CERT_PATH_KEY), DOCKER_CERT_PATH_KEY
-assert path.isfile(DOCKER_CERT_PATH_CERT), DOCKER_CERT_PATH_CERT
-assert path.isfile('/root/.ssh/id_rsa'), 'Did not find git RSA cert'
+DOCKER_CERT_PATH = None
+if path.isdir(environ['DOCKER_CERT_PATH']):
+    DOCKER_CERT_PATH = environ['DOCKER_CERT_PATH']
+    DOCKER_CERT_PATH_CA = path.join(DOCKER_CERT_PATH, 'ca.pem')
+    DOCKER_CERT_PATH_KEY = path.join(DOCKER_CERT_PATH, 'key.pem')
+    DOCKER_CERT_PATH_CERT = path.join(DOCKER_CERT_PATH, 'cert.pem')
+    assert path.isfile(DOCKER_CERT_PATH_CA), DOCKER_CERT_PATH_CA
+    assert path.isfile(DOCKER_CERT_PATH_KEY), DOCKER_CERT_PATH_KEY
+    assert path.isfile(DOCKER_CERT_PATH_CERT), DOCKER_CERT_PATH_CERT
 
+if DOCKER_CERT_PATH:
+    TLS_CONFIG = docker.tls.TLSConfig(
+        client_cert=(
+            DOCKER_CERT_PATH_CERT,
+            DOCKER_CERT_PATH_KEY),
+        ca_cert=DOCKER_CERT_PATH_CA,
+        verify=False)
+else:
+    TLS_CONFIG = None
+
+# bitbucket
 EVE_BITBUCKET_LOGIN = environ['EVE_BITBUCKET_LOGIN']
 EVE_BITBUCKET_PWD = environ['EVE_BITBUCKET_PWD']
 
@@ -83,31 +99,37 @@ PROJECT_URL = environ['PROJECT_URL']
 # TODO : for prod, use something like 'mysql://user@pass:mysqlserver/buildbot'
 DB_URL = environ.get('DB_URL', 'sqlite:///state.sqlite')
 
+
+docker_client = docker.Client(
+    base_url=DOCKER_HOST,
+    tls=TLS_CONFIG
+)
+
 ##########################
 # Project Identity
 ##########################
-c = BuildmasterConfig = {}
-c['title'] = "Eve: pipeline of the %s project" % PROJECT_NAME
-c['titleURL'] = PROJECT_URL
-c['buildbotURL'] = 'https://%s/' % MASTER_FQDN
+EVE_CONF = BuildmasterConfig = {}
+EVE_CONF['title'] = "Eve: pipeline of the %s project" % PROJECT_NAME
+EVE_CONF['titleURL'] = PROJECT_URL
+EVE_CONF['buildbotURL'] = EXTERNAL_URL
 
 # 'protocols' contains information about protocols which master will use for
 # communicating with workers. You must define at least 'port' option that
 # workers could connect to your master with this protocol.
 # 'port' must match the value configured into the buildworkers (with their
 # --master option)
-c['protocols'] = {'pb': {'port': 9989}}
+EVE_CONF['protocols'] = {'pb': {'port': PB_PORT}}
 
 
 ##########################
 # Web UI
 ##########################
 # Create a basic auth website with the waterfall view and the console view
-c['www'] = dict(port="unix:/run/buildbot.sock",
-                auth=UserPasswordAuth({EVE_WEB_LOGIN: EVE_WEB_PWD}),
-                plugins=dict(
-                    waterfall_view={},
-                    console_view={}))
+EVE_CONF['www'] = dict(port=8000,
+                       auth=UserPasswordAuth({EVE_WEB_LOGIN: EVE_WEB_PWD}),
+                       plugins=dict(
+                           waterfall_view={},
+                           console_view={}))
 
 # Limit write operations to the EVE_WEB_LOGIN account except for tests
 if EVE_WEB_LOGIN != 'test':
@@ -121,11 +143,11 @@ if EVE_WEB_LOGIN != 'test':
             roles.RolesFromEmails(admin=[EVE_WEB_LOGIN])
         ]
     )
-    c['www']['authz'] = authz
+    EVE_CONF['www']['authz'] = authz
 
 # DB URL
 # TODO: Replace with a MySQL database
-c['db'] = {
+EVE_CONF['db'] = {
     # This specifies what database buildbot uses to store its state.
     # You can leave this at its default for all but the largest installations.
     'db_url': DB_URL,
@@ -167,8 +189,9 @@ class BitbucketBuildStatusPush(HttpStatusPushBase):
             else:
                 bitbucket_state = 'FAILED'
             message += Results[results]
-            d = (build['complete_at'] - build['started_at']).total_seconds()
-            message += ' in %d seconds' % d
+            delay = (build['complete_at'] -
+                     build['started_at']).total_seconds()
+            message += ' in %d seconds' % delay
 
         else:
             # This code is never reached. Buildbot does not call a reporter
@@ -203,35 +226,31 @@ class BitbucketBuildStatusPush(HttpStatusPushBase):
                               response=response)
 
 # The status push works only on the main builder (bootstrap)
-sp = BitbucketBuildStatusPush(builders=['bootstrap'], wantProperties=True)
-c['services'] = [sp]
+statpsh = BitbucketBuildStatusPush(builders=['bootstrap'], wantProperties=True)
+EVE_CONF['services'] = [statpsh]
 
 ##########################
 # Workers
 ##########################
 # Create One Local Worker that will bootstrap all the jobs
-c['workers'] = [LocalWorker(LOCAL_WORKER_NAME)]
+EVE_CONF['workers'] = [LocalWorker(LOCAL_WORKER_NAME)]
 
 # Then create MAX_DOCKER_WORKERS Docker Workers that will do the real job
-tls_config = docker.tls.TLSConfig(
-    client_cert=(
-        DOCKER_CERT_PATH_CERT,
-        DOCKER_CERT_PATH_KEY),
-    ca_cert=DOCKER_CERT_PATH_CA,
-    verify=False)
-docker_workers = []
+
+DOCKER_WORKERS = []
 for i in range(MAX_DOCKER_WORKERS):
-    docker_workers.append(
+    DOCKER_WORKERS.append(
         DockerLatentWorker(
-            name='latent-docker-worker-%d' % i,
+            name='dw%03d-%s' % (i, MASTER_DOCKER_NAME),
             password='pwd%d' % i,  # fixme: stronger passwords
-            docker_host=environ['DOCKER_HOST'],
-            tls=tls_config,
+            docker_host=DOCKER_HOST,
+            hostconfig={'links': [(MASTER_DOCKER_NAME, MASTER_DOCKER_NAME)]},
+            tls=TLS_CONFIG,
             image=Property('docker_image'),
             networking_config=None,
             followStartupLogs=True,
-            masterFQDN=MASTER_FQDN))
-c['workers'].extend(docker_workers)
+            masterFQDN=MASTER_DOCKER_NAME))
+EVE_CONF['workers'].extend(DOCKER_WORKERS)
 
 ##########################
 # Change Sources
@@ -239,8 +258,8 @@ c['workers'].extend(docker_workers)
 # the 'change_source' setting tells the buildmaster how it should find out
 # about source code changes.
 
-c['change_source'] = []
-c['change_source'].append(GitPoller(
+EVE_CONF['change_source'] = []
+EVE_CONF['change_source'].append(GitPoller(
     GIT_REPO,
     workdir='gitpoller-workdir',
     branches=True,
@@ -333,9 +352,9 @@ class StepExtractor(BuildStep):
             # for the HTTP step
             if issubclass(_cls, HTTPStep):
                 pwd = params['auth'][1].replace('$', '')
-                if pwd in os.environ:
+                if pwd in environ:
                     params['auth'] = HTTPBasicAuth(
-                        params['auth'][0], os.environ[pwd])
+                        params['auth'][0], environ[pwd])
 
             # Hack! Buildbot does not accept unicode step names
             if 'name' in params and isinstance(params['name'], unicode):
@@ -361,10 +380,6 @@ class BuildDockerImage(BuildStep):
     def run(self):
         # Capture the output of the docker build command in a log object
         stdio = yield self.addLog('stdio')
-        docker_client = docker.Client(
-            base_url=environ['DOCKER_HOST'],
-            tls=tls_config
-        )
         stdio.addHeader('Building docker image %s fom %s\n' % (
             self.name, self.full_path))
         fail = False
@@ -373,21 +388,21 @@ class BuildDockerImage(BuildStep):
             '%s does not exist in %s' % (self.full_path, getcwd())
         shutil.copy(GIT_KEY_PATH, self.full_path)
         self.setProperty('docker_image', self.image_name)
-        for line in docker_client.build(
+        for output in docker_client.build(
                 path=self.full_path,
                 tag=self.image_name):
-            self.logger.debug(line)
-            try:
-                streamlines = _handle_stream_line(line)
-            except simplejson.scanner.JSONDecodeError:
-                continue
-            for streamline in streamlines:
-                if 'ERROR: ' in streamline:
-                    stdio.addStderr(streamline + '\n')
-                    fail = True
+            for json_line in output.rstrip().split('\r\n'):
+                formatted = json.loads(json_line)
+                if 'error' in formatted:
+                    stdio.addStderr(formatted['error'] + '\n')
+                    raise Exception("ERROR: " + formatted['error'])
+                elif 'stream' in formatted:
+                    for line in formatted['stream'].split('\n'):
+                        if line:
+                            stdio.addStdout(formatted['stream'])
+                            # self.logger.info(line)
                 else:
-                    stdio.addStdout(streamline + '\n')
-
+                    self.logger.info(formatted)
         stdio.finish()
         if fail:
             returnValue(FAILURE)
@@ -412,7 +427,10 @@ class TriggerStages(BuildStep):
         build_image_steps = []
 
         for stage_name in reversed(self.stage_names):
-            docker_path = conf['stages'][stage_name]['image']['path']
+            try:
+                docker_path = conf['stages'][stage_name]['image']['path']
+            except KeyError:
+                return succeed(FAILURE)
             full_docker_path = 'workers/%s/%s/build/%s' % (
                 LOCAL_WORKER_NAME,
                 BOOTSTRAP_BUILDER_NAME,
@@ -457,13 +475,13 @@ class TriggerStagesOld(Trigger):
 # #########################
 # Bootstrap Sequence: Schedulers
 # #########################
-c['schedulers'] = []
-c['schedulers'].append(AnyBranchScheduler(
+EVE_CONF['schedulers'] = []
+EVE_CONF['schedulers'].append(AnyBranchScheduler(
     name=BOOTSTRAP_SCHEDULER_NAME,
     treeStableTimer=None,
     builderNames=[BOOTSTRAP_BUILDER_NAME]))
 
-c['schedulers'].append(ForceScheduler(
+EVE_CONF['schedulers'].append(ForceScheduler(
     name="force-bootstrap",
     builderNames=[BOOTSTRAP_BUILDER_NAME]))
 
@@ -481,8 +499,8 @@ bootstrap_factory.addStep(ReadConfFromYaml())
 # #########################
 # Bootstrap Sequence: Builders
 # #########################
-c['builders'] = []
-c['builders'].append(
+EVE_CONF['builders'] = []
+EVE_CONF['builders'].append(
     BuilderConfig(
         name=BOOTSTRAP_BUILDER_NAME,
         workernames=[LOCAL_WORKER_NAME],
@@ -491,7 +509,7 @@ c['builders'].append(
 # #########################
 # Triggerable Sequence: Schedulers
 # #########################
-c['schedulers'].append(Triggerable(
+EVE_CONF['schedulers'].append(Triggerable(
     name=TRIGGERABLE_SCHEDULER_NAME,
     builderNames=[TRIGGERABLE_BUILDER_NAME]))
 
@@ -505,10 +523,10 @@ triggered_factory.addStep(StepExtractor())
 # #########################
 # Triggerable Sequence: Builders
 # #########################
-c['builders'].append(
+EVE_CONF['builders'].append(
     BuilderConfig(
         name=TRIGGERABLE_BUILDER_NAME,
-        workernames=[dw.name for dw in docker_workers],
+        workernames=[dw.name for dw in DOCKER_WORKERS],
         factory=triggered_factory
     ))
 
@@ -519,10 +537,10 @@ c['builders'].append(
 # unbound method _defaultCollapseRequestFn()
 # must be called with Builder instance as first
 # argument (got BuildMaster instance instead)
-c['collapseRequests'] = False
+EVE_CONF['collapseRequests'] = False
 
 # Hack to fix a bug stating that LocalWorkers do not have a valid path_module
-for w in c['workers']:
+for w in EVE_CONF['workers']:
     w.path_module = namedModule("posixpath")
 
 

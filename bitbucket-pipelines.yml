@@ -4,16 +4,34 @@ pipelines:
   default:
     - step:
         script:
-          # Setting up the SSH key to interact with git
-          - mkdir $HOME/.ssh
-          - echo $GIT_CERT_KEY_BASE64 | base64 --decode > $HOME/.ssh/id_rsa
-          - chmod 600 $HOME/.ssh/id_rsa
-          - ssh-keyscan bitbucket.org >> $HOME/.ssh/known_hosts
+          # Reading certificates from environment variables and
+
+          # converting them to files
+          - python create-files-for-bitbucket-pipelines.py
+
+          # fixing git certificate
+          - mkdir -p ~/.ssh/
+          - cp certs/git/id_rsa ~/.ssh/
+          - chmod 600 ~/.ssh/id_rsa
+          - ssh-keyscan bitbucket.org >> ~/.ssh/known_hosts
+          - git clone git@bitbucket.org:scality/test-eve.git
+
+          # installing tox
+          - pip install tox
+
+          # Launching static checks tests
+          # - tox -e static || exit 0 # FIXME: too many pylint errors
+
           # Setting up CARINA Docker environment and variables
           - eval $(python deploy/carina_setup_env.py eve_cluster_test)
+
           # Launching tests
-          - pip install tox
-          - tox
+          - HTTP_PORT="" PB_PORT="" REPO="" tox -e tests
+
+          # Deplying eve for the eve-test repo
+          - HTTP_PORT=8998 PB_PORT=9998 REPO=eve-test tox -e deploy
+
+
   branches:
     development/*:
       - step:

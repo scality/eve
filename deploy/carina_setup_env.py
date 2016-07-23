@@ -3,8 +3,8 @@
 from __future__ import print_function
 
 import os
-from subprocess import check_output
 import sys
+from subprocess import check_output
 
 assert os.environ['CARINA_USERNAME']
 assert os.environ['CARINA_APIKEY']
