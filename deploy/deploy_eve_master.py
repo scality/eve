@@ -4,6 +4,7 @@ import logging
 import os
 import time
 from argparse import ArgumentParser
+from urlparse import urlparse, urljoin
 
 import requests
 
@@ -29,7 +30,7 @@ class EveMaster(object):
             'git@bitbucket.org:%s.git' % git_repo_name
         self.name = name
         self.external_url = external_url
-        api_base_url = self.external_url + 'api/v2/'
+        api_base_url = urljoin(self.external_url, 'api/v2/')
 
         self.eve_env_vars = {
             'GIT_REPO': bitbucket_git_repo,
@@ -157,15 +158,15 @@ def main():
                         help='increase verbosity (may be supplied two times)')
     args = parser.parse_args()
 
-    if args.master_docker_host.startswith('unix:///'):
+    if urlparse(args.master_docker_host).scheme == 'unix':
         args.master_docker_cert_path = None
         args.public_web_url = 'http://localhost:%d/' % args.http_port
 
-    if args.workers_docker_host.startswith('unix:///'):
+    if urlparse(args.workers_docker_host).scheme == 'unix':
         args.workers_docker_cert_path = None
 
     if args.public_web_url is None:
-        fqdn = args.master_docker_host.replace('tcp://', '').split(':')[0]
+        fqdn = urlparse(args.master_docker_host).hostname
         args.public_web_url = 'http://%s:%d/' % (fqdn, args.http_port)
 
     # Set up basic logging according to selected verbosity
