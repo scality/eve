@@ -101,7 +101,7 @@ class EveMaster(object):
                 return
             except requests.ConnectionError:
                 time.sleep(1)
-        print self.docker.client.logs(container_id)
+        logger.error(self.docker.client.logs(container_id))
         raise Exception('Could not connect to API')
 
 
