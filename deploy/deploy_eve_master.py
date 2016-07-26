@@ -133,7 +133,7 @@ def main():
              '--workers_docker_cert_path is ignored')
     parser.add_argument(
         '--workers_docker_cert_path',
-        default=os.environ.get('DOCKER_CERT_PATH', 'certs/docker_master'),
+        default=os.environ.get('DOCKER_CERT_PATH', 'certs/docker_workers'),
         help='The path to the docker host\'s certificates. Default value is '
              '$DOCKER_CERT_PATH if defined or certs/docker_master otherwise')
     parser.add_argument(
