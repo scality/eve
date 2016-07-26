@@ -44,7 +44,6 @@ MAX_DOCKER_WORKERS = 10
 EVE_FOLDER = 'eve'
 EVE_MAIN_YAML = 'main.yml'
 EVE_MAIN_YAML_FULL_PATH = '%s/%s' % (EVE_FOLDER, EVE_MAIN_YAML)
-PB_PORT = environ.get('PB_PORT', 9000)
 
 ##########################
 # Set/Check environment variables
@@ -118,7 +117,7 @@ EVE_CONF['buildbotURL'] = EXTERNAL_URL
 # workers could connect to your master with this protocol.
 # 'port' must match the value configured into the buildworkers (with their
 # --master option)
-EVE_CONF['protocols'] = {'pb': {'port': PB_PORT}}
+EVE_CONF['protocols'] = {'pb': {'port': 9000}}
 
 
 ##########################
