@@ -20,8 +20,6 @@ logging.basicConfig(format='[%(levelname)s] %(message)s', level=logging.INFO)
 
 SUCCESS = 0
 FAILURE = 2
-EVE_WEB_LOGIN = 'test'
-EVE_WEB_PWD = 'testpwd'
 HTTP_PORT = 8999
 PB_PORT = 9999
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)

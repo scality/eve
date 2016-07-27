@@ -26,7 +26,7 @@ from buildbot.steps.source.git import Git
 from buildbot.steps.trigger import Trigger
 from buildbot.worker.docker import DockerLatentWorker
 from buildbot.worker.local import LocalWorker
-from buildbot.www.auth import UserPasswordAuth
+from buildbot.www.oauth2 import GoogleAuth
 from buildbot.www.authz import Authz, endpointmatchers, roles
 from requests.auth import HTTPBasicAuth
 from twisted.internet.defer import inlineCallbacks, returnValue, succeed
@@ -89,8 +89,8 @@ else:
 EVE_BITBUCKET_LOGIN = environ['EVE_BITBUCKET_LOGIN']
 EVE_BITBUCKET_PWD = environ['EVE_BITBUCKET_PWD']
 
-EVE_WEB_LOGIN = environ['EVE_WEB_LOGIN']
-EVE_WEB_PWD = environ['EVE_WEB_PWD']
+OAUTH2_CLIENT_ID = environ['OAUTH2_CLIENT_ID']
+OAUTH2_CLIENT_SECRET = environ['OAUTH2_CLIENT_SECRET']
 
 PROJECT_NAME = environ['PROJECT_NAME']
 PROJECT_URL = environ['PROJECT_URL']
@@ -124,21 +124,29 @@ EVE_CONF['protocols'] = {'pb': {'port': 9000}}
 ##########################
 # Create a basic auth website with the waterfall view and the console view
 EVE_CONF['www'] = dict(port=8000,
-                       auth=UserPasswordAuth({EVE_WEB_LOGIN: EVE_WEB_PWD}),
+                       auth=GoogleAuth(OAUTH2_CLIENT_ID, OAUTH2_CLIENT_SECRET),
                        plugins=dict(
                            waterfall_view={},
                            console_view={}))
 
-# Limit write operations to the EVE_WEB_LOGIN account except for tests
-if EVE_WEB_LOGIN != 'test':
+# Limit write operations to the OAUTH2_CLIENT_ID account except for tests
+
+
+class DeveloperRoleIfConnected(roles.RolesFromBase):
+    """ Sets the 'developer' role to all authenticated users"""
+
+    def getRolesFromUser(self, userDetails):
+        if 'email' in userDetails:# and userDetails['email']:
+            return ['developer']
+        return []
+
+if OAUTH2_CLIENT_ID != 'test':
     authz = Authz(
         allowRules=[
-            endpointmatchers.StopBuildEndpointMatcher(role='admin'),
-            endpointmatchers.ForceBuildEndpointMatcher(role='admin'),
-            endpointmatchers.RebuildBuildEndpointMatcher(role='admin'),
+            endpointmatchers.AnyEndpointMatcher(role='developer'),
         ],
         roleMatchers=[
-            roles.RolesFromEmails(admin=[EVE_WEB_LOGIN])
+            DeveloperRoleIfConnected()
         ]
     )
     EVE_CONF['www']['authz'] = authz
@@ -378,8 +386,9 @@ class BuildDockerImage(BuildStep):
     def run(self):
         # Capture the output of the docker build command in a log object
         stdio = yield self.addLog('stdio')
-        stdio.addHeader('Building docker image %s fom %s\n' % (
-            self.name, self.full_path))
+        stdio.addHeader(
+            'Building docker image <%s> fom %s on docker host %s\n' %
+            (self.image_name, self.full_path, DOCKER_HOST))
         fail = False
         # assert the directory containing the dockerfile exists
         assert path.exists(self.full_path), \

@@ -50,14 +50,15 @@ class EveMaster(object):
         self.eve_env_vars['EVE_BITBUCKET_LOGIN'] = eve_bitbucket_login
         self.eve_env_vars['EVE_BITBUCKET_PWD'] = eve_bitbucket_pwd
 
-    def set_web_credentials(
+    def set_oauth2_credentials(
             self,
-            eve_web_login,
-            eve_web_pwd):
-        """Sets credentials that will allow to connect to the Web/API."""
-        self.eve_env_vars['EVE_WEB_LOGIN'] = eve_web_login
-        self.eve_env_vars['EVE_WEB_PWD'] = eve_web_pwd
-        self.api.add_auth(eve_web_login, eve_web_pwd)
+            oauth2_client_id,
+            oauth2_client_secret):
+        """Sets oauth2 credentials that will allow to connect to the
+        Web/API."""
+        self.eve_env_vars['OAUTH2_CLIENT_ID'] = oauth2_client_id
+        self.eve_env_vars['OAUTH2_CLIENT_SECRET'] = oauth2_client_secret
+        self.api.add_auth(oauth2_client_id, oauth2_client_secret)
 
     def set_db_url(self, db_url):
         """Sets the database url (including credentials)."""
@@ -191,9 +192,9 @@ def main():
     eve.set_bitbucket_credentials(
         os.environ['EVE_BITBUCKET_LOGIN'],
         os.environ['EVE_BITBUCKET_PWD'])
-    eve.set_web_credentials(
-        os.environ['EVE_WEB_LOGIN'],
-        os.environ['EVE_WEB_PWD'])
+    eve.set_oauth2_credentials(
+        os.environ['OAUTH2_CLIENT_ID'],
+        os.environ['OAUTH2_CLIENT_SECRET'])
     eve.set_db_url(os.environ.get('DB_URL', 'sqlite:///state.sqlite'))
     container_id = eve.deploy(
         master_docker_host=args.master_docker_host,
