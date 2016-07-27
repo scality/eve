@@ -4,6 +4,7 @@ import shutil
 from fnmatch import fnmatch
 from os import environ, getcwd, path
 from random import randint
+from urlparse import urlparse
 
 import docker
 import yaml
@@ -247,7 +248,7 @@ for i in range(MAX_DOCKER_WORKERS):
             image=Property('docker_image'),
             networking_config=None,
             followStartupLogs=True,
-            masterFQDN=MASTER_DOCKER_NAME))
+            masterFQDN=urlparse(EXTERNAL_URL).hostname))
 EVE_CONF['workers'].extend(DOCKER_WORKERS)
 
 ##########################
