@@ -59,6 +59,10 @@ class EveMaster(object):
         self.eve_env_vars['EVE_WEB_PWD'] = eve_web_pwd
         self.api.add_auth(eve_web_login, eve_web_pwd)
 
+    def set_db_url(self, db_url):
+        """Sets the database url (including credentials)."""
+        self.eve_env_vars['DB_URL'] = db_url
+
     def deploy(self, master_docker_host, master_docker_cert_path,
                workers_docker_host, workers_docker_cert_path,
                http_port, pb_port):
@@ -190,6 +194,7 @@ def main():
     eve.set_web_credentials(
         os.environ['EVE_WEB_LOGIN'],
         os.environ['EVE_WEB_PWD'])
+    eve.set_db_url(os.environ.get('DB_URL', 'sqlite:///state.sqlite'))
     container_id = eve.deploy(
         master_docker_host=args.master_docker_host,
         master_docker_cert_path=args.master_docker_cert_path,

@@ -96,9 +96,7 @@ PROJECT_NAME = environ['PROJECT_NAME']
 PROJECT_URL = environ['PROJECT_URL']
 
 # database
-# TODO : for prod, use something like 'mysql://user@pass:mysqlserver/buildbot'
-DB_URL = environ.get('DB_URL', 'sqlite:///state.sqlite')
-
+DB_URL = environ['DB_URL']
 
 docker_client = docker.Client(
     base_url=DOCKER_HOST,
@@ -146,10 +144,7 @@ if EVE_WEB_LOGIN != 'test':
     EVE_CONF['www']['authz'] = authz
 
 # DB URL
-# TODO: Replace with a MySQL database
 EVE_CONF['db'] = {
-    # This specifies what database buildbot uses to store its state.
-    # You can leave this at its default for all but the largest installations.
     'db_url': DB_URL,
 }
 
