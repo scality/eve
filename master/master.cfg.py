@@ -307,7 +307,11 @@ class ReadConfFromYaml(SetPropertyFromCommand):
                 break
         else:
             self.logger.debug('No branch match. Using default branch config.')
-            stage_name = conf['branches']['default']['stage']
+            try:
+                stage_name = conf['branches']['default']['stage']
+            except KeyError:
+                self.logger.debug('No default. Stopping here.')
+                return
         self.setProperty('stage_name', stage_name, 'ReadConfFromYaml Step')
         self.property_changes['stage_name'] = stage_name
         self.build.addStepsAfterCurrentStep([TriggerStages([stage_name])])
