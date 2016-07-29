@@ -36,9 +36,9 @@ pipelines:
     development/*:
       - step:
           script:
-            python deploy/deploy_eve_master.py scality wall-e
+            - HTTP_PORT=8002 PB_PORT=9002 REPO=wall-e tox -e deploy
   branches:
     release/*:
       - step:
           script:
-            python deploy/deploy_eve_master.py scality ring
+            - HTTP_PORT=8000 PB_PORT=9000 REPO=ring tox -e deploy
