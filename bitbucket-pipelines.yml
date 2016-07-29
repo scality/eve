@@ -37,7 +37,6 @@ pipelines:
       - step:
           script:
             - HTTP_PORT=8002 PB_PORT=9002 REPO=wall-e tox -e deploy
-  branches:
     release/*:
       - step:
           script:
