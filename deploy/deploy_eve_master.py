@@ -42,6 +42,13 @@ class EveMaster(object):
         self.api = BuildbotDataAPI(api_base_url)
         self.docker = None
 
+    def set_auth_credentials(
+            self,
+            login,
+            password):
+        """Sets HTTP basic auth credentials to access the REST API"""
+        self.api.add_auth(login, password)
+
     def set_bitbucket_credentials(
             self,
             eve_bitbucket_login,
@@ -159,6 +166,12 @@ def main():
         type=int,
         help='The port on which the buildbot will listen for its workers on '
              'the master docker host')
+    parser.add_argument(
+        '--auth_login',
+        help='The login to access the web server as seen by the end users')
+    parser.add_argument(
+        '--auth_pwd',
+        help='The password to access the web server as seen by the end users')
     parser.add_argument('-v', '--verbose', action='count', default=0,
                         help='increase verbosity (may be supplied two times)')
     args = parser.parse_args()
@@ -196,6 +209,9 @@ def main():
         os.environ['OAUTH2_CLIENT_ID'],
         os.environ['OAUTH2_CLIENT_SECRET'])
     eve.set_db_url(os.environ.get('DB_URL', 'sqlite:///state.sqlite'))
+    eve.set_auth_credentials(
+        args.auth_login,
+        args.auth_pwd)
     container_id = eve.deploy(
         master_docker_host=args.master_docker_host,
         master_docker_cert_path=args.master_docker_cert_path,
