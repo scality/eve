@@ -246,6 +246,7 @@ for i in range(MAX_DOCKER_WORKERS):
             name='dw%03d-%s' % (i, MASTER_DOCKER_NAME),
             password='pwd%d' % i,  # fixme: stronger passwords
             docker_host=DOCKER_HOST,
+            hostconfig={'links': [(MASTER_DOCKER_NAME, MASTER_DOCKER_NAME)]},
             tls=TLS_CONFIG,
             image=Property('docker_image'),
             networking_config=None,
