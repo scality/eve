@@ -6,13 +6,14 @@ import subprocess
 logger = logging.getLogger(__name__)
 
 
-def cmd(command, ignore_exception=False):
+def cmd(command, ignore_exception=False, cwd=None):
     """Execute a shell command and display output in a readable manner."""
     output = ''
     logger.info('COMMAND : %s', command)
     process = subprocess.Popen(command, shell=True,
                                stdout=subprocess.PIPE,
-                               stderr=subprocess.STDOUT)
+                               stderr=subprocess.STDOUT,
+                               cwd=cwd)
 
     # Poll process for new output until finished
     while True:

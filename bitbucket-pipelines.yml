@@ -4,38 +4,40 @@ pipelines:
   default:
     - step:
         script:
-          # Setting up the SSH key to interact with git
-          - mkdir $HOME/.ssh
-          - echo $GIT_CERT_KEY_BASE64 | base64 --decode > $HOME/.ssh/id_rsa
-          - chmod 600 $HOME/.ssh/id_rsa
-          - ssh-keyscan bitbucket.org >> $HOME/.ssh/known_hosts
+          # Reading certificates from environment variables and
+
+          # converting them to files
+          - python create-files-for-bitbucket-pipelines.py
+
+          # fixing git certificate
+          - mkdir -p ~/.ssh/
+          - cp certs/git/id_rsa ~/.ssh/
+          - chmod 600 ~/.ssh/id_rsa
+          - ssh-keyscan bitbucket.org >> ~/.ssh/known_hosts
+          - git clone git@bitbucket.org:scality/test-eve.git
+
+          # installing tox
+          - pip install tox
+
+          # Launching static checks tests
+          # - tox -e static || exit 0 # FIXME: too many pylint errors
+
           # Setting up CARINA Docker environment and variables
           - eval $(python deploy/carina_setup_env.py eve_cluster_test)
+
           # Launching tests
-          - pip install tox
-          - tox
+          - HTTP_PORT="" PB_PORT="" REPO="" tox -e test
+
+          # Deploying eve for the eve-test repo
+          - HTTP_PORT=8998 PB_PORT=9998 REPO=eve-test tox -e deploy
+
+
   branches:
     development/*:
       - step:
           script:
-            # Setting up CARINA Docker environment and variables
-            - eval $(python infrastructure/carina_setup_env.py eve_cluster_prod)
-            - cp -rp $DOCKER_CERT_PATH eve/docker_worker/docker_certs
-            - apt-get --assume-yes -qq update
-            - DEBIAN_FRONTEND=noninteractive apt-get -qq install -y python-pip python-dev git
-            - curl -sSL https://get.docker.com/ | sh
-            - docker build -t eve eve
-            - docker rm -f eve || true
-            - docker run
-              -e EVE_BITBUCKET_LOGIN="$EVE_BITBUCKET_LOGIN"
-              -e EVE_BITBUCKET_PWD="$EVE_BITBUCKET_PWD"
-              -e EVE_WEB_LOGIN="$EVE_WEB_LOGIN"
-              -e EVE_WEB_PWD="$EVE_WEB_PWD"
-              -e GIT_CERT_KEY_BASE64="$GIT_CERT_KEY_BASE64"
-              -e GIT_REPO=git@bitbucket.org:scality/wall-e.git
-              -e DOCKER_HOST="$DOCKER_HOST"
-              -e MASTER_FQDN="$MASTER_FQDN"
-              -e DOCKER_TLS_VERIFY="$DOCKER_TLS_VERIFY"
-              -e BB_WALL_E_PWD="$BB_WALL_E_PWD"
-              -e BB_EVE_PWD="$BB_EVE_PWD"
-              -p 8000:8000 -p 9989:9989 --name=eve eve
+            - HTTP_PORT=8002 PB_PORT=9002 REPO=wall-e tox -e deploy
+    release/*:
+      - step:
+          script:
+            - HTTP_PORT=8000 PB_PORT=9000 REPO=ring tox -e deploy

@@ -1,9 +1,10 @@
 # coding: utf-8
 """Deploy an EVE instance."""
-from argparse import ArgumentParser
 import logging
 import os
 import time
+from argparse import ArgumentParser
+from urlparse import urlparse, urljoin
 
 import requests
 
@@ -20,25 +21,33 @@ class EveMaster(object):
     """Gathers all the parameters and deploys an EVE instance."""
 
     def __init__(self,
-                 bitbucket_git_repo,
-                 bitbucket_git_cert_key_baser64,
-                 master_fqdn,
-                 worker_docker_host):
+                 git_repo_name,
+                 external_url,
+                 project_name,
+                 project_url):
+        name = 'eve__%s' % git_repo_name.replace('/', '-')
+        bitbucket_git_repo = \
+            'git@bitbucket.org:%s.git' % git_repo_name
+        self.name = name
+        self.external_url = external_url
+        api_base_url = urljoin(self.external_url, 'api/v2/')
+
         self.eve_env_vars = {
             'GIT_REPO': bitbucket_git_repo,
-            'DOCKER_HOST': worker_docker_host,
-            'MASTER_FQDN': master_fqdn,
-            'GIT_CERT_KEY_BASE64': bitbucket_git_cert_key_baser64,
+            'EXTERNAL_URL': self.external_url,
+            'MASTER_DOCKER_NAME': name,
+            'PROJECT_NAME': project_name,
+            'PROJECT_URL': project_url,
         }
-
-        api_base_url = 'https://%s/api/v2/' % master_fqdn
         self.api = BuildbotDataAPI(api_base_url)
         self.docker = None
 
-    def set_project_infos(self, project_name, project_url):
-        """Sets basic infos on the project watched by this eve instance."""
-        self.eve_env_vars['PROJECT_NAME'] = project_name
-        self.eve_env_vars['PROJECT_URL'] = project_url
+    def set_auth_credentials(
+            self,
+            login,
+            password):
+        """Sets HTTP basic auth credentials to access the REST API"""
+        self.api.add_auth(login, password)
 
     def set_bitbucket_credentials(
             self,
@@ -48,59 +57,135 @@ class EveMaster(object):
         self.eve_env_vars['EVE_BITBUCKET_LOGIN'] = eve_bitbucket_login
         self.eve_env_vars['EVE_BITBUCKET_PWD'] = eve_bitbucket_pwd
 
-    def set_web_credentials(
+    def set_oauth2_credentials(
             self,
-            eve_web_login,
-            eve_web_pwd):
-        """Sets credentials that will allow to connect to the Web/API."""
-        self.eve_env_vars['EVE_WEB_LOGIN'] = eve_web_login
-        self.eve_env_vars['EVE_WEB_PWD'] = eve_web_pwd
-        self.api.add_auth(eve_web_login, eve_web_pwd)
+            oauth2_client_id,
+            oauth2_client_secret):
+        """Sets oauth2 credentials that will allow to connect to the
+        Web/API."""
+        self.eve_env_vars['OAUTH2_CLIENT_ID'] = oauth2_client_id
+        self.eve_env_vars['OAUTH2_CLIENT_SECRET'] = oauth2_client_secret
+        self.api.add_auth(oauth2_client_id, oauth2_client_secret)
 
-    def deploy(self,
-               master_docker_host,
-               master_docker_cert_path,
-               worker_docker_cert_path):
+    def set_db_url(self, db_url):
+        """Sets the database url (including credentials)."""
+        self.eve_env_vars['DB_URL'] = db_url
+
+    def deploy(self, master_docker_host, master_docker_cert_path,
+               workers_docker_host, workers_docker_cert_path,
+               http_port, pb_port):
         """Deploy an EVE instance on docker."""
+
+        self.eve_env_vars['DOCKER_HOST'] = workers_docker_host
+        logger.info('=> Creating docker image <%s> on %s...',
+                    self.name, master_docker_host)
         self.docker = Docker(
-            'eve',
+            self.name,
             docker_host=master_docker_host,
             docker_cert_path=master_docker_cert_path)
         self.docker.build_image(
-            fqdn=self.eve_env_vars['MASTER_FQDN'],
-            login=self.eve_env_vars['EVE_WEB_LOGIN'],
-            pwd=self.eve_env_vars['EVE_WEB_PWD'],
-            worker_cert_path=worker_docker_cert_path
+            name=self.name,
+            git_cert_path='certs/git',
+            master_docker_cert_path=master_docker_cert_path,
+            workers_docker_cert_path=workers_docker_cert_path,
         )
-        self.docker.rm_all(force=True)
-        self.docker.run('eve', env_vars=self.eve_env_vars)
+        logger.info('=> Removing docker instance of <%s> if it exists',
+                    self.name)
+        self.docker.rm_all(self.name, force=True)
+        logger.info('=> Creating a new instance of <%s>', self.name)
+        container_id = self.docker.run(
+            self.name, env_vars=self.eve_env_vars, http_port=http_port,
+            pb_port=pb_port)
 
-    def wait(self):
+        return container_id
+
+    def wait(self, container_id):
         """Polls the REST API of an EVE instance until it responds."""
-
+        time.sleep(5)
         for i in range(MAX_EVE_API_TRIES):
             try:
-                logger.info('Checking buildbot\'s webserver response '
-                            '(retry %d/%d)', i + 1, MAX_EVE_API_TRIES)
+                logger.info('=> Checking response from %s (retry %d/%d)',
+                            self.external_url,
+                            i + 1,
+                            MAX_EVE_API_TRIES)
                 builds = self.api.get('builds')
                 assert builds['meta']['total'] == 0
                 return
             except requests.ConnectionError:
                 time.sleep(1)
+        logger.error(self.docker.client.logs(container_id))
         raise Exception('Could not connect to API')
 
 
 def main():
     """Allows to spwan EVE from the command line."""
     parser = ArgumentParser(description='Deploy an EVE master.')
-    parser.add_argument('git_repo',
-                        help='The git repo. e.g., git@example.org:repo.git')
-    parser.add_argument('fqdn',
-                        help='The fully qualified domain name to be used for '
-                             'the web URL (e.g. example.com)')
+    parser.add_argument(
+        'git_repo_name',
+        help='The git repo full name. e.g., scality/wall-e, scality/ring')
+    parser.add_argument(
+        '--master_docker_host',
+        default=os.environ.get('DOCKER_HOST', 'unix:///var/run/docker.sock'),
+        help='The url of the docker host that will host the eve master '
+             'container. Default value is $DOCKER_HOST if defined or '
+             'unix:///var/run/docker.sock otherwise. If a unix socket is used,'
+             ' --master_docker_cert_path is ignored')
+    parser.add_argument(
+        '--master_docker_cert_path',
+        default=os.environ.get('DOCKER_CERT_PATH', 'certs/docker_master'),
+        help='The path to the master docker host\'s certificates. Default '
+             'value is $DOCKER_CERT_PATH if defined or certs/docker_master '
+             'otherwise')
+    parser.add_argument(
+        '--workers_docker_host',
+        default=os.environ.get('DOCKER_HOST', 'unix:///var/run/docker.sock'),
+        help='The url of the workers\' docker host. Default value '
+             'is $DOCKER_HOST if defined or '
+             'unix:///var/run/docker.sock otherwise If a unix socket is used, '
+             '--workers_docker_cert_path is ignored')
+    parser.add_argument(
+        '--workers_docker_cert_path',
+        default=os.environ.get('DOCKER_CERT_PATH', 'certs/docker_workers'),
+        help='The path to the docker host\'s certificates. Default value is '
+             '$DOCKER_CERT_PATH if defined or certs/docker_master otherwise')
+    parser.add_argument(
+        '--public_web_url',
+        default=None,
+        help='The URL of the web server as seen by the end users (E.g., the '
+             'URL of a reverse proxy. If omitted, a default value will be '
+             'extracted from --master_docker_host and --http_port')
+    parser.add_argument(
+        '--http_port',
+        default=8000,
+        type=int,
+        help='The port on which the buildbot will listen for HTTP requests '
+             'on the master docker host')
+    parser.add_argument(
+        '--pb_port',
+        default=9000,
+        type=int,
+        help='The port on which the buildbot will listen for its workers on '
+             'the master docker host')
+    parser.add_argument(
+        '--auth_login',
+        help='The login to access the web server as seen by the end users')
+    parser.add_argument(
+        '--auth_pwd',
+        help='The password to access the web server as seen by the end users')
     parser.add_argument('-v', '--verbose', action='count', default=0,
                         help='increase verbosity (may be supplied two times)')
     args = parser.parse_args()
+
+    if urlparse(args.master_docker_host).scheme == 'unix':
+        args.master_docker_cert_path = None
+        args.public_web_url = 'http://localhost:%d/' % args.http_port
+
+    if urlparse(args.workers_docker_host).scheme == 'unix':
+        args.workers_docker_cert_path = None
+
+    if args.public_web_url is None:
+        fqdn = urlparse(args.master_docker_host).hostname
+        args.public_web_url = 'http://%s:%d/' % (fqdn, args.http_port)
 
     # Set up basic logging according to selected verbosity
     logging.basicConfig(
@@ -111,33 +196,30 @@ def main():
             2: logging.DEBUG,
         }[args.verbose],
     )
-
-    if not args.fqdn:
-        docker_host = os.environ['DOCKER_HOST']
-        args.fqdn = docker_host.replace('tcp://', '').split(':')[0]
-
     eve = EveMaster(
-        bitbucket_git_repo=args.git_repo,
-        bitbucket_git_cert_key_baser64=os.environ['GIT_CERT_KEY_BASE64'],
-        master_fqdn=args.fqdn,
-        worker_docker_host=os.environ['DOCKER_HOST'],
+        args.git_repo_name,
+        external_url=args.public_web_url,
+        project_name=args.git_repo_name,
+        project_url='https://bitbucket.org/%s/' % args.git_repo_name
     )
-    eve.set_project_infos(
-        os.environ['PROJECT_NAME'],
-        os.environ['PROJECT_URL'])
     eve.set_bitbucket_credentials(
         os.environ['EVE_BITBUCKET_LOGIN'],
         os.environ['EVE_BITBUCKET_PWD'])
-    eve.set_web_credentials(
-        os.environ['EVE_WEB_LOGIN'],
-        os.environ['EVE_WEB_PWD'])
-    eve.deploy(
-        master_docker_host=os.environ['DOCKER_HOST'],
-        master_docker_cert_path=os.environ['DOCKER_CERT_PATH'],
-        worker_docker_cert_path=os.environ['DOCKER_CERT_PATH'],
-    )
-    eve.wait()
-
+    eve.set_oauth2_credentials(
+        os.environ['OAUTH2_CLIENT_ID'],
+        os.environ['OAUTH2_CLIENT_SECRET'])
+    eve.set_db_url(os.environ.get('DB_URL', 'sqlite:///state.sqlite'))
+    eve.set_auth_credentials(
+        args.auth_login,
+        args.auth_pwd)
+    container_id = eve.deploy(
+        master_docker_host=args.master_docker_host,
+        master_docker_cert_path=args.master_docker_cert_path,
+        workers_docker_host=args.workers_docker_host,
+        workers_docker_cert_path=args.workers_docker_cert_path,
+        http_port=args.http_port, pb_port=args.pb_port)
+    eve.wait(container_id)
+    return eve
 
 if __name__ == '__main__':
     main()
