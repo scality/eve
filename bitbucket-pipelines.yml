@@ -28,7 +28,7 @@ pipelines:
           # Launching tests
           - HTTP_PORT="" PB_PORT="" REPO="" tox -e test
 
-          # Deplying eve for the eve-test repo
+          # Deploying eve for the eve-test repo
           - HTTP_PORT=8998 PB_PORT=9998 REPO=eve-test tox -e deploy
 
 
