@@ -25,7 +25,7 @@ class EveMaster(object):
                  external_url,
                  project_name,
                  project_url):
-        name = 'eve__%s' % git_repo_name.replace('/', '-')
+        name = 'eve_%s' % git_repo_name.replace('/', '_').replace('-', '_')
         bitbucket_git_repo = \
             'git@bitbucket.org:%s.git' % git_repo_name
         self.name = name
@@ -69,6 +69,8 @@ class EveMaster(object):
 
     def set_db_url(self, db_url):
         """Sets the database url (including credentials)."""
+        if not db_url.startswith('sqlite'):
+            db_url += self.name + '?max_idle=300'
         self.eve_env_vars['DB_URL'] = db_url
 
     def deploy(self, master_docker_host, master_docker_cert_path,
@@ -109,7 +111,7 @@ class EveMaster(object):
                             i + 1,
                             MAX_EVE_API_TRIES)
                 builds = self.api.get('builds')
-                assert builds['meta']['total'] == 0
+                assert builds['meta']['total'] >= 0
                 return
             except requests.ConnectionError:
                 time.sleep(1)

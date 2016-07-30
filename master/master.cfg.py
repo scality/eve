@@ -250,7 +250,6 @@ for i in range(MAX_DOCKER_WORKERS):
             hostconfig={'links': [(MASTER_DOCKER_NAME, MASTER_DOCKER_NAME)]},
             tls=TLS_CONFIG,
             image=Property('docker_image'),
-            networking_config=None,
             followStartupLogs=True,
             masterFQDN=MASTER_DOCKER_NAME))
 EVE_CONF['workers'].extend(DOCKER_WORKERS)

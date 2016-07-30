@@ -4,31 +4,24 @@ pipelines:
   default:
     - step:
         script:
-          # Reading certificates from environment variables and
+          # set-up git certificate
+          - mkdir -p certs/git && cd certs/git
+          - echo $GIT_ID_RSA_BASE64 | base64 --decode | tar -zxvf -
+          - cd -
 
-          # converting them to files
-          - python create-files-for-bitbucket-pipelines.py
-
-          # fixing git certificate
-          - mkdir -p ~/.ssh/
-          - cp certs/git/id_rsa ~/.ssh/
-          - chmod 600 ~/.ssh/id_rsa
-          - ssh-keyscan bitbucket.org >> ~/.ssh/known_hosts
-          - git clone git@bitbucket.org:scality/test-eve.git
-
-          # installing tox
+          # install tox
           - pip install tox
 
-          # Launching static checks tests
+          # launch static checks
           # - tox -e static || exit 0 # FIXME: too many pylint errors
 
-          # Setting up CARINA Docker environment and variables
+          # set-up CARINA Docker environment and variables
           - eval $(python deploy/carina_setup_env.py eve_cluster_test)
 
-          # Launching tests
+          # launch tests
           - HTTP_PORT="" PB_PORT="" REPO="" tox -e test
 
-          # Deploying eve for the eve-test repo
+          # deploy eve for the eve-test repo
           - HTTP_PORT=8998 PB_PORT=9998 REPO=eve-test tox -e deploy
 
 
@@ -36,8 +29,41 @@ pipelines:
     development/*:
       - step:
           script:
+            # set-up git certificate
+            - mkdir -p certs/git && cd certs/git
+            - echo $GIT_ID_RSA_BASE64 | base64 --decode | tar -zxvf -
+            - cd -
+
+            # set-up the docker environement
+            - mkdir -p certs/docker && cd certs/docker
+            - echo $DOCKER_HOST1_ENV_TAR_GZ_BASE64 | base64 --decode | tar -zxvf -  && source fill_env_vars.sh
+            - cd -
+
+            # instal tox
+            - pip install tox
+
+            # deploy eve for wall-e
             - HTTP_PORT=8002 PB_PORT=9002 REPO=wall-e tox -e deploy
     release/*:
       - step:
           script:
+            # set-up git certificate
+            - mkdir -p certs/git && cd certs/git
+            - echo $GIT_ID_RSA_BASE64 | base64 --decode | tar -zxvf -
+            - cd -
+
+            # set-up the docker environement
+            - mkdir -p certs/docker && cd certs/docker
+            - echo $DOCKER_HOST1_ENV_TAR_GZ_BASE64 | base64 --decode | tar -zxvf -  && source fill_env_vars.sh
+            - cd -
+
+            # instal tox
+            - pip install tox
+
+            # deploy eve for eve
+            - HTTP_PORT=8001 PB_PORT=9001 REPO=eve tox -e deploy
+
+            # deploy eve for the ring!
             - HTTP_PORT=8000 PB_PORT=9000 REPO=ring tox -e deploy
+
+
