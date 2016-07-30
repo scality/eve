@@ -29,6 +29,7 @@ from buildbot.www.oauth2 import GoogleAuth
 from buildbot.www.authz import Authz, endpointmatchers, roles
 from requests.auth import HTTPBasicAuth
 from twisted.internet.defer import inlineCallbacks, returnValue, succeed
+from twisted.internet import threads
 from twisted.logger import Logger
 from twisted.python.reflect import namedModule
 
@@ -389,31 +390,29 @@ class BuildDockerImage(BuildStep):
         stdio.addHeader(
             'Building docker image <%s> fom %s on docker host %s\n' %
             (self.image_name, self.full_path, DOCKER_HOST))
-        fail = False
         # assert the directory containing the dockerfile exists
         assert path.exists(self.full_path), \
             '%s does not exist in %s' % (self.full_path, getcwd())
         shutil.copy(GIT_KEY_PATH, self.full_path)
         self.setProperty('docker_image', self.image_name)
-        for output in docker_client.build(
-                path=self.full_path,
-                tag=self.image_name):
-            for json_line in output.rstrip().split('\r\n'):
-                formatted = json.loads(json_line)
-                if 'error' in formatted:
-                    stdio.addStderr(formatted['error'] + '\n')
-                    raise Exception("ERROR: " + formatted['error'])
-                elif 'stream' in formatted:
-                    for line in formatted['stream'].split('\n'):
-                        if line:
-                            stdio.addStdout(formatted['stream'])
-                            # self.logger.info(line)
+        stream = docker_client.build(path=self.full_path, tag=self.image_name)
+        try:
+            while True:
+                output = yield threads.deferToThread(next, stream)
+                line = json.loads(output)
+                if 'error' in line:
+                    stdio.addStderr(line['error'] + '\n')
+                    break
+                elif 'stream' in line:
+                    stdio.addStdout(line['stream'])
                 else:
-                    self.logger.info(formatted)
-        stdio.finish()
-        if fail:
+                    self.logger.info(line)
+        except StopIteration:
+            stdio.finish()
+            returnValue(SUCCESS)
+        else:
+            stdio.finish()
             returnValue(FAILURE)
-        returnValue(SUCCESS)
 
 
 class TriggerStages(BuildStep):
