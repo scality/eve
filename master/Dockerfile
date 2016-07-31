@@ -29,7 +29,6 @@ ENV GIT_KEY_PATH /root/.ssh/id_rsa
 RUN mkdir /root/.ssh/
 RUN mv /certs/git/id_rsa $GIT_KEY_PATH
 RUN chmod 600 $GIT_KEY_PATH
-RUN ls
 RUN ssh-keyscan bitbucket.org >> /root/.ssh/known_hosts 2> /dev/null
 
 # Create buildbot folder
@@ -38,4 +37,4 @@ RUN mkdir master
 # Copy buildbot configuration
 COPY master.cfg.py master/master.cfg
 
-CMD buildbot create-master --relocatable --db=$DB_URL master; buildbot start master;  tail -f master/twistd.log
+CMD buildbot create-master --quiet --relocatable --db=$DB_URL master; buildbot start master;  tail -f master/twistd.log

@@ -287,6 +287,7 @@ class ReadConfFromYaml(SetPropertyFromCommand):
             self,
             name='Read config from %s' % EVE_MAIN_YAML_FULL_PATH,
             command='cat %s' % EVE_MAIN_YAML_FULL_PATH,
+            logEnviron=False,
             property='conf',
             haltOnFailure=True,
             **kwargs)
