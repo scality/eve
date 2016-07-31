@@ -31,7 +31,11 @@ from requests.auth import HTTPBasicAuth
 from twisted.internet.defer import inlineCallbacks, returnValue, succeed
 from twisted.internet import threads
 from twisted.logger import Logger
+from twisted.python import log
 from twisted.python.reflect import namedModule
+
+from raven import Client
+from raven.transport.twisted import TwistedHTTPTransport
 
 ##########################
 # Constants
@@ -55,6 +59,8 @@ assert GIT_REPO
 GIT_KEY_PATH = environ['GIT_KEY_PATH']
 assert path.isfile(GIT_KEY_PATH), 'Did not find git RSA cert in %s' %\
                                   GIT_KEY_PATH
+# Sentry
+SENTRY_DSN = environ.get('SENTRY_DSN', None)
 
 # docker
 assert '//' in environ['DOCKER_HOST']
@@ -554,6 +560,21 @@ for w in EVE_CONF['workers']:
 
 
 # #########################
+# Sentry Logging
+# #########################
+
+def logToSentry(event):
+    if not event.get('isError') or 'failure' not in event:
+        return
+
+    f = event['failure']
+    client.captureException((f.type, f.value, f.getTracebackObject()))
+
+if SENTRY_DSN:
+    client = Client(SENTRY_DSN, transport=TwistedHTTPTransport, auto_log_stacks=True)
+    log.addObserver(logToSentry)
+
+# #########################
 # Utils
 # #########################
 def replace_with_interpolate(obj):
@@ -572,3 +593,4 @@ def replace_with_interpolate(obj):
         return Interpolate(obj)
     else:
         return obj
+

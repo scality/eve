@@ -13,3 +13,4 @@ service_identity==16.0.0
 txrequests==0.9.2 # required by the HTTPStep
 mysql-python==1.2.5
 SQLAlchemy-Utils==0.32.9
+raven==5.23.0

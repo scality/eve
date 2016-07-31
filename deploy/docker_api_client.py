@@ -96,6 +96,8 @@ class Docker(object):
             volumes = []
             binds = {}
         container = self.client.create_container(
+            hostname=name,
+            name=name,
             image=self.tag,
             environment=env_vars,
             volumes=volumes,
@@ -104,7 +106,6 @@ class Docker(object):
                 port_bindings={
                     8000: http_port,
                     9000: pb_port}),
-            name=name
         )
         cont_id = container.get('Id')
         self.client.start(container=cont_id)

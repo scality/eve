@@ -69,6 +69,11 @@ class EveMaster(object):
         self.eve_env_vars['OAUTH2_CLIENT_SECRET'] = oauth2_client_secret
         self.api.add_auth(oauth2_client_id, oauth2_client_secret)
 
+    def set_sentry_dsn(self, sentry_dsn):
+        """Set the sentry dsn if provided"""
+        if sentry_dsn:
+            self.eve_env_vars['SENTRY_DSN'] = sentry_dsn
+
     def set_db_url(self, db_url):
         """Sets the database url (including credentials)."""
         if not db_url.startswith('sqlite'):
@@ -217,6 +222,7 @@ def main():
     eve.set_oauth2_credentials(
         os.environ['OAUTH2_CLIENT_ID'],
         os.environ['OAUTH2_CLIENT_SECRET'])
+    eve.set_sentry_dsn(os.environ.get('SENTRY_DSN', None))
     eve.set_db_url(os.environ.get('DB_URL', 'sqlite:///state.sqlite'))
     eve.set_auth_credentials(
         args.auth_login,
