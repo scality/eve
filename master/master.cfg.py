@@ -126,7 +126,8 @@ EVE_CONF['protocols'] = {'pb': {'port': 9000}}
 ##########################
 # Create a basic auth website with the waterfall view and the console view
 EVE_CONF['www'] = dict(port=8000,
-                       auth=GoogleAuth(OAUTH2_CLIENT_ID, OAUTH2_CLIENT_SECRET),
+                       auth=GoogleAuth(OAUTH2_CLIENT_ID, OAUTH2_CLIENT_SECRET,
+                                       autologin=True),
                        plugins=dict(
                            waterfall_view={},
                            console_view={}))
