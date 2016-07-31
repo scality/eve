@@ -96,7 +96,7 @@ class Docker(object):
             volumes = []
             binds = {}
         container = self.client.create_container(
-            hostname=name,
+            hostname=name.replace('_', '-'),
             name=name,
             image=self.tag,
             environment=env_vars,

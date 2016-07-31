@@ -40,12 +40,12 @@ from raven.transport.twisted import TwistedHTTPTransport
 ##########################
 # Constants
 ##########################
-LOCAL_WORKER_NAME = 'lw-001'
 BOOTSTRAP_BUILDER_NAME = 'bootstrap'
 BOOTSTRAP_SCHEDULER_NAME = 's-bootstrap'
 TRIGGERABLE_BUILDER_NAME = 'triggerable'
 TRIGGERABLE_SCHEDULER_NAME = 's-triggerable'
-MAX_DOCKER_WORKERS = 10
+MAX_LOCAL_WORKERS = 10
+MAX_DOCKER_WORKERS = 20
 EVE_FOLDER = 'eve'
 EVE_MAIN_YAML = 'main.yml'
 EVE_MAIN_YAML_FULL_PATH = '%s/%s' % (EVE_FOLDER, EVE_MAIN_YAML)
@@ -131,12 +131,12 @@ EVE_CONF['protocols'] = {'pb': {'port': 9000}}
 # Web UI
 ##########################
 # Create a basic auth website with the waterfall view and the console view
-EVE_CONF['www'] = dict(port=8000,
-                       auth=GoogleAuth(OAUTH2_CLIENT_ID, OAUTH2_CLIENT_SECRET,
-                                       autologin=True),
-                       plugins=dict(
-                           waterfall_view={},
-                           console_view={}))
+
+EVE_CONF['www'] = dict(
+    port=8000,
+    plugins=dict(waterfall_view={},console_view={}),
+    auth=GoogleAuth(OAUTH2_CLIENT_ID,
+                    OAUTH2_CLIENT_SECRET))
 
 # Limit write operations to the OAUTH2_CLIENT_ID account except for tests
 
@@ -220,7 +220,14 @@ class BitbucketBuildStatusPush(HttpStatusPushBase):
         self.logger.debug('Sending build status to Bitbucket: {buildstatus}',
                           buildstatus=build)
 
-        stage_name = build['properties']['stage_name'][0]
+        try:
+            stage_name = build['properties']['stage_name'][0]
+        except KeyError:
+            self.logger.error(
+                'Unable to send to Bitbucket: {build_url}, stage_name not set',
+                build_url=build['url'])
+            return
+
         state, message, description = self.forge_messages(stage_name, build)
         data = {
             'state': state,
@@ -244,11 +251,15 @@ EVE_CONF['services'] = [statpsh]
 ##########################
 # Workers
 ##########################
-# Create One Local Worker that will bootstrap all the jobs
-EVE_CONF['workers'] = [LocalWorker(LOCAL_WORKER_NAME)]
+EVE_CONF['workers'] = []
+
+# Create MAX_LOCAL_WORKERS Local Workers that will bootstrap all the jobs
+LOCAL_WORKERS = []
+for i in range(MAX_LOCAL_WORKERS):
+    LOCAL_WORKERS.append(LocalWorker('lw%03d' % i))
+EVE_CONF['workers'].extend(LOCAL_WORKERS)
 
 # Then create MAX_DOCKER_WORKERS Docker Workers that will do the real job
-
 DOCKER_WORKERS = []
 for i in range(MAX_DOCKER_WORKERS):
     DOCKER_WORKERS.append(
@@ -328,6 +339,7 @@ class ReadConfFromYaml(SetPropertyFromCommand):
         self.setProperty('stage_name', stage_name, 'ReadConfFromYaml Step')
         self.property_changes['stage_name'] = stage_name
         self.build.addStepsAfterCurrentStep([TriggerStages([stage_name])])
+        self.setProperty('local_worker_name', self.worker.name)
 
 
 class StepExtractor(BuildStep):
@@ -397,7 +409,7 @@ class BuildDockerImage(BuildStep):
         # Capture the output of the docker build command in a log object
         stdio = yield self.addLog('stdio')
         stdio.addHeader(
-            'Building docker image <%s> fom %s on docker host %s\n' %
+            'Building docker image <%s> from %s on docker host %s\n' %
             (self.image_name, self.full_path, DOCKER_HOST))
         # assert the directory containing the dockerfile exists
         assert path.exists(self.full_path), \
@@ -447,7 +459,7 @@ class TriggerStages(BuildStep):
             except KeyError:
                 return succeed(FAILURE)
             full_docker_path = 'workers/%s/%s/build/%s' % (
-                LOCAL_WORKER_NAME,
+                self.getProperty('local_worker_name'),
                 BOOTSTRAP_BUILDER_NAME,
                 docker_path)
             image_name = '%s-%06d' % (docker_path, randint(0, 999999))
@@ -478,12 +490,12 @@ class TriggerStagesOld(Trigger):
         Trigger.__init__(self, schedulerNames=stage_names, **kwargs)
 
     def getSchedulersAndProperties(self):   # NOQA flake8 to ignore camelCase
-        conf = self.getProperty('conf')
         return [
             (TRIGGERABLE_SCHEDULER_NAME, {
                 'stage_name': stage_name,
                 'docker_image': docker_image,
-                'conf': conf
+                'conf': self.getProperty('conf'),
+                'local_worker_name': self.getProperty('local_worker_name'),
             }) for stage_name, docker_image in self.schedulerNames]
 
 
@@ -518,7 +530,7 @@ EVE_CONF['builders'] = []
 EVE_CONF['builders'].append(
     BuilderConfig(
         name=BOOTSTRAP_BUILDER_NAME,
-        workernames=[LOCAL_WORKER_NAME],
+        workernames=[lw.name for lw in LOCAL_WORKERS],
         factory=bootstrap_factory))
 
 # #########################
@@ -563,16 +575,15 @@ for w in EVE_CONF['workers']:
 # Sentry Logging
 # #########################
 
-def logToSentry(event):
+def log_to_sentry(event):
     if not event.get('isError') or 'failure' not in event:
         return
-
     f = event['failure']
     client.captureException((f.type, f.value, f.getTracebackObject()))
 
 if SENTRY_DSN:
     client = Client(SENTRY_DSN, transport=TwistedHTTPTransport, auto_log_stacks=True)
-    log.addObserver(logToSentry)
+    log.addObserver(log_to_sentry)
 
 # #########################
 # Utils
