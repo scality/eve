@@ -5,6 +5,8 @@ import os
 import time
 from argparse import ArgumentParser
 from urlparse import urlparse, urljoin
+from sqlalchemy import create_engine
+from sqlalchemy_utils import database_exists, create_database
 
 import requests
 
@@ -70,7 +72,12 @@ class EveMaster(object):
     def set_db_url(self, db_url):
         """Sets the database url (including credentials)."""
         if not db_url.startswith('sqlite'):
-            db_url += self.name + '?max_idle=300'
+            db_url += self.name
+            # create database if it does not exist
+            engine = create_engine(db_url)
+            if not database_exists(engine.url):
+                create_database(engine.url)
+            db_url += '?max_idle=300'
         self.eve_env_vars['DB_URL'] = db_url
 
     def deploy(self, master_docker_host, master_docker_cert_path,
