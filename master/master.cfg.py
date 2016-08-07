@@ -113,7 +113,7 @@ docker_client = docker.Client(
 # Project Identity
 ##########################
 EVE_CONF = BuildmasterConfig = {}
-EVE_CONF['title'] = "Eve: pipeline of the %s project" % PROJECT_NAME
+EVE_CONF['title'] = "the %s project" % PROJECT_NAME
 EVE_CONF['titleURL'] = PROJECT_URL
 EVE_CONF['buildbotURL'] = EXTERNAL_URL
 
