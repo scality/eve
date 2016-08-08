@@ -124,7 +124,7 @@ EVE_CONF['multiMaster'] = True
 # workers could connect to your master with this protocol.
 # 'port' must match the value configured into the buildworkers (with their
 # --master option)
-EVE_CONF['protocols'] = {'pb': {'port': 9000}}
+EVE_CONF['protocols'] = {'pb': {'port': environ['PB_PORT']}}
 
 
 ##########################
@@ -133,7 +133,7 @@ EVE_CONF['protocols'] = {'pb': {'port': 9000}}
 # Create a basic auth website with the waterfall view and the console view
 
 EVE_CONF['www'] = dict(
-    port=8000,
+    port=environ['HTTP_PORT'],
     plugins=dict(waterfall_view={},console_view={}),
     auth=GoogleAuth(OAUTH2_CLIENT_ID,
                     OAUTH2_CLIENT_SECRET))

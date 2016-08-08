@@ -1,7 +1,10 @@
 FROM ubuntu
 
-EXPOSE :8000
-EXPOSE :9000
+ENV HTTP_PORT 8000
+ENV PB_PORT 9000
+
+EXPOSE :$HTTP_PORT
+EXPOSE :$PB_PORT
 
 # Install buildbot and its dependencies
 RUN apt-get update -y
