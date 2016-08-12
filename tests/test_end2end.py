@@ -9,19 +9,19 @@ import tempfile
 import time
 import unittest
 
+import docker
 import requests
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
-import deploy.deploy_eve_master
-from deploy.cmd import cmd
+from tests.buildbot_api_client import BuildbotDataAPI
+from tests.cmd import cmd
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(format='[%(levelname)s] %(message)s', level=logging.INFO)
 
 SUCCESS = 0
 FAILURE = 2
-HTTP_PORT = 8999
-PB_PORT = 9999
+HTTP_PORT = os.environ['HTTP_PORT']
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 
@@ -31,23 +31,49 @@ class Test(unittest.TestCase):
     - Sets-up bitbucket git repo
     - Checks build status
     """
-    git_repo = 'git@bitbucket.org:scality/test-eve.git'
-    api = None
-    eve = None
 
-    def setup_git(self, eve_dir):
+    docker = docker.AutoVersionClient()
+
+    def setUp(self):
+        self.setup_git()
+        self.setup_eve_master()
+        self.api = BuildbotDataAPI('http://localhost:%s' % HTTP_PORT)
+
+    def setup_git(self):
         """push the yaml file and the docker context to bitbucket."""
-        old_dir = os.getcwd()
+        self.docker.build(path='tests/git-daemon-docker', tag='git-daemon')
+        self.docker.remove_container('git-daemon', force=True)
+        container = self.docker.create_container(
+            name='git-daemon',
+            image='git-daemon',
+            host_config=self.docker.create_host_config(
+                port_bindings={9418: ('127.0.0.1', 9418)},
+            ),
+        )
+        self.docker.start(container=container.get('Id'))
+
+        self.git_dir = tempfile.mkdtemp(prefix='eve_test_')
+        cwd = os.getcwd()
+        os.environ['GIT_REPO'] = 'git://git-daemon:9418/repo.git'
+        os.chdir(self.git_dir)
+        cmd('git clone git://127.0.0.1:9418/repo.git .')
+        cmd('git config user.email "john.doe@example.com"')
+        cmd('git config user.name "John Doe"')
+        cmd('git config push.default simple')
+        os.chdir(cwd)
+
+    def setup_eve_master(self):
+        """Spawns a EVE docker master.
+
+        It will wait until it is up and running.
+        """
+        cmd('buildbot create-master --relocatable eve')
+        cmd('buildbot start eve')
+
+    def commit_git(self, eve_dir):
+        cwd = os.getcwd()
+        os.chdir(self.git_dir)
         this_dir = os.path.dirname(os.path.abspath(__file__))
-
-        os.chdir(tempfile.mkdtemp())
-        cmd('git clone %s' % self.git_repo)
-        os.chdir('test-eve')
-
-        try:
-            shutil.rmtree('eve')
-        except OSError:
-            pass
 
         src_ctxt = os.path.join(this_dir, 'contexts')
         shutil.copytree(src_ctxt, 'eve')
@@ -55,13 +81,15 @@ class Test(unittest.TestCase):
         eve_yaml_file = os.path.join(this_dir, 'yaml', eve_dir, 'main.yml')
         shutil.copy(eve_yaml_file, 'eve')
 
-        cmd('git config user.email "john.doe@example.com"')
-        cmd('git config user.name "John Doe"')
-        cmd('git config push.default simple')
         cmd('git add -A')
         cmd('git commit --allow-empty -m "changed build ctxt to %s"' % eve_dir)
         cmd('git push')
-        os.chdir(old_dir)
+
+        os.chdir(cwd)
+
+    def get_buildbot_log(self):
+        """return the contents of master/twistd.log for debugging"""
+        return cmd('cat eve/twistd.log')
 
     def get_build_status(self, build_id, timeout=120):
         """Wait for the build to finish and get build status from buildbot.
@@ -104,37 +132,15 @@ class Test(unittest.TestCase):
 
         Spawns EVE, sends a YAML that will fail and check that it fails.
         """
-        self.setup_eve_master()
-        self.setup_git('empty_yaml')
+        self.commit_git('empty_yaml')
         self.assertEqual('failure', self.get_build_status(build_id=1))
-
-    def setup_eve_master(self):
-        """Spawns a EVE docker master.
-
-        It will wait until it is up and running.
-        """
-        sys.argv = [
-            'python_unittest',
-            'scality/test-eve',
-            '-vv',  # very verbose while under heavy development
-            '--http_port=%d' % HTTP_PORT,
-            '--pb_port=%d' % PB_PORT,
-        ]
-        self.eve = deploy.deploy_eve_master.main()
-        self.api = self.eve.api
-
-    def get_buildbot_log(self):
-        """return the contents of master/twistd.log for debugging"""
-        return self.eve.docker.execute(self.eve.name, 'cat master/twistd.log')
-
 
     def test_git_poll_failure(self):
         """Tests builds triggered by git polling.
 
         Spawns EVE, sends a YAML that will fail and check that it fails.
         """
-        self.setup_eve_master()
-        self.setup_git('expected_fail')
+        self.commit_git('expected_fail')
         self.assertEqual('failure', self.get_build_status(build_id=1))
 
     def test_git_poll_success(self):
@@ -143,21 +149,6 @@ class Test(unittest.TestCase):
         Spawns EVE, sends a good YAML with 3 steps (with parallelization) and
         checks that it succeeds.
         """
-        self.setup_eve_master()
-        self.setup_git('four_stages_sleep')
+        self.commit_git('four_stages_sleep')
         self.assertEqual('success', self.get_build_status(build_id=2))
 
-    @unittest.skip("not working right now")
-    def test_force_build(self):
-        """Tests to force a build.
-
-        Sets up a git, Forces a build and check that it succeeds.
-        """
-        self.setup_git('four_stages_sleep')
-        self.setup_eve_master()
-        bootstrap_builder_id = self.api.get_element_id_from_name(
-            'builders',
-            'bootstrap',
-            'builderid')
-        self.api.force_build(bootstrap_builder_id, self.git_repo)
-        self.assertEqual('success', self.get_build_status(build_id=1))

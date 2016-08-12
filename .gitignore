@@ -1,8 +1,2 @@
 .tox
-id_rsa
 *.pyc
-*.pem
-*.pub
-config.env
-certs
-carina
