@@ -6,4 +6,3 @@ id_rsa
 config.env
 certs
 carina
-etc/ssl
