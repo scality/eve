@@ -166,12 +166,25 @@ class Test(unittest.TestCase):
         self.assertEqual('success', self.get_build_status(build_id=1))
 
     def test_worker_pulls_git_repo(self):
-        """Tests builds triggered by git polling.
-
-        Spawns EVE, sends a good YAML with 3 steps (with parallelization) and
-        checks that it succeeds.
+        """Tests git repo caching capabilities
         """
         self.commit_git('worker_pulls_git_repo')
+        self.assertEqual('success', self.get_build_status(build_id=1))
+
+    def test_write_read_from_cache(self):
+        """Tests docker cache volumes
+
+        Step1 creates a docker named volume and creates a file into it.
+        Step2 starts another container and reads a file from the same volume.
+        """
+        self.commit_git('write_read_from_cache')
+        self.assertEqual('success', self.get_build_status(build_id=1))
+
+    @unittest.skip("needs rackspace credentials")
+    def test_worker_uploads_artifacts(self):
+        """Tests artifact uploading to cloudfiles
+        """
+        self.commit_git('worker_uploads_artifacts')
         self.assertEqual('success', self.get_build_status(build_id=1))
 
     @unittest.skip("not working right now")
