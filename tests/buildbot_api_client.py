@@ -19,6 +19,7 @@ class BuildbotDataAPI(object):
     """Class to interact with a Buildbot master through its REST API."""
 
     def __init__(self, base_url):
+        assert base_url.endswith('api/v2/')
         self.base_url = base_url
         self.headers = {
             'Content-Type': 'application/json',

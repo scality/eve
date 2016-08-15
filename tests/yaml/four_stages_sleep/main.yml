@@ -6,7 +6,7 @@ branches:
 
 stages:
   pre-merge:
-    image:
+    worker:
         type: docker
         path: eve/ubuntu-trusty-ctxt
     steps:
@@ -25,35 +25,35 @@ stages:
             - finalize
           waitForFinish: True
   compile:
-    image:
+    worker:
         type: docker
         path: eve/ubuntu-trusty-ctxt
     steps:
       - ShellCommand:
-          name: sleep 1
-          command: "sleep 1"
+          name: exit 0
+          command: exit 0
   test:
-    image:
+    worker:
         type: docker
         path: eve/centos7-ctxt
     steps:
       - ShellCommand:
-          name: sleep 2
-          command: "sleep 2"
+          name: exit 0
+          command: exit 0
   finalize:
-    image:
+    worker:
       type: docker
       path: eve/ubuntu-trusty-ctxt
     steps:
       - ShellCommand:
-          name: sleep 4
-          command: "sleep 4"
+          name: exit 0
+          command: exit 0
 
   post-merge:
-    image:
+    worker:
         type: docker
         path: eve/ubuntu-trusty-ctxt
     steps:
       - ShellCommand:
           name: directory listing
-          command: "ls -l"
+          command: ls -l
