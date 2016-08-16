@@ -54,7 +54,7 @@ class Test(unittest.TestCase):
 
     def get_master_fqdn(self):
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s.connect(("gmail.com",80))
+        s.connect(("8.8.8.8", 53))
         fqdn = s.getsockname()[0]
         s.close()
         return fqdn
