@@ -16,6 +16,7 @@ from tests.buildbot_api_client import BuildbotDataAPI
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(format='[%(levelname)s] %(message)s', level=logging.INFO)
+logging.getLogger('requests').setLevel(logging.WARNING)
 
 SUCCESS = 0
 FAILURE = 2
@@ -117,7 +118,7 @@ class Test(unittest.TestCase):
             time.sleep(1)
             log = self.get_buildbot_log()
             if 'Traceback (most recent call last):' in log:
-                #logger.error(log)
+                logger.error(log)
                 raise Exception('Found an Exception Traceback in twistd.log')
             try:
                 build = self.api.get('builds/%d' % build_id)['builds'][0]
@@ -126,7 +127,7 @@ class Test(unittest.TestCase):
                             exp.message)
                 continue
             state = build['state_string']
-            # logger.info('API responded: BUILD STATE = %s', state)
+            logger.info('API responded: BUILD STATE = %s', state)
             if state not in ('starting', 'created', 'building'):
                 if build['results'] is not None:
                     break
