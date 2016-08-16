@@ -1,0 +1,35 @@
+branches:
+  default:
+    stage: write
+
+stages:
+  write:
+    worker:
+        type: docker
+        path: eve/centos7-ctxt
+        volumes:
+          - 'testcache:/write'
+    steps:
+      - ShellCommand:
+          name: write in cache
+          command: echo "hello" > /write/%(prop:revision)s
+      - ShellCommand:
+          name: display cache
+          command: ls -la /write
+      - TriggerStages:
+          name: trigger read
+          stage_names:
+            - read
+  read:
+    worker:
+        type: docker
+        path: eve/centos7-ctxt
+        volumes:
+          - 'testcache:/read'
+    steps:
+      - ShellCommand:
+          name: display cache
+          command: ls -la /read
+      - ShellCommand:
+          name: read from cache
+          command: cat /read/%(prop:revision)s

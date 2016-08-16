@@ -20,4 +20,5 @@ COPY id_rsa /root/.ssh/id_rsa
 RUN ssh-keyscan bitbucket.org >> /root/.ssh/known_hosts
 
 WORKDIR /worker
-CMD  buildbot-worker create-worker . "$BUILDMASTER:$BUILDMASTER_PORT" "$WORKERNAME" "$WORKERPASS" && buildbot-worker start --nodaemon
+CMD buildbot-worker create-worker . "$BUILDMASTER:$BUILDMASTER_PORT" "$WORKERNAME" "$WORKERPASS" \
+ && buildbot-worker start --nodaemon

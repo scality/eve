@@ -4,7 +4,7 @@ branches:
 
 stages:
   pre-merge:
-    image:
+    worker:
         type: docker
         path: eve/centos7-ctxt
     steps:

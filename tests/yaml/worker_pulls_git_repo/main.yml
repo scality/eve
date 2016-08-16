@@ -1,0 +1,15 @@
+branches:
+  default:
+    stage: git-pull
+
+stages:
+  git-pull:
+    worker:
+        type: docker
+        path: eve/ubuntu-trusty-ctxt
+    steps:
+      - Git:
+          name: git pull
+          repourl: "%(prop:git_reference)s"
+          submodules: True
+          retryFetch: True
