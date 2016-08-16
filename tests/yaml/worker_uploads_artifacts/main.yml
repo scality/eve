@@ -1,0 +1,24 @@
+branches:
+  default:
+    stage: write
+
+stages:
+  write:
+    worker:
+        type: docker
+        path: eve/centos7-ctxt
+        volumes:
+          - 'testcache:/write'
+    steps:
+      - ShellCommand:
+          name: create artifacts dir
+          command: mkdir artifacts
+      - ShellCommand:
+          name: create a file in artifacts dir
+          command: echo 'hello' > artifacts/hello.txt
+      - SetPropertyFromCommand:
+          name: set build id
+          command: echo 'eve_test_build_id'
+          property: build_id
+      - Upload:
+          source: artifacts
