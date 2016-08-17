@@ -198,8 +198,7 @@ class Test(unittest.TestCase):
 
         Sets up a git, Forces a build and check that it succeeds.
         """
-        self.setup_git('four_stages_sleep')
-        self.setup_eve_master()
+        self.commit_git('four_stages_sleep')
         bootstrap_builder_id = self.api.get_element_id_from_name(
             'builders',
             'bootstrap',
