@@ -4,15 +4,16 @@
 import logging
 import os
 import shutil
-from tests.cmd import cmd
+import socket
 import tempfile
 import time
 import unittest
-import socket
 
 import requests
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from tests.buildbot_api_client import BuildbotDataAPI
+
+from tests.cmd import cmd
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(format='[%(levelname)s] %(message)s', level=logging.INFO)
