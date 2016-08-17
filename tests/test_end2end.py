@@ -41,6 +41,11 @@ def setup_eve_master():
 
 
 def get_master_fqdn():
+    """Get the master fqdn.
+
+    Returns:
+        str: the fqdn (or ip) of the master the slave can connect to.
+    """
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.connect(("8.8.8.8", 53))
     fqdn = sock.getsockname()[0]
@@ -49,7 +54,11 @@ def get_master_fqdn():
 
 
 def get_buildbot_log():
-    """return the contents of master/twistd.log for debugging"""
+    """Read the contents of master/twistd.log for debugging.
+
+    Returns:
+        str: the content of twistd.log.
+    """
     return open('eve/twistd.log').read()
 
 
@@ -70,7 +79,7 @@ class Test(unittest.TestCase):
         self.api = BuildbotDataAPI('http://localhost:%s/api/v2/' % HTTP_PORT)
 
     def setup_git(self):
-        """push the yaml file and the docker context to bitbucket."""
+        """Push the yaml file and the docker context to bitbucket."""
         self.git_dir = tempfile.mkdtemp(prefix='eve_test_')
         cwd = os.getcwd()
         os.environ['GIT_REPO'] = self.git_repo
@@ -82,6 +91,11 @@ class Test(unittest.TestCase):
         os.chdir(cwd)
 
     def commit_git(self, eve_dir):
+        """Create a new commit to trigger a test build.
+
+        Args:
+            eve_dir (str): directory of the yaml test file.
+        """
         cwd = os.getcwd()
         os.chdir(self.git_dir)
         this_dir = os.path.dirname(os.path.abspath(__file__))
@@ -112,7 +126,14 @@ class Test(unittest.TestCase):
     def get_build_status(self, build_id, timeout=120):
         """Wait for the build to finish and get build status from buildbot.
 
-        See `Build Result Codes`_ for more details on build status.
+        Args:
+            build_id (int): id of the build to watch.
+            timeout (int, optional): maximum time to wait for the build to
+                complete.
+
+        Returns:
+            str: the build status. See `Build Result Codes`_ for more details
+                on build status.
 
         .. _Build Result Codes:
           http://docs.buildbot.net/latest/developer/results.html
