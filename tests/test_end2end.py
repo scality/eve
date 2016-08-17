@@ -136,7 +136,7 @@ class Test(unittest.TestCase):
                 if build['results'] is not None:
                     break
                 logger.info('API says that the job is finished (%s) but '
-                            'there are no results => retrying!' % state)
+                            'there are no results => retrying!', state)
 
         self.assertEqual('finished', state)
         # Bitbucket API bug. Happens sometimes!
