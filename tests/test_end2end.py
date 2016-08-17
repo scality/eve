@@ -139,6 +139,7 @@ class Test(unittest.TestCase):
           http://docs.buildbot.net/latest/developer/results.html
         """
         state = None
+        last_message = None
         for _ in range(timeout):
             time.sleep(1)
             log = get_buildbot_log()
@@ -147,12 +148,16 @@ class Test(unittest.TestCase):
                 raise Exception('Found an Exception Traceback in twistd.log')
             try:
                 build = self.api.get('builds/%d' % build_id)['builds'][0]
-            except requests.HTTPError as exp:
-                logger.info('Build did not start yet. API responded: %s',
-                            exp.message)
+            except requests.HTTPError as ex:
+                if ex.message != last_message:
+                    logger.info('Build did not start yet. API responded: %s',
+                                ex.message)
+                    last_message = ex.message
                 continue
             state = build['state_string']
-            logger.info('API responded: BUILD STATE = %s', state)
+            if state != last_message:
+                logger.info('API responded: BUILD STATE = %s', state)
+                last_message = state
             if state not in ('starting', 'created', 'building'):
                 if build['results'] is not None:
                     break
