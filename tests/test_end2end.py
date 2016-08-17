@@ -31,10 +31,10 @@ class Test(unittest.TestCase):
     - Sets-up bitbucket git repo
     - Checks build status
     """
+
     git_repo = 'git@bitbucket.org:scality/test-eve.git'
     api = None
     eve = None
-
 
     def setUp(self):
         self.setup_git()
@@ -88,7 +88,7 @@ class Test(unittest.TestCase):
         cmd('git add -A')
         cmd('git commit --allow-empty -m "changed build ctxt to %s"' % eve_dir)
         os.chdir(cwd)
-        for i in range(40):
+        for _ in range(40):
             time.sleep(1)
             if 'gitpoller: processing changes from' in self.get_buildbot_log():
                 break
