@@ -26,6 +26,33 @@ PB_PORT = 9999
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 
+def setup_eve_master():
+    """Spawns a EVE master.
+
+    It will wait until it is up and running.
+    """
+    cmd('buildbot stop eve', ignore_exception=True)
+    cmd('git clean -fd eve', ignore_exception=True)
+    cmd('buildbot create-master --relocatable eve')
+    os.environ['GIT_KEY_PATH'] = os.path.expanduser('~/.ssh/id_rsa')
+    os.environ['MASTER_FQDN'] = get_master_fqdn()
+    os.environ['DOCKER_PREFIX'] = 'test-eve'
+    cmd('buildbot start eve')
+
+
+def get_master_fqdn():
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock.connect(("8.8.8.8", 53))
+    fqdn = sock.getsockname()[0]
+    sock.close()
+    return fqdn
+
+
+def get_buildbot_log():
+    """return the contents of master/twistd.log for debugging"""
+    return open('eve/twistd.log').read()
+
+
 class Test(unittest.TestCase):
     """Base class for test classes
 
@@ -39,7 +66,7 @@ class Test(unittest.TestCase):
 
     def setUp(self):
         self.setup_git()
-        self.setup_eve_master()
+        setup_eve_master()
         self.api = BuildbotDataAPI('http://localhost:%s/api/v2/' % HTTP_PORT)
 
     def setup_git(self):
@@ -53,26 +80,6 @@ class Test(unittest.TestCase):
         cmd('git config user.name "John Doe"')
         cmd('git config push.default simple')
         os.chdir(cwd)
-
-    def get_master_fqdn(self):
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s.connect(("8.8.8.8", 53))
-        fqdn = s.getsockname()[0]
-        s.close()
-        return fqdn
-
-    def setup_eve_master(self):
-        """Spawns a EVE master.
-
-        It will wait until it is up and running.
-        """
-        cmd('buildbot stop eve', ignore_exception=True)
-        cmd('git clean -fd eve', ignore_exception=True)
-        cmd('buildbot create-master --relocatable eve')
-        os.environ['GIT_KEY_PATH'] = os.path.expanduser('~/.ssh/id_rsa')
-        os.environ['MASTER_FQDN'] = self.get_master_fqdn()
-        os.environ['DOCKER_PREFIX'] = 'test-eve'
-        cmd('buildbot start eve')
 
     def commit_git(self, eve_dir):
         cwd = os.getcwd()
@@ -91,7 +98,7 @@ class Test(unittest.TestCase):
         os.chdir(cwd)
         for _ in range(40):
             time.sleep(1)
-            if 'gitpoller: processing changes from' in self.get_buildbot_log():
+            if 'gitpoller: processing changes from' in get_buildbot_log():
                 break
 
             logger.info('Waiting for gitpoller to start')
@@ -101,10 +108,6 @@ class Test(unittest.TestCase):
         os.chdir(self.git_dir)
         cmd('git push')
         os.chdir(cwd)
-
-    def get_buildbot_log(self):
-        """return the contents of master/twistd.log for debugging"""
-        return open('eve/twistd.log').read()
 
     def get_build_status(self, build_id, timeout=120):
         """Wait for the build to finish and get build status from buildbot.
@@ -117,7 +120,7 @@ class Test(unittest.TestCase):
         state = None
         for _ in range(timeout):
             time.sleep(1)
-            log = self.get_buildbot_log()
+            log = get_buildbot_log()
             if 'Traceback (most recent call last):' in log:
                 logger.error(log)
                 raise Exception('Found an Exception Traceback in twistd.log')
