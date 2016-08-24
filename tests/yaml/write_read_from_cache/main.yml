@@ -12,12 +12,15 @@ stages:
     steps:
       - ShellCommand:
           name: write in cache
+          haltOnFailure: True
           command: echo "hello" > /write/%(prop:revision)s
       - ShellCommand:
           name: display cache
+          haltOnFailure: True
           command: ls -la /write
       - TriggerStages:
           name: trigger read
+          haltOnFailure: True
           stage_names:
             - read
   read:
@@ -30,6 +33,12 @@ stages:
       - ShellCommand:
           name: display cache
           command: ls -la /read
+          haltOnFailure: True
       - ShellCommand:
           name: read from cache
           command: cat /read/%(prop:revision)s
+          haltOnFailure: True
+      - ShellCommand:
+          name: check also git cache
+          command: cat %(prop:git_reference)s/eve/main.yml
+          haltOnFailure: True

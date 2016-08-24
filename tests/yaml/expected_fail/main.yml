@@ -11,3 +11,4 @@ stages:
       - ShellCommand:
           name: exit 1
           command: exit 1
+          haltOnFailure: True

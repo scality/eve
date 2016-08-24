@@ -112,6 +112,7 @@ class Test(unittest.TestCase):
         if 'Traceback (most recent call last):' in log:
             raise Exception('Found an Exception Traceback in twistd.log')
 
+    @unittest.skip("not useful")
     def test_git_poll_empty_yaml(self):
         """Tests builds triggered by git polling.
 
