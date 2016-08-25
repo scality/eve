@@ -1,0 +1,14 @@
+branches:
+  default:
+    stage: pre-merge
+
+stages:
+  pre-merge:
+    worker:
+        type: openstack
+        image: 8 GB General Purpose v1
+        flavor: Ubuntu 16.04 LTS (Xenial Xerus) (PVHVM)
+    steps:
+      - ShellCommand:
+          name: exit 0
+          command: exit 0

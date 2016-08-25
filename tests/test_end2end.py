@@ -144,6 +144,13 @@ class Test(unittest.TestCase):
         self.commit_git('worker_pulls_git_repo')
         self.build()
 
+    @unittest.skip("needs rackspace credentials")
+    def test_openstack_worker(self):
+        """Tests git repo caching capabilities
+        """
+        self.commit_git('openstack_worker')
+        self.build()
+
     def test_write_read_from_cache(self):
         """Tests docker cache volumes
 
