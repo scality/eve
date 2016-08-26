@@ -144,6 +144,13 @@ class Test(unittest.TestCase):
         self.commit_git('worker_pulls_git_repo')
         self.build()
 
+    def test_bad_dockerfile(self):
+        """Tests that when a docker file cannot be built, the whole build is
+         interrupted.
+        """
+        self.commit_git('bad_dockerfile')
+        self.build(expected_result='failure')
+
     @unittest.skip("needs rackspace credentials")
     def test_openstack_worker(self):
         """Tests git repo caching capabilities
