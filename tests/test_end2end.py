@@ -159,3 +159,11 @@ class Test(unittest.TestCase):
         """
         self.commit_git('worker_uploads_artifacts')
         self.build()
+
+    def test_gollum(self):
+        """Tests gollum
+
+        Steps : TODO .
+        """
+        self.commit_git('gollum')
+        self.build()

@@ -20,7 +20,11 @@ RUN mkdir /root/.ssh/
 
 # Copy over private key, and set permissions
 COPY id_rsa /root/.ssh/id_rsa
+COPY id_rsa.pub /root/.ssh/id_rsa.pub
 RUN ssh-keyscan bitbucket.org >> /root/.ssh/known_hosts
+
+# install docker
+RUN yum install -y docker && groupadd docker && usermod root -aG docker
 
 WORKDIR /worker
 CMD  buildbot-worker create-worker . "$BUILDMASTER:$BUILDMASTER_PORT" "$WORKERNAME" "$WORKERPASS" && buildbot-worker start --nodaemon

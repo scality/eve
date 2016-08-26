@@ -1,0 +1,32 @@
+branches:
+  default:
+    stage: gollum_tests
+
+stages:
+  gollum_tests:
+    worker:
+      type: docker
+      path: eve/centos7-ctxt
+    steps:
+      - ShellCommand:
+          name: clone gollum repository
+          workdir: /tmp
+          command: >
+            git clone 'git@bitbucket.org:scality/gollum.git'
+            --branch  'development/1.0'
+          haltOnFailure: True
+      - ShellCommand:
+          name: install gollum
+          workdir: /tmp/gollum
+          command: pip install .
+          haltOnFailure: True
+      - ShellCommand:
+          name: create gollum project
+          workdir: /tmp/
+          command: gollum startproject gollum_tests
+          haltOnFailure: True
+      - ShellCommand:
+          name: launch gollum tests
+          workdir: /tmp/gollum_tests
+          command: gollum test
+          haltOnFailure: False
