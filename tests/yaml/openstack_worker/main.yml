@@ -7,7 +7,7 @@ stages:
     worker:
         type: openstack
         image: 8 GB General Purpose v1
-        flavor: Ubuntu 16.04 LTS (Xenial Xerus) (PVHVM)
+        flavor: Ubuntu 14.04 LTS (Trusty Tahr) (PVHVM)
     steps:
       - ShellCommand:
           name: exit 0
