@@ -10,5 +10,11 @@ stages:
         flavor: Ubuntu 14.04 LTS (Trusty Tahr) (PVHVM)
     steps:
       - ShellCommand:
-          name: exit 0
-          command: exit 0
+          name: uname -a
+          command: uname -a
+      - ShellCommand:
+          name: clone gollum repository
+          workdir: /tmp
+          command: >
+            git clone 'git@bitbucket.org:scality/gollum.git'
+            --branch  'development/1.0'
