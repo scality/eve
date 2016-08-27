@@ -1,9 +1,9 @@
-buildbot[tls]==0.9.0rc1
-buildbot-pkg==0.9.0rc1
-buildbot-console-view==0.9.0rc1
-buildbot-waterfall-view==0.9.0rc1
-buildbot-www==0.9.0rc1
-buildbot-worker==0.9.0rc1
+buildbot[tls]==0.9.0rc2
+buildbot-pkg==0.9.0rc2
+buildbot-console-view==0.9.0rc2
+buildbot-waterfall-view==0.9.0rc2
+buildbot-www==0.9.0rc2
+buildbot-worker==0.9.0rc2
 docker-py==1.8.1
 paramiko==2.0.1
 pyaml==15.8.2

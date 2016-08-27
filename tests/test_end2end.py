@@ -3,6 +3,7 @@
 
 import logging
 import os
+import platform
 import shutil
 import socket
 import tempfile
@@ -89,7 +90,6 @@ class Test(unittest.TestCase):
         eve_yaml_file = os.path.join(self.top_dir, 'tests',
                                      'yaml', eve_dir, 'main.yml')
         shutil.copy(eve_yaml_file, 'eve')
-        cmd('pwd')
         cmd('git add -A')
 
     def build(self, expected_result='success'):
@@ -101,10 +101,12 @@ class Test(unittest.TestCase):
         client = os.path.join(self.top_dir, 'eve', 'client.py')
         out = cmd('python %s --host=localhost --port=%s --passwd=%s'
                   % (client, os.environ['TRY_PORT'], os.environ['TRY_PWD']),
-                  ignore_exception=(expected_result == 'failure'))
+                  ignore_exception=(expected_result != 'success'))
 
         if expected_result == 'failure':
             assert 'bootstrap: failure (finished)' in out
+        elif expected_result == 'cancelled':
+            assert 'bootstrap: cancelled (finished)' in out
         else:
             assert 'bootstrap: success (finished)' in out
 
@@ -112,7 +114,6 @@ class Test(unittest.TestCase):
         if 'Traceback (most recent call last):' in log:
             raise Exception('Found an Exception Traceback in twistd.log')
 
-    @unittest.skip("not useful")
     def test_git_poll_empty_yaml(self):
         """Tests builds triggered by git polling.
 
@@ -173,6 +174,15 @@ class Test(unittest.TestCase):
         """
         self.commit_git('worker_uploads_artifacts')
         self.build()
+
+    def test_skip_if_no_branch_in_yml(self):
+        """Tests that the build is cancelled when the branch is not covered
+         by the eve/main.yml file
+        """
+        self.commit_git('branch_not_listed_in_yaml')
+        self.build(expected_result='cancelled')
+
+    unittest.skipIf(platform.system() == 'Darwin', 'Does not work on Mac')
 
     def test_gollum(self):
         """Tests gollum

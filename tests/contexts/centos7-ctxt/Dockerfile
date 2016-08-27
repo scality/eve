@@ -15,12 +15,8 @@ RUN /usr/bin/pip install buildbot-worker==0.9.0b9
 RUN groupadd -r buildbot && useradd -r -g buildbot buildbot
 RUN mkdir /worker && chown buildbot:buildbot /worker
 
-# Make ssh dir
+# Make ssh dir and add bitbucket to known_hosts
 RUN mkdir /root/.ssh/
-
-# Copy over private key, and set permissions
-COPY id_rsa /root/.ssh/id_rsa
-COPY id_rsa.pub /root/.ssh/id_rsa.pub
 RUN ssh-keyscan bitbucket.org >> /root/.ssh/known_hosts
 
 # install docker
