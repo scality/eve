@@ -4,7 +4,9 @@ buildbot-console-view==0.9.0rc2
 buildbot-waterfall-view==0.9.0rc2
 buildbot-www==0.9.0rc2
 buildbot-worker==0.9.0rc2
-docker-py==1.8.1
+#docker-py==1.10.0.dev0  fixme: uncomment when docker-py 1.10 is out
+https://github.com/docker/docker-py/archive/master.zip # fixme: delete when docker-py 1.10 is out
+# See : https://github.com/docker/docker-py/pull/1081 # fixme: delete when docker-py 1.10 is out
 paramiko==2.0.1
 pyaml==15.8.2
 python-novaclient==2.35

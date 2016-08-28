@@ -113,6 +113,8 @@ class Test(unittest.TestCase):
         log = open(os.path.join(self.top_dir, 'eve', 'twistd.log'), 'r').read()
         if 'Traceback (most recent call last):' in log:
             raise Exception('Found an Exception Traceback in twistd.log')
+        if '_mysql_exceptions' in log:
+            raise Exception('Found a MySQL issue in twistd.log')
 
     def test_git_poll_empty_yaml(self):
         """Tests builds triggered by git polling.
