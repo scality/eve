@@ -185,9 +185,11 @@ class Test(unittest.TestCase):
     unittest.skipIf(platform.system() == 'Darwin', 'Does not work on Mac')
 
     def test_gollum(self):
-        """Tests gollum
+        """Tests gollum install / project creation.
 
-        Steps : TODO .
+        Step1 creates a docker and install gollum on it.
+        Step2 create a new gollum project
+        Step3 run sample tests in this newly created gollum project
         """
         self.commit_git('gollum')
         self.build()
