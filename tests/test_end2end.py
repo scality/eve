@@ -92,17 +92,19 @@ class Test(unittest.TestCase):
         shutil.copy(eve_yaml_file, 'eve')
         cmd('git add -A')
 
-    def build(self, expected_result='success'):
+    def build(self, expected_result='success', wait=True):
         """
         Triggers a build, waits for the result and performs sanity checks
         :param expected_result: success or failure
         :return: None
         """
         client = os.path.join(self.top_dir, 'eve', 'client.py')
-        out = cmd('python %s --host=localhost --port=%s --passwd=%s'
-                  % (client, os.environ['TRY_PORT'], os.environ['TRY_PWD']),
+        out = cmd('python %s --host=localhost --port=%s --passwd=%s %s'
+                  % (client, os.environ['TRY_PORT'], os.environ['TRY_PWD'],
+                     '--wait' if wait else ''),
                   ignore_exception=(expected_result != 'success'))
-
+        if not wait:
+            return
         if expected_result == 'failure':
             assert 'bootstrap: failure (finished)' in out
         elif expected_result == 'cancelled':
@@ -184,12 +186,22 @@ class Test(unittest.TestCase):
         self.commit_git('branch_not_listed_in_yaml')
         self.build(expected_result='cancelled')
 
-    unittest.skipIf(platform.system() == 'Darwin', 'Does not work on Mac')
-
+    @unittest.skipIf(platform.system() == 'Darwin', 'Does not work on Mac')
     def test_gollum(self):
         """Tests gollum
 
         Steps : TODO .
         """
         self.commit_git('gollum')
+        self.build()
+
+    def test_ring(self):
+        """test a ring like yaml with lots of steps
+        Steps :
+         * Launch 20 jobs without waiting
+         * Launch a last job and wait for the result
+        """
+        self.commit_git('ring')
+        for _ in range(20):
+            self.build(wait=False)
         self.build()

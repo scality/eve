@@ -1,0 +1,224 @@
+branches:
+  master, user/*, feature/*, improvement/*, bugfix/*:
+    stage: pre-merge
+
+stages:
+  pre-merge:
+    worker:
+      type: docker
+      path: eve/ubuntu-trusty-ctxt
+    steps:
+      - Git:
+          name: git pull
+          repourl: "%(prop:git_reference)s"
+          shallow: True
+          retryFetch: True
+          haltOnFailure: True
+      - SetPropertyFromCommand:
+          name: set target_version  # e.g., 7.0.0
+          property: target_version
+          command: echo 6.0.0
+          haltOnFailure: True
+      - SetPropertyFromCommand:
+          name: set timestamp  # e.g., 160805190203
+          property: timestamp
+          workdir: "%(prop:git_reference)s"
+          command: date --date=@`git show -s --format=%ct HEAD` +%y%m%d%H%M%S
+          haltOnFailure: True
+      - SetPropertyFromCommand:
+          name: set short_commit_sha1  # e.g., 3ac2ffd
+          property: short_commit_sha1
+          command: python -c "print('%(prop:revision)s'[:7])"
+          haltOnFailure: True
+      - SetPropertyFromCommand:
+          name: build_id  # e.g., 7.0.0.r160805190203.3ac2ffd
+          property: build_id
+          command: "echo %(prop:target_version)s.r%(prop:timestamp)s.%(prop:short_commit_sha1)s"
+          haltOnFailure: True
+      - TriggerStages:
+          name: trigger compilation and test stages simultaneously
+          stage_names:
+            - compile-trusty
+            - compile-centos6
+            - compile-centos7
+            - ucheck
+            - static-analysis
+            # - robot-framework-bizio
+          waitForFinish: True
+          haltOnFailure: True
+      - ShellCommand:
+          name: add .final_status object to artifacts
+          command: >
+              mkdir build_status
+              && echo -n "SUCCESSFUL" > build_status/.final_status
+          haltOnFailure: True
+
+  compile-trusty:
+    worker:
+      type: docker
+      path: eve/ubuntu-trusty-ctxt
+      volumes:
+        - 'ccache:/home/eve/cache/ccache'
+    steps:
+      - Git:
+          name: git pull
+          repourl: "%(prop:git_reference)s"
+          shallow: True
+          retryFetch: True
+          haltOnFailure: True
+      - ShellCommand:
+          name: make all-the-world (Trusty)
+          command: exit 0
+          haltOnFailure: True
+      - ShellCommand:
+          name: make packages (Trusty)
+          command: exit 0
+          haltOnFailure: True
+      - ShellCommand:
+          name: make installer (Trusty)
+          command: exit 0
+          haltOnFailure: True
+      - ShellCommand:
+          name: prepare artifacts to be uploaded
+          command: >
+              mkdir -p artifacts/repo artifacts/installer
+              && cd artifacts/repo
+              && ln -s `echo ../../build/prod/packages/repository/[0-9]*` trusty
+              && cd ../../artifacts/installer
+              && ln -s `echo ../../build/prod/installer/scality-ring-*.run` .
+          haltOnFailure: True
+
+  compile-centos6:
+    worker:
+      type: docker
+      path: eve/centos7-ctxt
+      volumes:
+        - 'ccache:/home/eve/cache/ccache'
+    steps:
+      - Git:
+          name: git pull
+          repourl: "%(prop:git_reference)s"
+          shallow: True
+          retryFetch: True
+          haltOnFailure: True
+      - ShellCommand:
+          name: make all-the-world (CentOS 6)
+          command: exit 0
+          haltOnFailure: True
+      - ShellCommand:
+          name: make packages (CentOS 6)
+          command: exit 0
+          haltOnFailure: True
+      - ShellCommand:
+          name: make installer (CentOS 6)
+          command: exit 0
+          haltOnFailure: True
+      - ShellCommand:
+          name: prepare artifacts to be uploaded
+          command: >
+              mkdir -p artifacts/{repo,installer}
+              && cd artifacts/repo
+              && ln -s `echo ../../build/prod/packages/repository/[0-9]*` centos6
+              && cd ../../artifacts/installer
+              && ln -s `echo ../../build/prod/installer/scality-ring-*.run` .
+          haltOnFailure: True
+
+  compile-centos7:
+    worker:
+      type: docker
+      path: eve/centos7-ctxt
+      volumes:
+        - 'ccache:/home/eve/cache/ccache'
+    steps:
+      - Git:
+          name: git pull
+          repourl: "%(prop:git_reference)s"
+          shallow: True
+          retryFetch: True
+          haltOnFailure: True
+      - ShellCommand:
+          name: make all-the-world (CentOS 7)
+          command: exit 0
+          haltOnFailure: True
+      - ShellCommand:
+          name: make packages (CentOS 7)
+          command: exit 0
+          haltOnFailure: True
+      - ShellCommand:
+          name: make installer (CentOS 7)
+          command: exit 0
+          haltOnFailure: True
+      - ShellCommand:
+          name: prepare artifacts to be uploaded (CentOS 7)
+          command: >
+              mkdir -p artifacts/{repo,installer}
+              && cd artifacts/repo
+              && ln -s `echo ../../build/prod/packages/repository/[0-9]*` centos7
+              && cd ../../artifacts/installer
+              && ln -s `echo ../../build/prod/installer/scality-ring-*.run` .
+          haltOnFailure: True
+
+  ucheck:
+    worker:
+      type: docker
+      path: eve/centos7-ctxt
+      volumes:
+        - 'ccache:/home/eve/cache/ccache'
+    steps:
+      - Git:
+          name: git pull
+          repourl: "%(prop:git_reference)s"
+          shallow: True
+          retryFetch: True
+          haltOnFailure: True
+      - ShellCommand:
+          name: make ucheck (unit tests)
+          command: exit 0
+          haltOnFailure: True
+      - ShellCommand:
+          name: prepare artifacts to be uploaded
+          command: >
+              mkdir artifacts
+              && cd artifacts
+              && ln -s ../build/ucheck/tests/reports/last ucheck
+          haltOnFailure: True
+
+  static-analysis:
+    worker:
+      type: docker
+      path: eve/ubuntu-trusty-ctxt
+      volumes:
+        - 'ccache:/home/eve/cache/ccache'
+    steps:
+      - Git:
+          name: git pull
+          repourl: "%(prop:git_reference)s"
+          shallow: True
+          retryFetch: True
+          haltOnFailure: True
+      - ShellCommand:
+          name: static analysis
+          command: exit 0
+          env:
+            ANALYSIS_OUTPUT: parseable
+          haltOnFailure: True
+      - ShellCommand:
+          name: prepare artifacts to be uploaded
+          command: >
+              mkdir artifacts
+              && cd artifacts
+              && ln -s ../build/analysis analysis
+          haltOnFailure: True
+
+  robot-framework-bizio:
+    worker:
+        type: openstack
+        image: 8 GB General Purpose v1
+        flavor: Ubuntu 14.04 LTS (Trusty Tahr) (PVHVM)
+    steps:
+      - Git:
+          name: git pull
+          repourl: git@bitbucket.org:scality/ring.git
+          shallow: True
+          retryFetch: True
+          haltOnFailure: True

@@ -15,7 +15,7 @@ def output(*msg):
         log.msg(line)
 
 
-def run(host, port, passwd):
+def run(host, port, passwd, wait):
     """
     Run eve client
     :param host: e.g. example.com
@@ -30,7 +30,7 @@ def run(host, port, passwd):
         username='try',
         passwd=passwd,
         master='%s:%s' % (host, port),
-        wait=True,
+        wait=wait,
     )
     tryc = tryclient.Try(config)
     tryc.run()
@@ -42,8 +42,9 @@ def main():
     parser.add_argument('--host', help='the eve master host name')
     parser.add_argument('--port', help='the eve master try port')
     parser.add_argument('--passwd', help='the eve master try passwd')
+    parser.add_argument('--wait', action='store_true', help='wait for finish')
     args = parser.parse_args()
-    run(host=args.host, port=args.port, passwd=args.passwd)
+    run(host=args.host, port=args.port, passwd=args.passwd, wait=args.wait)
 
 
 if __name__ == '__main__':
