@@ -156,7 +156,7 @@ class Test(unittest.TestCase):
         self.commit_git('bad_dockerfile')
         self.build(expected_result='failure')
 
-    @unittest.skip("needs rackspace credentials")
+    @unittest.skipIf('RAX_LOGIN' not in os.environ, "needs rackspace credentials")
     def test_openstack_worker(self):
         """Tests git repo caching capabilities
         """
