@@ -22,3 +22,5 @@ stages:
           property: build_id
       - Upload:
           source: artifacts
+          urls:
+           - hello.txt

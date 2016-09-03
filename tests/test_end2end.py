@@ -172,7 +172,7 @@ class Test(unittest.TestCase):
         self.commit_git('write_read_from_cache')
         self.build()
 
-    @unittest.skip("needs rackspace credentials")
+    @unittest.skipIf('RAX_LOGIN' not in os.environ, "needs rackspace credentials")
     def test_worker_uploads_artifacts(self):
         """Tests artifact uploading to cloudfiles
         """
