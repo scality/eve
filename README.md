@@ -58,6 +58,7 @@ env postactivate script for example); important items are marked with a *
                      # skipped if left empty)
     unset RAX_PWD  # same (rackspace password, not API_KEY)
     unset OPENSTACK_SSH_KEY  # same, defaults to ~/.ssh/id_rsa
+    unset OPENSTACK_KEY_NAME  # same, defaults to eve-key-pair
 
 Create and start buildbot:
 
@@ -82,7 +83,14 @@ To follow activity of buildbot:
 
 Notes for developpers intending to use Openstack slaves:
 - slaves will try to contact the master, and therefore a public IP is required
-- you need to define a key named 'eve-key-pair' in openstack identities
+- you need to define a key named as OPENSTACK_KEY_NAME in openstack identities 
+  (directly in rackspace interface, or via nova with the command below)
+
+    $ nova --os-username "YOUR_USERNAME" --os-project-name test \
+      --os-auth-url "https://identity.api.rackspacecloud.com/v2.0/" \
+      --os-tenant-id "YOUR_TENANT_ID" --os-region-name "YOUR_REGION" \
+      --os-password 'YOUR_PASSWORD' keypair-add --pub-key ~/.ssh/id_rsa.pub \
+      $OPENSTACK_KEY_NAME
 
 ## How to run tests
 The installation of mysql dev environment and tox are required.
