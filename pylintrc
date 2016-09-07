@@ -1,5 +1,6 @@
 [BASIC]
 good-names=i,j,k,ex,Run,_,logger
+generated-members=reactor.callLater
 
 [MESSAGES CONTROL]
 disable=locally-disabled,too-many-ancestors,abstract-method
