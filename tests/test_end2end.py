@@ -65,7 +65,7 @@ class Test(unittest.TestCase):
         cmd('buildbot create-master --relocatable eve')
         os.environ['GIT_KEY_PATH'] = os.path.expanduser('~/.ssh/id_rsa')
         os.environ['MASTER_FQDN'] = get_master_fqdn()
-        os.environ['DOCKER_PREFIX'] = 'test-eve'
+        os.environ['WORKER_SUFFIX'] = 'test-eve'
         cmd('buildbot start eve')
 
     def setup_git(self):

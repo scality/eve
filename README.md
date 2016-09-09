@@ -45,7 +45,7 @@ env postactivate script for example); important items are marked with a *
     export HIPCHAT_ROOM=fake
     export GIT_KEY_PATH=$HOME/.ssh/id_rsa
     export MASTER_FQDN=172.17.0.1  # (*) should work on most installations
-    export DOCKER_PREFIX=dev_eve  # (*) customize with username for example
+    export WORKER_SUFFIX=dev_eve  # (*) customize with username for example
     export GIT_REPO=$HOME/project_source  # (*) local path to project to build
     export NGROK=/usr/local/ngrok # path to ngrok if installed, usefull if you 
                                   # need to spawn distant VMs (ex. OS worker)
