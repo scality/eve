@@ -61,6 +61,7 @@ env postactivate script for example); important items are marked with a *
     unset RAX_PWD  # same (rackspace password, not API_KEY)
     unset OPENSTACK_SSH_KEY  # same, defaults to ~/.ssh/id_rsa
     unset OPENSTACK_KEY_NAME  # same, defaults to eve-key-pair
+    export BITBUCKET_PUB_KEY=$(ssh-keyscan bitbucket.org)
 
 Create and start buildbot:
 
@@ -106,6 +107,7 @@ You can tailor the way tests are run by setting the following env variables:
     RAX_LOGIN
     RAX_PWD
     OPENSTACK_SSH_KEY
+    BITBUCKET_PUB_KEY
 
 Run tests with:
 
