@@ -92,7 +92,7 @@ class Test(unittest.TestCase):
         shutil.copy(eve_yaml_file, 'eve')
         cmd('git add -A')
 
-    def build(self, expected_result='success', wait=True):
+    def build(self, expected_result='success', wait=True, allow_traceback=False):
         """
         Triggers a build, waits for the result and performs sanity checks
         :param expected_result: success or failure
@@ -113,7 +113,7 @@ class Test(unittest.TestCase):
             assert 'bootstrap: success (finished)' in out
 
         log = open(os.path.join(self.top_dir, 'eve', 'twistd.log'), 'r').read()
-        if 'Traceback (most recent call last):' in log:
+        if not allow_traceback and 'Traceback (most recent call last):' in log:
             raise Exception('Found an Exception Traceback in twistd.log')
         if '_mysql_exceptions' in log:
             raise Exception('Found a MySQL issue in twistd.log')
@@ -200,7 +200,8 @@ class Test(unittest.TestCase):
         self.build()
 
     def test_ring(self):
-        """test a ring like yaml with lots of steps
+        """Test a ring like yaml with lots of steps.
+
         Steps :
          * Launch 20 jobs without waiting
          * Launch a last job and wait for the result
@@ -209,3 +210,13 @@ class Test(unittest.TestCase):
         for _ in range(20):
             self.build(wait=False)
         self.build()
+
+    def test_lost_slave_recovery(self):
+        """Ensures test can recover when slave is lost.
+
+        Steps :
+         * Launch the first job, that kills buildbot/container
+         * Launch again, detect it is a retry, and just pass
+        """
+        self.commit_git('lost_slave_recovery')
+        self.build(allow_traceback=True)
