@@ -15,7 +15,11 @@ stages:
           command: mkdir artifacts
       - ShellCommand:
           name: create a file in artifacts dir
-          command: echo 'hello' > artifacts/hello.txt
+          command: >
+              mkdir artifacts/test
+              && echo 'hello' > artifacts/test/hello.txt
+              && echo 'hello' > artifacts/test/hello_2.txt
+              && echo 'hello' > artifacts/hello.txt
       - SetPropertyFromCommand:
           name: set build id
           command: echo 'eve_test_build_id'
@@ -24,3 +28,8 @@ stages:
           source: artifacts
           urls:
            - hello.txt
+           - ['files in test directory : ', 'test/*']
+           - ['every hello files : ', '*hello*']
+           - a_path_pattern_with_no_match
+           - [a_prefix, a_path_pattern_with_no_match]
+           - '*'
