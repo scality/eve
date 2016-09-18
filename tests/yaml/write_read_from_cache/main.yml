@@ -38,7 +38,3 @@ stages:
           name: read from cache
           command: cat /read/%(prop:revision)s
           haltOnFailure: True
-      - ShellCommand:
-          name: check also git cache
-          command: cat %(prop:git_reference)s/eve/main.yml
-          haltOnFailure: True
