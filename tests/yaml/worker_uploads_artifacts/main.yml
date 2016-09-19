@@ -33,3 +33,11 @@ stages:
            - a_path_pattern_with_no_match
            - [a_prefix, a_path_pattern_with_no_match]
            - '*'
+           - ['?ello.txt : ', '?ello.txt']
+           - ['h*o.txt : ', 'h*o.txt']
+           - ['test/h* : ', 'test/h*']
+           - ['/h : ', '/h']
+           - ['h.t : ', 'h.t']
+           - ['*/.txt : ', '*/.txt']
+           - ['*hello.txt : ', '*hello.txt']
+           - ['hello.txt* : ', 'hello.txt*']
