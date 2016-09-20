@@ -263,6 +263,8 @@ class Test(unittest.TestCase):
         self.notify_webhook()
         self.get_build_result(expected_result='success')
 
+    @unittest.skipIf('ARTIFACTS_LOGIN' not in os.environ,
+                     'needs artifacts credentials')
     @unittest.skipIf('RAX_LOGIN' not in os.environ,
                      'needs rackspace credentials')
     def test_worker_uploads_artifacts(self):
