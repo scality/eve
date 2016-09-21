@@ -41,6 +41,7 @@ stages:
            - ['*/.txt : ', '*/.txt']
            - ['*hello.txt : ', '*hello.txt']
            - ['hello.txt* : ', 'hello.txt*']
+           - ['hello from path: \1', '*hello.txt']
       - Download:
           name: tries to download uploaded files
           files:
