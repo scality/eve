@@ -6,7 +6,7 @@ import subprocess
 logger = logging.getLogger(__name__)
 
 
-def cmd(command, ignore_exception=False, cwd=None):
+def cmd(command, ignore_exception=False, cwd=None, wait=True):
     """Execute a shell command and display output in a readable manner."""
     output = ''
     logger.info('COMMAND : %s', command)
@@ -14,6 +14,9 @@ def cmd(command, ignore_exception=False, cwd=None):
                                stdout=subprocess.PIPE,
                                stderr=subprocess.STDOUT,
                                cwd=cwd)
+
+    if not wait:
+        return None
 
     # Poll process for new output until finished
     while True:
