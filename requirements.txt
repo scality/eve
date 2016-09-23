@@ -1,9 +1,9 @@
-buildbot[tls]==0.9.0rc2
-buildbot-pkg==0.9.0rc2
-buildbot-console-view==0.9.0rc2
-buildbot-waterfall-view==0.9.0rc2
-buildbot-www==0.9.0rc2
-buildbot-worker==0.9.0rc2
+buildbot[tls]==0.9.0rc3
+buildbot-pkg==0.9.0rc3
+buildbot-console-view==0.9.0rc3
+buildbot-waterfall-view==0.9.0rc3
+buildbot-www==0.9.0rc3
+buildbot-worker==0.9.0rc3
 #docker-py==1.10.0.dev0  fixme: uncomment when docker-py 1.10 is out
 https://github.com/docker/docker-py/archive/master.zip # fixme: delete when docker-py 1.10 is out
 # See : https://github.com/docker/docker-py/pull/1081 # fixme: delete when docker-py 1.10 is out
