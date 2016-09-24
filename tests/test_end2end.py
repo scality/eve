@@ -63,6 +63,7 @@ class Test(unittest.TestCase):
         os.environ['GIT_REPO'] = self.git_dir
         self.url = 'http://localhost:%d/' % (BASE_HTTP_PORT + 1)
         os.environ['EXTERNAL_URL'] = self.url
+        self.setup_crossbar()
         self.setup_eve_master(master_id=1)
         self.setup_eve_master(master_id=2)
         self.api = buildbot_api_client.BuildbotDataAPI(self.url + 'api/v2/')
@@ -103,6 +104,18 @@ class Test(unittest.TestCase):
         os.environ['MAX_LOCAL_WORKERS'] = '1'
 
         cmd('buildbot start .')
+
+    def setup_crossbar(self):
+        """Spawns a local crossbar.
+        """
+        crossbar_dir = os.path.join(self.top_dir, '.test', 'crossbar')
+        cmd('mkdir -p %s' % crossbar_dir, ignore_exception=True)
+        crossbar_cfg_path = os.path.join(self.top_dir, 'tests', 'crossbar.json')
+        os.chdir(crossbar_dir)
+
+        cmd('cp %s %s' % (crossbar_cfg_path,
+                          os.path.join(crossbar_dir, 'config.json')))
+        cmd('crossbar start --logtofile --cbdir %s' % crossbar_dir, wait=False)
 
     def setup_git(self):
         """Create a new git repo."""
