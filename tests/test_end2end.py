@@ -1,6 +1,7 @@
 # coding: utf-8
 """This test suite checks end-to-end operation of EVE."""
 
+import json
 import logging
 import os
 import platform
@@ -10,13 +11,11 @@ import tempfile
 import time
 import unittest
 
-
-import json
 import requests
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
-from tests.cmd import cmd
 import buildbot_api_client
+from tests.cmd import cmd
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(format='[%(levelname)s] %(message)s', level=logging.INFO)
@@ -27,6 +26,8 @@ requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 BASE_TRY_PORT = 7990
 BASE_HTTP_PORT = 8990
 BASE_PB_PORT = 9990
+WAMP_PORT = 10990
+
 
 def get_master_fqdn():
     """Get the master fqdn.
@@ -61,47 +62,71 @@ class Test(unittest.TestCase):
         except OSError:
             pass
         os.environ['GIT_REPO'] = self.git_dir
-        self.url = 'http://localhost:%d/' % (BASE_HTTP_PORT + 1)
+        self.url = 'http://localhost:%d/' % (BASE_HTTP_PORT)
         os.environ['EXTERNAL_URL'] = self.url
         self.setup_crossbar()
-        self.setup_eve_master(master_id=1)
-        self.setup_eve_master(master_id=2)
+        self.setup_eve_master_frontend(master_id=0)
+        self.setup_eve_master_backend(master_id=1)
+        self.setup_eve_master_backend(master_id=2)
         self.api = buildbot_api_client.BuildbotDataAPI(self.url + 'api/v2/')
         self.setup_git()
 
     def shutdown_eve(self):
         for filename in os.listdir(self.test_dir):
-            if not filename.startswith('master'):
-                continue
-            filpath = os.path.join(self.test_dir, filename)
-            cmd('buildbot stop %s' % filpath, ignore_exception=True)
+            filepath = os.path.join(self.test_dir, filename)
+            if filename.startswith('master'):
+                cmd('buildbot stop %s' % filepath, ignore_exception=True)
+            elif filename.startswith('crossbar'):
+                cmd('crossbar stop --cbdir %s' %
+                    filepath, ignore_exception=True)
+
         cmd('rm -rf %s' % self.test_dir)
 
-
-    def setup_eve_master(self, master_id=1):
-        """Spawns a EVE master.
+    def setup_eve_master_frontend(self, master_id):
+        """Spawns a EVE master frontend.
 
         It will wait until it is up and running.
         """
-        masterdir = os.path.join(self.top_dir, '.test', 'master%i' % master_id)
-        cmd('mkdir -p %s' % masterdir, ignore_exception=True)
-        master_cfg_path = os.path.join(self.top_dir, 'eve', 'master.cfg')
-        os.chdir(masterdir)
+        os.environ['TRY_PORT'] = str(BASE_TRY_PORT + master_id)
+        os.environ['HTTP_PORT'] = str(BASE_HTTP_PORT + master_id)
+        self.setup_eve_master(master_id, master_type='frontend')
 
-        cmd('cp %s .' % master_cfg_path)
+    def setup_eve_master_backend(self, master_id):
+        """Spawns a EVE master backend.
 
-        sql_path = os.path.join(self.top_dir, '.test', 'state.sqlite')
-        os.environ['DB_URL'] = 'sqlite:///' + sql_path
-
-        cmd('buildbot create-master --relocatable --db=%s .' % os.environ['DB_URL'])
+        It will wait until it is up and running.
+        """
         os.environ['GIT_KEY_PATH'] = os.path.expanduser('~/.ssh/id_rsa')
         os.environ['MASTER_FQDN'] = get_master_fqdn()
         os.environ['MASTER_NAME'] = 'master%d' % master_id
         os.environ['WORKER_SUFFIX'] = 'test-eve%d' % master_id
-        os.environ['TRY_PORT'] = str(BASE_TRY_PORT + master_id)
-        os.environ['HTTP_PORT'] = str(BASE_HTTP_PORT + master_id)
+
         os.environ['PB_PORT'] = str(BASE_PB_PORT + master_id)
         os.environ['MAX_LOCAL_WORKERS'] = '1'
+        self.setup_eve_master(master_id, master_type='backend')
+
+    def setup_eve_master(self, master_id, master_type):
+        """Spawns a EVE master backend.
+
+        It will wait until it is up and running.
+        """
+
+        sql_path = os.path.join(self.top_dir, '.test', 'state.sqlite')
+        os.environ['DB_URL'] = 'sqlite:///' + sql_path
+
+        os.environ['WAMP_ROUTER_URL'] = 'ws://localhost:%d/ws' % WAMP_PORT
+        os.environ['WAMP_REALM'] = 'buildbot'
+
+        master_cfg_dir = os.path.join(self.top_dir, 'eve', 'master')
+
+        masterdir = os.path.join(self.top_dir, '.test', 'master%i' % master_id)
+        cmd('mkdir -p %s' % masterdir, ignore_exception=True)
+        os.chdir(masterdir)
+        cmd('cp -r %s/* .' % master_cfg_dir)
+        cmd('mv %s.master.cfg master.cfg' % master_type)
+
+        cmd('buildbot create-master --relocatable --db=%s .' %
+            os.environ['DB_URL'])
 
         cmd('buildbot start .')
 
@@ -110,7 +135,8 @@ class Test(unittest.TestCase):
         """
         crossbar_dir = os.path.join(self.top_dir, '.test', 'crossbar')
         cmd('mkdir -p %s' % crossbar_dir, ignore_exception=True)
-        crossbar_cfg_path = os.path.join(self.top_dir, 'tests', 'crossbar.json')
+        crossbar_cfg_path = os.path.join(
+            self.top_dir, 'tests', 'crossbar.json')
         os.chdir(crossbar_dir)
 
         cmd('cp %s %s' % (crossbar_cfg_path,
@@ -143,7 +169,7 @@ class Test(unittest.TestCase):
         cmd('git add -A')
         cmd('git commit -m "add %s"' % eve_yaml_file)
 
-    def notify_webhook(self, master_id=1):
+    def notify_webhook(self):
         commits = []
         res = cmd('git log --pretty=format:"%an %ae|%s|%H|%cd" --date=iso')
         for line in reversed(res.splitlines()):
@@ -165,15 +191,14 @@ class Test(unittest.TestCase):
             'commits': commits,
         }
         webhook_url = 'http://localhost:%d/change_hook/bitbucket'
-        requests.post(webhook_url % (BASE_HTTP_PORT + master_id),
+        requests.post(webhook_url % BASE_HTTP_PORT,
                       data={'payload': json.dumps(payload)})
 
-    def get_bootstrap_builder(self, master_id=1):
-        return self.api.get(
-            'builders?name=bootstrap-master%d' % master_id)['builders'][0]
+    def get_bootstrap_builder(self):
+        return self.api.get('builders?name=bootstrap')['builders'][0]
 
-    def get_bootstrap_build(self, master_id=1, build_number=1):
-        builder = self.get_bootstrap_builder(master_id)
+    def get_bootstrap_build(self, build_number=1):
+        builder = self.get_bootstrap_builder()
         for _ in range(10):
             try:
                 return self.api.get(
@@ -182,17 +207,15 @@ class Test(unittest.TestCase):
             except IndexError:
                 time.sleep(1)
                 print('waiting for build to start')
-        raise Exception('unable to find bootstrap build master_id=%d, '
+        raise Exception('unable to find bootstrap build, '
                         'builderid=%d, build_number=%d' %
-                        (master_id, builder['builderid'], build_number))
+                        (builder['builderid'], build_number))
 
-    def get_build_result(self, build_number=1, master_id=1,
-                         expected_result='success'):
-        for _ in range(60):
-            build = self.get_bootstrap_build(master_id=master_id,
-                                             build_number=build_number)
+    def get_build_result(self, build_number=1, expected_result='success'):
+        for _ in range(120):
+            build = self.get_bootstrap_build(build_number=build_number)
             if build['state_string'] == 'finished' and \
-                            build['results'] is not None:
+                    build['results'] is not None:
                 break
             time.sleep(1)
             print('waiting for build to finish')
@@ -235,12 +258,12 @@ class Test(unittest.TestCase):
         """Tests that multi master mode works
         """
         self.commit_git('four_stages_sleep')
-        self.notify_webhook(master_id=1)
+        self.notify_webhook()
         time.sleep(10)
         self.commit_git('ring')
-        self.notify_webhook(master_id=2)
-        self.get_build_result(master_id=1, expected_result='success')
-        self.get_build_result(master_id=2, expected_result='success')
+        self.notify_webhook()
+        self.get_build_result(expected_result='success')
+        self.get_build_result(expected_result='success')
 
     def test_worker_pulls_git_repo(self):
         """Tests git repo caching capabilities
