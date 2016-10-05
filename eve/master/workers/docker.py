@@ -33,6 +33,7 @@ class EveDockerLatentWorker(DockerLatentWorker):
             '--env', 'WORKERPASS=%s' % self.password,
             '--env', 'BUILDMASTER_PORT=%s' % environ['PB_PORT'],
             '--env', 'DOCKER_HOST_IP=%s' % docker_host_ip,
+            '--link', 'bitbucket.org',
             '--detach',
         ]
         cmd.extend(['--volume=%s' % volume for volume in volumes])
