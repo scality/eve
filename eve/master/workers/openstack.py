@@ -1,3 +1,5 @@
+"""Allow eve to use openstack workers."""
+
 import re
 import time
 from os import environ  # FIXME: remove need for environment variables
@@ -27,6 +29,7 @@ class EveOpenStackLatentWorker(OpenStackLatentWorker):
     _ngrok = None
 
     def get_reachable_address(self):
+        """Get the address to the eve master reachable by the worker."""
         if not self._reachable_address:
             if 'NGROK' in environ:
                 self._ngrok = ngrok.Ngrok(command=environ['NGROK'])
@@ -194,7 +197,7 @@ class EveOpenStackLatentWorker(OpenStackLatentWorker):
         # until we are sure they are deleted (Not the case in the original
         # class)
         threads.deferToThread(self._stop_instance, instance, fast)
-        self.output = self.instance = None
+        self.instance = None
 
         return AbstractWorker.disconnect(self)
 
