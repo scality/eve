@@ -171,7 +171,7 @@ class Upload(ShellCommand):
                 # case 1 : prefix is a pattern
                 if self.PREFIX_PATTERN_ELEMENTS.search(prefix):
                     path_pattern = re.compile(
-                        '^' +
+                        '^./' +
                         link['path'].replace('*', '(.*)').replace('?', '(.)') +
                         '$')
                     links.update([
