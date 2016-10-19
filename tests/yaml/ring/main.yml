@@ -213,8 +213,9 @@ stages:
   robot-framework-bizio:
     worker:
         type: openstack
-        image: 8 GB General Purpose v1
-        flavor: Ubuntu 14.04 LTS (Trusty Tahr) (PVHVM)
+        image: Ubuntu 14.04 LTS (Trusty Tahr) (PVHVM)
+        flavor: general1-8
+        path: eve/openstack_worker
     steps:
       - Git:
           name: git pull
