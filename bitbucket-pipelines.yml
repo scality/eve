@@ -5,5 +5,5 @@ pipelines:
     - step:
         script:
           - pip install tox
-          - tox -e static
+          # - tox -e static
           - tox -e test
