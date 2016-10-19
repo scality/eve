@@ -340,3 +340,16 @@ class Test(unittest.TestCase):
         self.commit_git('lost_slave_recovery')
         self.notify_webhook()
         self.get_build_result(expected_result='success')
+
+    @unittest.skipIf('RAX_LOGIN' not in os.environ,
+                     'needs rackspace credentials')
+    def test_bad_substantiate(self):
+        """Ensures that a bad latent worker substantiation fails the build.
+
+        Steps:
+         * Try to substantiate a bad latent worker
+         * Verify the build is in failed state afterward
+        """
+        self.commit_git('bad_substantiate')
+        self.notify_webhook()
+        self.get_build_result(expected_result='failure')

@@ -134,7 +134,6 @@ class EveOpenStackLatentWorker(OpenStackLatentWorker):
         try:
             self.start_worker(init_script)
         except CalledProcessError as exception:
-            time.sleep(60)  # avoid a fast loop in case of failure
             self.logger.debug('Error on %s %s while executing "%s" <%s> %s.' %
                               (self.workername, self.ip_address,
                                exception.cmd, exception, exception.output))
