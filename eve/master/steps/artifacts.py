@@ -1,3 +1,5 @@
+"""Steps allowing eve to interact with artifacts."""
+
 import json
 import re
 from collections import defaultdict
@@ -23,7 +25,7 @@ CURL_CMD = """curl -s -X POST -H "Content-type: application/json" \
 
 
 class CloudfilesAuthenticate(SetPropertyFromCommand):
-    """ Authenticate with rackspace and store the auth token on a property."""
+    """Authenticate with rackspace and store the auth token on a property."""
 
     def __init__(self, rax_login, rax_pwd, **kwargs):
         SetPropertyFromCommand.__init__(
@@ -47,8 +49,7 @@ class CloudfilesAuthenticate(SetPropertyFromCommand):
 
 
 class Upload(ShellCommand):
-    """ Upload files to rackspace
-    """
+    """Upload files to rackspace."""
 
     # maximum upload time, in seconds.
     UPLOAD_MAX_TIME = 900
@@ -162,7 +163,7 @@ class Upload(ShellCommand):
             if not matches:
                 continue
             if (len(matches) == 1
-                and '*' not in link['path'] and '?' not in link['path']
+                    and '*' not in link['path'] and '?' not in link['path']
                     and 'name' in link):
                 links.add((link['name'], matches[0]))
             else:
@@ -212,6 +213,7 @@ class Upload(ShellCommand):
 
 
 class Download(ShellCommand):
+    """Download files from rackspace."""
 
     def __init__(self, files, **kwargs):
         name = kwargs.pop(

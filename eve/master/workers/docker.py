@@ -1,9 +1,11 @@
-import netifaces
-import time
+"""Allow eve to use docker workers."""
+
 from os import environ
 from subprocess import STDOUT, CalledProcessError, check_output
+import time
 
 from buildbot.worker.docker import DockerLatentWorker
+import netifaces
 from twisted.logger import Logger
 
 
@@ -22,7 +24,7 @@ class EveDockerLatentWorker(DockerLatentWorker):
         docker_host_ip = None
         try:
             docker_host_ip = netifaces.ifaddresses('docker0')[2][0]['addr']
-        except:
+        except Exception:  # FIXME: do we need such a generic exception?
             pass
 
         cmd = [

@@ -1,3 +1,5 @@
+"""Utils to log errors to sentry."""
+
 from raven import Client
 from raven.transport.twisted import TwistedHTTPTransport
 from twisted.logger import ILogObserver, globalLogPublisher
