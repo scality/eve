@@ -175,24 +175,38 @@ class Test(unittest.TestCase):
         for line in reversed(res.splitlines()):
             author, message, revision, timestamp = line.split('|')
             commits.append({
-                'raw_author': author,
-                'files': [{'file': 'eve/main.yml'}],
-                'message': message,
-                'raw_node': revision,
-                'node': revision,
-                'utctimestamp': timestamp,
-                'branch': 'master',
-                'revlink': 'http://www.google.com',
+                'new': {
+                    'type': 'branch',
+                    'target': {
+                        'hash': revision,
+                        'author': {'raw': author},
+                        'message': message,
+                        'links': {
+                            'html': {'href': revision}
+                        },
+                    },
+                    'name': 'master'
+                }
             })
 
         payload = {
-            'canon_url': 'https://bitbucket.org',
-            'repository': {'absolute_url': '/scality/test', 'scm': 'git'},
+            'repository': {
+                'links': {
+                    'html': {
+                        'href': 'https://bitbucket.org/scality/test'
+                    }
+                },
+                'scm': 'git',
+                'project': {'name': 'TEST'},
+            },
+            'push': {
+                'changes': commits
+            },
             'commits': commits,
         }
         webhook_url = 'http://localhost:%d/change_hook/bitbucket'
         requests.post(webhook_url % BASE_HTTP_PORT,
-                      data={'payload': json.dumps(payload)})
+                      data=json.dumps(payload))
 
     def get_bootstrap_builder(self):
         return self.api.get('builders?name=bootstrap')['builders'][0]
