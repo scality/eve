@@ -65,6 +65,8 @@ class Upload(ShellCommand):
             'cd ' + source,
             ('[ "$(ls -A)" ]'
              ' || (echo "Directory is empty. Nothing to do."; exit 1)'),
+            ('[ -n find . -type f ]'
+             ' || (echo "No files here, nothing to do."; exit 0)',
             'tar -chvzf ../artifacts.tar.gz . ',
             'echo tar successful. Calling curl... ',
             ('curl --verbose --max-time {max_time} -s -T ../artifacts.tar.gz '
