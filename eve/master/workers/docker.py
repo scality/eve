@@ -35,7 +35,8 @@ class EveDockerLatentWorker(DockerLatentWorker):
             '--env', 'WORKERPASS=%s' % self.password,
             '--env', 'BUILDMASTER_PORT=%s' % environ['PB_PORT'],
             '--env', 'DOCKER_HOST_IP=%s' % docker_host_ip,
-            '--env', 'ARTIFACTS_PREFIX=%s' % environ['ARTIFACTS_PREFIX'],
+            '--env', 'ARTIFACTS_PREFIX=%s' % environ.get('ARTIFACTS_PREFIX',
+                                                         'staging-'),
             '--link', 'bitbucket.org',
             '--detach',
         ]
