@@ -36,11 +36,11 @@ class EveOpenStackLatentWorker(OpenStackLatentWorker):
                 self._reachable_address = self._ngrok.start(
                     'tcp', environ['PB_PORT'], 'us')
             else:
-                self._reachable_address = self.master_fqdn, environ['PB_PORT']
+                self._reachable_address = self.masterFQDN, environ['PB_PORT']
         return self._reachable_address
 
     def __init__(self, region, ssh_key, git_key_path,
-                 bitbucket_pub_key, master_fqdn, **kwargs):
+                 bitbucket_pub_key, masterFQDN, **kwargs):
         super(EveOpenStackLatentWorker, self).__init__(**kwargs)
         # fixme: This is a fragile hack because the original class does not
         # allow to specify a region name. We should fix this upstream.
@@ -48,7 +48,7 @@ class EveOpenStackLatentWorker(OpenStackLatentWorker):
         self.ssh_key = ssh_key
         self.ip_address = None
         self.git_key_path = git_key_path
-        self.master_fqdn = master_fqdn
+        self.masterFQDN = masterFQDN
         self.bitbucket_pub_key = bitbucket_pub_key
         self._ngrok = None
 
