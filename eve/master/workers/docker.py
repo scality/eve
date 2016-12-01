@@ -16,8 +16,9 @@ class EveDockerLatentWorker(DockerLatentWorker):
     logger = Logger('eve.workers.EveDockerLatentWorker')
 
     def __init__(self, docker_tls_verify=None, docker_cert_path=None, **kwargs):
-        self.docker_tls_verify=docker_tls_verify
-        self.docker_cert_path=docker_cert_path
+        self.docker_tls_verify = docker_tls_verify
+        self.docker_cert_path = docker_cert_path
+        self.docker_host = kwargs['docker_host']
         DockerLatentWorker.__init__(self, **kwargs)
 
     def _thd_start_instance(self, image, volumes):
