@@ -15,6 +15,12 @@ class EveDockerLatentWorker(DockerLatentWorker):
     """
     logger = Logger('eve.workers.EveDockerLatentWorker')
 
+    def __init__(self, docker_tls_verify=None, docker_cert_path=None, **kwargs):
+        self.docker_tls_verify = docker_tls_verify
+        self.docker_cert_path = docker_cert_path
+        self.docker_host = kwargs['docker_host']
+        DockerLatentWorker.__init__(self, **kwargs)
+
     def _thd_start_instance(self, image, volumes):
         if image not in self.docker_invoke('images'):
             # hack to avoid a loop when the original image does not exist
@@ -60,6 +66,14 @@ class EveDockerLatentWorker(DockerLatentWorker):
 
          """
         cmd = ['docker']
+        if self.docker_tls_verify == '1':
+            cmd.extend([
+                '--tlsverify',
+                '--tlscacert=%s/ca.pem' % self.docker_cert_path,
+                '--tlscert=%s/cert.pem' % self.docker_cert_path,
+                '--tlskey=%s/key.pem' % self.docker_cert_path,
+                '--host=%s' % self.docker_host,
+            ])
         cmd.extend(args)
         try:
             res = check_output(cmd, stderr=STDOUT).strip()
