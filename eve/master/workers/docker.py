@@ -46,14 +46,6 @@ class EveDockerLatentWorker(DockerLatentWorker):
             '--detach',
         ]
         cmd.extend(['--volume=%s' % volume for volume in volumes])
-        if self.DOCKER_TLS_VERIFY == '1':
-            cmd.extend([
-                '--tlsverify',
-                '--tlscacert=%s/ca.pem' % self.DOCKER_CERT_PATH,
-                '--tlscert=%s/cert.pem' % self.DOCKER_CERT_PATH,
-                '--tlskey=%s/key.pem' % self.DOCKER_CERT_PATH,
-                '--host=%s' % self.DOCKER_HOST,
-            ])
         cmd.append(image)
         self.instance = self.docker_invoke(*cmd)
         self.logger.debug('Container created, Id: %s...' % self.instance)
@@ -73,6 +65,14 @@ class EveDockerLatentWorker(DockerLatentWorker):
 
          """
         cmd = ['docker']
+        if self.DOCKER_TLS_VERIFY == '1':
+            cmd.extend([
+                '--tlsverify',
+                '--tlscacert=%s/ca.pem' % self.DOCKER_CERT_PATH,
+                '--tlscert=%s/cert.pem' % self.DOCKER_CERT_PATH,
+                '--tlskey=%s/key.pem' % self.DOCKER_CERT_PATH,
+                '--host=%s' % self.DOCKER_HOST,
+            ])
         cmd.extend(args)
         try:
             res = check_output(cmd, stderr=STDOUT).strip()
