@@ -65,13 +65,13 @@ class EveDockerLatentWorker(DockerLatentWorker):
 
          """
         cmd = ['docker']
-        if self.DOCKER_TLS_VERIFY == '1':
+        if self.docker_tls_verify == '1':
             cmd.extend([
                 '--tlsverify',
-                '--tlscacert=%s/ca.pem' % self.DOCKER_CERT_PATH,
-                '--tlscert=%s/cert.pem' % self.DOCKER_CERT_PATH,
-                '--tlskey=%s/key.pem' % self.DOCKER_CERT_PATH,
-                '--host=%s' % self.DOCKER_HOST,
+                '--tlscacert=%s/ca.pem' % self.docker_cert_path,
+                '--tlscert=%s/cert.pem' % self.docker_cert_path,
+                '--tlskey=%s/key.pem' % self.docker_cert_path,
+                '--host=%s' % self.docker_host,
             ])
         cmd.extend(args)
         try:
