@@ -1,6 +1,8 @@
 # coding: utf-8
 """This test suite checks end-to-end operation of EVE."""
 
+from __future__ import print_function
+
 import json
 import logging
 import os
@@ -49,6 +51,7 @@ class Test(unittest.TestCase):  # pylint: disable=too-many-public-methods
     - Checks build status
     """
 
+    webhook_url = 'http://localhost:%d/change_hook/bitbucket'
     api = None
     eve = None
 
@@ -175,7 +178,7 @@ class Test(unittest.TestCase):  # pylint: disable=too-many-public-methods
         commits = []
         res = cmd('git log --pretty=format:"%an %ae|%s|%H|%cd" --date=iso')
         for line in reversed(res.splitlines()):
-            author, message, revision, timestamp = line.split('|')
+            author, message, revision, _ = line.split('|')
             commits.append({
                 'new': {
                     'type': 'branch',
@@ -206,8 +209,7 @@ class Test(unittest.TestCase):  # pylint: disable=too-many-public-methods
             },
             'commits': commits,
         }
-        webhook_url = 'http://localhost:%d/change_hook/bitbucket'
-        requests.post(webhook_url % BASE_HTTP_PORT,
+        requests.post(self.webhook_url % BASE_HTTP_PORT,
                       data=json.dumps(payload))
 
     def get_bootstrap_builder(self):

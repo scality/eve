@@ -165,7 +165,8 @@ class Upload(ShellCommand):
             if not matches:
                 continue
             if (len(matches) == 1
-                    and '*' not in link['path'] and '?' not in link['path']
+                    and '*' not in link['path']
+                    and '?' not in link['path']
                     and 'name' in link):
                 links.add((link['name'], matches[0]))
             else:

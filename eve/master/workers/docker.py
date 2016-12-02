@@ -15,11 +15,11 @@ class EveDockerLatentWorker(DockerLatentWorker):
     """
     logger = Logger('eve.workers.EveDockerLatentWorker')
 
-    def __init__(self, docker_tls_verify=None, docker_cert_path=None, **kwargs):
+    def __init__(self, docker_tls_verify=None, docker_cert_path=None, **kw):
         self.docker_tls_verify = docker_tls_verify
         self.docker_cert_path = docker_cert_path
-        self.docker_host = kwargs['docker_host']
-        DockerLatentWorker.__init__(self, **kwargs)
+        self.docker_host = kw['docker_host']
+        DockerLatentWorker.__init__(self, **kw)
 
     def _thd_start_instance(self, image, volumes):
         if image not in self.docker_invoke('images'):
