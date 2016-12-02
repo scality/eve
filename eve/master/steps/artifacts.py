@@ -152,6 +152,29 @@ class Upload(ShellCommand):
             return
 
         # extracts file path used in urls, in command output:
+        links = self._get_links_from_stdout()
+
+        # append path to names if several links share the same name
+        paths = defaultdict(int)
+        for name, _ in links:
+            paths[name] += 1
+        for index, (name, upath) in enumerate(links):
+            if paths[name] > 1:
+                links[index] = (
+                    '{name} ({detail})'.format(name=name, detail=upath[2:]),
+                    upath)
+
+        # adds links in step display, based on existing files
+        for (name, upath) in links:
+            url = ('{url}/{prefix}{build_id}/{path}'.format(
+                url=self.ARTIFACTS_URL,
+                prefix=self.ARTIFACTS_PREFIX,
+                build_id=self.getProperty('build_id'),
+                path=upath
+            ))
+            self.addURL(name, url)
+
+    def _get_links_from_stdout(self):
         lines = self.observer.getStdout().split('\n')
         links = set()
         for link in self._links:
@@ -192,27 +215,7 @@ class Upload(ShellCommand):
                         for match in matches
                     ])
 
-        links = sorted(links)
-
-        # append path to names if several links share the same name
-        pathes = defaultdict(int)
-        for name, _ in links:
-            pathes[name] += 1
-        for index, (name, upath) in enumerate(links):
-            if pathes[name] > 1:
-                links[index] = (
-                    '{name} ({detail})'.format(name=name, detail=upath[2:]),
-                    upath)
-
-        # adds links in step display, based on existing files
-        for (name, upath) in links:
-            url = ('{url}/{prefix}{build_id}/{path}'.format(
-                url=self.ARTIFACTS_URL,
-                prefix=self.ARTIFACTS_PREFIX,
-                build_id=self.getProperty('build_id'),
-                path=upath
-            ))
-            self.addURL(name, url)
+        return sorted(links)
 
 
 class Download(ShellCommand):
