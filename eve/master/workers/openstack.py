@@ -12,7 +12,7 @@ from buildbot.worker.openstack import OpenStackLatentWorker
 from twisted.internet import defer, threads
 from twisted.logger import Logger
 
-import ngrok
+from . import ngrok
 
 
 class EveOpenStackLatentWorker(OpenStackLatentWorker):

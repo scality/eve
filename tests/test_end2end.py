@@ -14,7 +14,7 @@ import unittest
 import requests
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
-import buildbot_api_client
+from . import buildbot_api_client
 from tests.cmd import cmd
 
 logger = logging.getLogger(__name__)
