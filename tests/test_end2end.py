@@ -72,6 +72,7 @@ class Test(unittest.TestCase):
         self.setup_git()
 
     def shutdown_eve(self):
+        """Stop Eve masters and crossbar instances."""
         for filename in os.listdir(self.test_dir):
             filepath = os.path.join(self.test_dir, filename)
             if filename.startswith('master'):
@@ -170,6 +171,7 @@ class Test(unittest.TestCase):
         cmd('git commit -m "add %s"' % eve_yaml_file)
 
     def notify_webhook(self):
+        """Notify Eve's bitbucket hook of a new change."""
         commits = []
         res = cmd('git log --pretty=format:"%an %ae|%s|%H|%cd" --date=iso')
         for line in reversed(res.splitlines()):
@@ -209,9 +211,11 @@ class Test(unittest.TestCase):
                       data=json.dumps(payload))
 
     def get_bootstrap_builder(self):
+        """Get builder named 'bootstrap' from the Buildbot's API."""
         return self.api.get('builders?name=bootstrap')['builders'][0]
 
     def get_bootstrap_build(self, build_number=1):
+        """Wait for build 'bootstrap' to start and return its infos."""
         builder = self.get_bootstrap_builder()
         for _ in range(10):
             try:
@@ -226,6 +230,7 @@ class Test(unittest.TestCase):
                         (builder['builderid'], build_number))
 
     def get_build_result(self, build_number=1, expected_result='success'):
+        """Get the result of the build `build_number`."""
         for _ in range(120):
             build = self.get_bootstrap_build(build_number=build_number)
             if build['state_string'] == 'finished' and \
