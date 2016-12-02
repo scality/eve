@@ -29,9 +29,14 @@ class EveDockerLatentWorker(DockerLatentWorker):
 
         docker_host_ip = None
         try:
-            docker_host_ip = netifaces.ifaddresses('docker0')[2][0]['addr']
-        except Exception:  # FIXME: do we need such a generic exception?
+            docker_addresses = netifaces.ifaddresses('docker0')
+        except ValueError:
             pass
+        else:
+            try:
+                docker_host_ip = docker_addresses[netifaces.AF_INET][0]['addr']
+            except KeyError:
+                pass
 
         cmd = [
             'run',
