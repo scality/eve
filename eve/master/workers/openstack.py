@@ -2,7 +2,7 @@
 
 import re
 import time
-from os import environ  # FIXME: remove need for environment variables
+from os import environ
 from subprocess import STDOUT, CalledProcessError, check_output
 
 import novaclient
