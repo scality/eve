@@ -42,7 +42,7 @@ def get_master_fqdn():
     return fqdn
 
 
-class Test(unittest.TestCase):
+class Test(unittest.TestCase):  # pylint: disable=too-many-public-methods
     """Base class for test classes
 
     - Sets-up bitbucket git repo

@@ -40,7 +40,7 @@ class EveOpenStackLatentWorker(OpenStackLatentWorker):
         return self._reachable_address
 
     def __init__(self, region, ssh_key, git_key_path,
-                 bitbucket_pub_key, masterFQDN, **kwargs):
+                 bitbucket_pub_key, masterFQDN, **kwargs):  # flake8: noqa
         super(EveOpenStackLatentWorker, self).__init__(**kwargs)
         # fixme: This is a fragile hack because the original class does not
         # allow to specify a region name. We should fix this upstream.
@@ -109,7 +109,7 @@ class EveOpenStackLatentWorker(OpenStackLatentWorker):
                                           flavor, init_script)
         defer.returnValue(res)
 
-    def _start_instance(self, image, flavor, init_script):
+    def _start_instance(self, image, flavor, init_script):  # pylint: disable=arguments-differ
         self.image = OpenStackImageByName(image)
         self.flavor = flavor
         result = super(EveOpenStackLatentWorker, self)._start_instance()
@@ -236,7 +236,7 @@ class EveOpenStackLatentWorker(OpenStackLatentWorker):
              instance.id, instance.name))
 
 
-class OpenStackImageByName(object):
+class OpenStackImageByName(object):  # pylint: disable=too-few-public-methods
     """Identification of an OpenStack image based on its name.
 
     Callable class passed to OpenStackLatentWorker.
