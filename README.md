@@ -94,11 +94,17 @@ Notes for developpers intending to use Openstack slaves:
   (directly in rackspace interface, or via nova with the command below)
 
 
+
+```
+#!bash
+
     $ nova --os-username "YOUR_USERNAME" --os-project-name test \
       --os-auth-url "https://identity.api.rackspacecloud.com/v2.0/" \
       --os-tenant-id "YOUR_TENANT_ID" --os-region-name "YOUR_REGION" \
       --os-password 'YOUR_PASSWORD' keypair-add --pub-key ~/.ssh/id_rsa.pub \
       $OPENSTACK_KEY_NAME
+```
+
 
 
 ## How to run tests
