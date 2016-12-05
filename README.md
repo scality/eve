@@ -93,11 +93,13 @@ Notes for developpers intending to use Openstack slaves:
 - you need to define a key named as OPENSTACK_KEY_NAME in openstack identities
   (directly in rackspace interface, or via nova with the command below)
 
+
     $ nova --os-username "YOUR_USERNAME" --os-project-name test \
       --os-auth-url "https://identity.api.rackspacecloud.com/v2.0/" \
       --os-tenant-id "YOUR_TENANT_ID" --os-region-name "YOUR_REGION" \
       --os-password 'YOUR_PASSWORD' keypair-add --pub-key ~/.ssh/id_rsa.pub \
       $OPENSTACK_KEY_NAME
+
 
 ## How to run tests
 The installation of mysql dev environment and tox are required.
