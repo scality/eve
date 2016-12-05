@@ -88,6 +88,7 @@ To follow activity of buildbot:
 
 
 Notes for developpers intending to use Openstack slaves:
+
 - slaves will try to contact the master, and therefore a public IP is required
 - you need to define a key named as OPENSTACK_KEY_NAME in openstack identities
   (directly in rackspace interface, or via nova with the command below)
