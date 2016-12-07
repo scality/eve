@@ -7,7 +7,7 @@ from os import path
 
 from buildbot.process import logobserver
 from buildbot.process.properties import Interpolate
-from buildbot.process.results import FAILURE, SKIPPED
+from buildbot.process.results import SUCCESS, FAILURE, SKIPPED
 from buildbot.steps.shell import SetPropertyFromCommand, ShellCommand
 from twisted.internet import defer, reactor
 
@@ -64,9 +64,9 @@ class Upload(ShellCommand):
         command = [
             'cd ' + source,
             ('[ "$(ls -A)" ]'
-             ' || (echo "Directory is empty. Nothing to do."; exit 1)'),
-            ('if [ -z "$(find -L . -type f)" ]; then'
-             ' echo "No files here, nothing to do."; exit 0; fi'),
+             ' || {echo "Directory is empty. Nothing to do."; exit 0}'),
+            ('[ -n "$(find -L . -type f)" ]'
+             ' || {echo "No files here. Nothing to do."; exit 0}'),
             'tar -chvzf ../artifacts.tar.gz . ',
             'echo tar successful. Calling curl... ',
             ('curl --verbose --max-time {max_time} -s -T ../artifacts.tar.gz '
@@ -133,11 +133,10 @@ class Upload(ShellCommand):
     def evaluateCommand(self, cmd):  # NOQA flake8 to ignore camelCase
         out = self.observer.getStdout()
         err = self.observer.getStderr()
-        if ('Cowardly refusing to create an empty archive' in err
-                or 'No such file or directory' in err
-                or 'File removed before we read it' in err
-                or 'Directory is empty' in out):
-            return SKIPPED
+        if (not err and (
+                'Directory is empty. Nothing to do.' in out or
+                'No files here. Nothing to do.' in out)):
+            return SUCCESS
         elif 'Response Status: 201 Created' not in out:
             return FAILURE
         return cmd.results()
