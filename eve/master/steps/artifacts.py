@@ -62,11 +62,8 @@ class Upload(ShellCommand):
         self._urls = urls
 
         command = [
-            'cd ' + source,
-            ('[ "$(ls -A)" ]'
-             ' || {echo "Directory is empty. Nothing to do."; exit 0}'),
-            ('[ -n "$(find -L . -type f)" ]'
-             ' || {echo "No files here. Nothing to do."; exit 0}'),
+            ('if [ ! -n "$(find -L . -type f | head -1)" ]; then '
+             'echo "No files here. Nothing to do."; exit 0; fi'),
             'tar -chvzf ../artifacts.tar.gz . ',
             'echo tar successful. Calling curl... ',
             ('curl --verbose --max-time {max_time} -s -T ../artifacts.tar.gz '
@@ -104,6 +101,7 @@ class Upload(ShellCommand):
             haltOnFailure=True,
             command=Interpolate(' && '.join(command)),
             maxTime=self.UPLOAD_MAX_TIME + 10,
+            workdir='build/' + source,
             **kwargs
         )
         self.observer = logobserver.BufferLogObserver(wantStdout=True,
@@ -133,9 +131,7 @@ class Upload(ShellCommand):
     def evaluateCommand(self, cmd):  # NOQA flake8 to ignore camelCase
         out = self.observer.getStdout()
         err = self.observer.getStderr()
-        if (not err and (
-                'Directory is empty. Nothing to do.' in out or
-                'No files here. Nothing to do.' in out)):
+        if (not err and 'No files here. Nothing to do.' in out):
             return SUCCESS
         elif 'Response Status: 201 Created' not in out:
             return FAILURE
