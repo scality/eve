@@ -132,7 +132,7 @@ class Upload(ShellCommand):
     def evaluateCommand(self, cmd):  # NOQA flake8 to ignore camelCase
         out = self.observer.getStdout()
         err = self.observer.getStderr()
-        if (not err and 'No files here. Nothing to do.' in out):
+        if not err and 'No files here. Nothing to do.' in out:
             return SUCCESS
         elif 'Response Status: 201 Created' not in out:
             return FAILURE

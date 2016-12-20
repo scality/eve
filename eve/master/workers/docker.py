@@ -31,10 +31,11 @@ class EveDockerLatentWorker(DockerLatentWorker):
         image = yield build.render(self.image)
         volumes = build.getProperty('docker_volumes')
         buildnumber = yield build.render(Property('buildnumber'))
-        res = yield threads.deferToThread(self._thd_start_instance, image, volumes, buildnumber)
+        res = yield threads.deferToThread(self._thd_start, image,
+                                          volumes, buildnumber)
         defer.returnValue(res)
 
-    def _thd_start_instance(self, image, volumes, buildnumber):
+    def _thd_start(self, image, volumes, buildnumber):
         if image not in self.docker_invoke('images'):
             # hack to avoid a loop when the original image does not exist
             self.docker_invoke('pull', 'ubuntu:trusty')
