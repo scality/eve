@@ -36,6 +36,7 @@ class CloudfilesAuthenticate(SetPropertyFromCommand):
             haltOnFailure=True,
             env={'RAX_LOGIN': rax_login, 'RAX_PWD': rax_pwd},
             logEnviron=False,  # Obfuscate $RAX_PWD
+            hideStepIf=lambda results, s: results == SUCCESS,
             **kwargs
         )
 
