@@ -175,7 +175,12 @@ class Upload(ShellCommand):
         links = set()
         for link in self._links:
             matches = []
-            start = lines.index(link['header'])
+            try:
+                start = lines.index(link['header'])
+            except ValueError:
+                # lines may be empty or not have the header
+                # (missing an expected artefact)
+                continue
             for line in lines[start + 1:]:
                 if line == '':
                     break
