@@ -1,4 +1,4 @@
-From ubuntu:trusty
+FROM ubuntu:trusty
 
 #
 # Add user eve

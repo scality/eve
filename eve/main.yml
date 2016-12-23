@@ -3,9 +3,22 @@ version: 0.1
 
 branches:
   user/*, feature/*, improvement/*, bugfix/*, w/*, q/*:
-    stage: static checks
+    stage: pre-merge
+
+
+
 
 stages:
+  pre-merge:
+    worker:
+      type: docker
+      path: eve/workers/trusty
+    steps:
+      - TriggerStages:
+          name: trigger static checks and test stages simultaneously
+          stage_names:
+            - static checks
+            - system tests
   static checks:
     worker:
       type: docker
@@ -25,3 +38,36 @@ stages:
       - ShellCommand:
           name: run prospector
           command: prospector -F
+  system tests:
+    worker:
+      type: openstack
+      image: Ubuntu 16.04 LTS (Xenial Xerus) (PVHVM)
+      flavor: general1-4
+      path: eve/workers/system_tests
+    steps:
+      - Git:
+          name: fetch source
+          repourl: "%(prop:git_reference)s"
+          shallow: True
+          retryFetch: True
+      - ShellCommand:
+          name: upgrade pip
+          command: sudo -H pip install --upgrade pip
+          haltOnFailure: True
+      - ShellCommand:
+          name: install mysql client
+          command: sudo apt-get install -qy libmysqlclient-dev
+          haltOnFailure: True
+      - ShellCommand:
+          name: install tox
+          command: sudo -H pip install tox==2.3.2
+          haltOnFailure: True
+      - ShellCommand:
+          name: run tests
+          command: HOME=/home/eve tox -e test
+          logfiles:
+            master0.twistd.log: /home/eve/.eve_test_data/master0/twistd.log
+            master1.twistd.log: /home/eve/.eve_test_data/master1/twistd.log
+            master2.twistd.log: /home/eve/.eve_test_data/master2/twistd.log
+          lazylogfiles: True
+          haltOnFailure: True

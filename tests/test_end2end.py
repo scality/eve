@@ -6,7 +6,6 @@ from __future__ import print_function
 import json
 import logging
 import os
-import platform
 import shutil
 import socket
 import tempfile
@@ -35,7 +34,7 @@ def get_master_fqdn():
     """Get the master fqdn.
 
     Returns:
-        str: the fqdn (or ip) of the master the slave can connect to.
+        str: the fqdn (or ip) of the master the worker can connect to.
     """
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.connect(("8.8.8.8", 53))
@@ -59,12 +58,13 @@ class Test(unittest.TestCase):  # pylint: disable=too-many-public-methods
         self.git_dir = tempfile.mkdtemp(prefix='eve_test_')
         self.top_dir = os.path.dirname((os.path.dirname(
             os.path.abspath(__file__))))
-        self.test_dir = os.path.join(self.top_dir, '.test')
+        self.test_dir = os.path.join(os.path.expanduser('~/.eve_test_data'))
         try:
             self.shutdown_eve()
         except OSError:
             pass
-        os.environ['GIT_REPO'] = self.git_dir
+        os.environ['GIT_REPO'] = 'git@bitbucket.org:scality/mock.git'
+        os.environ['LOCAL_GIT_REPO'] = self.git_dir
         self.url = 'http://localhost:%d/' % (BASE_HTTP_PORT)
         os.environ['EXTERNAL_URL'] = self.url
         self.setup_crossbar()
@@ -84,7 +84,7 @@ class Test(unittest.TestCase):  # pylint: disable=too-many-public-methods
                 cmd('crossbar stop --cbdir %s' %
                     filepath, ignore_exception=True)
 
-        cmd('rm -rf %s' % self.test_dir)
+        cmd('rm -rf %s' % self.test_dir, ignore_exception=True)
 
     def setup_eve_master_frontend(self, master_id):
         """Spawns a EVE master frontend.
@@ -115,7 +115,7 @@ class Test(unittest.TestCase):  # pylint: disable=too-many-public-methods
         It will wait until it is up and running.
         """
 
-        sql_path = os.path.join(self.top_dir, '.test', 'state.sqlite')
+        sql_path = os.path.join(self.test_dir, 'state.sqlite')
         os.environ['DB_URL'] = 'sqlite:///' + sql_path
 
         os.environ['WAMP_ROUTER_URL'] = 'ws://localhost:%d/ws' % WAMP_PORT
@@ -123,7 +123,7 @@ class Test(unittest.TestCase):  # pylint: disable=too-many-public-methods
 
         master_cfg_dir = os.path.join(self.top_dir, 'eve', 'master')
 
-        masterdir = os.path.join(self.top_dir, '.test', 'master%i' % master_id)
+        masterdir = os.path.join(self.test_dir, 'master%i' % master_id)
         cmd('mkdir -p %s' % masterdir, ignore_exception=True)
         os.chdir(masterdir)
         cmd('cp -r %s/* .' % master_cfg_dir)
@@ -137,7 +137,7 @@ class Test(unittest.TestCase):  # pylint: disable=too-many-public-methods
     def setup_crossbar(self):
         """Spawns a local crossbar.
         """
-        crossbar_dir = os.path.join(self.top_dir, '.test', 'crossbar')
+        crossbar_dir = os.path.join(self.test_dir, 'crossbar')
         cmd('mkdir -p %s' % crossbar_dir, ignore_exception=True)
         crossbar_cfg_path = os.path.join(
             self.top_dir, 'tests', 'crossbar.json')
@@ -149,13 +149,23 @@ class Test(unittest.TestCase):  # pylint: disable=too-many-public-methods
 
     def setup_git(self):
         """Create a new git repo."""
+
+        bitbucket_cache_dir = os.path.join(self.top_dir, 'eve', 'master',
+                                           'services', 'bitbucket_cache')
+        cmd('docker build -t bitbucket.org %s' % bitbucket_cache_dir)
+        cmd('docker rm -f bitbucket.org', ignore_exception=True)
+        self.git_cache_docker_id = cmd('docker run -d -p 2222:22 '
+                                       '--name bitbucket.org bitbucket.org')
+        time.sleep(1)
         os.chdir(self.git_dir)
-        cmd('git init .')
+        cmd('git clone '
+            'git+ssh://git@localhost:2222/home/git/scality/mock.git .')
         cmd('git config user.email "john.doe@example.com"')
         cmd('git config user.name "John Doe"')
         cmd('echo hello > readme.txt')
         cmd('git add -A')
         cmd('git commit -m "first commit"')
+        cmd('git push')
 
     def commit_git(self, eve_dir):
         """Create a new commit to trigger a test build.
@@ -172,6 +182,7 @@ class Test(unittest.TestCase):  # pylint: disable=too-many-public-methods
         shutil.copy(eve_yaml_file, 'eve')
         cmd('git add -A')
         cmd('git commit -m "add %s"' % eve_yaml_file)
+        cmd('git push')
 
     def notify_webhook(self):
         """Notify Eve's bitbucket hook of a new change."""
@@ -233,7 +244,7 @@ class Test(unittest.TestCase):  # pylint: disable=too-many-public-methods
 
     def get_build_result(self, build_number=1, expected_result='success'):
         """Get the result of the build `build_number`."""
-        for _ in range(120):
+        for _ in range(900):
             build = self.get_bootstrap_build(build_number=build_number)
             if build['state_string'] == 'finished' and \
                     build['results'] is not None:
@@ -339,7 +350,7 @@ class Test(unittest.TestCase):  # pylint: disable=too-many-public-methods
         self.notify_webhook()
         self.get_build_result(expected_result='cancelled')
 
-    @unittest.skipIf(platform.system() == 'Darwin', 'Does not work on Mac')
+    @unittest.skip('Needs authenticated git access')
     def test_gollum(self):
         """Tests gollum install / project creation.
 

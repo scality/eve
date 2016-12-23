@@ -17,7 +17,7 @@ RUN mkdir /worker && chown buildbot:buildbot /worker
 
 # Make ssh dir and add bitbucket to known_hosts
 RUN mkdir /root/.ssh/
-RUN ssh-keyscan bitbucket.org >> /root/.ssh/known_hosts
+RUN /bin/echo -e "Host bitbucket.org\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
 
 # install docker
 RUN yum install -y docker && groupadd docker && usermod root -aG docker
