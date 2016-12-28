@@ -90,7 +90,7 @@ class EveDockerLatentWorker(DockerLatentWorker):
             instance)) or {}
         self.docker_invoke('kill', instance)
         self.docker_invoke('wait', instance)
-        self.docker_invoke('rm', instance)
+        self.docker_invoke('rm', '--volumes', instance)
         for mount in mounts:
             mount_name = mount.get('Name', '')
             if mount_name.startswith('AUTODELETE_'):
