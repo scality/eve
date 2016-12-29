@@ -387,11 +387,27 @@ class Test(unittest.TestCase):  # pylint: disable=too-many-public-methods
         self.get_build_result(expected_result='failure')
 
     def test_docker_in_docker(self):
-        """Tests docker cache volumes
+        """Tests that we can launch a docker command inside a docker worker
 
-        Step1 creates a docker named volume and creates a file into it.
-        Step2 starts another container and reads a file from the same volume.
+        Steps:
+         * Substantiate a docker worker containing docker installation
+         * Launch a `docker ps` command
+         * Check that it succeeds
         """
         self.commit_git('docker_in_docker')
+        self.notify_webhook()
+        self.get_build_result(expected_result='success')
+
+    def test_use_premade_docker_image(self):
+        """Tests that we can build docker images on our own and give them to
+        buildbot
+
+        Steps:
+         * Substantiate a docker worker containing docker installation
+         * Launch a `docker build` command
+         * Launch a stage with the newly built image
+         * Check that it succeeds
+        """
+        self.commit_git('use_premade_docker_image')
         self.notify_webhook()
         self.get_build_result(expected_result='success')
