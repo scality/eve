@@ -385,3 +385,13 @@ class Test(unittest.TestCase):  # pylint: disable=too-many-public-methods
         self.commit_git('bad_substantiate')
         self.notify_webhook()
         self.get_build_result(expected_result='failure')
+
+    def test_docker_in_docker(self):
+        """Tests docker cache volumes
+
+        Step1 creates a docker named volume and creates a file into it.
+        Step2 starts another container and reads a file from the same volume.
+        """
+        self.commit_git('docker_in_docker')
+        self.notify_webhook()
+        self.get_build_result(expected_result='success')

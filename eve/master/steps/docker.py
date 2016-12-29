@@ -12,24 +12,11 @@ class DockerBuild(MasterShellCommand):
 
     def __init__(self, image, **kwargs):
         self.image = image
-        if self.DOCKER_TLS_VERIFY == '1':
-            docker_cmd = [
-                'docker',
-                '--tlsverify',
-                '--host=%s' % self.DOCKER_HOST,
-                '--tlscacert=%s' % self.DOCKER_CERT_PATH_CA,
-                '--tlscert=%s ' % self.DOCKER_CERT_PATH_CERT,
-                '--tlskey=%s' % self.DOCKER_CERT_PATH_KEY,
-                'build',
-            ]
-        else:
-            docker_cmd = ['docker', 'build']
-
         kwargs.setdefault('locks', []).append(
             DOCKER_BUILD_LOCK.access('exclusive'))
 
         super(DockerBuild, self).__init__(
-            command='%s -t %s .' % (' '.join(docker_cmd), image),
+            command=['docker', 'build', '-t', image, '.'],
             **kwargs
         )
 

@@ -6,23 +6,24 @@ from subprocess import STDOUT, CalledProcessError, check_output
 import time
 
 from buildbot.process.properties import Property
-from buildbot.worker.docker import DockerLatentWorker
+from buildbot.worker.base import AbstractLatentWorker
 import netifaces
 from twisted.internet import defer, threads
 from twisted.logger import Logger
 
 
-class EveDockerLatentWorker(DockerLatentWorker):
+class EveDockerLatentWorker(AbstractLatentWorker):
     """Improved version of DockerLatentWorker using the docker command line
      client instead of docker-py which was the cause of multiple dead locks
     """
     logger = Logger('eve.workers.EveDockerLatentWorker')
+    instance = None
 
-    def __init__(self, docker_tls_verify=None, docker_cert_path=None, **kw):
-        self.docker_tls_verify = docker_tls_verify
-        self.docker_cert_path = docker_cert_path
-        self.docker_host = kw['docker_host']
-        DockerLatentWorker.__init__(self, **kw)
+    def __init__(self, name, password, image, master_fqdn, **kwargs):
+        self.image = image
+        self.master_fqdn = master_fqdn,
+        AbstractLatentWorker.__init__(self, name, password,
+                                      **kwargs)
 
     @defer.inlineCallbacks
     def start_instance(self, build):
@@ -55,7 +56,7 @@ class EveDockerLatentWorker(DockerLatentWorker):
         cmd = [
             'run',
             '--privileged',
-            '--env', 'BUILDMASTER=%s' % self.masterFQDN,
+            '--env', 'BUILDMASTER=%s' % self.master_fqdn,
             '--env', 'WORKERNAME=%s' % self.name,
             '--env', 'WORKERPASS=%s' % self.password,
             '--env', 'BUILDMASTER_PORT=%s' % environ['PB_PORT'],
@@ -82,7 +83,15 @@ class EveDockerLatentWorker(DockerLatentWorker):
         self.logger.debug('Container created, Id: %s...' % self.instance)
         return [self.instance, image]
 
-    def _thd_stop_instance(self, instance, fast):
+    def stop_instance(self, fast=False):
+        assert not fast  # unused parameter, we cannot remove it (PEP8)
+        if self.instance is None:
+            return defer.succeed(None)
+        instance = self.instance
+        self.instance = None
+        return threads.deferToThread(self._thd_stop_instance, instance)
+
+    def _thd_stop_instance(self, instance):
         self.logger.debug('Stopping container %s...' % instance)
         mounts = loads(self.docker_invoke(
             "inspect",
@@ -104,14 +113,6 @@ class EveDockerLatentWorker(DockerLatentWorker):
 
          """
         cmd = ['docker']
-        if self.docker_tls_verify == '1':
-            cmd.extend([
-                '--tlsverify',
-                '--tlscacert=%s/ca.pem' % self.docker_cert_path,
-                '--tlscert=%s/cert.pem' % self.docker_cert_path,
-                '--tlskey=%s/key.pem' % self.docker_cert_path,
-                '--host=%s' % self.docker_host,
-            ])
         cmd.extend(args)
         try:
             res = check_output(cmd, stderr=STDOUT).strip()
