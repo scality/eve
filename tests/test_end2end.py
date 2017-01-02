@@ -411,3 +411,15 @@ class Test(unittest.TestCase):  # pylint: disable=too-many-public-methods
         self.commit_git('use_premade_docker_image')
         self.notify_webhook()
         self.get_build_result(expected_result='success')
+
+    def test_use_different_dockerfile(self):
+        """Test to build Docker image with a different Dockerfile.
+
+        By default, ``docker build`` use the dockerfile named
+        **/Dockerfile** inside the Docker context.
+        We can use a different Dockerfile (see ``-f`` option of
+        ``docker build`` command).
+        """
+        self.commit_git('use_different_dockerfile')
+        self.notify_webhook()
+        self.get_build_result(expected_result='success')
