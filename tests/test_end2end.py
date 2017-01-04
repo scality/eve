@@ -15,8 +15,9 @@ import unittest
 import requests
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
-from . import buildbot_api_client
 from tests.cmd import cmd
+
+from . import buildbot_api_client
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(format='[%(levelname)s] %(message)s', level=logging.INFO)
@@ -434,3 +435,17 @@ class Test(unittest.TestCase):  # pylint: disable=too-many-public-methods
         self.commit_git('use_different_dockerfile')
         self.notify_webhook()
         self.get_build_result(expected_result='success')
+
+    @unittest.skip('Really slow (5 minutes)')
+    def test_use_broken_openstack(self):
+        """Test the retry mechanism when OpenStack spawning fails.
+
+        Steps:
+         * Substantiate an openstack worker with an inexisting image and no
+         credentials
+         * Expect a failure after 5 minutes or so
+        """
+
+        self.commit_git('use_broken_openstack')
+        self.notify_webhook()
+        self.get_build_result(expected_result='failure')

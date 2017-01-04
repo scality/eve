@@ -3,7 +3,6 @@
 from buildbot.locks import MasterLock
 from buildbot.steps.master import MasterShellCommand
 
-
 DOCKER_BUILD_LOCK = MasterLock("docker_build")
 
 

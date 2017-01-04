@@ -5,9 +5,6 @@ branches:
   user/*, feature/*, improvement/*, bugfix/*, w/*, q/*:
     stage: pre-merge
 
-
-
-
 stages:
   pre-merge:
     worker:

@@ -9,6 +9,7 @@ import novaclient
 from buildbot.process.properties import Property
 from buildbot.worker import AbstractWorker
 from buildbot.worker.openstack import OpenStackLatentWorker
+from retrying import retry
 from twisted.internet import defer, threads
 from twisted.logger import Logger
 
@@ -109,12 +110,14 @@ class EveOpenStackLatentWorker(OpenStackLatentWorker):
                                           flavor, init_script)
         defer.returnValue(res)
 
+    @retry(wait_exponential_multiplier=10000, stop_max_delay=300000)
+    # 10s exponential backoff and giving up after about five minutes
     def _start(self, image, flavor, init_script):
+        self.logger.debug('Spawning the machine...')
         self.image = OpenStackImageByName(image)
         self.flavor = flavor
         result = super(EveOpenStackLatentWorker, self)._start_instance(
-            self.image, []
-        )
+            self.image, block_devices=[])
         if not self.instance:
             return result
 

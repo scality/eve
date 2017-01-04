@@ -1,13 +1,13 @@
 """Allow eve to use docker workers."""
 
+import time
 from json import loads
 from os import environ
 from subprocess import STDOUT, CalledProcessError, check_output
-import time
 
-from buildbot.process.properties import Property
-from buildbot.worker import AbstractLatentWorker
 import netifaces
+from buildbot.process.properties import Property
+from buildbot.worker.latent import AbstractLatentWorker
 from twisted.internet import defer, threads
 from twisted.logger import Logger
 
@@ -22,8 +22,9 @@ class EveDockerLatentWorker(AbstractLatentWorker):
     def __init__(self, name, password, image, master_fqdn, **kwargs):
         self.image = image
         self.master_fqdn = master_fqdn,
-        AbstractLatentWorker.__init__(self, name, password,
-                                      **kwargs)
+        kwargs.setdefault('build_wait_timeout', 0)
+        kwargs.setdefault('keepalive_interval', None)
+        AbstractLatentWorker.__init__(self, name, password, **kwargs)
 
     @defer.inlineCallbacks
     def start_instance(self, build):

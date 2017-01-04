@@ -7,9 +7,10 @@ from os import path
 
 from buildbot.process import logobserver
 from buildbot.process.properties import Interpolate
-from buildbot.process.results import SUCCESS, FAILURE, SKIPPED
+from buildbot.process.results import FAILURE, SKIPPED, SUCCESS
 from buildbot.steps.shell import SetPropertyFromCommand, ShellCommand
 from twisted.internet import defer, reactor
+
 
 CURL_CMD = """curl -s -X POST -H "Content-type: application/json" \
 --progress-bar https://identity.api.rackspacecloud.com/v2.0/tokens \
