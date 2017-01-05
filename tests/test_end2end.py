@@ -416,6 +416,13 @@ class Test(unittest.TestCase):  # pylint: disable=too-many-public-methods
         self.notify_webhook()
         self.get_build_result(expected_result='success')
 
+    def test_use_premade_docker_img_p(self):
+        """Same test than test_use_premade_docker_image but use
+        property to store the image id."""
+        self.commit_git('use_premade_docker_image_property')
+        self.notify_webhook()
+        self.get_build_result(expected_result='success')
+
     def test_use_different_dockerfile(self):
         """Test to build Docker image with a different Dockerfile.
 
