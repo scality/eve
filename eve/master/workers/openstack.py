@@ -105,14 +105,16 @@ class EveOpenStackLatentWorker(OpenStackLatentWorker):
         master_builddir = yield build.render(Property('master_builddir'))
         worker_path = yield build.render(Property('worker_path'))
         init_script = "%s/build/%s/init.sh" % (master_builddir, worker_path)
-        res = yield threads.deferToThread(self._start_instance, self.image,
+        res = yield threads.deferToThread(self._start, self.image,
                                           flavor, init_script)
         defer.returnValue(res)
 
-    def _start_instance(self, image, flavor, init_script):  # pylint: disable=arguments-differ
+    def _start(self, image, flavor, init_script):
         self.image = OpenStackImageByName(image)
         self.flavor = flavor
-        result = super(EveOpenStackLatentWorker, self)._start_instance()
+        result = super(EveOpenStackLatentWorker, self)._start_instance(
+            self.image, []
+        )
         if not self.instance:
             return result
 
