@@ -236,7 +236,7 @@ class EveOpenStackLatentWorker(OpenStackLatentWorker):
              instance.id, instance.name))
 
 
-class OpenStackImageByName(object):  # pylint: disable=too-few-public-methods
+class OpenStackImageByName(object):
     """Identification of an OpenStack image based on its name.
 
     Callable class passed to OpenStackLatentWorker.
