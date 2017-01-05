@@ -22,7 +22,7 @@
 
 set -o xtrace -o errexit -o nounset -o pipefail
 
-BUILDBOT_VERSION=${1:-0.9.0rc2}
+BUILDBOT_VERSION=${1:-0.9.2}
 
 # install buildbot worker
 apt-get update

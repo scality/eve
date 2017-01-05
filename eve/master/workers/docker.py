@@ -6,7 +6,7 @@ from subprocess import STDOUT, CalledProcessError, check_output
 import time
 
 from buildbot.process.properties import Property
-from buildbot.worker.base import AbstractLatentWorker
+from buildbot.worker import AbstractLatentWorker
 import netifaces
 from twisted.internet import defer, threads
 from twisted.logger import Logger

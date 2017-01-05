@@ -7,7 +7,7 @@ from subprocess import STDOUT, CalledProcessError, check_output
 
 import novaclient
 from buildbot.process.properties import Property
-from buildbot.worker.base import AbstractWorker
+from buildbot.worker import AbstractWorker
 from buildbot.worker.openstack import OpenStackLatentWorker
 from twisted.internet import defer, threads
 from twisted.logger import Logger
@@ -151,7 +151,7 @@ class EveOpenStackLatentWorker(OpenStackLatentWorker):
         """
         self.scp(init_script, '/tmp/worker_init.sh')
         self.ssh(
-            'chmod u+x /tmp/worker_init.sh && /tmp/worker_init.sh 0.9.0.post1')
+            'chmod u+x /tmp/worker_init.sh && /tmp/worker_init.sh 0.9.2')
 
         self.ssh('mkdir -p /home/eve/.ssh')
 
