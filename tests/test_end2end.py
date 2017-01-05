@@ -402,7 +402,7 @@ class Test(unittest.TestCase):  # pylint: disable=too-many-public-methods
         self.notify_webhook()
         self.get_build_result(expected_result='success')
 
-    def test_use_premade_docker_image(self):
+    def test_use_premade_docker_img(self):
         """Tests that we can build docker images on our own and give them to
         buildbot
 
