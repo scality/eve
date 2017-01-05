@@ -65,6 +65,8 @@ stages:
       - ShellCommand:
           name: run tests
           command: HOME=/home/eve tox -e test
+          env:
+            MASTER_FQDN: auto
           logfiles:
             master0.twistd.log: /home/eve/.eve_test_data/master0/twistd.log
             master1.twistd.log: /home/eve/.eve_test_data/master1/twistd.log
