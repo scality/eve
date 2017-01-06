@@ -9,21 +9,19 @@ then
 fi
 
 # clone the repo if not done yet
-(
-    repo=$(echo "$SSH_ORIGINAL_COMMAND" | sed -re "s/^.*'scality\/([a-zA-Z_-]+)\.git'/\1/")
-    repo_dest=/home/git/scality/$repo.git
-    if [ ! -d "$repo_dest" ]
-    then
-        if [ ! "$repo" = 'mock' ];
-        then
-            cd $repo_dest;
-            git remote update || exit 1;
-        fi
-    else
-        mkdir -p /home/git/scality
-        git clone --mirror git@bitbucket.org:scality/$repo $repo_dest || exit 1
-    fi
-) > /dev/null || exit 1
+
+repo=$(echo "$SSH_ORIGINAL_COMMAND" | sed -re "s/^.*'[a-zA-Z_-]+\/([a-zA-Z_-]+)\.git'/\1/")
+repo_dest=/home/git/scality/$repo.git
+if [ ! -d "$repo_dest" ]
+then
+    git clone --mirror git@bitbucket.org:scality/$repo $repo_dest
+fi
+
+cd $repo_dest;
+if [ ! "$repo" = 'mock' ];
+then
+    git remote update;
+fi
 
 
 # execute git-upload-pack
