@@ -36,3 +36,6 @@ stages:
             [ $(cat /write/file) = '1st' ]
             && pkill --signal SIGKILL -f buildbot-worker
             || true
+      - ShellCommand:
+          name: "waiting SIGKILL signal..."
+          command: "sleep 5"

@@ -371,11 +371,11 @@ class Test(unittest.TestCase):  # pylint: disable=too-many-public-methods
 
         Steps :
          * Launch the first job, that kills buildbot/container
-         * Launch again, detect it is a retry, and just pass
+         * The build shouldn't be retried and should fail
         """
         self.commit_git('lost_slave_recovery')
         self.notify_webhook()
-        self.get_build_result(expected_result='success')
+        self.get_build_result(expected_result='failure')
 
     @unittest.skipIf('RAX_LOGIN' not in os.environ,
                      'needs rackspace credentials')
