@@ -55,6 +55,10 @@ class Test(unittest.TestCase):  # pylint: disable=too-many-public-methods
     eve = None
 
     def setUp(self):
+        self.master_fqdn = os.getenv('MASTER_FQDN', 'auto')
+        if self.master_fqdn == 'auto':
+            self.master_fqdn = get_master_fqdn()
+
         self.git_dir = tempfile.mkdtemp(prefix='eve_test_')
         self.top_dir = os.path.dirname((os.path.dirname(
             os.path.abspath(__file__))))
@@ -65,7 +69,7 @@ class Test(unittest.TestCase):  # pylint: disable=too-many-public-methods
             pass
         os.environ['GIT_REPO'] = 'git@bitbucket.org:scality/mock.git'
         os.environ['LOCAL_GIT_REPO'] = self.git_dir
-        self.url = 'http://localhost:%d/' % (BASE_HTTP_PORT)
+        self.url = 'http://%s:%d/' % (self.master_fqdn, BASE_HTTP_PORT)
         os.environ['EXTERNAL_URL'] = self.url
         self.setup_crossbar()
         self.setup_eve_master_frontend(master_id=0)
@@ -101,7 +105,7 @@ class Test(unittest.TestCase):  # pylint: disable=too-many-public-methods
         It will wait until it is up and running.
         """
         os.environ['GIT_KEY_PATH'] = os.path.expanduser('~/.ssh/id_rsa')
-        os.environ['MASTER_FQDN'] = get_master_fqdn()
+        os.environ['MASTER_FQDN'] = self.master_fqdn
         os.environ['MASTER_NAME'] = 'master%d' % master_id
         os.environ['WORKER_SUFFIX'] = 'test-eve%d' % master_id
 
