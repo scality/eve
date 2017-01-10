@@ -35,7 +35,7 @@ RUN sed -ri '/PermitEmptyPasswords/d' /etc/ssh/sshd_config
 RUN echo 'AllowUsers git' >> /etc/ssh/sshd_config
 RUN echo 'PasswordAuthentication yes' >> /etc/ssh/sshd_config
 RUN echo 'PermitEmptyPasswords yes' >> /etc/ssh/sshd_config
-#RUN echo 'ForceCommand /home/git/gitmirror_access_via_ssh.sh' >> /etc/ssh/sshd_config
+RUN echo 'ForceCommand /usr/bin/flock -w 120 /var/lock/bitbucket_cache.lock -c /home/git/gitmirror_access_via_ssh.sh' >> /etc/ssh/sshd_config
 
 
 RUN chown -R git:git /home/git
