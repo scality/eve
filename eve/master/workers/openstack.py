@@ -101,23 +101,27 @@ class EveOpenStackLatentWorker(OpenStackLatentWorker):
         """
         if self.instance is not None:
             raise ValueError('instance active')
-        self.image = build.getProperty('openstack_image')
-        flavor = build.getProperty('openstack_flavor')
+        image = yield build.render(Property('openstack_image'))
+        flavor = yield build.render(Property('openstack_flavor'))
         master_builddir = yield build.render(Property('master_builddir'))
         worker_path = yield build.render(Property('worker_path'))
         init_script = "%s/build/%s/init.sh" % (master_builddir, worker_path)
-        res = yield threads.deferToThread(self._start, self.image,
+        res = yield threads.deferToThread(self._start, image,
                                           flavor, init_script)
         defer.returnValue(res)
 
     @retry(wait_exponential_multiplier=10000, stop_max_delay=300000)
     # 10s exponential backoff and giving up after about five minutes
     def _start(self, image, flavor, init_script):
-        self.logger.debug('Spawning the machine...')
-        self.image = OpenStackImageByName(image)
+        self.logger.debug('Spawning Openstack machine'
+                          ' <image:{}> <flavor:{}> <init_script:{}>...'.
+                          format(image, flavor, init_script))
+
+        image_obj = get_openstack_image_by_name(image, self.novaclient)
+        self.logger.debug('Openstack image UUID: {}'.format(image_obj.id))
         self.flavor = flavor
         result = super(EveOpenStackLatentWorker, self)._start_instance(
-            self.image, block_devices=[])
+            image_obj, None)
         if not self.instance:
             return result
 
@@ -241,28 +245,21 @@ class EveOpenStackLatentWorker(OpenStackLatentWorker):
              instance.id, instance.name))
 
 
-class OpenStackImageByName(object):
+def get_openstack_image_by_name(image_name, novaclient):
     """Identification of an OpenStack image based on its name.
 
-    Callable class passed to OpenStackLatentWorker.
-
-    """
-
-    def __init__(self, image_name):
-        self.image_name = image_name
-
-    def __call__(self, images):
-        """
-        :param images: a list of nova image objects
+        :param image_name: a list of nova image objects
+        :param novaclient: a nova client
         :return: the image that matches the name
         """
-        for image in images:
-            if image.name == self.image_name:
-                return image
 
-        time.sleep(60)  # hack to avoid a fast loop in case of failure
-        raise RuntimeError('Error: Openstack image <%s> not found on the '
-                           'openstack server image list : <%s>' % (
-                               self.image_name, [
-                                   image.name for image in images]
-                           ))
+    images = novaclient.images.list()
+    for image in images:
+        if image.name == image_name:
+            return image
+
+    raise RuntimeError('Error: Openstack image <%s> not found on the '
+                       'openstack server image list : <%s>' % (
+                           image_name, [
+                               image.name for image in images]
+                       ))
