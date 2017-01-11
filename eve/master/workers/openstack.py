@@ -245,15 +245,15 @@ class EveOpenStackLatentWorker(OpenStackLatentWorker):
              instance.id, instance.name))
 
 
-def get_openstack_image_by_name(image_name, novaclient):
+def get_openstack_image_by_name(image_name, nova_client):
     """Identification of an OpenStack image based on its name.
 
         :param image_name: a list of nova image objects
-        :param novaclient: a nova client
+        :param nova_client: a nova client
         :return: the image that matches the name
         """
 
-    images = novaclient.images.list()
+    images = nova_client.images.list()
     for image in images:
         if image.name == image_name:
             return image
