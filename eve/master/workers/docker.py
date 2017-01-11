@@ -38,11 +38,6 @@ class EveDockerLatentWorker(AbstractLatentWorker):
         defer.returnValue(res)
 
     def _thd_start(self, image, volumes, buildnumber):
-        if image not in self.docker_invoke('images'):
-            # hack to avoid a loop when the original image does not exist
-            self.docker_invoke('pull', 'ubuntu:trusty')
-            image = 'ubuntu:trusty'
-
         docker_host_ip = None
         try:
             docker_addresses = netifaces.ifaddresses('docker0')
