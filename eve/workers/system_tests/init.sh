@@ -22,7 +22,7 @@
 
 set -o xtrace -o errexit -o nounset -o pipefail
 
-BUILDBOT_VERSION=${1:-0.9.2}
+BUILDBOT_VERSION=${1:-0.9.3}
 
 # install buildbot worker
 for i in $(seq 1 10); do

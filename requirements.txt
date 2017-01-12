@@ -1,9 +1,9 @@
-buildbot[tls]==0.9.2
-buildbot-pkg==0.9.2
-buildbot-console-view==0.9.2
-buildbot-waterfall-view==0.9.2
-buildbot-www==0.9.2
-buildbot-worker==0.9.2
+buildbot[tls]==0.9.3
+buildbot-pkg==0.9.3
+buildbot-console-view==0.9.3
+buildbot-waterfall-view==0.9.3
+buildbot-www==0.9.3
+buildbot-worker==0.9.3
 netifaces==0.10.5
 paramiko==2.0.1
 pyaml==15.8.2

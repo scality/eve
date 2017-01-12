@@ -160,7 +160,7 @@ class EveOpenStackLatentWorker(OpenStackLatentWorker):
         """
         self.scp(init_script, '/tmp/worker_init.sh')
         self.ssh(
-            'chmod u+x /tmp/worker_init.sh && /tmp/worker_init.sh 0.9.2')
+            'chmod u+x /tmp/worker_init.sh && /tmp/worker_init.sh 0.9.3')
 
         self.ssh('mkdir -p /home/eve/.ssh')
 
