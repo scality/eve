@@ -1,8 +1,5 @@
 # Eve requirements
 buildbot[tls]==0.9.3
-buildbot-pkg==0.9.3
-buildbot-console-view==0.9.3
-buildbot-waterfall-view==0.9.3
 buildbot-www==0.9.3
 buildbot-worker==0.9.3
 docker-py==1.10.3
