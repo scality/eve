@@ -100,6 +100,10 @@ class EveOpenStackLatentWorker(OpenStackLatentWorker):
 
         """
         if self.instance is not None:
+            # Delete instance from previous try
+            yield threads.deferToThread(self._stop_instance,
+                                        self.instance, False)
+            self.instance = None
             raise ValueError('instance active')
         image = yield build.render(Property('openstack_image'))
         flavor = yield build.render(Property('openstack_flavor'))
@@ -116,6 +120,11 @@ class EveOpenStackLatentWorker(OpenStackLatentWorker):
         self.logger.debug('Spawning Openstack machine'
                           ' <image:{}> <flavor:{}> <init_script:{}>...'.
                           format(image, flavor, init_script))
+
+        # delete any existing instance of this worker (from previous trials)
+        servers = get_active_servers_by_name(self.workername, self.novaclient)
+        for instance in servers:
+            self._stop_instance(instance, False)
 
         image_obj = get_openstack_image_by_name(image, self.novaclient)
         self.logger.debug('Openstack image UUID: {}'.format(image_obj.id))
@@ -243,6 +252,18 @@ class EveOpenStackLatentWorker(OpenStackLatentWorker):
             '%s %s instance %s (%s) deleted successfully' %
             (self.__class__.__name__, self.workername,
              instance.id, instance.name))
+
+
+def get_active_servers_by_name(server_name, nova_client):
+    """Get all active servers having a given name.
+
+        :param server_name: the server name we are looking for
+        :param nova_client: a nova client
+
+        :return: a list of servers having given name.
+    """
+    return nova_client.servers.list(search_opts={'name': server_name})
+
 
 
 def get_openstack_image_by_name(image_name, nova_client):
