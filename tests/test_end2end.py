@@ -247,6 +247,18 @@ class Test(unittest.TestCase):  # pylint: disable=too-many-public-methods
                         'builderid=%d, build_number=%d' %
                         (builder['builderid'], build_number))
 
+    def get_bootstrap_build_steps(self, build_number=1):
+        """Returns steps from specified 'bootstrap' build."""
+        builder = self.get_bootstrap_builder()
+        try:
+            return self.api.get(
+                'builders/%d/builds/%d/steps' %
+                (builder['builderid'], build_number))['steps']
+        except KeyError:
+            raise Exception('unable to find bootstrap build steps, '
+                            'builderid=%d, build_number=%d' %
+                            (builder['builderid'], build_number))
+
     def get_build_result(self, build_number=1, expected_result='success'):
         """Get the result of the build `build_number`."""
         for _ in range(900):
@@ -316,6 +328,12 @@ class Test(unittest.TestCase):  # pylint: disable=too-many-public-methods
         self.commit_git('bad_dockerfile')
         self.notify_webhook()
         self.get_build_result(expected_result='failure')
+
+        steps = self.get_bootstrap_build_steps()
+        assert (steps[-2]['name'] == 'build docker image from '
+                                     'eve/bad-ubuntu-trusty-ctxt')
+        assert (steps[-1]['name'] == 'docker build retry from '
+                                     'eve/bad-ubuntu-trusty-ctxt')
 
     @unittest.skipIf('RAX_LOGIN' not in os.environ,
                      'needs rackspace credentials')
