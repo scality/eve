@@ -100,10 +100,6 @@ class EveOpenStackLatentWorker(OpenStackLatentWorker):
 
         """
         if self.instance is not None:
-            # Delete instance from previous try
-            yield threads.deferToThread(self._stop_instance,
-                                        self.instance, False)
-            self.instance = None
             raise ValueError('instance active')
         image = yield build.render(Property('openstack_image'))
         flavor = yield build.render(Property('openstack_flavor'))
