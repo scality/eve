@@ -265,7 +265,6 @@ def get_active_servers_by_name(server_name, nova_client):
     return nova_client.servers.list(search_opts={'name': server_name})
 
 
-
 def get_openstack_image_by_name(image_name, nova_client):
     """Identification of an OpenStack image based on its name.
 
