@@ -205,12 +205,12 @@ class EveOpenStackLatentWorker(OpenStackLatentWorker):
             # started.
             return defer.succeed(None)
         instance = self.instance
+        self.instance = None
 
         # this allows to call the vm deletion in a thread so we can wait
         # until we are sure they are deleted (Not the case in the original
         # class)
         threads.deferToThread(self._stop_instance, instance, fast)
-        self.instance = None
 
         return AbstractWorker.disconnect(self)
 
