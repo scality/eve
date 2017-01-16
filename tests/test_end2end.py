@@ -161,7 +161,7 @@ class Test(unittest.TestCase):  # pylint: disable=too-many-public-methods
         cmd('docker rm -f bitbucket.org', ignore_exception=True)
         self.git_cache_docker_id = cmd('docker run -d -p 2222:22 '
                                        '--name bitbucket.org bitbucket.org')
-        time.sleep(1)
+        time.sleep(3)  # wait for bitbucket cache service to stabilize
         os.chdir(self.git_dir)
         cmd('git clone '
             'git+ssh://git@localhost:2222/home/git/scality/mock.git .')
