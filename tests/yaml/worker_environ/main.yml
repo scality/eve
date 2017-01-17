@@ -1,0 +1,17 @@
+branches:
+  default:
+    stage: pre-merge
+
+stages:
+  pre-merge:
+    worker:
+      type: docker
+      path: eve/ubuntu-trusty-ctxt
+
+    steps:
+      - ShellCommand:
+          name: check if FOO variable is not in environ using ShellCommand
+          command: test -z "$FOO"
+      - ShellCommandWithSecrets:
+          name: check if FOO variable is not in environ using ShellCommandWithSecrets
+          command: test -z "$FOO"
