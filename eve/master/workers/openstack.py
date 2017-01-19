@@ -12,6 +12,7 @@ from buildbot.worker.openstack import OpenStackLatentWorker
 from retrying import retry
 from twisted.internet import defer, threads
 from twisted.logger import Logger
+from twisted.python import log
 
 from . import ngrok
 
@@ -256,20 +257,24 @@ class EveOpenStackLatentWorker(OpenStackLatentWorker):
              instance.id, instance.name))
 
     def detached(self):
+        AbstractWorker.detached(self)
         if self._starting_instance:
             # Hack to avoid a race condition.
             # If we are currently spawning an openstack worker, then this
             # method is called because an older instance has just disconnected.
             #
             # In such a case, since we're in the middle of a substanciation,
-            # AbstractLatentWokrer.detached() would believe that the we were
+            # OpenstackLatentWokrer.detached() would believe that we were
             # waiting for the former worker to detach before substanciating a
             # new one, and would attempt to call start_instance(), which can
             # only result in an exception being triggered.
             #
             # Bottomline: it is safe to simply ignore the 'detach' event here.
             return
-        return super(EveOpenStackLatentWorker, self).detached()
+        if self._substantiation_notifier:
+            d = self._substantiate(self.substantiation_build)
+            d.addErrback(log.err, 'while re-substantiating')
+
 
 def get_active_servers_by_name(server_name, nova_client):
     """Get all active servers having a given name.
