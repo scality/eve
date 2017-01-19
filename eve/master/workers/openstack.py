@@ -52,6 +52,7 @@ class EveOpenStackLatentWorker(OpenStackLatentWorker):
         self.masterFQDN = masterFQDN
         self.bitbucket_pub_key = bitbucket_pub_key
         self._ngrok = None
+        self._starting_instance = False
 
     def ssh(self, cmd):
         """ Execute an ssh command on the instance.
@@ -106,9 +107,14 @@ class EveOpenStackLatentWorker(OpenStackLatentWorker):
         master_builddir = yield build.render(Property('master_builddir'))
         worker_path = yield build.render(Property('worker_path'))
         init_script = "%s/build/%s/init.sh" % (master_builddir, worker_path)
-        res = yield threads.deferToThread(self._start, image,
-                                          flavor, init_script)
-        defer.returnValue(res)
+
+        self._starting_instance = True
+        try:
+            res = yield threads.deferToThread(self._start, image,
+                                              flavor, init_script)
+            defer.returnValue(res)
+        finally:
+            self._starting_instance = False
 
     @retry(wait_exponential_multiplier=10000, stop_max_delay=300000)
     # 10s exponential backoff and giving up after about five minutes
@@ -249,6 +255,21 @@ class EveOpenStackLatentWorker(OpenStackLatentWorker):
             (self.__class__.__name__, self.workername,
              instance.id, instance.name))
 
+    def detached(self):
+        if self._starting_instance:
+            # Hack to avoid a race condition.
+            # If we are currently spawning an openstack worker, then this
+            # method is called because an older instance has just disconnected.
+            #
+            # In such a case, since we're in the middle of a substanciation,
+            # AbstractLatentWokrer.detached() would believe that the we were
+            # waiting for the former worker to detach before substanciating a
+            # new one, and would attempt to call start_instance(), which can
+            # only result in an exception being triggered.
+            #
+            # Bottomline: it is safe to simply ignore the 'detach' event here.
+            return
+        return super(EveOpenStackLatentWorker, self).detached()
 
 def get_active_servers_by_name(server_name, nova_client):
     """Get all active servers having a given name.
