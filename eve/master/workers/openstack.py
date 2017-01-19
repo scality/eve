@@ -272,8 +272,8 @@ class EveOpenStackLatentWorker(OpenStackLatentWorker):
             # Bottomline: it is safe to simply ignore the 'detach' event here.
             return
         if self._substantiation_notifier:
-            d = self._substantiate(self.substantiation_build)
-            d.addErrback(log.err, 'while re-substantiating')
+            deferred = self._substantiate(self.substantiation_build)
+            deferred.addErrback(log.err, 'while re-substantiating')
 
 
 def get_active_servers_by_name(server_name, nova_client):
