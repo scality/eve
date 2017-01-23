@@ -5,7 +5,7 @@ set -e
 retention_duration="86400"
 keep_containers=""
 keep_tags=""
-tryrun=0
+dryrun=0
 debug=0
 
 usage() {
@@ -89,7 +89,7 @@ while true; do
             shift 2
             ;;
         -n)
-            tryrun=1
+            dryrun=1
             shift
             ;;
         -d|--debug)
@@ -177,7 +177,7 @@ for cid in $(docker ps --all --quiet); do
     fi
 
     echo "Removing container ${cname##/} ($cid)..."
-    if [ $tryrun -eq 0 ]; then
+    if [ $dryrun -eq 0 ]; then
         if ! docker rm --force --volumes "$cid"; then
             incr_warnings
         fi
@@ -197,7 +197,7 @@ for vid in $(docker volume ls --quiet --filter dangling=true); do
     esac
 
     echo "Removing volume $vid..."
-    if [ $tryrun -eq 0 ]; then
+    if [ $dryrun -eq 0 ]; then
         if ! docker volume rm "$vid"; then
             incr_warnings
         fi
@@ -250,7 +250,7 @@ for iid in $(docker images --quiet | uniq); do
         rid="$iid"
     fi
 
-    if [ $tryrun -eq 0 ]; then
+    if [ $dryrun -eq 0 ]; then
         if ! docker rmi --force $rid; then
             incr_warnings
         fi
