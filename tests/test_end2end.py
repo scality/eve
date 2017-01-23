@@ -31,6 +31,32 @@ BASE_PB_PORT = 9990
 WAMP_PORT = 10990
 
 
+def need_env_vars(varnames, reason):
+    """Decorator to skip test if environment variables are not passsed."""
+    return unittest.skipIf(
+        any([
+            varname not in os.environ
+            for varname in varnames
+        ]),
+        reason
+    )
+
+
+def need_rackspace_credentials(reason='needs rackspace credentials'):
+    """Decorator to skip test if rackspace credentials are not passed."""
+    return need_env_vars([
+        'RAX_LOGIN', 'RAX_PWD'
+    ], reason)
+
+
+def need_artifacts_credentials(reason='needs artifacts credentials'):
+    """Decorator to skip test if artifacts credentials are not passed."""
+    return need_env_vars([
+        'ARTIFACTS_URL',
+        'SECRET_ARTIFACT_CREDS'
+    ], reason)
+
+
 def get_master_fqdn():
     """Get the master fqdn.
 
@@ -385,10 +411,8 @@ class Test(unittest.TestCase):  # pylint: disable=too-many-public-methods
         self.notify_webhook()
         self.get_build_result(expected_result='success')
 
-    @unittest.skipIf('ARTIFACTS_LOGIN' not in os.environ,
-                     'needs artifacts credentials')
-    @unittest.skipIf('RAX_LOGIN' not in os.environ,
-                     'needs rackspace credentials')
+    @need_rackspace_credentials()
+    @need_artifacts_credentials()
     def test_worker_uploads_artifacts(self):
         """Tests artifact uploading to cloudfiles
         """

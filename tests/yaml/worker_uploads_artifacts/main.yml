@@ -7,8 +7,6 @@ stages:
     worker:
         type: docker
         path: eve/centos7-ctxt
-        volumes:
-          - 'testcache:/write'
     steps:
       - ShellCommand:
           name: create artifacts dir
@@ -17,9 +15,9 @@ stages:
           name: create a file in artifacts dir
           command: >
               mkdir artifacts/test
-              && echo 'hello' > artifacts/test/hello.txt
-              && echo 'hello' > artifacts/test/hello_2.txt
-              && echo 'hello' > artifacts/hello.txt
+              && echo 'test/hello'   > artifacts/test/hello.txt
+              && echo 'test/hello_2' > artifacts/test/hello_2.txt
+              && echo 'hello'        > artifacts/hello.txt
       - SetPropertyFromCommand:
           name: set build id
           command: echo 'eve_test_build_id'
@@ -42,9 +40,13 @@ stages:
            - ['*hello.txt : ', '*hello.txt']
            - ['hello.txt* : ', 'hello.txt*']
            - ['hello from path: \1', '*hello.txt']
-      - Download:
+      - SetProperty:
+          property: "artifacts_uri"
+          value: "%(prop:artifacts_url)s/%(prop:artifacts_prefix)s%(prop:build_id)s"
+      - ShellCommandWithSecrets:
           name: tries to download uploaded files
-          files:
-            - hello.txt
-            - test/hello.txt
-            - test/hello_2.txt
+          command: >
+            set -ex;
+            curl --fail -u $ARTIFACT_CREDS %(prop:artifacts_uri)s/hello.txt;
+            curl --fail -u $ARTIFACT_CREDS %(prop:artifacts_uri)s/test/hello.txt;
+            curl --fail -u $ARTIFACT_CREDS %(prop:artifacts_uri)s/test/hello_2.txt;
