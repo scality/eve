@@ -44,6 +44,16 @@ def get_master_fqdn():
     return fqdn
 
 
+def use_environ(**environ):
+    """Decorator to specify extra Eve environment variables."""
+    def decorate(func):
+        """Set extra Eve envrionment variables to the given function."""
+        func.__eve_environ__ = environ
+        func.__old_eve_environ__ = {}
+        return func
+    return decorate
+
+
 class Test(unittest.TestCase):  # pylint: disable=too-many-public-methods
     """Base class for test classes
 
@@ -56,6 +66,16 @@ class Test(unittest.TestCase):  # pylint: disable=too-many-public-methods
     eve = None
 
     def setUp(self):
+        # Set extra environment variables
+        test_method = getattr(self, self._testMethodName)
+        extra_environ = getattr(test_method, "__eve_environ__", False)
+        if extra_environ:
+            for varname, value in extra_environ.iteritems():
+                test_method.__old_eve_environ__.update({
+                    varname: os.environ.get(varname)
+                })
+                os.environ[varname] = str(value)
+
         self.master_fqdn = os.getenv('MASTER_FQDN', 'auto')
         if self.master_fqdn == 'auto':
             self.master_fqdn = get_master_fqdn()
@@ -78,6 +98,17 @@ class Test(unittest.TestCase):  # pylint: disable=too-many-public-methods
         self.setup_eve_master_backend(master_id=2)
         self.api = buildbot_api_client.BuildbotDataAPI(self.url + 'api/v2/')
         self.setup_git()
+
+    def tearDown(self):
+        # Restore extra environment variables
+        test_method = getattr(self, self._testMethodName)
+        old_environ = getattr(test_method, "__old_eve_environ__", False)
+        if old_environ:
+            for varname, value in old_environ.iteritems():
+                if value is not None:
+                    os.environ[varname] = value
+                else:
+                    del os.environ[varname]
 
     def shutdown_eve(self):
         """Stop Eve masters and crossbar instances."""
@@ -463,7 +494,18 @@ class Test(unittest.TestCase):  # pylint: disable=too-many-public-methods
          credentials
          * Expect a failure after 5 minutes or so
         """
-
         self.commit_git('use_broken_openstack')
         self.notify_webhook()
         self.get_build_result(expected_result='failure')
+
+    @use_environ(FOO="BAR")
+    def test_worker_environ(self):
+        """Test worker environment.
+
+        Steps:
+        * Spawn worker
+        * Check Eve environment variables are not setted in the worker
+        """
+        self.commit_git('worker_environ')
+        self.notify_webhook()
+        self.get_build_result(expected_result='success')
