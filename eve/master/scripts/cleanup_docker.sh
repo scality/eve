@@ -11,19 +11,24 @@ debug=0
 usage() {
     cat <<-EOF
 		Usage: $0 [OPTIONS]
-		    [-r|--retention VALUE]    	Retention duration in seconds (default: $retention_duration)
-		    [-c|--keep-container NAME]	Keep this named container
-		    [-i|--keep-image NAME]    	Keep this tagged image
-		    [-n]                      	Don't remove anything
+		    [-r|--retention VALUE]             	Retention duration in seconds (default: $retention_duration)
 
-		    [-d|--debug]              	Run with debug and verbose flags (-xv)
-		    [-h|--help]               	Print this help and exit
+		    [-c|--keep-container NAME]         	Keep this named container
+		    [-C|--keep-container-file FILEPATH]	List of containers to keep
+
+		    [-i|--keep-image NAME]             	Keep this tagged image
+		    [-I|--keep-image-file FILEPATH]    	List of images to keep
+
+		    [-n]                               	Don't remove anything
+
+		    [-d|--debug]                       	Run with debug and verbose flags (-xv)
+		    [-h|--help]                        	Print this help and exit
 	EOF
 
 }
 
-OPTS=$(getopt -n $0 -o "r:c:i:ndh" \
-              --long "retention:,keep-container:,keep-image:,debug,help" \
+OPTS=$(getopt -n $0 -o "r:c:C:i:I:ndh" \
+              --long "retention:,keep-container:,keep-container-file:,keep-image:,keep-image-file:,debug,help" \
               -- "$@")
 
 if [ $? -ne 0 ]; then
@@ -42,12 +47,45 @@ while true; do
             keep_containers="$keep_containers $2"
             shift 2
             ;;
+        -C|--keep-container-file)
+            keep_container_filepath="$2"
+            if [ ! -f "$keep_container_filepath" ]; then
+                echo "Error: Keep container file" \
+                     "\"$keep_container_filepath\" not found" >&2
+                exit 1
+            fi
+            for keep_container in $(cat "$keep_container_filepath"); do
+                case "$keep_container" in
+                    \#*) continue ;;
+                    *) ;;
+                esac
+                keep_containers="$keep_containers $keep_container"
+            done
+            shift 2
+            ;;
         -i|--keep-image)
             case "$2" in
                 *:*) tag="$2" ;;
                 *) tag="$2:latest" ;;
             esac
             keep_tags="$keep_tags $tag"
+            shift 2
+            ;;
+        -I|--keep-image-file)
+            keep_image_filepath="$2"
+            if [ ! -f "$keep_image_filepath" ]; then
+                echo "Error: Keep image file" \
+                     "\"${keep_image_filepath}\" not found" >&2
+                exit 1
+            fi
+            for keep_image in $(cat "$keep_image_filepath"); do
+                case "$keep_image" in
+                    \#*) continue ;;
+                    *:*) tag="$keep_image" ;;
+                    *) tag="$keep_image:latest" ;;
+                esac
+                keep_tags="$keep_tags $tag"
+            done
             shift 2
             ;;
         -n)
