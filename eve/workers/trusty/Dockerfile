@@ -8,8 +8,6 @@ RUN adduser -u 1042 --home /home/eve --disabled-password --gecos "" eve \
     && adduser eve sudo \
     && sed -ri 's/(%sudo.*)ALL$/\1NOPASSWD:ALL/' /etc/sudoers
 
-WORKDIR /home/eve
-
 #
 # Install packages needed by the buildchain
 #
@@ -32,12 +30,14 @@ RUN apt-get purge -y python-pip \
 
 USER eve
 
-RUN mkdir -p /home/eve/.ssh/ \
+RUN mkdir -p /home/eve/workspace/ \
+    && mkdir -p /home/eve/.ssh/ \
     && /bin/echo -e "Host bitbucket.org\n\tStrictHostKeyChecking no\n" >> /home/eve/.ssh/config 
 
 #
 # Run buildbot-worker on startup
 #
 
+WORKDIR /home/eve/workspace
 CMD buildbot-worker create-worker . "$BUILDMASTER:$BUILDMASTER_PORT" "$WORKERNAME" "$WORKERPASS" \
     && buildbot-worker start --nodaemon
