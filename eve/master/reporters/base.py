@@ -48,6 +48,7 @@ class BaseBuildStatusPush(HttpStatusPushBase):
 
     @defer.inlineCallbacks
     def getDetailsForTriggeredBuilds(self, build):
+        """get details for triggered builds."""
         for step in build['steps']:
             step.setdefault('triggered_builds', [])
             for url in step['urls']:
@@ -107,6 +108,7 @@ class BaseBuildStatusPush(HttpStatusPushBase):
         return key, result, title, summary, description
 
     def getStepsWithResult(self, build):
+        """get steps with result."""
         res = []
         for step in build['steps']:
             if step['results'] != build['results']:
