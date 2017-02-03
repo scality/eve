@@ -2,8 +2,9 @@
 
 
 import re
+
 from buildbot.process.results import (CANCELLED, EXCEPTION, FAILURE, RETRY,
-SKIPPED, SUCCESS, WARNINGS, Results)
+                                      SKIPPED, SUCCESS, WARNINGS, Results)
 from buildbot.reporters import utils
 from buildbot.reporters.http import HttpStatusPushBase
 from buildbot.util.httpclientservice import HTTPClientService
@@ -187,7 +188,7 @@ class HipChatBuildStatusPush(BaseBuildStatusPush):
 
 # The status push works only on the main builder (bootstrap)
 # To reactivate when fixed
-#EVE_CONF['services'].append(HipChatBuildStatusPush(
+# EVE_CONF['services'].append(HipChatBuildStatusPush(
 #    builders=[BOOTSTRAP_BUILDER_NAME]))
 
 
@@ -260,4 +261,3 @@ class BitbucketBuildStatusPush(BaseBuildStatusPush):
             self.BITBUCKET_STATUS_CORRESP[result],
             key,
             url))
-
