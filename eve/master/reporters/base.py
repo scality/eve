@@ -1,5 +1,4 @@
-#!/usr/bin/env python
-
+"""Allow eve to send reports."""
 
 import re
 from os import environ
@@ -55,7 +54,8 @@ class BaseBuildStatusPush(HttpStatusPushBase):
                 matched = re.search(r'builders/(\d+)/builds/(\d+)', url['url'])
                 if not matched:
                     continue
-                trig_build = yield self.master.db.builds.getBuildByNumber(*matched.groups())
+                builds = self.master.db.builds
+                trig_build = yield builds.getBuildByNumber(*matched.groups())
                 trig_build['buildid'] = trig_build['id']
                 yield utils.getDetailsForBuild(self.master,
                                                trig_build,
@@ -65,7 +65,8 @@ class BaseBuildStatusPush(HttpStatusPushBase):
 
     @defer.inlineCallbacks
     def getMoreInfoAndSend(self, build):
-        yield utils.getDetailsForBuild(self.master, build, **self.neededDetails)
+        yield utils.getDetailsForBuild(self.master, build,
+                                       **self.neededDetails)
         if self.filterBuilds(build):
             yield self.getDetailsForTriggeredBuilds(build)
             yield self.send(build)
@@ -115,7 +116,8 @@ class BaseBuildStatusPush(HttpStatusPushBase):
                     if trig_build['results'] != build['results']:
                         continue
                     for step_chain in self.getStepsWithResult(trig_build):
-                        res.append('%s -> %s' % (trig_build['properties']['stage_name'][0],
+                        stage_name = trig_build['properties']['stage_name'][0]
+                        res.append('%s -> %s' % (stage_name,
                                                  step_chain))
             else:
                 res.append(step['name'])
