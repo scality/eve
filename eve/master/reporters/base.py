@@ -2,6 +2,7 @@
 
 
 import re
+from os import environ
 
 from buildbot.process.results import (CANCELLED, EXCEPTION, FAILURE, RETRY,
                                       SKIPPED, SUCCESS, WARNINGS, Results)
@@ -10,6 +11,26 @@ from buildbot.reporters.http import HttpStatusPushBase
 from buildbot.util.httpclientservice import HTTPClientService
 from twisted.internet import defer
 from twisted.logger import Logger
+
+##########################
+# HipChat Configuration
+##########################
+REPO_ICON = 'http://www.packal.org/sites/default/files/public/styles/icon_' \
+            'large/public/workflow-files/netdeanishealfred-git-repos/icon/' \
+            'icon.png?itok=1zkuMgPa'
+BRANCH_ICON = 'http://plainicon.com/dboard/userprod/2800_a1826/prod_thumb/' \
+              'plainicon.com-50219-512px-201.png'
+CLOCK_ICON = 'https://image.freepik.com/free-icon/clock-of-circular-shape-at' \
+             '-two-o-clock_318-48022.jpg'
+
+HIPCHAT_TOKEN = environ.pop('HIPCHAT_TOKEN')
+HIPCHAT_ROOM = environ.pop('HIPCHAT_ROOM')
+
+###########################
+# bitbucket Configuration
+###########################
+EVE_BITBUCKET_LOGIN = environ.pop('EVE_BITBUCKET_LOGIN')
+EVE_BITBUCKET_PWD = environ.pop('EVE_BITBUCKET_PWD')
 
 
 class BaseBuildStatusPush(HttpStatusPushBase):
