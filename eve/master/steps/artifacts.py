@@ -96,8 +96,7 @@ class Upload(ShellCommand):
                 ))
         self._links = links
 
-        ShellCommand.__init__(
-            self,
+        super(Upload, self).__init__(
             name=name,
             haltOnFailure=True,
             command=Interpolate(' && '.join(command)),
