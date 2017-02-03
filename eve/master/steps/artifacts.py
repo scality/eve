@@ -3,7 +3,6 @@
 import json
 import re
 from collections import defaultdict
-from os import path
 
 from buildbot.process import logobserver
 from buildbot.process.properties import Interpolate
@@ -218,56 +217,3 @@ class Upload(ShellCommand):
                     ])
 
         return sorted(links)
-
-
-class Download(ShellCommand):
-    """Download files from rackspace."""
-
-    def __init__(self, files, **kwargs):
-        name = kwargs.pop(
-            'name', 'downloads artifacts from artifact repository')
-        self._retry = kwargs.pop('retry', (0, 1))
-        self._kwargs = kwargs
-
-        command = []
-        for fpath in files:
-            url = '{url}/{prefix}%(prop:build_id)s'.format(
-                url=self.ARTIFACTS_URL,
-                prefix=self.ARTIFACTS_PREFIX)
-
-            # inserts artifacts login / pwd in url
-            url = url.replace(
-                'https://',
-                'https://{login}:{password}@'.format(
-                    login=self.ARTIFACTS_LOGIN,
-                    password=self.ARTIFACTS_PWD
-                ))
-
-            output = fpath
-
-            command.append(
-                'echo "> download {path} from artifacts into {output}"'.format(
-                    path=fpath,
-                    output=output
-                ))
-
-            output_dir = path.dirname(fpath)
-            if output_dir:
-                command.append(
-                    'mkdir -p {output_dir}'.format(output_dir=output_dir))
-
-            command.append(
-                'curl --silent --retry 10 -s --fail '
-                '--output {output} '
-                '{url}/{path}'.format(url=url, path=fpath, output=output))
-
-        ShellCommand.__init__(
-            self,
-            name=name,
-            haltOnFailure=True,
-            command=Interpolate(' && '.join(command)),
-            **kwargs
-        )
-        self.observer = logobserver.BufferLogObserver(wantStdout=True,
-                                                      wantStderr=True)
-        self.addLogObserver('stdio', self.observer)

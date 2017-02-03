@@ -10,6 +10,8 @@ stages:
     worker:
       type: docker
       path: eve/workers/trusty
+      volumes:
+        - '/home/eve/workspace'
     steps:
       - TriggerStages:
           name: trigger static checks and test stages simultaneously
@@ -20,6 +22,8 @@ stages:
     worker:
       type: docker
       path: eve/workers/trusty
+      volumes:
+        - '/home/eve/workspace'
     steps:
       - Git:
           name: fetch source
