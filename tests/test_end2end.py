@@ -11,9 +11,10 @@ import socket
 import tempfile
 import time
 import unittest
-
 import requests
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
+
+from buildbot.process.results import FAILURE, SUCCESS, WARNINGS
 
 from tests.cmd import cmd
 
@@ -224,6 +225,7 @@ class Test(unittest.TestCase):  # pylint: disable=too-many-public-methods
             'git+ssh://git@localhost:2222/home/git/scality/mock.git .')
         cmd('git config user.email "john.doe@example.com"')
         cmd('git config user.name "John Doe"')
+        cmd('git config push.default simple')
         cmd('echo hello > readme.txt')
         cmd('git add -A')
         cmd('git commit -m "first commit"')
@@ -285,13 +287,13 @@ class Test(unittest.TestCase):  # pylint: disable=too-many-public-methods
         requests.post(self.webhook_url % BASE_HTTP_PORT,
                       data=json.dumps(payload))
 
-    def get_bootstrap_builder(self):
-        """Get builder named 'bootstrap' from the Buildbot's API."""
-        return self.api.get('builders?name=bootstrap')['builders'][0]
+    def get_builder(self, name):
+        """Get builder named name from the Buildbot's API."""
+        return self.api.get('builders?name=%s' % name)['builders'][0]
 
-    def get_bootstrap_build(self, build_number=1):
-        """Wait for build 'bootstrap' to start and return its infos."""
-        builder = self.get_bootstrap_builder()
+    def get_build(self, builder='boostrap', build_number=1):
+        """Wait for build to start and return its infos."""
+        builder = self.get_builder(builder)
         for _ in range(10):
             try:
                 return self.api.get(
@@ -300,26 +302,38 @@ class Test(unittest.TestCase):  # pylint: disable=too-many-public-methods
             except IndexError:
                 time.sleep(1)
                 print('waiting for build to start')
-        raise Exception('unable to find bootstrap build, '
+        raise Exception('unable to find build, '
                         'builderid=%d, build_number=%d' %
                         (builder['builderid'], build_number))
 
-    def get_bootstrap_build_steps(self, build_number=1):
-        """Returns steps from specified 'bootstrap' build."""
-        builder = self.get_bootstrap_builder()
+    def get_build_steps(self, builder='bootstrap', build_number=1):
+        """Returns steps from specified builder and build."""
+        builder = self.get_builder(builder)
         try:
             return self.api.get(
                 'builders/%d/builds/%d/steps' %
                 (builder['builderid'], build_number))['steps']
         except KeyError:
-            raise Exception('unable to find bootstrap build steps, '
+            raise Exception('unable to find build steps, '
                             'builderid=%d, build_number=%d' %
                             (builder['builderid'], build_number))
 
-    def get_build_result(self, build_number=1, expected_result='success'):
+    def get_step(self, name, builder='bootstrap', build_number=1):
+        """Returns matching step from specified builder and build number."""
+        steps = self.get_build_steps(
+            builder=builder, build_number=build_number)
+        step = [s for s in steps if s["name"] == name]
+        if not step:
+            raise Exception('unable to find build step %r, '
+                            'builderid=%d, build_number=%d' %
+                            (name, builder['builderid'], build_number))
+        return step[0]
+
+    def get_build_result(self, builder='bootstrap', build_number=1,
+                         expected_result='success'):
         """Get the result of the build `build_number`."""
         for _ in range(900):
-            build = self.get_bootstrap_build(build_number=build_number)
+            build = self.get_build(builder=builder, build_number=build_number)
             if build['state_string'] == 'finished' and \
                     build['results'] is not None:
                 break
@@ -386,7 +400,7 @@ class Test(unittest.TestCase):  # pylint: disable=too-many-public-methods
         self.notify_webhook()
         self.get_build_result(expected_result='failure')
 
-        steps = self.get_bootstrap_build_steps()
+        steps = self.get_build_steps()
         assert (steps[-2]['name'] == 'build docker image from '
                                      'eve/bad-ubuntu-trusty-ctxt')
         assert (steps[-1]['name'] == 'docker build retry from '
@@ -533,3 +547,109 @@ class Test(unittest.TestCase):  # pylint: disable=too-many-public-methods
         self.commit_git('worker_environ')
         self.notify_webhook()
         self.get_build_result(expected_result='success')
+
+    def test_junit_step(self):  # pylint: disable=too-many-statements
+        """Test customized JUnitShellComment step with OK tests.
+
+        Steps:
+        * Spawn worker
+        * Have various commands create JUnit reports and parse them
+        """
+        self.commit_git('junit_step')
+        self.notify_webhook()
+        self.get_build_result(expected_result='failure')
+
+        # crude method to determine which builder executed the steps
+        builder = 'docker-master1'
+        try:
+            step = self.get_step(
+                name=u'single report with one pass', builder=builder)
+        except:  # pylint: disable=bare-except
+            builder = 'docker-master2'
+            step = self.get_step(
+                name=u'single report with one pass', builder=builder)
+
+        assert step['results'] == SUCCESS
+        assert step['state_string'] == u'T:1 E:0 F:0 S:0'
+
+        step = self.get_step(
+            name=u'three reports with lots of pass', builder=builder)
+        assert step['results'] == SUCCESS
+        assert step['state_string'] == u'T:2134 E:0 F:0 S:108'
+
+        step = self.get_step(
+            name=u'no files in directory', builder=builder)
+        assert step['results'] == WARNINGS
+        assert step['state_string'] == u'no test results found'
+
+        step = self.get_step(
+            name=u'missing report directory', builder=builder)
+        assert step['results'] == WARNINGS
+        assert step['state_string'] == u'no test results found'
+
+        step = self.get_step(
+            name=u'single report with invalid data', builder=builder)
+        assert step['results'] == WARNINGS
+        assert step['state_string'] == u'no test results found'
+
+        step = self.get_step(
+            name=u'report with invalid data along valid report',
+            builder=builder)
+        assert step['results'] == SUCCESS
+        assert step['state_string'] == u'T:1 E:0 F:0 S:0'
+
+        step = self.get_step(
+            name=u'single report with invalid extension', builder=builder)
+        assert step['results'] == WARNINGS
+        assert step['state_string'] == u'no test results found'
+
+        step = self.get_step(
+            name=u'report with failures and successful command',
+            builder=builder)
+        assert step['results'] == FAILURE
+        assert (step['state_string'] ==
+                u'FAIL: toto.tests.sample.test_sample.test_sample')
+
+        step = self.get_step(
+            name=u'report with no failures and failed command',
+            builder=builder)
+        assert step['results'] == FAILURE
+        assert step['state_string'] == u'T:1 E:0 F:0 S:0'
+
+        step = self.get_step(name=u'report with failures', builder=builder)
+        assert step['results'] == FAILURE
+        assert (step['state_string'] ==
+                u'FAIL: toto.tests.sample.test_sample.test_sample')
+
+        step = self.get_step(name=u'report with errors', builder=builder)
+        assert step['results'] == FAILURE
+        assert (step['state_string'] ==
+                u'ERROR: supervisor.test_01_deployment.TestGenericDeployment.'
+                'test_supervisor_configuration[os_trusty]')
+
+        step = self.get_step(name=u'report with skips', builder=builder)
+        assert step['results'] == SUCCESS
+        assert step['state_string'] == u'T:144 E:0 F:0 S:24'
+
+        step = self.get_step(
+            name=u'report with both errors and failures',
+            builder=builder)
+        assert step['results'] == FAILURE
+        assert (step['state_string'] ==
+                u'ERROR: supervisor.test_01_deployment.TestGenericDeployment.'
+                'test_supervisor_configuration[os_trusty]')
+
+        step = self.get_step(
+            name=u'report with one xfail and one xpass', builder=builder)
+        assert step['results'] == SUCCESS
+        assert step['state_string'] == u'T:2 E:0 F:0 S:2'
+
+        step = self.get_step(
+            name=u'undeclared report directory and a pass', builder=builder)
+        assert step['results'] == WARNINGS
+        assert step['state_string'] == u'no test results found'
+
+        step = self.get_step(
+            name=u'undeclared report directory and a fail', builder=builder)
+        assert step['results'] == FAILURE
+        assert step['state_string'] == u'no test results found'

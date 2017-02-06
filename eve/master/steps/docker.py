@@ -1,8 +1,8 @@
 """All docker related steps."""
 
 from buildbot.locks import MasterLock
-from buildbot.steps.master import MasterShellCommand
 from buildbot.process.results import FAILURE
+from buildbot.steps.master import MasterShellCommand
 from twisted.internet import defer
 
 DOCKER_BUILD_LOCK = MasterLock("docker_build")
@@ -32,7 +32,7 @@ class DockerBuild(MasterShellCommand):
 
         super(DockerBuild, self).__init__(command, **kwargs)
 
-    def isNewStyle(self): # flake8: noqa
+    def isNewStyle(self):  # flake8: noqa
         # needed because we redefine `run` below
         return False
 

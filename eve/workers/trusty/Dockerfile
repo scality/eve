@@ -32,7 +32,7 @@ USER eve
 
 RUN mkdir -p /home/eve/workspace/ \
     && mkdir -p /home/eve/.ssh/ \
-    && /bin/echo -e "Host bitbucket.org\n\tStrictHostKeyChecking no\n" >> /home/eve/.ssh/config 
+    && /bin/echo -e "Host bitbucket.org\n\tStrictHostKeyChecking no\n" >> /home/eve/.ssh/config
 
 #
 # Run buildbot-worker on startup

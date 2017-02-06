@@ -1,0 +1,1 @@
+<?xml version="1.0" encoding="utf-8"?><testsuite errors="0" failures="0" name="pytest" skips="0" tests="1" time="0.009"><testcase classname="toto.tests.sample.test_sample" file="toto/tests/sample/test_sample.py" line="2" name="test_sample" time="0.000354766845703"></testcase></testsuite>

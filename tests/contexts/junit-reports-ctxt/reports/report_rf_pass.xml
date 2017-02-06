@@ -1,0 +1,435 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite failures="0" tests="216" errors="0" name="RING" skip="0">
+<testcase classname="RING.Bizio.Bizobj Stats" name="bizioctl_stats" time="19">
+</testcase>
+<testcase classname="RING.Bizio.Bizobj Stats" name="mg_stats" time="7">
+</testcase>
+<testcase classname="RING.Bizio.Timeslots" name="bizio_ts_ut" time="0">
+</testcase>
+<testcase classname="RING.Bizio.Bizio Nonreg" name="bizobj_dat_reclaim_alloc_on_close" time="6">
+</testcase>
+<testcase classname="RING.Bizio.Bizioctl Sanity" name="bizioctl_sanity" time="14">
+</testcase>
+<testcase classname="RING.Bizio.Bizioctl Sanity" name="bizioctl_clear_repair_failed" time="10">
+</testcase>
+<testcase classname="RING.Bizio.Bizobj" name="bizobj" time="12">
+</testcase>
+<testcase classname="RING.Bizio.Bizobj" name="bizobj_valgrind" time="130">
+</testcase>
+<testcase classname="RING.Bizio.Zero Key Object" name="bizobj_zeroes" time="16">
+</testcase>
+<testcase classname="RING.Bizio.Random Io" name="random_io_bizobj_nosync" time="21">
+</testcase>
+<testcase classname="RING.Bizio.Nonreg 10998" name="nonreg_10998" time="6">
+</testcase>
+<testcase classname="RING.Bizio.Default Helper" name="default_helper_bizobj" time="26">
+</testcase>
+<testcase classname="RING.Bizio.Default Helper" name="concurrency_helper_bizobj" time="14">
+</testcase>
+<testcase classname="RING.Bizio.Default Helper" name="check_helper_args_format" time="8">
+</testcase>
+<testcase classname="RING.Bizio.Nonreg 11553" name="nonreg_11553" time="6">
+</testcase>
+<testcase classname="RING.Bizio.Start Stop" name="start_stop" time="1">
+</testcase>
+<testcase classname="RING.Bizio.Start Stop" name="exit_error_daemon" time="1">
+</testcase>
+<testcase classname="RING.Bizio.Start Stop" name="check_pid_is_flocked" time="2">
+</testcase>
+<testcase classname="RING.Bizio.Start Stop" name="check_pid_is_flocked_nodaemon" time="2">
+</testcase>
+<testcase classname="RING.Bizio.Store Basic" name="store_basic_bizobj" time="29">
+</testcase>
+<testcase classname="RING.Bizio.Nonreg" name="nonreg_11784" time="9">
+</testcase>
+<testcase classname="RING.Bizio.Nonreg" name="nonreg_11725" time="8">
+</testcase>
+<testcase classname="RING.Bizio.Nonreg" name="nonreg_11826" time="6">
+</testcase>
+<testcase classname="RING.Bizio.Nonreg" name="nonreg_11233" time="5">
+</testcase>
+<testcase classname="RING.Bizio.Nonreg" name="nonreg_11672" time="6">
+</testcase>
+<testcase classname="RING.Bizio.Nonreg" name="nonreg_10562" time="11">
+</testcase>
+<testcase classname="RING.Bizio.Nonreg" name="nonreg_8496_bizobj" time="1">
+</testcase>
+<testcase classname="RING.Bizio.Nonreg" name="nonreg_12906" time="41">
+</testcase>
+<testcase classname="RING.Bizio.Nonreg" name="nonreg_13535" time="87">
+</testcase>
+<testcase classname="RING.Bizio.Nonreg" name="bizobj_log_catchup_ioerr" time="19">
+</testcase>
+<testcase classname="RING.Bizio.Nonreg" name="nonreg_16255" time="3">
+</testcase>
+<testcase classname="RING.Bizio.Biziod Ipc" name="bizobj_ipc" time="5">
+</testcase>
+<testcase classname="RING.Bizio.Biziod Tracer" name="bizobj_tracer" time="12">
+</testcase>
+<testcase classname="RING.Bizio.Bizobj Relocation" name="bizobj_relocation" time="19">
+</testcase>
+<testcase classname="RING.Bizio.Bizobj Relocation" name="bizobj_relocation2" time="30">
+</testcase>
+<testcase classname="RING.Bizio.Bizobj Relocation" name="bizobj_relocation_fatal_error_offline" time="19">
+</testcase>
+<testcase classname="RING.Bizio.Scrubbing" name="bizobj_scrubbing" time="6">
+</testcase>
+<testcase classname="RING.Bizio.Biziod Daemon" name="biziod_daemonization" time="28">
+</testcase>
+<testcase classname="RING.Bizio.Biziod Daemon" name="biziod_connection_timeout" time="4">
+</testcase>
+<testcase classname="RING.Bizio.Biziod Daemon" name="biziod_refcount_corruption" time="2">
+</testcase>
+<testcase classname="RING.Bizio.Statcheck" name="nonreg_17596" time="23">
+</testcase>
+<testcase classname="RING.Dewpoint.Capabilities" name="dewpoint_capabilities_setup" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Capabilities" name="dewpoint_capabilities_root" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Capabilities" name="dewpoint_capabilities_container" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Capabilities" name="dewpoint_capabilities_dataobject" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Copy" name="dewpoint_cdmi_copy_container" time="2">
+</testcase>
+<testcase classname="RING.Dewpoint.Copy" name="dewpoint_cdmi_move_container" time="2">
+</testcase>
+<testcase classname="RING.Dewpoint.Copy" name="dewpoint_cdmi_copy_object" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Copy" name="dewpoint_cdmi_move_object" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Copy" name="dewpoint_cdmi_copy_range_object" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Copy" name="dewpoint_cdmi_link_container" time="2">
+</testcase>
+<testcase classname="RING.Dewpoint.Copy" name="dewpoint_cdmi_link_object" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Copy" name="dewpoint_cdmi_link_nameless" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Dewpoint Fcgi" name="dewpoint_daemonization" time="31">
+</testcase>
+<testcase classname="RING.Dewpoint.Dewpoint Fcgi" name="dewpoint_fcgi_shutdown" time="4">
+</testcase>
+<testcase classname="RING.Dewpoint.Dewpoint Fcgi" name="dewpoint_fcgi_shutdown_nofuse" time="4">
+</testcase>
+<testcase classname="RING.Dewpoint.Dewpoint Fcgi" name="dewpoint_fcgi_shutdown_busy_fuse" time="4">
+</testcase>
+<testcase classname="RING.Dewpoint.Dewpoint Fcgi" name="dewpoint_fcgi_loaded_shutdown" time="10">
+</testcase>
+<testcase classname="RING.Dewpoint.Dewpoint Test" name="dewpoint_cdmi_crud" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Dewpoint Test" name="dewpoint_cdmi_rmdent" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Dewpoint Test" name="dewpoint_post_in_rootfs" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Dewpoint Test" name="dewpoint_13921" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Dewpoint Test" name="dewpoint_13923_1" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Dewpoint Test" name="dewpoint_13923_2" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Dewpoint Test" name="dewpoint_13923_3" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Dewpoint Test" name="dewpoint_13923_4" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Dewpoint Test" name="dewpoint_13923_5" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Dewpoint Test" name="dewpoint_13923_6" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Dewpoint Test" name="dewpoint_13923_7" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Dewpoint Test" name="dewpoint_13923_8" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Dewpoint Test" name="dewpoint_13923_9" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Dewpoint Test" name="dewpoint_13923_10" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Dewpoint Test" name="dewpoint_13923_11" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Dewpoint Test" name="dewpoint_13923_12" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Dewpoint Test" name="dewpoint_13923_13" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Dewpoint Test" name="dewpoint_13923_14" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Dewpoint Test" name="dewpoint_13923_15" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Dewpoint Test" name="dewpoint_13923_16" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Dewpoint Test" name="dewpoint_14176_1" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Dewpoint Test" name="dp_14593_missing_lookup_chunk" time="21">
+</testcase>
+<testcase classname="RING.Dewpoint.Dewpoint Test" name="dp_14593_missing_main_chunk" time="1">
+</testcase>
+<testcase classname="RING.Dewpoint.Dewpoint Test" name="dp_13256_bad_protocol" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Dewpoint Test" name="dp_15107_missing_lookup_chunk_and_index" time="82">
+</testcase>
+<testcase classname="RING.Dewpoint.Dewpoint Test" name="dp_15059_double_check" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Dewpoint Test" name="dp_14950_old_time_value_in_the_response_to_a_put_request" time="2">
+</testcase>
+<testcase classname="RING.Dewpoint.Dewpoint Test" name="dp_18181_rm_root" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Ext Batch Delete" name="dewpoint_batch_delete_best_effort" time="5">
+</testcase>
+<testcase classname="RING.Dewpoint.Ext Batch Delete" name="dewpoint_batch_delete_best_effort_byid" time="5">
+</testcase>
+<testcase classname="RING.Dewpoint.Ext Batch Delete" name="dewpoint_batch_delete_best_effort_linked_byid" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Ext Batch Delete" name="dewpoint_batch_delete_nulljson" time="2">
+</testcase>
+<testcase classname="RING.Dewpoint.Ext Batch Delete" name="dewpoint_batch_delete_invalid" time="2">
+</testcase>
+<testcase classname="RING.Dewpoint.Ext Batch Delete" name="dewpoint_batch_delete_same_file" time="2">
+</testcase>
+<testcase classname="RING.Dewpoint.Ext Batch Delete" name="dewpoint_batch_delete_same_id" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Ext Batch Link" name="dewpoint_batch_link_bad_headers" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Ext Batch Link" name="dewpoint_batch_link_bad_json" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Ext Batch Link" name="dewpoint_batch_link_bad_source" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Ext Batch Link" name="dewpoint_batch_link_bad_dest" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Ext Batch Link" name="dewpoint_batch_link_good_dest" time="1">
+</testcase>
+<testcase classname="RING.Dewpoint.Ext Batch Link" name="dewpoint_batch_link_double_dst" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Ext Batch Link" name="dewpoint_batch_link_and_unlink" time="1">
+</testcase>
+<testcase classname="RING.Dewpoint.Ext Batch Link" name="dewpoint_batch_link_failed_setattr_17719" time="21">
+</testcase>
+<testcase classname="RING.Dewpoint.Ext Dent" name="dewpoint_dent_nlink" time="1">
+</testcase>
+<testcase classname="RING.Dewpoint.Ext Dent" name="dewpoint_mvdent_container" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Ext Misc" name="dewpoint_async_delete" time="1">
+</testcase>
+<testcase classname="RING.Dewpoint.Ext Misc" name="dewpoint_force_oid" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Ext Misc" name="dewpoint_force_oid_container" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Ext Readdir" name="dewpoint_readdir" time="1">
+</testcase>
+<testcase classname="RING.Dewpoint.Ext Readdir" name="dewpoint_readdir_rootfs_14522" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Ext Readdir" name="dewpoint_readdir_largedir" time="8">
+</testcase>
+<testcase classname="RING.Dewpoint.Ext Truncate" name="dewpoint_truncate" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Ext Truncate" name="dewpoint_truncate_hash" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Ext Truncate" name="dewpoint_truncate_hash_http" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Partial" name="dewpoint_partial_transcoding" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Partial" name="dewpoint_partial_transcoding_ff" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Partial" name="dewpoint_partial_transcoding_upd" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Partial" name="dewpoint_partial_update_mime" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Partial" name="dewpoint_partial_transcoding_base64" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Partial" name="dewpoint_partial_transcoding_base64_ff" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Partial" name="dewpoint_partial_transcoding_base64_upd" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Partial" name="dewpoint_create_cond_raw_with_content_type" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Partial" name="dewpoint_cdmi_update_by_chunks" time="1">
+</testcase>
+<testcase classname="RING.Dewpoint.References" name="dewpoint_cdmi_references" time="3">
+</testcase>
+<testcase classname="RING.Dewpoint.Ext Batch Delete  Opt  Fs Batch" name="dewpoint_batch_delete_best_effort" time="4">
+</testcase>
+<testcase classname="RING.Dewpoint.Ext Batch Delete  Opt  Fs Batch" name="dewpoint_batch_delete_best_effort_byid" time="5">
+</testcase>
+<testcase classname="RING.Dewpoint.Ext Batch Delete  Opt  Fs Batch" name="dewpoint_batch_delete_best_effort_linked_byid" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Ext Batch Delete  Opt  Fs Batch" name="dewpoint_batch_delete_nulljson" time="2">
+</testcase>
+<testcase classname="RING.Dewpoint.Ext Batch Delete  Opt  Fs Batch" name="dewpoint_batch_delete_invalid" time="2">
+</testcase>
+<testcase classname="RING.Dewpoint.Ext Batch Delete  Opt  Fs Batch" name="dewpoint_batch_delete_same_file" time="2">
+</testcase>
+<testcase classname="RING.Dewpoint.Ext Batch Delete  Opt  Fs Batch" name="dewpoint_batch_delete_same_id" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Ext Batch Delete  Opt  Prefetch" name="dewpoint_batch_delete_best_effort" time="5">
+</testcase>
+<testcase classname="RING.Dewpoint.Ext Batch Delete  Opt  Prefetch" name="dewpoint_batch_delete_best_effort_byid" time="5">
+</testcase>
+<testcase classname="RING.Dewpoint.Ext Batch Delete  Opt  Prefetch" name="dewpoint_batch_delete_best_effort_linked_byid" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Ext Batch Delete  Opt  Prefetch" name="dewpoint_batch_delete_nulljson" time="2">
+</testcase>
+<testcase classname="RING.Dewpoint.Ext Batch Delete  Opt  Prefetch" name="dewpoint_batch_delete_invalid" time="2">
+</testcase>
+<testcase classname="RING.Dewpoint.Ext Batch Delete  Opt  Prefetch" name="dewpoint_batch_delete_same_file" time="2">
+</testcase>
+<testcase classname="RING.Dewpoint.Ext Batch Delete  Opt  Prefetch" name="dewpoint_batch_delete_same_id" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Ext Batch Delete  Opt  Fs Batch Prefetch" name="dewpoint_batch_delete_best_effort" time="5">
+</testcase>
+<testcase classname="RING.Dewpoint.Ext Batch Delete  Opt  Fs Batch Prefetch" name="dewpoint_batch_delete_best_effort_byid" time="5">
+</testcase>
+<testcase classname="RING.Dewpoint.Ext Batch Delete  Opt  Fs Batch Prefetch" name="dewpoint_batch_delete_best_effort_linked_byid" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Ext Batch Delete  Opt  Fs Batch Prefetch" name="dewpoint_batch_delete_nulljson" time="2">
+</testcase>
+<testcase classname="RING.Dewpoint.Ext Batch Delete  Opt  Fs Batch Prefetch" name="dewpoint_batch_delete_invalid" time="2">
+</testcase>
+<testcase classname="RING.Dewpoint.Ext Batch Delete  Opt  Fs Batch Prefetch" name="dewpoint_batch_delete_same_file" time="2">
+</testcase>
+<testcase classname="RING.Dewpoint.Ext Batch Delete  Opt  Fs Batch Prefetch" name="dewpoint_batch_delete_same_id" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Ext Batch Link  Opt  Fs Batch" name="dewpoint_batch_link_bad_headers" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Ext Batch Link  Opt  Fs Batch" name="dewpoint_batch_link_bad_json" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Ext Batch Link  Opt  Fs Batch" name="dewpoint_batch_link_bad_source" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Ext Batch Link  Opt  Fs Batch" name="dewpoint_batch_link_bad_dest" time="1">
+</testcase>
+<testcase classname="RING.Dewpoint.Ext Batch Link  Opt  Fs Batch" name="dewpoint_batch_link_good_dest" time="1">
+</testcase>
+<testcase classname="RING.Dewpoint.Ext Batch Link  Opt  Fs Batch" name="dewpoint_batch_link_double_dst" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Ext Batch Link  Opt  Fs Batch" name="dewpoint_batch_link_and_unlink" time="1">
+</testcase>
+<testcase classname="RING.Dewpoint.Ext Batch Link  Opt  Fs Batch" name="dewpoint_batch_link_failed_setattr_17719" time="22">
+</testcase>
+<testcase classname="RING.Dewpoint.Ext Batch Link  Opt  Prefetch" name="dewpoint_batch_link_bad_headers" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Ext Batch Link  Opt  Prefetch" name="dewpoint_batch_link_bad_json" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Ext Batch Link  Opt  Prefetch" name="dewpoint_batch_link_bad_source" time="1">
+</testcase>
+<testcase classname="RING.Dewpoint.Ext Batch Link  Opt  Prefetch" name="dewpoint_batch_link_bad_dest" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Ext Batch Link  Opt  Prefetch" name="dewpoint_batch_link_good_dest" time="1">
+</testcase>
+<testcase classname="RING.Dewpoint.Ext Batch Link  Opt  Prefetch" name="dewpoint_batch_link_double_dst" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Ext Batch Link  Opt  Prefetch" name="dewpoint_batch_link_and_unlink" time="1">
+</testcase>
+<testcase classname="RING.Dewpoint.Ext Batch Link  Opt  Prefetch" name="dewpoint_batch_link_failed_setattr_17719" time="21">
+</testcase>
+<testcase classname="RING.Dewpoint.Ext Batch Link  Opt  Fs Batch Prefetch" name="dewpoint_batch_link_bad_headers" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Ext Batch Link  Opt  Fs Batch Prefetch" name="dewpoint_batch_link_bad_json" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Ext Batch Link  Opt  Fs Batch Prefetch" name="dewpoint_batch_link_bad_source" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Ext Batch Link  Opt  Fs Batch Prefetch" name="dewpoint_batch_link_bad_dest" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Ext Batch Link  Opt  Fs Batch Prefetch" name="dewpoint_batch_link_good_dest" time="1">
+</testcase>
+<testcase classname="RING.Dewpoint.Ext Batch Link  Opt  Fs Batch Prefetch" name="dewpoint_batch_link_double_dst" time="0">
+</testcase>
+<testcase classname="RING.Dewpoint.Ext Batch Link  Opt  Fs Batch Prefetch" name="dewpoint_batch_link_and_unlink" time="1">
+</testcase>
+<testcase classname="RING.Dewpoint.Ext Batch Link  Opt  Fs Batch Prefetch" name="dewpoint_batch_link_failed_setattr_17719" time="21">
+</testcase>
+<testcase classname="RING.Installer.Installer Test" name="unitary tests" time="21">
+</testcase>
+<testcase classname="RING.Installer.Installer Test" name="empty for suite test" time="0">
+</testcase>
+<testcase classname="RING.Nasdk.Chord" name="chord_lock_test" time="0">
+</testcase>
+<testcase classname="RING.Nasdk.Chord" name="chord_cons_tests" time="1">
+</testcase>
+<testcase classname="RING.Nasdk.Chord" name="chord_diagnose_test" time="1">
+</testcase>
+<testcase classname="RING.Nasdk.Chord" name="cons_put_nocreat" time="2">
+</testcase>
+<testcase classname="RING.Nasdk.Arc" name="arc_func_test_01" time="23">
+</testcase>
+<testcase classname="RING.Nasdk.Arc" name="arc_func_test_02" time="3">
+</testcase>
+<testcase classname="RING.Nasdk.Arc" name="arc_test_10648" time="0">
+</testcase>
+<testcase classname="RING.Nasdk.Arc" name="arc_test_14653" time="0">
+</testcase>
+<testcase classname="RING.Nasdk.Arc" name="arc_diagnose_test" time="1">
+</testcase>
+<testcase classname="RING.Nasdk.Ring" name="driver_test_chord" time="1">
+</testcase>
+<testcase classname="RING.Nasdk.Ring" name="load_test_chord" time="0">
+</testcase>
+<testcase classname="RING.Nasdk.Ring" name="driver_test_arc" time="2">
+</testcase>
+<testcase classname="RING.Nasdk.Ring" name="load_test_arc" time="0">
+</testcase>
+<testcase classname="RING.Nasdk.Ring" name="driver_test_srest" time="1">
+</testcase>
+<testcase classname="RING.Nasdk.Ring" name="load_test_srest" time="0">
+</testcase>
+<testcase classname="RING.Nasdk.Split" name="split_test_driver_memory" time="0">
+</testcase>
+<testcase classname="RING.Nasdk.Split" name="split_test_driver_chord" time="1">
+</testcase>
+<testcase classname="RING.Nasdk.Split" name="split_test_driver_arc" time="3">
+</testcase>
+<testcase classname="RING.Nasdk.Split" name="split_test_driver_srest" time="1">
+</testcase>
+<testcase classname="RING.Nasdk.Srest" name="srest_diagnose_test" time="11">
+</testcase>
+<testcase classname="RING.Nasdk.Std" name="nasdk_std_scalstd_trace_14928" time="0">
+</testcase>
+<testcase classname="RING.Scal-Std.Daemon.Daemon" name="daemontest_daemonization" time="26">
+</testcase>
+<testcase classname="RING.Scal-Std.Daemon.Daemon" name="daemontest_crash" time="7">
+</testcase>
+<testcase classname="RING.Scloned.Daemon" name="scloned_daemonization" time="51">
+</testcase>
+<testcase classname="RING.Sindexd.Diagnose" name="diagnose_basic_tests" time="1">
+</testcase>
+<testcase classname="RING.Sindexd.Diagnose" name="diagnose_broken_test" time="3">
+</testcase>
+<testcase classname="RING.Sindexd.Diagnose" name="diagnose_index_state_test" time="0">
+</testcase>
+<testcase classname="RING.Sindexd.Tests" name="functional_tests" time="38">
+</testcase>
+<testcase classname="RING.Sindexd.Tests" name="spurious_rollbacks" time="0">
+</testcase>
+<testcase classname="RING.Sindexd.Tests" name="test_16691" time="0">
+</testcase>
+<testcase classname="RING.Sindexd.Daemon" name="sindexd_daemonization" time="60">
+</testcase>
+<testcase classname="RING.Sophia.Sophiad" name="test_running_conf_desc" time="0">
+</testcase>
+<testcase classname="RING.Sproxyd.Crud" name="sproxyd_crud_chord" time="2">
+</testcase>
+<testcase classname="RING.Sproxyd.Crud" name="sproxyd_crud_arc" time="2">
+</testcase>
+<testcase classname="RING.Sproxyd.Crud" name="sproxyd_crud_bpchord" time="2">
+</testcase>
+<testcase classname="RING.Sproxyd.Crud" name="sproxyd_crud_bparc" time="3">
+</testcase>
+<testcase classname="RING.Sproxyd.Diagnose" name="sproxyd_diagnose" time="1">
+</testcase>
+<testcase classname="RING.Sproxyd.Diagnose" name="sproxyd_diagnose_badinput" time="0">
+</testcase>
+<testcase classname="RING.Sproxyd.Range" name="Get First Byte of Entity" time="0">
+</testcase>
+<testcase classname="RING.Sproxyd.Range" name="Get Fully Specified Range" time="0">
+</testcase>
+<testcase classname="RING.Sproxyd.Range" name="Get Range Specifying Greater `last-byte-pos` Than Entity Size" time="0">
+</testcase>
+<testcase classname="RING.Sproxyd.Range" name="Get Range Without `last-byte-pos` Specified" time="0">
+</testcase>
+<testcase classname="RING.Sproxyd.Range" name="Get Range Specifying `suffix-length` Greater Than Entity Size" time="0">
+</testcase>
+<testcase classname="RING.Sproxyd.Range" name="Get Range Outside Entity Length" time="0">
+</testcase>
+<testcase classname="RING.Sproxyd.Range" name="Get Multiple Byte Ranges" time="0">
+</testcase>
+<testcase classname="RING.Sproxyd.Daemon" name="sproxyd_daemonization" time="66">
+</testcase>
+<testcase classname="RING.Srebuildd.Daemon" name="srebuildd_daemonization" time="51">
+</testcase>
+</testsuite>
