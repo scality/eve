@@ -269,13 +269,13 @@ class BitbucketBuildStatusPush(BaseBuildStatusPush):
         }
         url = self.forge_url(build)
 
-        # if 'eve.devsca.com' not in EXTERNAL_URL:
-        #     self.logger.info("Bitbucket status not sent (not in prod) "
-        #                      "(%s:%s on %s)" % (
-        #                          self.BITBUCKET_STATUS_CORRESP[result],
-        #                          key,
-        #                          url))
-        #     return  # Don't really push status for tests
+        if 'eve.devsca.com' not in EXTERNAL_URL:
+            self.logger.info("Bitbucket status not sent (not in prod) "
+                             "(%s:%s on %s)" % (
+                                 self.BITBUCKET_STATUS_CORRESP[result],
+                                 key,
+                                 url))
+            return  # Don't really push status for tests
         http_service = yield HTTPClientService.getService(
             self.master, url, auth=(EVE_BITBUCKET_LOGIN, EVE_BITBUCKET_PWD))
         response = yield http_service.post('', json=data)
