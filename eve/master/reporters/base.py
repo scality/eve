@@ -229,11 +229,12 @@ class BitbucketBuildStatusPush(BaseBuildStatusPush):
         SUCCESS: 'SUCCESSFUL',
         WARNINGS: 'SUCCESSFUL',
         FAILURE: 'FAILED',
-        SKIPPED: 'FAILED',
+        SKIPPED: 'STOPPED',
         EXCEPTION: 'FAILED',
-        CANCELLED: 'FAILED',
+        CANCELLED: 'STOPPED',
         RETRY: 'INPROGRESS',
-        None: 'INPROGRESS'}
+        None: 'INPROGRESS',
+    }
 
     def forge_url(self, build):
         """Forge the BB API URL on which the build status will be posted."""
