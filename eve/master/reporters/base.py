@@ -81,7 +81,7 @@ class BaseBuildStatusPush(HttpStatusPushBase):
         :param build: The build dictionary
         :return: (key, result, title, summary, description)
         """
-        key = build['properties']['stage_name']
+        key = build['properties']['stage_name'][0]
         src = build['buildset']['sourcestamps'][0]
         self.repo = src['repository'].strip('/').split('/')[-1].\
             replace('.git', '')
