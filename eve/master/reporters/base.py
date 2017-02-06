@@ -50,7 +50,7 @@ class BaseBuildStatusPush(HttpStatusPushBase):
         CANCELLED: 'pink'}
 
     @defer.inlineCallbacks
-    def getDetailsForTriggeredBuilds(self, build):
+    def getDetailsForTriggeredBuilds(self, build):  # noqa
         """get details for triggered builds."""
         for step in build['steps']:
             step.setdefault('triggered_builds', [])
@@ -68,7 +68,7 @@ class BaseBuildStatusPush(HttpStatusPushBase):
                 step['triggered_builds'].append(trig_build)
 
     @defer.inlineCallbacks
-    def getMoreInfoAndSend(self, build):
+    def getMoreInfoAndSend(self, build):  # noqa
         yield utils.getDetailsForBuild(self.master, build,
                                        **self.neededDetails)
         if self.filterBuilds(build):
@@ -110,7 +110,7 @@ class BaseBuildStatusPush(HttpStatusPushBase):
 
         return key, result, title, summary, description
 
-    def getStepsWithResult(self, build):
+    def getStepsWithResult(self, build):  # noqa
         """get steps with result."""
         res = []
         for step in build['steps']:
