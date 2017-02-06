@@ -96,12 +96,12 @@ class Upload(ShellCommand):
                 ))
         self._links = links
 
+        kwargs['workdir'] = kwargs.get('workdir', 'build/' + source)
         super(Upload, self).__init__(
             name=name,
             haltOnFailure=True,
             command=Interpolate(' && '.join(command)),
             maxTime=self.UPLOAD_MAX_TIME + 10,
-            workdir='build/' + source,
             **kwargs
         )
         self.observer = logobserver.BufferLogObserver(wantStdout=True,
