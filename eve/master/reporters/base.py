@@ -11,6 +11,9 @@ from buildbot.util.httpclientservice import HTTPClientService
 from twisted.internet import defer
 from twisted.logger import Logger
 
+# pylint: disable=invalid-name
+# pylint: disable=attribute-defined-outside-init
+
 ##########################
 # HipChat Configuration
 ##########################
