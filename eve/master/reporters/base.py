@@ -14,6 +14,8 @@ from twisted.logger import Logger
 # pylint: disable=invalid-name
 # pylint: disable=attribute-defined-outside-init
 
+EXTERNAL_URL = environ.get('EXTERNAL_URL')
+
 ##########################
 # HipChat Configuration
 ##########################
