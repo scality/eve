@@ -88,8 +88,9 @@ class Upload(ShellCommand):
 
         for link in links:
             command.append(
-                'echo -e "\\n{header}\\n'
-                '$(find -L . -type f -path \'./{path}\')'
+                '/bin/echo -e "\\n{header}\\n'
+                '$(find -L . -type f -path \'./{path}\' -print -or '
+                '-type d -path \'./${path}\' -printf "%p/\\n")'
                 '\\n\\n"'.format(
                     header=link['header'],
                     path=link['path']
