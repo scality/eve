@@ -74,9 +74,27 @@ def get_master_fqdn():
 def use_environ(**environ):
     """Decorator to specify extra Eve environment variables."""
     def decorate(func):
-        """Set extra Eve envrionment variables to the given function."""
+        """Set extra Eve environment variables to the given function."""
         func.__eve_environ__ = environ
         func.__old_eve_environ__ = {}
+        return func
+    return decorate
+
+
+def frontend_local_job(jobnames):
+    """Decorator to add local job(s) to eve config."""
+    def decorate(func):
+        """Set extra Eve job to the setup of this test."""
+        func.__frontend_jobs__ = jobnames
+        return func
+    return decorate
+
+
+def backend_local_job(jobnames):
+    """Decorator to add local job(s) to eve config."""
+    def decorate(func):
+        """Set extra Eve job to the setup of this test."""
+        func.__backend_jobs__ = jobnames
         return func
     return decorate
 
@@ -96,6 +114,8 @@ class Test(unittest.TestCase):  # pylint: disable=too-many-public-methods
         # Set extra environment variables
         test_method = getattr(self, self._testMethodName)
         extra_environ = getattr(test_method, "__eve_environ__", False)
+        frontend_jobs = getattr(test_method, "__frontend_jobs__", None)
+        backend_jobs = getattr(test_method, "__backend_jobs__", None)
         if extra_environ:
             for varname, value in extra_environ.iteritems():
                 test_method.__old_eve_environ__.update({
@@ -120,8 +140,8 @@ class Test(unittest.TestCase):  # pylint: disable=too-many-public-methods
         self.url = 'http://%s:%d/' % (self.master_fqdn, BASE_HTTP_PORT)
         os.environ['EXTERNAL_URL'] = self.url
         self.setup_crossbar()
-        self.setup_eve_master_frontend(master_id=0)
-        self.setup_eve_master_backend(master_id=1)
+        self.setup_eve_master_frontend(master_id=0, local_jobs=frontend_jobs)
+        self.setup_eve_master_backend(master_id=1, local_jobs=backend_jobs)
         self.setup_eve_master_backend(master_id=2)
         self.api = buildbot_api_client.BuildbotDataAPI(self.url)
         self.api.login("eve", "eve")
@@ -150,16 +170,22 @@ class Test(unittest.TestCase):  # pylint: disable=too-many-public-methods
 
         cmd('rm -rf %s' % self.test_dir, ignore_exception=True)
 
-    def setup_eve_master_frontend(self, master_id):
+    def setup_eve_master_frontend(self, master_id, local_jobs=None):
         """Spawns a EVE master frontend.
 
         It will wait until it is up and running.
         """
         os.environ['TRY_PORT'] = str(BASE_TRY_PORT + master_id)
         os.environ['HTTP_PORT'] = str(BASE_HTTP_PORT + master_id)
-        self.setup_eve_master(master_id, master_type='frontend')
+        os.environ['MASTER_FQDN'] = self.master_fqdn
+        os.environ['MASTER_NAME'] = 'master%d' % master_id
+        os.environ['WORKER_SUFFIX'] = 'test-eve%d' % master_id
+        os.environ['PB_PORT'] = str(BASE_PB_PORT + master_id)
+        os.environ['MAX_LOCAL_WORKERS'] = '1'
+        self.setup_eve_master(
+            master_id, master_type='frontend', local_jobs=local_jobs)
 
-    def setup_eve_master_backend(self, master_id):
+    def setup_eve_master_backend(self, master_id, local_jobs=None):
         """Spawns a EVE master backend.
 
         It will wait until it is up and running.
@@ -171,9 +197,10 @@ class Test(unittest.TestCase):  # pylint: disable=too-many-public-methods
 
         os.environ['PB_PORT'] = str(BASE_PB_PORT + master_id)
         os.environ['MAX_LOCAL_WORKERS'] = '1'
-        self.setup_eve_master(master_id, master_type='backend')
+        self.setup_eve_master(
+            master_id, master_type='backend', local_jobs=local_jobs)
 
-    def setup_eve_master(self, master_id, master_type):
+    def setup_eve_master(self, master_id, master_type, local_jobs=None):
         """Spawns a EVE master backend.
 
         It will wait until it is up and running.
@@ -193,10 +220,36 @@ class Test(unittest.TestCase):  # pylint: disable=too-many-public-methods
         cmd('cp -r %s/* .' % master_cfg_dir)
         cmd('mv %s.master.cfg master.cfg' % master_type)
 
+        self.setup_local_job(masterdir, local_jobs)
+
         cmd('buildbot create-master --relocatable --db=%s .' %
             os.environ['DB_URL'])
 
         cmd('buildbot start .')
+
+    def setup_local_job(self, masterdir, job_files):
+        if job_files is None:
+            # allow creation of directory for ""
+            return
+        local_dirpath = os.path.join(
+            masterdir, os.environ.get('LOCAL_JOBS_DIRPATH', 'local'))
+        shutil.rmtree(local_dirpath, ignore_errors=True)
+        cmd('mkdir -p %s' % local_dirpath, ignore_exception=True)
+        if not job_files:
+            return
+
+        os.chdir(local_dirpath)
+        if isinstance(job_files, list):
+            for job in job_files:
+                job_yaml_file = os.path.join(self.top_dir, 'tests',
+                                             'local', '%s.yml' % job)
+                cmd('cp -r %s .' % job_yaml_file)
+        else:
+            job_yaml_file = os.path.join(
+                self.top_dir, 'tests',
+                'local', '%s.yml' % job_files)
+            cmd('cp -r %s .' % job_yaml_file)
+        os.chdir(masterdir)
 
     def setup_crossbar(self):
         """Spawns a local crossbar.
@@ -291,6 +344,10 @@ class Test(unittest.TestCase):  # pylint: disable=too-many-public-methods
     def get_builder(self, name):
         """Get builder named name from the Buildbot's API."""
         return self.api.get('builders?name=%s' % name)['builders'][0]
+
+    def get_scheduler(self, name):
+        """Get scheduler named name from the Buildbot's API."""
+        return self.api.get('schedulers?name=%s' % name)['schedulers'][0]
 
     def get_build(self, builder='boostrap', build_number=1):
         """Wait for build to start and return its infos."""
@@ -550,7 +607,7 @@ class Test(unittest.TestCase):  # pylint: disable=too-many-public-methods
         self.get_build_result(expected_result='success')
 
     def test_junit_step(self):  # pylint: disable=too-many-statements
-        """Test customized JUnitShellComment step with OK tests.
+        """Test customized JUnitShellCommand step with OK tests.
 
         Steps:
         * Spawn worker
@@ -654,3 +711,125 @@ class Test(unittest.TestCase):  # pylint: disable=too-many-public-methods
             name=u'undeclared report directory and a fail', builder=builder)
         assert step['results'] == FAILURE
         assert step['state_string'] == u'no test results found'
+
+    @frontend_local_job("periodic")
+    @use_environ(LOCAL_JOBS_DIRPATH="local2/sub")
+    def test_local_job_frontend(self):
+        """Test a local job on the frontend.
+
+        The local directory is customized with a subdirectory.
+
+        Steps:
+        * Configure local job in decorator
+        * Check Eve can start (no error in setup)
+        * Verify directories and files (test setup validation)
+        * Check schedulers and builders are correct
+        """
+        try:
+            path = os.path.join(self.test_dir, 'master0/local2/sub')
+            assert os.path.isdir(path)
+            path = os.path.join(
+                self.test_dir, 'master0/local2/sub/periodic.yml')
+            assert os.path.isfile(path)
+            path = os.path.join(self.test_dir, 'master1/local2/sub')
+            assert not os.path.isdir(path)
+            path = os.path.join(
+                self.test_dir, 'master1/local2/sub/periodic.yml')
+            assert not os.path.isfile(path)
+
+            builder = self.get_builder('my-periodic-builder')
+            assert builder['description'] == 'I run periodically'
+            scheduler = self.get_scheduler('my-periodic-scheduler')
+            assert 'master0' in scheduler['master']['name']
+            time.sleep(5)  # let job trigger at least once
+            step = self.get_step(
+                name=u'type something on console',
+                builder=str(builder['name']))
+            assert step['results'] == SUCCESS
+        finally:
+            # stop eve manually to prevent periodic job from running
+            self.shutdown_eve()
+
+    @backend_local_job("periodic")
+    def test_local_job_backend(self):
+        """Test a local job on the backend.
+
+        The local directory is kept at default value.
+
+        Steps:
+        * Configure local job in decorator
+        * Check Eve can start (no error in setup)
+        * Verify directories and files (test setup validation)
+        * Check schedulers and builders are correct
+        * Check periodic job is running
+        """
+        try:
+            path = os.path.join(self.test_dir, 'master0/local')
+            assert not os.path.isdir(path)
+            path = os.path.join(self.test_dir, 'master0/local/periodic.yml')
+            assert not os.path.isfile(path)
+            path = os.path.join(self.test_dir, 'master1/local')
+            assert os.path.isdir(path)
+            path = os.path.join(self.test_dir, 'master1/local/periodic.yml')
+            assert os.path.isfile(path)
+
+            builder = self.get_builder('my-periodic-builder')
+            assert builder['description'] == 'I run periodically'
+            scheduler = self.get_scheduler('my-periodic-scheduler')
+            assert 'master1' in scheduler['master']['name']
+            time.sleep(5)  # let job trigger at least once
+            step = self.get_step(
+                name=u'type something on console',
+                builder=str(builder['name']))
+            assert step['results'] == SUCCESS
+        finally:
+            # stop eve manually to prevent periodic job from running
+            self.shutdown_eve()
+
+    @frontend_local_job(["periodic", "nightly"])
+    @backend_local_job("nightly")
+    def test_local_job_mixed(self):
+        """Test a local job on the frontend and backend simultaneously.
+
+        Steps:
+        * Configure local jobs in decorators
+        * Check Eve can start (no error in setup)
+        * Verify directories and files (test setup validation)
+        * Check schedulers and builders are correct
+        """
+        try:
+            path = os.path.join(self.test_dir, 'master0/local')
+            assert os.path.isdir(path)
+            path = os.path.join(self.test_dir, 'master0/local/periodic.yml')
+            assert os.path.isfile(path)
+            path = os.path.join(self.test_dir, 'master0/local/nightly.yml')
+            assert os.path.isfile(path)
+            path = os.path.join(self.test_dir, 'master1/local')
+            assert os.path.isdir(path)
+            path = os.path.join(self.test_dir, 'master1/local/nightly.yml')
+            assert os.path.isfile(path)
+
+            self.get_builder('my-periodic-builder')
+            scheduler = self.get_scheduler('my-periodic-scheduler')
+            assert 'master0' in scheduler['master']['name']
+            scheduler = self.get_scheduler('nightly-scheduler-master0')
+            assert 'master0' in scheduler['master']['name']
+            scheduler = self.get_scheduler('nightly-scheduler-master1')
+            assert 'master1' in scheduler['master']['name']
+        finally:
+            # stop eve manually to prevent periodic job from running
+            self.shutdown_eve()
+
+    @backend_local_job("")
+    @use_environ(LOCAL_JOBS_DIRPATH="/tmp/.eve_test_data/local")
+    def test_local_job_empty(self):  # pylint: disable=no-self-use
+        """Test local jobs with no job defined and absolute path.
+
+        (useful for people who want to store job files in /etc)
+
+        Steps:
+        * Configure local jobs in decorator
+        * Check Eve can start (no error in setup)
+        * Verify directory (test setup validation)
+        """
+        assert os.path.isdir('/tmp/.eve_test_data/local')

@@ -1,0 +1,12 @@
+scheduler:
+  type: Nightly
+  hour: 1
+  minute: 10
+
+builder:
+  description: I sleep
+
+steps:
+  - ShellCommand:
+      name: sleep for 1 second
+      command: sleep 1
