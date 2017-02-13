@@ -1,0 +1,18 @@
+PyYaml
+autobahn
+buildbot-worker==0.9.3
+buildbot-www==0.9.3
+buildbot[tls]==0.9.3
+netifaces
+python-dateutil
+python-novaclient # 2.35.0
+raven
+requests[security]
+retrying
+twisted<17
+xunitparser
+zope.interface
+
+# mysql-python
+# sentry
+# SQLAlchemy-Utils
