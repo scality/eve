@@ -1,0 +1,8 @@
+flake8
+pylint
+prospector
+
+# flake8            depends pycodestyle>=2.0.0
+# prospector 0.12.4 depends pycodestyle==2.0.0
+# but pip install pycodestyle>2.0.0
+pycodestyle==2.0.0

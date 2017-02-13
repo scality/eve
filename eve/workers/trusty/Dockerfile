@@ -19,8 +19,7 @@ RUN apt-get update \
     && rm -f /tmp/packages.list
 
 COPY ./requirements.txt /tmp
-RUN apt-get purge -y python-pip \
- && wget -q -O - https://bootstrap.pypa.io/get-pip.py | python2 - 'pip==9.0.1' \
+RUN wget -q -O - https://bootstrap.pypa.io/get-pip.py | python2 - 'pip==9.0.1' \
  && pip install --no-cache-dir -r /tmp/requirements.txt \
  && rm -f /tmp/requirements.txt
 

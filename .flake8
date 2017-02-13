@@ -1,0 +1,8 @@
+[flake8]
+ignore =
+  # N802: function name should be lowercase
+  N802,
+  # N803: argument name should be lowercase
+  N803,
+  # W503: line break before binary operator
+  W503
