@@ -182,10 +182,6 @@ class HipChatBuildStatusPush(BaseBuildStatusPush):
         self.attributes = []
         key, result, title, summary, description = self.gather_data(build)
 
-        headers = {
-            'content-type': 'application/json',
-            'authorization': 'Bearer %s' % HIPCHAT_TOKEN}
-
         card = dict(
             style='application',
             url=build['url'],
@@ -208,7 +204,11 @@ class HipChatBuildStatusPush(BaseBuildStatusPush):
 
         if EVE_BITBUCKET_LOGIN == 'test':
             return  # Don't really push status for tests
-        response = yield self.session.post(url, headers=headers, json=data)
+
+        http_service = yield HTTPClientService.getService(self.master, url)
+        response = yield http_service.post('', json=data, params={
+            "auth_token": HIPCHAT_TOKEN
+        })
         if response.status_code != 204:
             raise Exception(
                 "{response.status_code}: unable to send status to HipChat: "
