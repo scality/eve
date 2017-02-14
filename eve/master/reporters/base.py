@@ -27,8 +27,8 @@ BRANCH_ICON = 'http://plainicon.com/dboard/userprod/2800_a1826/prod_thumb/' \
 CLOCK_ICON = 'https://image.freepik.com/free-icon/clock-of-circular-shape-at' \
              '-two-o-clock_318-48022.jpg'
 
-HIPCHAT_TOKEN = environ.pop('HIPCHAT_TOKEN')
-HIPCHAT_ROOM = environ.pop('HIPCHAT_ROOM')
+HIPCHAT_TOKEN = environ.pop('HIPCHAT_TOKEN', None)
+HIPCHAT_ROOM = environ.pop('HIPCHAT_ROOM', None)
 
 ###########################
 # bitbucket Configuration
@@ -178,6 +178,12 @@ class HipChatBuildStatusPush(BaseBuildStatusPush):
     @defer.inlineCallbacks
     def send(self, build):
         """Send build status to HipChat."""
+        if not HIPCHAT_ROOM or not HIPCHAT_TOKEN:
+            self.logger.info(
+                "Hipchat status not sent"
+                " (HIPCHAT_* variables not defined))"
+            )
+            return
 
         self.attributes = []
         key, result, title, summary, description = self.gather_data(build)
@@ -202,24 +208,18 @@ class HipChatBuildStatusPush(BaseBuildStatusPush):
 
         url = 'https://api.hipchat.com/v2/room/%s/notification' % HIPCHAT_ROOM
 
-        if EVE_BITBUCKET_LOGIN == 'test':
-            return  # Don't really push status for tests
-
         http_service = yield HTTPClientService.getService(self.master, url)
         response = yield http_service.post('', json=data, params={
             "auth_token": HIPCHAT_TOKEN
         })
+
         if response.status_code != 204:
             raise Exception(
                 "{response.status_code}: unable to send status to HipChat: "
                 "{url}\nRequest:\n{request}\nResponse:\n{response.content}".
                 format(request=data, response=response, url=url))
-        self.logger.info("HipChat status sent")
 
-# The status push works only on the main builder (bootstrap)
-# To reactivate when fixed
-# EVE_CONF['services'].append(HipChatBuildStatusPush(
-#    builders=[BOOTSTRAP_BUILDER_NAME]))
+        self.logger.info("HipChat status sent")
 
 
 class BitbucketBuildStatusPush(BaseBuildStatusPush):
