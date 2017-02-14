@@ -123,7 +123,8 @@ class Test(unittest.TestCase):  # pylint: disable=too-many-public-methods
         self.setup_eve_master_frontend(master_id=0)
         self.setup_eve_master_backend(master_id=1)
         self.setup_eve_master_backend(master_id=2)
-        self.api = buildbot_api_client.BuildbotDataAPI(self.url + 'api/v2/')
+        self.api = buildbot_api_client.BuildbotDataAPI(self.url)
+        self.api.login("eve", "eve")
         self.setup_git()
 
     def tearDown(self):

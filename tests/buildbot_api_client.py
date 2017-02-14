@@ -8,7 +8,6 @@ for more info on the API, see `buildbot REST API documentation`_
 """
 
 import requests
-from requests.auth import HTTPBasicAuth
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 # Hack to remove a lot of warnings in stdout while testing
@@ -18,18 +17,21 @@ requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 class BuildbotDataAPI(object):
     """Class to interact with a Buildbot master through its REST API."""
 
-    def __init__(self, base_url):
-        assert base_url.endswith('api/v2/')
-        self.base_url = base_url
-        self.headers = {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json, text/plain, */*',
-        }
-        self.auth = None
+    def __init__(self, uri):
+        self.uri = uri
+        self.api_uri = "{0}api/v2/".format(self.uri)
 
-    def add_auth(self, user, password):
-        """Use given `user` and `password` for HTTP basic auth."""
-        self.auth = HTTPBasicAuth(user, password)
+        self.session = requests.Session()
+
+    def login(self, user, password):
+        """Retreive the authenticated cookie in the session."""
+        res = self.session.get(self.uri + "auth/login", auth=(user, password))
+        res.raise_for_status()
+
+    def logout(self):
+        """Remove the authenticated cookie from the session."""
+        res = self.session.get(self.uri + "auth/logout")
+        res.raise_for_status()
 
     def post(self, route, method, params=None):
         """Post data to the REST API."""
@@ -40,15 +42,15 @@ class BuildbotDataAPI(object):
             'params': params
         }
 
-        res = requests.post(self.base_url + route, json=data,
-                            headers=self.headers, auth=self.auth)
+        res = self.session.post(self.api_uri + route, json=data)
         res.raise_for_status()
         return res.json()
 
     def get(self, route):
         """Get data from the REST API."""
-        res = requests.get(self.base_url + route, headers=self.headers,
-                           auth=self.auth)
+        res = self.session.get(self.api_uri + route, headers={
+            "Accept": "application/json"
+        })
         res.raise_for_status()
         return res.json()
 
