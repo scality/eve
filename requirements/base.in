@@ -1,8 +1,10 @@
+-c buildbot-constraints.txt
+
 PyYaml
 autobahn
-buildbot-worker==0.9.3
-buildbot-www==0.9.3
-buildbot[tls]==0.9.3
+buildbot-worker
+buildbot-www
+buildbot[tls]
 netifaces
 python-dateutil
 python-novaclient # 2.35.0
