@@ -1,7 +1,7 @@
-# For CI to create the docker latent worker
-buildbot-worker
-
 # For static analysis
-tox
 -r ../../../requirements/base.in
 -r ../../../requirements/lint.in
+tox
+
+# For CI to create the docker latent worker
+buildbot-worker
