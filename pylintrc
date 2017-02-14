@@ -1,6 +1,0 @@
-[BASIC]
-good-names=i,j,k,ex,Run,_,logger,masterFQDN
-generated-members=reactor.callLater
-
-[MESSAGES CONTROL]
-disable=locally-disabled,too-many-ancestors,abstract-method,too-many-instance-attributes,too-many-arguments,too-few-public-methods

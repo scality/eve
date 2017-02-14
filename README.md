@@ -22,7 +22,7 @@ Install the libraries required for mysql on your machine:
 
 Next install eve requirements (virtual env recommended):
 
-    $ pip install -r requirements.txt
+    $ pip install -r requirements/base.txt
 
 Configure the following environment variables (can be added to the virtual
 env postactivate script for example); important items are marked with a *

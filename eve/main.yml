@@ -31,14 +31,15 @@ stages:
           shallow: True
           retryFetch: True
       - ShellCommand:
-          name: run pylint
-          command: pylint eve/master tests
+          name: run static analysis tools
+          command: tox --sitepackages -e flake8,prospector,pylint
       - ShellCommand:
-          name: run flake8
-          command: flake8 eve/master tests
-      - ShellCommand:
-          name: run prospector
-          command: prospector -F
+          name: run pylint on {frontend,backend}.master.cfg
+          command: tox --sitepackages -e pylint -- eve/master/*.master.cfg
+          decodeRC:
+            0: 0 # SUCCESS
+            1: 1 # WARNINGS
+          warnOnWarnings: True
   system tests:
     worker:
       type: openstack
