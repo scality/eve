@@ -7,11 +7,43 @@ from buildbot.plugins import schedulers, steps
 from buildbot.process.factory import BuildFactory
 from buildbot.process.properties import Interpolate
 from buildbot.steps.http import HTTPStep
+from buildbot.steps.shell import ShellCommand
 from buildbot.steps.source.git import Git
 from requests.auth import HTTPBasicAuth
 from twisted.logger import Logger
 
 from steps.artifacts import Upload  # pylint: disable=relative-import
+
+# store 'secret' environment variables in a separate dictionary
+SECRETS = {}
+
+
+def filter_secrets():
+    global SECRETS  # pylint: disable=global-variable-not-assigned
+
+    for key in dict(environ):
+        if key.startswith('SECRET_'):
+            SECRETS[key.lstrip('SECRET_')] = environ.pop(key)
+
+
+class ShellCommandWithSecrets(ShellCommand):
+    """ Execute a shell command that needs secret environment variables.
+
+    All variables on the form SECRET_{var} will be passed as {var} inside the
+    worker. Naturally, the environment is not logged during such a step.
+
+    """
+
+    def __init__(self, *args, **kwargs):
+        new_env = kwargs.pop('env', {})
+        new_env.update(SECRETS)
+
+        kwargs.update({
+            'logEnviron': False,
+            'env': new_env,
+        })
+
+        super(ShellCommandWithSecrets, self).__init__(*args, **kwargs)
 
 
 def replace_with_interpolate(obj):
@@ -36,14 +68,19 @@ def step_factory(custom_steps, step_type, **params):
     """Generate a buildbot step from dictionnary."""
     try:
         # try to see if the required step is imported or
-        # defined in the current context
+        # defined in the custom steps
         _cls = custom_steps[step_type]
     except KeyError:
-        # otherwise import the step from standars buildbot steps
+        # otherwise try in local context
         try:
-            _cls = getattr(steps, step_type)
-        except AttributeError:
-            raise Exception('Could not load step %s' % step_type)
+            # try in local context
+            _cls = globals()[step_type]
+        except KeyError:
+            # otherwise import the step from standars buildbot steps
+            try:
+                _cls = getattr(steps, step_type)
+            except AttributeError:
+                raise Exception('Could not load step %s' % step_type)
 
     # Replace the %(prop:*)s in the text with an Interpolate obj
     params = replace_with_interpolate(params)
