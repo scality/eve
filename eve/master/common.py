@@ -19,8 +19,6 @@ SECRETS = {}
 
 
 def filter_secrets():
-    global SECRETS  # pylint: disable=global-variable-not-assigned
-
     for key in dict(environ):
         if key.startswith('SECRET_'):
             SECRETS[key.lstrip('SECRET_')] = environ.pop(key)
