@@ -4,12 +4,14 @@ import json
 import re
 from collections import defaultdict
 
+from buildbot.plugins import util
 from buildbot.process import logobserver
-from buildbot.process.properties import Interpolate
 from buildbot.process.results import FAILURE, SKIPPED, SUCCESS
 from buildbot.steps.shell import SetPropertyFromCommand, ShellCommand
+from packaging import version
 from twisted.internet import defer, reactor
 
+# pylint: disable=attribute-defined-outside-init
 
 CURL_CMD = """curl -s -X POST -H "Content-type: application/json" \
 --progress-bar https://identity.api.rackspacecloud.com/v2.0/tokens \
@@ -62,15 +64,37 @@ class Upload(ShellCommand):
         self._kwargs = kwargs
         self._urls = urls
 
+        kwargs['workdir'] = kwargs.get('workdir', 'build/' + source)
+        super(Upload, self).__init__(
+            name=name,
+            haltOnFailure=True,
+            command=util.Transform(self.set_command, urls),
+            maxTime=self.UPLOAD_MAX_TIME + 10,
+            **kwargs
+        )
+        self.observer = logobserver.BufferLogObserver(wantStdout=True,
+                                                      wantStderr=True)
+        self.addLogObserver('stdio', self.observer)
+
+    def get_artifacts_container(self):
+        eve_api_version = self.getProperty('eve_api_version')
+        if version.parse(eve_api_version) >= version.parse('0.2'):
+            return self.getProperty('artifacts_name')
+        else:
+            return self.ARTIFACTS_PREFIX + self.getProperty('build_id')
+
+    def set_command(self, urls):
+        artifacts_container = self.get_artifacts_container()
+
         command = [
             ('if [ ! -n "$(find -L . -type f | head -1)" ]; then '
              'echo "No files here. Nothing to do."; exit 0; fi'),
             'tar -chvzf ../artifacts.tar.gz . ',
             'echo tar successful. Calling curl... ',
             ('curl --verbose --max-time {max_time} -s -T ../artifacts.tar.gz '
-             '-X PUT -H"x-auth-token: %(prop:cloudfiles_token)s" ' +
-             self.CLOUDFILES_URL + self.ARTIFACTS_PREFIX +
-             '%(prop:build_id)s' +
+             '-X PUT -H"x-auth-token: ' +
+             self.getProperty('cloudfiles_token') + '" ' +
+             self.CLOUDFILES_URL + artifacts_container +
              '?extract-archive=tar.gz').format(max_time=self.UPLOAD_MAX_TIME)
         ]
 
@@ -96,17 +120,7 @@ class Upload(ShellCommand):
                 ))
         self._links = links
 
-        kwargs['workdir'] = kwargs.get('workdir', 'build/' + source)
-        super(Upload, self).__init__(
-            name=name,
-            haltOnFailure=True,
-            command=Interpolate(' && '.join(command)),
-            maxTime=self.UPLOAD_MAX_TIME + 10,
-            **kwargs
-        )
-        self.observer = logobserver.BufferLogObserver(wantStdout=True,
-                                                      wantStderr=True)
-        self.addLogObserver('stdio', self.observer)
+        return ' && '.join(command)
 
     @defer.inlineCallbacks
     def run(self):
@@ -160,11 +174,11 @@ class Upload(ShellCommand):
                     upath)
 
         # adds links in step display, based on existing files
+        artifacts_container = self.get_artifacts_container()
         for (name, upath) in links:
-            url = ('{url}/{prefix}{build_id}/{path}'.format(
+            url = ('{url}/{artifacts_container}/{path}'.format(
                 url=self.ARTIFACTS_URL,
-                prefix=self.ARTIFACTS_PREFIX,
-                build_id=self.getProperty('build_id'),
+                artifacts_container=artifacts_container,
                 path=upath
             ))
             self.addURL(name, url)
