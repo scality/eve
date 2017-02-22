@@ -34,8 +34,8 @@ env postactivate script for example); important items are marked with a *
     export MASTER_NAME=eve1 # Name of this master instance. This will be used as
                             # a name prefix to differenciate schedulers,
                             # masters, and workers in a multi-master setup
-    export EVE_BITBUCKET_LOGIN=test
-    export EVE_BITBUCKET_PWD=test
+    export EVE_GITHOST_LOGIN=test
+    export EVE_GITHOST_PWD=test
     export OAUTH2_CLIENT_ID=test
     export OAUTH2_CLIENT_SECRET=test
     export PROJECT_NAME=dev  # (*) customize with username for example
@@ -64,7 +64,7 @@ env postactivate script for example); important items are marked with a *
     unset RAX_PWD  # same (rackspace password, not API_KEY)
     unset OPENSTACK_SSH_KEY  # same, defaults to ~/.ssh/id_rsa
     unset OPENSTACK_KEY_NAME  # same, defaults to eve-key-pair
-    export BITBUCKET_PUB_KEY=$(ssh-keyscan bitbucket.org)
+    export GITHOST_PUB_KEY=$(ssh-keyscan bitbucket.org)
 
 Create and start buildbot:
 
@@ -119,7 +119,7 @@ You can tailor the way tests are run by setting the following env variables:
     RAX_LOGIN
     RAX_PWD
     OPENSTACK_SSH_KEY
-    BITBUCKET_PUB_KEY
+    GITHOST_PUB_KEY
 
 Run tests with:
 

@@ -33,8 +33,8 @@ HIPCHAT_ROOM = environ.pop('HIPCHAT_ROOM', None)
 ###########################
 # bitbucket Configuration
 ###########################
-EVE_BITBUCKET_LOGIN = environ.pop('EVE_BITBUCKET_LOGIN')
-EVE_BITBUCKET_PWD = environ.pop('EVE_BITBUCKET_PWD')
+EVE_GITHOST_LOGIN = environ.pop('EVE_GITHOST_LOGIN')
+EVE_GITHOST_PWD = environ.pop('EVE_GITHOST_PWD')
 
 
 class BaseBuildStatusPush(HttpStatusPushBase):
@@ -279,7 +279,7 @@ class BitbucketBuildStatusPush(BaseBuildStatusPush):
                                  url))
             return  # Don't really push status for tests
         http_service = yield HTTPClientService.getService(
-            self.master, url, auth=(EVE_BITBUCKET_LOGIN, EVE_BITBUCKET_PWD))
+            self.master, url, auth=(EVE_GITHOST_LOGIN, EVE_GITHOST_PWD))
         response = yield http_service.post('', json=data)
         # 200 means that the key already exists
         # 201 means that the key has been created successfully
