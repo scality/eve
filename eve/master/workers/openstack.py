@@ -43,7 +43,7 @@ class EveOpenStackLatentWorker(OpenStackLatentWorker):
         return self._reachable_address
 
     def __init__(self, region, ssh_key, git_key_path,
-                 bitbucket_pub_key, masterFQDN, **kwargs):  # flake8: noqa
+                 githost_pub_key, masterFQDN, **kwargs):  # flake8: noqa
         super(EveOpenStackLatentWorker, self).__init__(**kwargs)
         # fixme: This is a fragile hack because the original class does not
         # allow to specify a region name. We should fix this upstream.
@@ -52,7 +52,7 @@ class EveOpenStackLatentWorker(OpenStackLatentWorker):
         self.ip_address = None
         self.git_key_path = git_key_path
         self.masterFQDN = masterFQDN
-        self.bitbucket_pub_key = bitbucket_pub_key
+        self.githost_pub_key = githost_pub_key
         self._ngrok = None
         self._starting_instance = False
 
@@ -183,7 +183,7 @@ class EveOpenStackLatentWorker(OpenStackLatentWorker):
         self.scp(self.git_key_path + '.pub', '/home/eve/.ssh/id_rsa.pub')
         self.ssh('chown eve:eve /home/eve/.ssh/id_rsa* && '
                  'chmod 600 /home/eve/.ssh/id_rsa')
-        self.ssh('echo "%s" >> ' % self.bitbucket_pub_key +
+        self.ssh('echo "%s" >> ' % self.githost_pub_key +
                  '/home/eve/.ssh/known_hosts && '
                  'chown eve:eve /home/eve/.ssh/known_hosts && '
                  'chmod 644 /home/eve/.ssh/known_hosts')
