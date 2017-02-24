@@ -1,5 +1,6 @@
-"""All docker related steps."""
+"""All docker build related steps."""
 
+import buildbot
 from buildbot.locks import MasterLock
 from buildbot.process.results import FAILURE
 from buildbot.steps.master import MasterShellCommand
@@ -19,11 +20,12 @@ class DockerBuild(MasterShellCommand):
 
         command = [
             "docker", "build",
-            "-t", image
+            "--build-arg", "BUILDBOT_VERSION={0}".format(buildbot.version),
+            "--tag", image
         ]
 
         if dockerfile is not None:
-            command += ["-f", dockerfile]
+            command += ["--file", dockerfile]
 
         if is_retry:
             command += ["--no-cache"]

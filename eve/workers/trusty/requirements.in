@@ -1,5 +1,5 @@
 # For CI to create the docker latent worker
-buildbot-worker==0.9.3
+buildbot-worker
 
 # For static analysis
 tox
