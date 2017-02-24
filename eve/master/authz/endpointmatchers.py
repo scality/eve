@@ -45,7 +45,8 @@ class DenyRebuildBuildEndpointMatcher(bb_endpointmatchers.EndpointMatcherBase):
                 break
         else:
             raise bb_authz.Forbidden(
-                "This builder is not allowed to be rebuilt"
+                "This builder is not allowed to be rebuilt."
+                " Please select the 'bootstrap' builder."
             )
 
         if self.role:
