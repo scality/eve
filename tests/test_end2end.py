@@ -267,12 +267,14 @@ class Test(unittest.TestCase):  # pylint: disable=too-many-public-methods
     def setup_git(self):
         """Create a new git repo."""
 
-        bitbucket_cache_dir = os.path.join(self.top_dir, 'eve', 'master',
-                                           'services', 'bitbucket_cache')
-        cmd('docker build -t bitbucket.org %s' % bitbucket_cache_dir)
-        cmd('docker rm -f bitbucket.org', ignore_exception=True)
-        self.git_cache_docker_id = cmd('docker run -d -p 2222:22 '
-                                       '--name bitbucket.org bitbucket.org')
+        for path, name, port in [('bitbucket_cache', 'bitbucket.org', 2222),
+                                 ('github_cache', 'github.com', 2223)]:
+            cache_dir = os.path.join(self.top_dir, 'eve', 'master',
+                                     'services', path)
+            cmd('docker build -t %s %s' % (name, cache_dir))
+            cmd('docker rm -f %s' % name, ignore_exception=True)
+            self.git_cache_docker_id = cmd('docker run -d -p %s:22 '
+                                           '--name %s %s' % (port, name, name))
         time.sleep(3)  # wait for bitbucket cache service to stabilize
         os.chdir(self.git_dir)
         cmd('git clone '
@@ -833,3 +835,35 @@ class Test(unittest.TestCase):  # pylint: disable=too-many-public-methods
         * Verify directory (test setup validation)
         """
         assert os.path.isdir('/tmp/.eve_test_data/local')
+
+
+class TestServices(unittest.TestCase):
+    # pylint: disable=too-many-public-methods
+    """Test services."""
+
+    def setUp(self):
+        self.test_dir = tempfile.mkdtemp(prefix='eve_test_')
+        self.top_dir = os.path.dirname((os.path.dirname(
+            os.path.abspath(__file__))))
+        cmd('docker rm -f github.com', ignore_exception=True)
+
+    def test_github_docker_cache(self):
+        """Check github docker cache can build and works."""
+        github_cache_dir = os.path.join(self.top_dir, 'eve', 'master',
+                                        'services', 'github_cache')
+        cmd('docker build -t github.com %s' % github_cache_dir)
+        cmd('docker run -d -p 2223:22 --name github.com github.com')
+        time.sleep(3)  # wait for cache service to stabilize
+        # check clone via ssh and path
+        cmd('GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null '
+            '-o StrictHostKeyChecking=no" git clone '
+            'git+ssh://git@localhost:2223/home/git/scality/mock.git '
+            '%s/1' % self.test_dir)
+        # check clone via git ssh
+        docker_ip = cmd(
+            'docker inspect --format '
+            '"{{ .NetworkSettings.IPAddress }}" github.com').strip()
+        cmd('GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null '
+            '-o StrictHostKeyChecking=no" '
+            'git clone git@%s:scality/mock.git '
+            '%s/2' % (docker_ip, self.test_dir))
