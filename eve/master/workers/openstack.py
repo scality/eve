@@ -42,17 +42,16 @@ class EveOpenStackLatentWorker(OpenStackLatentWorker):
                 self._reachable_address = self.masterFQDN, environ['PB_PORT']
         return self._reachable_address
 
-    def __init__(self, region, ssh_key, git_key_path,
-                 githost_pub_key, masterFQDN, **kwargs):  # flake8: noqa
+    def __init__(self, region, ssh_key, masterFQDN,
+                 cloud_init=None, **kwargs):  # flake8: noqa
         super(EveOpenStackLatentWorker, self).__init__(**kwargs)
         # fixme: This is a fragile hack because the original class does not
         # allow to specify a region name. We should fix this upstream.
         self.novaclient.client.region_name = region
         self.ssh_key = ssh_key
+        self.cloud_init = cloud_init
         self.ip_address = None
-        self.git_key_path = git_key_path
         self.masterFQDN = masterFQDN
-        self.githost_pub_key = githost_pub_key
         self._ngrok = None
         self._starting_instance = False
 
@@ -166,10 +165,14 @@ class EveOpenStackLatentWorker(OpenStackLatentWorker):
         return result
 
     def start_worker(self, init_script):
-        """
-        Execute init script on machine (installs buildbot worker and eve
-        account), then install ssh keys and finally start the worker.
-        :return:
+        """Execute init scripts remotely and launches buildbot worker.
+
+        - run the init script provided by project (installs buildbot,
+          creates user `eve` for target system)
+        - run cloud init script, common to all workers (typically: adds
+          ssh keys)
+        - instanciate buildbot worker
+
         """
         self.scp(init_script, '/tmp/worker_init.sh')
         self.ssh(' && '.join([
@@ -177,16 +180,12 @@ class EveOpenStackLatentWorker(OpenStackLatentWorker):
             '/tmp/worker_init.sh {0}'.format(buildbot.version)
         ]))
 
-        self.ssh('mkdir -p /home/eve/.ssh')
-
-        self.scp(self.git_key_path, '/home/eve/.ssh/id_rsa')
-        self.scp(self.git_key_path + '.pub', '/home/eve/.ssh/id_rsa.pub')
-        self.ssh('chown eve:eve /home/eve/.ssh/id_rsa* && '
-                 'chmod 600 /home/eve/.ssh/id_rsa')
-        self.ssh('echo "%s" >> ' % self.githost_pub_key +
-                 '/home/eve/.ssh/known_hosts && '
-                 'chown eve:eve /home/eve/.ssh/known_hosts && '
-                 'chmod 644 /home/eve/.ssh/known_hosts')
+        if self.cloud_init:
+            self.scp(self.cloud_init, '/tmp/cloud_init.sh')
+            self.ssh(' && '.join([
+                'chmod u+x /tmp/cloud_init.sh',
+                '/tmp/cloud_init.sh'
+            ]))
 
         master, port = self.get_reachable_address()
         self.ssh('sudo -u eve buildbot-worker create-worker --umask=022 '
