@@ -60,6 +60,7 @@ class EveDockerLatentWorker(AbstractLatentWorker):
             '--env', 'ARTIFACTS_PREFIX=%s' % environ.get('ARTIFACTS_PREFIX',
                                                          'staging-'),
             '--link', 'bitbucket.org',
+            '--link', 'github.com',
             '--detach',
         ]
         for volume in volumes:
