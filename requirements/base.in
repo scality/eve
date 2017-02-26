@@ -1,20 +1,17 @@
 -c buildbot-constraints.txt
 
-PyYaml
 autobahn
 buildbot-worker
 buildbot-www
 buildbot[tls]
+MySQL-python
 netifaces
 python-dateutil
 python-novaclient # 2.35.0
+PyYAML
 raven
 requests[security]
 retrying
-twisted<17
+Twisted < 17
 xunitparser
 zope.interface
-
-# mysql-python
-# sentry
-# SQLAlchemy-Utils
