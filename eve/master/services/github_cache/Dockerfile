@@ -8,7 +8,7 @@ RUN apt-get update
 RUN apt-get install -qy nginx git openssh-server
 RUN mkdir -p /etc/nginx/ssl/
 COPY scality_github_config.txt /tmp/scality_github_config.txt
-RUN openssl req -batch -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/nginx/ssl/nginx.key -out /etc/nginx/ssl/nginx.crt -config /tmp/scality_github_config.txt
+RUN openssl req -batch -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/nginx/ssl/nginx.key -out /etc/nginx/ssl/nginx.crt -config /tmp/scality_github_config.txt \
  && chmod 400 /etc/nginx/ssl/nginx.key
 RUN mkdir -p /data/nginx
 COPY rproxy.conf /etc/nginx/sites-available/rproxy.conf
