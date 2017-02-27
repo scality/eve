@@ -52,6 +52,7 @@ class EveDockerLatentWorker(AbstractLatentWorker):
         cmd = [
             'run',
             '--privileged',
+            '--env', 'GIT_SSL_NO_VERIFY=true',
             '--env', 'BUILDMASTER=%s' % self.master_fqdn,
             '--env', 'WORKERNAME=%s' % self.name,
             '--env', 'WORKERPASS=%s' % self.password,
