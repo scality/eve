@@ -46,7 +46,6 @@ env postactivate script for example); important items are marked with a *
     export PB_PORT=9999
     export HIPCHAT_TOKEN=fake
     export HIPCHAT_ROOM=fake
-    export GIT_KEY_PATH=$HOME/.ssh/id_rsa
     export MASTER_FQDN=172.17.0.1  # (*) should work on most installations
     export WORKER_SUFFIX=dev_eve  # (*) customize with username for example
     export GIT_REPO=$HOME/project_source  # (*) local path to project to build
@@ -64,7 +63,8 @@ env postactivate script for example); important items are marked with a *
     unset RAX_PWD  # same (rackspace password, not API_KEY)
     unset OPENSTACK_SSH_KEY  # same, defaults to ~/.ssh/id_rsa
     unset OPENSTACK_KEY_NAME  # same, defaults to eve-key-pair
-    export GITHOST_PUB_KEY=$(ssh-keyscan bitbucket.org)
+    unset CLOUD_INIT_SCRIPT # path to script to execute on vm workers init
+
 
 Create and start buildbot:
 
@@ -119,7 +119,6 @@ You can tailor the way tests are run by setting the following env variables:
     RAX_LOGIN
     RAX_PWD
     OPENSTACK_SSH_KEY
-    GITHOST_PUB_KEY
 
 Run tests with:
 

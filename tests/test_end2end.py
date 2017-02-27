@@ -190,7 +190,6 @@ class Test(unittest.TestCase):  # pylint: disable=too-many-public-methods
 
         It will wait until it is up and running.
         """
-        os.environ['GIT_KEY_PATH'] = os.path.expanduser('~/.ssh/id_rsa')
         os.environ['MASTER_FQDN'] = self.master_fqdn
         os.environ['MASTER_NAME'] = 'master%d' % master_id
         os.environ['WORKER_SUFFIX'] = 'test-eve%d' % master_id
