@@ -9,7 +9,7 @@ ST                     = IDF
 L                      = Paris
 O                      = Scality
 OU                     = Release Engineering
-CN                     = github.org
+CN                     = github.com
 emailAddress           = releng@scality.com
 
 [ req_attributes ]
