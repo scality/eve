@@ -33,13 +33,6 @@ stages:
       - ShellCommand:
           name: run static analysis tools
           command: tox --sitepackages -e flake8,prospector,pylint
-      - ShellCommand:
-          name: run pylint on {frontend,backend}.master.cfg
-          command: tox --sitepackages -e pylint -- eve/master/*.master.cfg
-          decodeRC:
-            0: 0 # SUCCESS
-            1: 1 # WARNINGS
-          warnOnWarnings: True
   system tests:
     worker:
       type: openstack
