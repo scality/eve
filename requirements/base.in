@@ -4,7 +4,7 @@ autobahn
 buildbot-worker
 buildbot-www
 buildbot[tls]
-MySQL-python
+MySQL-python # Used in production with a mysql database
 netifaces
 python-dateutil
 python-novaclient # 2.35.0
@@ -12,6 +12,7 @@ PyYAML
 raven
 requests[security]
 retrying
+treq # Used by buildbot for HipchatStatus and BitbucketStatus
 Twisted < 17
 xunitparser
 zope.interface
