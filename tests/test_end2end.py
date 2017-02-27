@@ -835,6 +835,12 @@ class Test(unittest.TestCase):  # pylint: disable=too-many-public-methods
         """
         assert os.path.isdir('/tmp/.eve_test_data/local')
 
+    def test_docker_build_label(self):
+        """Test label on docker image exists."""
+        self.commit_git('docker_build_label')
+        self.notify_webhook()
+        self.get_build_result(expected_result='success')
+
 
 class TestServices(unittest.TestCase):
     # pylint: disable=too-many-public-methods

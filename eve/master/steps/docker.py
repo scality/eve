@@ -1,6 +1,5 @@
 """All docker build related steps."""
 
-import buildbot
 from buildbot.locks import MasterLock
 from buildbot.process.results import FAILURE
 from buildbot.steps.master import MasterShellCommand
@@ -12,17 +11,33 @@ DOCKER_BUILD_LOCK = MasterLock("docker_build")
 class DockerBuild(MasterShellCommand):
     """Step to build a docker image on eve docker host."""
 
-    def __init__(self, image, dockerfile=None, is_retry=False, **kwargs):
+    def __init__(self, image, dockerfile=None, is_retry=False,
+                 labels=None, build_args=None, **kwargs):
         self.image = image
         self.is_retry = is_retry
         kwargs.setdefault('locks', []).append(
-            DOCKER_BUILD_LOCK.access('exclusive'))
+            DOCKER_BUILD_LOCK.access('exclusive')
+        )
 
         command = [
             "docker", "build",
-            "--build-arg", "BUILDBOT_VERSION={0}".format(buildbot.version),
             "--tag", image
         ]
+
+        if labels:
+            for label_name, label_value in labels.iteritems():
+                command += ["--label", "{0}={1}".format(
+                    label_name, label_value
+                )]
+
+        if build_args:
+            for build_arg_name, build_arg_value in build_args.iteritems():
+                command += [
+                    "--build-arg", "{0}={1}".format(
+                        build_arg_name,
+                        build_arg_value
+                    )
+                ]
 
         if dockerfile is not None:
             command += ["--file", dockerfile]
