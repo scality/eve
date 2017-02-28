@@ -63,13 +63,12 @@ class EveDockerLatentWorker(AbstractLatentWorker):
             '--detach',
         ]
 
-        link = None
+        link = 'bitbucket.org'  # Default value to support legacy behaviour
         if project.startswith('bitbucket_'):
             link = 'bitbucket.org'
         if project.startswith('github_'):
             link = 'github.com'
-        if link:
-            cmd.extend(['--link', link])
+        cmd.extend(['--link', link])
 
         for volume in volumes:
             if isinstance(volume, dict):
