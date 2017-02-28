@@ -9,7 +9,7 @@ netifaces
 python-dateutil
 python-novaclient # 2.35.0
 PyYAML
-raven < 6 # Our code is not compatible with the version 6 (see EVE-350)
+raven
 requests[security]
 retrying
 treq # Used by buildbot for HipchatStatus and BitbucketStatus
