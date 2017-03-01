@@ -5,7 +5,6 @@ import time
 from os import environ
 from subprocess import STDOUT, CalledProcessError, check_output
 
-import buildbot
 from buildbot.process.properties import Property
 from buildbot.worker import AbstractWorker
 from buildbot.worker.openstack import OpenStackLatentWorker
@@ -177,7 +176,7 @@ class EveOpenStackLatentWorker(OpenStackLatentWorker):
         self.scp(init_script, '/tmp/worker_init.sh')
         self.ssh(' && '.join([
             'chmod u+x /tmp/worker_init.sh',
-            '/tmp/worker_init.sh {0}'.format(buildbot.version)
+            '/tmp/worker_init.sh 0.9.3'
         ]))
 
         if self.cloud_init:
