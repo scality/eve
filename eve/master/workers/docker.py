@@ -10,6 +10,7 @@ from buildbot.process.properties import Property
 from buildbot.worker.latent import AbstractLatentWorker
 from twisted.internet import defer, threads
 from twisted.logger import Logger
+from twisted.python import log
 
 
 class EveDockerLatentWorker(AbstractLatentWorker):
@@ -97,17 +98,29 @@ class EveDockerLatentWorker(AbstractLatentWorker):
 
     def _thd_stop_instance(self, instance):
         self.logger.debug('Stopping container %s...' % instance)
-        mounts = loads(self.docker_invoke(
+
+        mounts_content = self.docker_invoke(
             "inspect",
             "--format='{{ json .Mounts }}'",
-            instance)) or {}
+            instance
+        )
+
+        try:
+            mounts = loads(mounts_content)
+        except (TypeError, ValueError) as exc:
+            log.msg("Output: %r" % mounts_content)
+            log.err(exc, "Error: Unable to parse JSON content"
+                    " from docker inspect command")
+            mounts = None
+
         self.docker_invoke('kill', instance)
         self.docker_invoke('wait', instance)
         self.docker_invoke('rm', '--volumes', instance)
-        for mount in mounts:
-            mount_name = mount.get('Name', '')
-            if mount_name.startswith('AUTODELETE_'):
-                self.docker_invoke('volume', 'rm', mount_name)
+        if mounts:
+            for mount in mounts:
+                mount_name = mount.get('Name', '')
+                if mount_name.startswith('AUTODELETE_'):
+                    self.docker_invoke('volume', 'rm', mount_name)
         self.logger.debug('Container %s stopped successfully.' % instance)
 
     def docker_invoke(self, *args):
