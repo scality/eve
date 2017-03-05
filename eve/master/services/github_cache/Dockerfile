@@ -44,9 +44,9 @@ RUN echo 'ForceCommand /usr/bin/flock -w 120 /var/lock/github_cache.lock -c /hom
 RUN chown -R git:git /home/git
 USER git
 RUN mkdir /home/git/scality/
-VOLUME /home/git/scality/
 WORKDIR /home/git/scality
 RUN git init --bare mock.git
+VOLUME /home/git/scality/
 
 USER root
 CMD /root/gitmirror_init.sh && tail -f /dev/null
