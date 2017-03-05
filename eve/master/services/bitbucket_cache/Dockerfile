@@ -45,6 +45,7 @@ RUN echo 'ForceCommand /usr/bin/flock -w 120 /var/lock/bitbucket_cache.lock -c /
 RUN chown -R git:git /home/git
 USER git
 RUN mkdir /home/git/scality/
+VOLUME /home/git/scality/
 WORKDIR /home/git/scality
 RUN git init --bare mock.git
 
