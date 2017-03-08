@@ -101,7 +101,7 @@ class EveDockerLatentWorker(AbstractLatentWorker):
 
         mounts_content = self.docker_invoke(
             "inspect",
-            "--format='{{ json .Mounts }}'",
+            "--format", "{{ json .Mounts }}",
             instance
         )
 
