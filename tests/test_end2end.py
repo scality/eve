@@ -15,10 +15,15 @@ import requests
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 from buildbot.process.results import FAILURE, SUCCESS, WARNINGS
+import yaml
 
 from tests.cmd import cmd
+from tests.codecov_io_server import CodecovIOMockServer
 
 from . import buildbot_api_client
+
+__dirpath__ = os.path.dirname(__file__)
+"""Path of this directory (used to locate file in a docker context)."""
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(format='[%(levelname)s] %(message)s', level=logging.INFO)
@@ -99,7 +104,7 @@ def backend_local_job(jobnames):
     return decorate
 
 
-class Test(unittest.TestCase):  # pylint: disable=too-many-public-methods
+class BaseTest(unittest.TestCase):  # pylint: disable=too-many-public-methods
     """Base class for test classes
 
     - Sets-up bitbucket git repo
@@ -405,6 +410,8 @@ class Test(unittest.TestCase):  # pylint: disable=too-many-public-methods
         assert result_codes[build['results']] == expected_result
         return build
 
+
+class Test(BaseTest):  # pylint: disable=too-many-public-methods
     def test_git_poll_empty_yaml(self):
         """Tests builds triggered by git polling.
 
@@ -840,6 +847,161 @@ class Test(unittest.TestCase):  # pylint: disable=too-many-public-methods
         self.commit_git('docker_build_label')
         self.notify_webhook()
         self.get_build_result(expected_result='success')
+
+
+class TestPublishCodeCoverage(BaseTest):
+    """Test code coverage report publication step.
+
+    ``PublishCodeCoverage`` is the generic buildbot step to use to
+    publish several code coverage reports to an external service.
+    At this moment, only ``codecov.io`` service is supported.
+
+    These tests are two operating modes:
+
+    - The first is to use an internal mock ``codecov.io`` server.
+    - The second use the real ``codecov.io`` service.
+
+    By default, in the automatic tests, we use the mock ``codecov.io``
+    server to avoid being dependent external services that could not
+    be available in the future.
+
+    To use the real ``codecov.io`` server, we need to define the
+    environment variable **CODECOV_IO_UPLOAD_TOKEN** which is the
+    ``codecov.io`` upload token of the repository given in
+    *yaml/generate_coverage_report/main.yml* YAML file.
+    """
+    def __init__(self, *args, **kwargs):
+        super(TestPublishCodeCoverage, self).__init__(*args, **kwargs)
+
+        self.codecov_io_server = None
+
+    def setUp(self):
+        """Instantiate a ``codecov.io`` mock HTTP server if needed.
+
+        We define the **CODECOV_IO_BASE_URL** environment variable to
+        communicate with our mock HTTP server rather than the real
+        ``codecov.io`` server (see
+        `~master/steps/publish_coverage_report`).
+
+        We define the **CODECOV_IO_UPLOAD_TOKEN** environment variable
+        to avoid to skip the step.  It's the default behaviour if we
+        don't give this variable to Eve.
+        """
+        if not os.environ.get('CODECOV_IO_UPLOAD_TOKEN'):
+            self.codecov_io_server = CodecovIOMockServer('127.0.0.1')
+            self.codecov_io_server.start()
+
+            os.environ.update({
+                'CODECOV_IO_BASE_URL': self.codecov_io_server.url,
+                'CODECOV_IO_UPLOAD_TOKEN': 'FAKE_TOKEN',
+            })
+
+        super(TestPublishCodeCoverage, self).setUp()
+
+    def tearDown(self):
+        """Stop the ``codecov.io`` mock HTTP server if needed.
+
+        And restore old environment variables.
+        """
+        super(TestPublishCodeCoverage, self).tearDown()
+
+        if self.codecov_io_server:
+            self.codecov_io_server.stop()
+            self.codecov_io_server = None
+
+        for varname_suffix in ['BASE_URL', 'UPLOAD_TOKEN']:
+            varname = 'CODECOV_IO_{0}'.format(varname_suffix)
+            if varname in os.environ:
+                del os.environ[varname]
+
+    def _get_publish_codecov_build(self, builder_name="docker-master"):
+        """Search the build of the code coverage report publication step.
+
+        :args builder_name: Root builder name rather than bootstrap.
+        :returns None: If we don't find the potential build.
+        """
+        builders = self.api.get(
+            'builders?name__contains={0}'.format(builder_name)
+        )
+        for builder in builders['builders']:
+            builds_url = "builders/{0}/builds".format(builder['builderid'])
+            builds = self.api.get(builds_url)
+            for build in builds['builds']:
+                steps = self.api.get(
+                    "{0}/{1}/steps?name__contains=coverage".format(
+                        builds_url, build['number']
+                    )
+                )
+                if steps:
+                    return build
+        return None
+
+    def test_publication_success(self, name='generate_coverage_report'):
+        """Test PublishCoverageReport success.
+
+        :args name: Name of the directory which contains the
+                      ``main.yml`` to commit.
+
+        If we use the mock HTTP server, we ensure that we execute the
+        requests with the correct query parameters and headers, in
+        accordance with the ``codecov.io`` API (see
+        https://docs.codecov.io/v4.3.0/reference#upload).
+        """
+        self.commit_git(name)
+        self.notify_webhook()
+        self.get_build_result(expected_result='success')
+
+        if not self.codecov_io_server:
+            return
+
+        build = self._get_publish_codecov_build()
+        assert build is not None, \
+            'Unable to get the build which publish the code coverage report'
+
+        report_filepath = os.path.join(
+            __dirpath__, 'contexts', 'coverage-reports',
+            'reports', 'coverage.xml'
+        )
+
+        yaml_filepath = os.path.join(__dirpath__, 'yaml', name, 'main.yml')
+        with open(yaml_filepath, 'r') as yaml_file:
+            yaml_content = yaml.load(yaml_file)
+
+        try:
+            steps = yaml_content['stages']['coverage_tests']['steps']
+            publish_args = steps[1]['PublishCoverageReport']
+        except (TypeError, KeyError):
+            raise AssertionError(
+                'Unable to get parameters of the PublishCoverageReport step'
+            )
+
+        self.codecov_io_server.assert_request_received_with((
+            'POST', '/upload/v4', {
+                'commit': publish_args['revision'],
+                'token': 'FAKE_TOKEN',
+                'build': 1,
+                'build_url': '{0}#builders/{1}/builds/{2}'.format(
+                    self.url, build['builderid'], build['number']
+                ),
+                'service': 'buildbot',
+                'branch': publish_args['branch'],
+                'name': publish_args['uploadName'],
+                'slug': publish_args['repository'],
+            }, {
+                'Accept': 'text/plain',
+            }
+        ), (
+            'PUT', '/s3/fake_report.txt', {
+                'AWSAccessKeyId': 'FAKEAWSACCESSKID',
+                'Expires': str(self.codecov_io_server.expires),
+                'Signature': 'FAKESIGNATURE',
+            }, {
+                'Content-Length': str(os.path.getsize(report_filepath)),
+                'Content-Type': 'text/plain',
+                'x-amz-acl': 'public-read',
+                'x-amz-storage-class': 'REDUCED_REDUNDANCY',
+            }
+        ))
 
 
 class TestServices(unittest.TestCase):

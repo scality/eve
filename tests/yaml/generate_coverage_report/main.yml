@@ -1,0 +1,24 @@
+branches:
+  default:
+    stage: "coverage_tests"
+
+stages:
+  coverage_tests:
+    worker:
+      type: "docker"
+      path: "eve/coverage-reports"
+    steps:
+      - ShellCommand:
+          name: "patch coverage report (timestamp)"
+          command: >
+            sed -ri "s/XXXXXXXXXXXXX/$(date +%s)000/" \
+              /tmp/reports/coverage.xml
+          haltOnFailure: True
+          hideStepIf: True
+      - PublishCoverageReport:
+          repository: "scality/test_codecov_io"
+          revision: "98f9379054719da6e7b5fd537b5a8e0ede096968"
+          filepaths:
+            - "/tmp/reports/coverage.xml"
+          branch: "master"
+          uploadName: "ucheck"

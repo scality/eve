@@ -14,6 +14,7 @@ from twisted.logger import Logger
 
 from steps.artifacts import Upload  # pylint: disable=relative-import
 from steps.junit import JUnitShellCommand  # noqa: F401, pylint: disable=relative-import,unused-import
+from steps.publish_coverage_report import PublishCoverageReport  # noqa: F401, pylint: disable=relative-import,unused-import
 
 
 # store 'secret' environment variables in a separate dictionary

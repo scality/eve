@@ -12,7 +12,8 @@ PyYAML
 raven
 requests[security]
 retrying
-treq # Used by buildbot for HipchatStatus and BitbucketStatus
+six
+treq # Used by buildbot for the HTTP service
 Twisted < 17
 xunitparser
 zope.interface
