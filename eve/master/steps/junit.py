@@ -38,7 +38,7 @@ class JUnitShellCommand(ShellCommand, CommandMixin, CompositeStepMixin):
     total = 0
     first_failure = None
     first_error = None
-    name = "junit_shell"
+    name = 'junit_shell'
     renderables = ['report_dir']
 
     def __init__(self, report_dir=None, *args, **kwargs):
@@ -108,15 +108,15 @@ class JUnitShellCommand(ShellCommand, CommandMixin, CompositeStepMixin):
 
     def getResultSummary(self):  # flake8: noqa
         if not self.total:
-            return {u"step": u"no test results found"}
+            return {u'step': u'no test results found'}
 
         if self.first_error:
-            return {u"step": u"ERROR: %s" % self.first_error}
+            return {u'step': u'ERROR: %s' % self.first_error}
 
         if self.first_failure:
-            return {u"step": u"FAIL: %s" % self.first_failure}
+            return {u'step': u'FAIL: %s' % self.first_failure}
 
-        return {u"step": u"T:%d E:%d F:%d S:%d" % (
+        return {u'step': u'T:%d E:%d F:%d S:%d' % (
             self.total,
             self.errors,
             self.failures,

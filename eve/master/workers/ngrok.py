@@ -71,7 +71,7 @@ class Ngrok(object):
                 continue
             data = json.loads(stdout)
             if 'resp' in data:
-                match = self.URL_REGEXP.search(data["resp"])
+                match = self.URL_REGEXP.search(data['resp'])
                 if match:
                     self._proc = proc
                     self._state = (match.group(1), match.group(2))

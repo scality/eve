@@ -2,7 +2,6 @@ astroid==1.4.9
 backports.functools-lru-cache==1.3
 configparser==3.5.0
 dodgy==0.1.9
-enum34==1.1.6
 flake8==3.3.0
 isort==4.2.5
 lazy-object-proxy==1.2.2
@@ -18,8 +17,6 @@ pylint-common==0.2.2
 pylint-django==0.7.2
 pylint-flask==0.5
 pylint-plugin-utils==0.2.4
-PyYAML==3.12
 requirements-detector==0.5.2
 setoptconf==0.2.0
-six==1.10.0
-wrapt==1.10.8
+packaging==16.8

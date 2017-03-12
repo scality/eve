@@ -100,17 +100,17 @@ class EveDockerLatentWorker(AbstractLatentWorker):
         self.logger.debug('Stopping container %s...' % instance)
 
         mounts_content = self.docker_invoke(
-            "inspect",
-            "--format", "{{ json .Mounts }}",
+            'inspect',
+            '--format', '{{ json .Mounts }}',
             instance
         )
 
         try:
             mounts = loads(mounts_content)
         except (TypeError, ValueError) as exc:
-            log.msg("Output: %r" % mounts_content)
-            log.err(exc, "Error: Unable to parse JSON content"
-                    " from docker inspect command")
+            log.msg('Output: %r' % mounts_content)
+            log.err(exc, 'Error: Unable to parse JSON content'
+                    ' from docker inspect command')
             mounts = None
 
         self.docker_invoke('kill', instance)

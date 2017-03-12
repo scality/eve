@@ -5,7 +5,7 @@ from buildbot.process.results import FAILURE
 from buildbot.steps.master import MasterShellCommand
 from twisted.internet import defer
 
-DOCKER_BUILD_LOCK = MasterLock("docker_build")
+DOCKER_BUILD_LOCK = MasterLock('docker_build')
 
 
 class DockerBuild(MasterShellCommand):
@@ -20,32 +20,32 @@ class DockerBuild(MasterShellCommand):
         )
 
         command = [
-            "docker", "build",
-            "--tag", image
+            'docker', 'build',
+            '--tag', image
         ]
 
         if labels:
             for label_name, label_value in labels.iteritems():
-                command += ["--label", "{0}={1}".format(
+                command += ['--label', '{0}={1}'.format(
                     label_name, label_value
                 )]
 
         if build_args:
             for build_arg_name, build_arg_value in build_args.iteritems():
                 command += [
-                    "--build-arg", "{0}={1}".format(
+                    '--build-arg', '{0}={1}'.format(
                         build_arg_name,
                         build_arg_value
                     )
                 ]
 
         if dockerfile is not None:
-            command += ["--file", dockerfile]
+            command += ['--file', dockerfile]
 
         if is_retry:
-            command += ["--no-cache"]
+            command += ['--no-cache']
 
-        command += ["."]
+        command += ['.']
 
         super(DockerBuild, self).__init__(command, **kwargs)
 

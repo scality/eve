@@ -11,9 +11,8 @@ import socket
 import tempfile
 import time
 import unittest
-import requests
-from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
+import requests
 from buildbot.process.results import FAILURE, SUCCESS, WARNINGS
 
 from tests.cmd import cmd
@@ -24,7 +23,8 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(format='[%(levelname)s] %(message)s', level=logging.INFO)
 logging.getLogger('requests').setLevel(logging.WARNING)
 
-requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+requests.packages.urllib3.disable_warnings(
+    requests.packages.urllib3.exceptions.InsecureRequestWarning)
 
 BASE_TRY_PORT = 7990
 BASE_HTTP_PORT = 8990
@@ -183,7 +183,7 @@ class Test(unittest.TestCase):  # pylint: disable=too-many-public-methods
         os.environ['PB_PORT'] = str(BASE_PB_PORT + master_id)
         os.environ['MAX_LOCAL_WORKERS'] = '1'
         self.setup_eve_master(
-            master_id, master_type='frontend', local_jobs=local_jobs)
+            master_id, master_mode='frontend', local_jobs=local_jobs)
 
     def setup_eve_master_backend(self, master_id, local_jobs=None):
         """Spawns a EVE master backend.
@@ -197,14 +197,14 @@ class Test(unittest.TestCase):  # pylint: disable=too-many-public-methods
         os.environ['PB_PORT'] = str(BASE_PB_PORT + master_id)
         os.environ['MAX_LOCAL_WORKERS'] = '1'
         self.setup_eve_master(
-            master_id, master_type='backend', local_jobs=local_jobs)
+            master_id, master_mode='backend', local_jobs=local_jobs)
 
-    def setup_eve_master(self, master_id, master_type, local_jobs=None):
+    def setup_eve_master(self, master_id, master_mode, local_jobs=None):
         """Spawns a EVE master backend.
 
         It will wait until it is up and running.
         """
-
+        os.environ['MASTER_MODE'] = master_mode
         sql_path = os.path.join(self.test_dir, 'state.sqlite')
         os.environ['DB_URL'] = 'sqlite:///' + sql_path
 
@@ -217,7 +217,6 @@ class Test(unittest.TestCase):  # pylint: disable=too-many-public-methods
         cmd('mkdir -p %s' % masterdir, ignore_exception=True)
         os.chdir(masterdir)
         cmd('cp -r %s/* .' % master_cfg_dir)
-        cmd('mv %s.master.cfg master.cfg' % master_type)
 
         self.setup_local_job(masterdir, local_jobs)
 

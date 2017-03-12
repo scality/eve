@@ -17,6 +17,7 @@ class DenyRebuildIntermediateBuild(bb_endpointmatchers.EndpointMatcherBase):
     Here we need to deny the endpoint for all roles if the build is an
     intermediate build of the given builder.
     """
+
     def __init__(self, root_builder_name, **kwargs):
         """`DenyRebuildBuildEndpointMatcher` constructor.
 
@@ -63,6 +64,6 @@ class DenyRebuildIntermediateBuild(bb_endpointmatchers.EndpointMatcherBase):
             raise bb_authz.Forbidden(
                 'This builder is not allowed to be rebuilt.'
                 ' Please select the "{0}" builder.'.format(
-                    builder["name"]
+                    builder['name']
                 )
             )

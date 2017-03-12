@@ -144,7 +144,7 @@ class BaseBuildStatusPush(HttpStatusPushBase):
 
 class HipChatBuildStatusPush(BaseBuildStatusPush):
     """Send build result to HipChat build status API."""
-    name = "HipChatBuildStatusPush"
+    name = 'HipChatBuildStatusPush'
     logger = Logger('eve.steps.HipChatBuildStatusPush')
     attributes = []
     COLOR_STYLE_CORRESP = {
@@ -180,8 +180,8 @@ class HipChatBuildStatusPush(BaseBuildStatusPush):
         """Send build status to HipChat."""
         if not HIPCHAT_ROOM or not HIPCHAT_TOKEN:
             self.logger.info(
-                "Hipchat status not sent"
-                " (HIPCHAT_* variables not defined))"
+                'Hipchat status not sent'
+                ' (HIPCHAT_* variables not defined))'
             )
             return
 
@@ -210,7 +210,7 @@ class HipChatBuildStatusPush(BaseBuildStatusPush):
 
         http_service = yield HTTPClientService.getService(self.master, url)
         response = yield http_service.post('', json=data, params={
-            "auth_token": HIPCHAT_TOKEN
+            'auth_token': HIPCHAT_TOKEN
         })
 
         if response.status_code != 204:
@@ -219,12 +219,12 @@ class HipChatBuildStatusPush(BaseBuildStatusPush):
                 "{url}\nRequest:\n{request}\nResponse:\n{response.content}".
                 format(request=data, response=response, url=url))
 
-        self.logger.info("HipChat status sent")
+        self.logger.info('HipChat status sent')
 
 
 class BitbucketBuildStatusPush(BaseBuildStatusPush):
     """Send build result to bitbucket build status API."""
-    name = "BitbucketBuildStatusPush"
+    name = 'BitbucketBuildStatusPush'
     description_suffix = ''
     logger = Logger('eve.steps.BitbucketBuildStatusPush')
     BITBUCKET_STATUS_CORRESP = {
@@ -265,15 +265,15 @@ class BitbucketBuildStatusPush(BaseBuildStatusPush):
         data = {
             'state': self.BITBUCKET_STATUS_CORRESP[result],
             'key': key,
-            "name": summary,
-            "url": build['url'],
-            "description": description + self.description_suffix
+            'name': summary,
+            'url': build['url'],
+            'description': description + self.description_suffix
         }
         url = self.forge_url(build)
 
         if 'eve.devsca.com' not in EXTERNAL_URL:
-            self.logger.info("Bitbucket status not sent (not in prod) "
-                             "(%s:%s on %s)" % (
+            self.logger.info('Bitbucket status not sent (not in prod) '
+                             '(%s:%s on %s)' % (
                                  self.BITBUCKET_STATUS_CORRESP[result],
                                  key,
                                  url))
@@ -288,7 +288,7 @@ class BitbucketBuildStatusPush(BaseBuildStatusPush):
                 "{response.code}: unable to send status to Bitbucket: "
                 "{url}\nRequest:\n{request}\nResponse:\n{response.content}".
                 format(request=data, response=response, url=url))
-        self.logger.info("Bitbucket status sent (%s:%s on %s)" % (
+        self.logger.info('Bitbucket status sent (%s:%s on %s)' % (
             self.BITBUCKET_STATUS_CORRESP[result],
             key,
             url))

@@ -38,7 +38,7 @@ env postactivate script for example); important items are marked with a *
     export EVE_GITHOST_PWD=test
     export OAUTH2_CLIENT_ID=test
     export OAUTH2_CLIENT_SECRET=test
-    export PROJECT_NAME=dev  # (*) customize with username for example
+    export PROJECT_NAME=bitbucket_scality_reponame  # (*) customize with username for example
     export PROJECT_URL=foo
     export TRY_PWD=foo
     export TRY_PORT=7999

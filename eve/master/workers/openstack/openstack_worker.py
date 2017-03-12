@@ -5,16 +5,16 @@ import time
 from os import environ
 from subprocess import STDOUT, CalledProcessError, check_output
 
+import novaclient
 from buildbot.process.properties import Property
 from buildbot.worker import AbstractWorker
 from buildbot.worker.openstack import OpenStackLatentWorker
-import novaclient
 from retrying import retry
 from twisted.internet import defer, threads
 from twisted.logger import Logger
 from twisted.python import log
 
-from . import ngrok
+from workers import ngrok
 
 
 class EveOpenStackLatentWorker(OpenStackLatentWorker):
