@@ -213,9 +213,9 @@ class HipChatBuildStatusPush(BaseBuildStatusPush):
             "auth_token": HIPCHAT_TOKEN
         })
 
-        if response.status_code != 204:
+        if response.code != 204:
             raise Exception(
-                "{response.status_code}: unable to send status to HipChat: "
+                "{response.code}: unable to send status to HipChat: "
                 "{url}\nRequest:\n{request}\nResponse:\n{response.content}".
                 format(request=data, response=response, url=url))
 
