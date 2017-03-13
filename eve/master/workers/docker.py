@@ -62,8 +62,8 @@ class EveDockerLatentWorker(AbstractLatentWorker):
             '--env', 'ARTIFACTS_PREFIX=%s' % environ.get('ARTIFACTS_PREFIX',
                                                          'staging-'),
             '--detach',
-            '--memory=4G',
-            '--cpus=4',
+            '--memory=%s' % environ.get('BUILD_CONTAINER_MAX_MEMORY', '4G'),
+            '--cpus=%s' % environ.get('BUILD_CONTAINER_MAX_CPU', '4'),
         ]
 
         link = 'bitbucket.org'  # Default value to support legacy behaviour
