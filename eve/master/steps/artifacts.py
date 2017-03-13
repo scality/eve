@@ -6,6 +6,7 @@ from collections import defaultdict
 
 from buildbot.plugins import util
 from buildbot.process import logobserver
+from buildbot.process.properties import Interpolate
 from buildbot.process.results import FAILURE, SKIPPED, SUCCESS
 from buildbot.steps.shell import SetPropertyFromCommand, ShellCommand
 from twisted.internet import defer, reactor
@@ -26,6 +27,38 @@ CURL_CMD = """curl -s -X POST -H "Content-type: application/json" \
         } \
     }'
 """
+
+
+class GetArtifactsFromStage(SetPropertyFromCommand):
+    """Get artifacts from another stage and store it in a property."""
+
+    def __init__(self, stage, **kwargs):
+        assert 'command' not in kwargs
+        name = kwargs.pop('name', 'Get artifacts name from another stage')
+        SetPropertyFromCommand.__init__(
+            self,
+            name=name,
+            command=Interpolate('curl -I '
+                                '%(prop:artifacts_local_reverse_proxy)s'
+                                'last_success/%(prop:artifacts_base_name)s'
+                                '.' + stage),
+            **kwargs
+        )
+
+    def commandComplete(self, cmd):  # NOQA flake8 to ignore camelCase
+        if cmd.didFail():
+            return
+
+        # parse the response headers to get the container from redirection
+        lines = self.observer.getStdout().splitlines()
+        for line in lines:
+            reg = re.search('^Location: (https?://[^/]+|)/builds/(.*)$', line)
+            if reg:
+                artifacts_name = reg.group(2)
+                self.setProperty(self.property, str(artifacts_name),
+                                 "GetArtifactsFromStage")
+                self.property_changes[self.property] = artifacts_name
+                break
 
 
 class CloudfilesAuthenticate(SetPropertyFromCommand):

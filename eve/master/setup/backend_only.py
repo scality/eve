@@ -144,8 +144,8 @@ def setup_backend_only(conf, master_name, max_local_workers, worker_suffix,
     # #########################
     # Reporters send the build status when finished
     conf['services'] = services.setup_reporters(
-        project_name, bootstrap_builder_name, docker_builder_name,
-        openstack_builder_name)
+        project_name, bootstrap_builder_name,
+        docker_builder_name, openstack_builder_name)
 
     # #########################
     # Collapsing requests

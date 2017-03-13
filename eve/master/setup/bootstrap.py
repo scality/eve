@@ -106,27 +106,37 @@ def setup_bootstrap(git_repo, project_name,
         hideStepIf=lambda results, s: results == SUCCESS,
         property='product_version'))
     bootstrap_factory.addStep(SetPropertyFromCommand(
-        name='set the artifacts url',
+        name='set the artifacts base name',
         command=Interpolate('echo %(prop:git_host)s'
                             ':%(prop:git_owner)s'
                             ':%(prop:git_slug)s'
                             ':%(prop:artifacts_prefix)s'
                             '%(prop:product_version)s'
                             '.r%(prop:commit_timestamp)s'
-                            '.%(prop:commit_short_revision)s'
+                            '.%(prop:commit_short_revision)s'),
+        hideStepIf=lambda results, s: results == SUCCESS,
+        property='artifacts_base_name'))
+    bootstrap_factory.addStep(SetPropertyFromCommand(
+        name='set the artifacts name',
+        command=Interpolate('echo %(prop:artifacts_base_name)s'
                             '.%(prop:pipeline)s'
                             '.%(prop:b4nb)s'),
         hideStepIf=lambda results, s: results == SUCCESS,
         property='artifacts_name'))
+    bootstrap_factory.addStep(SetProperty(
+        name='set the artifacts local reverse proxy',
+        property='artifacts_local_reverse_proxy',
+        hideStepIf=lambda results, s: results == SUCCESS,
+        value='http://' + docker_host_ip + ':1080/'))
     bootstrap_factory.addStep(SetPropertyFromCommand(
-        name='set the artifacts name',
+        name='set the artifacts private url',
         command=Interpolate('echo http://' + docker_host_ip +
                             ':1080/builds/'
                             '%(prop:artifacts_name)s'),
         hideStepIf=lambda results, s: results == SUCCESS,
         property='artifacts_private_url'))
     bootstrap_factory.addStep(SetPropertyFromCommand(
-        name='set the artifacts name',
+        name='set the artifacts public url',
         command=Interpolate('echo ' + artifacts_url +
                             '/%(prop:artifacts_name)s'),
         hideStepIf=lambda results, s: results == SUCCESS,

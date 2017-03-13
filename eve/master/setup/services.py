@@ -6,7 +6,8 @@ from reporters.base import BitbucketBuildStatusPush, HipChatBuildStatusPush
 
 
 # pylint: disable=relative-import
-def setup_reporters(project_name, bootstrap_builder_name, docker_builder_name,
+def setup_reporters(project_name, bootstrap_builder_name,
+                    docker_builder_name,
                     openstack_builder_name):
     reporters = [HipChatBuildStatusPush(builders=[bootstrap_builder_name])]
     if 'github' in project_name:
