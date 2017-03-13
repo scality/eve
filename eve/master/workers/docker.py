@@ -13,6 +13,10 @@ from twisted.logger import Logger
 from twisted.python import log
 
 
+BUILD_CONTAINER_MAX_MEMORY = environ.get('BUILD_CONTAINER_MAX_MEMORY', '4G')
+BUILD_CONTAINER_MAX_CPU = environ.get('BUILD_CONTAINER_MAX_CPU', '4')
+
+
 class EveDockerLatentWorker(AbstractLatentWorker):
     """Improved version of DockerLatentWorker using the docker command line
      client instead of docker-py which was the cause of multiple dead locks
@@ -62,8 +66,8 @@ class EveDockerLatentWorker(AbstractLatentWorker):
             '--env', 'ARTIFACTS_PREFIX=%s' % environ.get('ARTIFACTS_PREFIX',
                                                          'staging-'),
             '--detach',
-            '--memory=%s' % environ.get('BUILD_CONTAINER_MAX_MEMORY', '4G'),
-            '--cpus=%s' % environ.get('BUILD_CONTAINER_MAX_CPU', '4'),
+            '--memory=%s' % BUILD_CONTAINER_MAX_MEMORY,
+            '--cpus=%s' % BUILD_CONTAINER_MAX_CPU,
         ]
 
         link = 'bitbucket.org'  # Default value to support legacy behaviour
