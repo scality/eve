@@ -27,30 +27,34 @@ CURL_CMD = """curl -s -X POST -H "Content-type: application/json" \
 """
 
 
-class GetArtifactsFromPipeline(SetPropertyFromCommand):
-    """Get artifacts from another pipeline and store it in a property."""
+class GetArtifactsFromStage(SetPropertyFromCommand):
+    """Get artifacts from another stage and store it in a property."""
 
-    def __init__(self, pipeline, **kwargs):
+    def __init__(self, stage, **kwargs):
+        assert 'command' not in kwargs
+        name = kwargs.pop('name', 'Get artifacts name from another stage')
         SetPropertyFromCommand.__init__(
             self,
-            name='Get artifacts name from another pipeline',
+            name=name,
             command=Interpolate('curl -I '
                                 '%(prop:artifacts_local_reverse_proxy)s'
                                 'last_success/%(prop:artifacts_base_name)s'
-                                '.' + pipeline),
+                                '.' + stage),
             **kwargs
         )
 
     def commandComplete(self, cmd):  # NOQA flake8 to ignore camelCase
         if cmd.didFail():
             return
+
+        # parse the response headers to get the container from redirection
         lines = self.observer.getStdout().splitlines()
         for line in lines:
             reg = re.search('^Location: (https?://[^/]+|)/builds/(.*)$', line)
             if reg:
                 artifacts_name = reg.group(2)
                 self.setProperty(self.property, str(artifacts_name),
-                                 "GetArtifactsFromPipeline")
+                                 "GetArtifactsFromStage")
                 self.property_changes[self.property] = artifacts_name
                 break
 
