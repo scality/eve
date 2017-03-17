@@ -37,6 +37,28 @@ BASE_PB_PORT = 9990
 WAMP_PORT = 10990
 
 
+def remove_bitbucket_cache_keys(host, port, filename=None):
+    if filename is None:
+        filename = os.path.expanduser("~/.ssh/known_hosts")
+
+    # Remove previous key, just in case
+    cmd("ssh-keygen -R '[{host}]:{port}' -f {filename}".format(
+        host=host, port=port, filename=filename))
+
+
+def setup_bitbucket_cache_keys(host, port):
+    known_host_file = os.path.expanduser("~/.ssh/known_hosts")
+
+    # Remove previous key, just in case
+    remove_bitbucket_cache_keys(host, port, known_host_file)
+
+    # Add the new ones
+    cmd("ssh-keyscan -p {port} {host} >> {filename}".format(
+        host=host,
+        port=port,
+        filename=known_host_file))
+
+
 def need_env_vars(varnames, reason):
     """Decorator to skip test if environment variables are not passsed."""
     return unittest.skipIf(
@@ -150,10 +172,15 @@ class BaseTest(unittest.TestCase):  # pylint: disable=too-many-public-methods
         self.setup_eve_master_backend(master_id=2)
         self.api = buildbot_api_client.BuildbotDataAPI(self.url)
         self.api.login("eve", "eve")
+
         self.setup_git()
 
     def tearDown(self):
         # Restore extra environment variables
+
+        # Remove keys from known_hosts
+        remove_bitbucket_cache_keys('localhost', 2222)
+
         test_method = getattr(self, self._testMethodName)
         old_environ = getattr(test_method, "__old_eve_environ__", False)
         if old_environ:
@@ -278,10 +305,15 @@ class BaseTest(unittest.TestCase):  # pylint: disable=too-many-public-methods
             cmd('docker rm -f %s' % name, ignore_exception=True)
             self.git_cache_docker_id = cmd('docker run -d -p %s:22 '
                                            '--name %s %s' % (port, name, name))
+
+        # setup bitbucket_cache keys right after the docker run
+        setup_bitbucket_cache_keys('localhost', 2222)
+
         time.sleep(3)  # wait for bitbucket cache service to stabilize
         os.chdir(self.git_dir)
         cmd('git clone '
             'git+ssh://git@localhost:2222/home/git/scality/mock.git .')
+
         cmd('git config user.email "john.doe@example.com"')
         cmd('git config user.name "John Doe"')
         cmd('git config push.default simple')
