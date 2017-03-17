@@ -5,7 +5,7 @@ from buildbot.plugins import util
 from buildbot.scheduler import AnyBranchScheduler
 from buildbot.schedulers.trysched import Try_Userpass
 
-from schedulers.force import EveForceScheduler
+from ..schedulers.force import EveForceScheduler
 
 BOOTSTRAP_SCHEDULER_NAME = 'bootstrap-scheduler'
 

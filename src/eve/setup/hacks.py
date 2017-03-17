@@ -4,9 +4,9 @@ from buildbot.process.buildstep import BuildStep
 from buildbot.process.results import FAILURE
 from twisted.python.reflect import namedModule
 
-from bugfixes.tempsourcestamp import TempSourceStamp
-from utils.interpolate import (hide_interpolatable_name,
-                               render_interpolatable_name)
+from ..bugfixes.tempsourcestamp import TempSourceStamp
+from ..utils.interpolate import (hide_interpolatable_name,
+                                 render_interpolatable_name)
 
 
 def setup_hacks(conf):

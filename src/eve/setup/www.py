@@ -7,9 +7,9 @@ from buildbot.www.authz import Authz
 from buildbot.www.hooks import bitbucket
 from buildbot.www.oauth2 import GoogleAuth
 
-import authz.endpointmatchers as eve_endpointmatchers
-import authz.roles as eve_roles
-import webhooks.bitbucket
+from ..authz.endpointmatchers import DenyRebuildIntermediateBuild
+from ..authz.roles import DeveloperRoleIfConnected
+from ..webhooks.bitbucket import getChanges
 
 
 def setup_www(conf, bootstrap_builder_name):
@@ -17,7 +17,7 @@ def setup_www(conf, bootstrap_builder_name):
     # HACK: Replace default bitbucket webhook
     #########################################
 
-    bitbucket.getChanges = webhooks.bitbucket.getChanges
+    bitbucket.getChanges = getChanges
 
     ###########################
     # Web UI
@@ -45,7 +45,7 @@ def setup_www(conf, bootstrap_builder_name):
 
     conf['www']['authz'] = Authz(
         allowRules=[
-            eve_endpointmatchers.DenyRebuildIntermediateBuild(
+            DenyRebuildIntermediateBuild(
                 bootstrap_builder_name,
                 role='developer'  # This parameter is not necessary,
                                   #   the next rule will deny access.
@@ -53,6 +53,6 @@ def setup_www(conf, bootstrap_builder_name):
             bb_endpointmatchers.AnyEndpointMatcher(role='developer'),
         ],
         roleMatchers=[
-            eve_roles.DeveloperRoleIfConnected()
+            DeveloperRoleIfConnected()
         ]
     )

@@ -9,12 +9,12 @@ from buildbot.process.results import CANCELLED, FAILURE, SUCCESS
 from buildbot.steps.master import SetProperty
 from buildbot.steps.shell import SetPropertyFromCommand
 from buildbot.steps.transfer import FileUpload
+from packaging import version
 from twisted.internet import defer
 from twisted.logger import Logger
 
-from packaging import version
-from steps.trigger_stages import TriggerStages
-from utils.step_factory import step_factory
+from ..steps.trigger_stages import TriggerStages
+from ..utils.step_factory import step_factory
 
 MASTER_START_TIME = time.time()
 

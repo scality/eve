@@ -1,7 +1,7 @@
 from buildbot.process import buildrequest
 
-from bugfixes.tempsourcestamp import TempSourceStamp
-from setup import frontend_schedulers, git_poller, www
+from ..bugfixes.tempsourcestamp import TempSourceStamp
+from ..setup import frontend_schedulers, git_poller, www
 
 
 def setup_frontend_only(conf, git_repo, project_name, bootstrap_builder_name):

@@ -9,9 +9,8 @@ from buildbot.process import logobserver
 from buildbot.process.properties import Interpolate
 from buildbot.process.results import FAILURE, SKIPPED, SUCCESS
 from buildbot.steps.shell import SetPropertyFromCommand, ShellCommand
-from twisted.internet import defer, reactor
-
 from packaging import version
+from twisted.internet import defer, reactor
 
 
 # pylint: disable=attribute-defined-outside-init

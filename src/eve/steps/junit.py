@@ -42,7 +42,7 @@ class JUnitShellCommand(ShellCommand, CommandMixin, CompositeStepMixin):
     renderables = ['report_dir']
 
     def __init__(self, report_dir=None, *args, **kwargs):
-        ShellCommand.__init__(self, *args, **kwargs)
+        super(JUnitShellCommand, self).__init__(*args, **kwargs)
         self.report_dir = report_dir
 
     def fail_or_warning(self, cmd):

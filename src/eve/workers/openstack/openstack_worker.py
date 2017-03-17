@@ -14,7 +14,7 @@ from twisted.internet import defer, threads
 from twisted.logger import Logger
 from twisted.python import log
 
-from workers import ngrok
+from ..ngrok import Ngrok
 
 
 class EveOpenStackLatentWorker(OpenStackLatentWorker):
@@ -34,7 +34,7 @@ class EveOpenStackLatentWorker(OpenStackLatentWorker):
         """Get the address to the eve master reachable by the worker."""
         if not self._reachable_address:
             if 'NGROK' in environ:
-                self._ngrok = ngrok.Ngrok(command=environ['NGROK'])
+                self._ngrok = Ngrok(command=environ['NGROK'])
                 self._reachable_address = self._ngrok.start(
                     'tcp', environ['PB_PORT'], 'us')
             else:

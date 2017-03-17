@@ -18,13 +18,17 @@ from buildbot.plugins import schedulers
 from buildbot.process.factory import BuildFactory
 from buildbot.process.results import SUCCESS
 
-from setup import bootstrap, docker_workers, hacks, openstack_workers, services
-from steps import trigger_stages
-from steps.artifacts import Upload
-from steps.cancel import CancelOldBuild
-from steps.yaml_parser import StepExtractor
-from workers.docker.build_order import DockerBuildOrder
-from workers.openstack.build_order import OpenStackBuildOrder
+from ..steps import trigger_stages
+from ..steps.artifacts import Upload
+from ..steps.cancel import CancelOldBuild
+from ..steps.yaml_parser import StepExtractor
+from ..workers.docker.build_order import DockerBuildOrder
+from ..workers.openstack.build_order import OpenStackBuildOrder
+from .bootstrap import setup_bootstrap
+from .docker_workers import setup_docker_workers
+from .hacks import setup_hacks
+from .openstack_workers import setup_openstack_workers
+from .services import setup_reporters
 
 
 # pylint: disable=too-many-arguments
@@ -73,14 +77,14 @@ def setup_backend_only(conf, master_name, max_local_workers, worker_suffix,
         assert path.isfile(path.join(docker_cert_path, 'cert.pem'))
 
     # Then create MAX_DOCKER_WORKERS Docker Workers that will do the real job
-    _docker_workers = docker_workers.setup_docker_workers(
+    _docker_workers = setup_docker_workers(
         max_docker_workers=max_docker_workers,
         worker_suffix=worker_suffix,
         master_fqdn=master_fqdn)
     conf['workers'].extend(_docker_workers)
 
     # Create MAX_OPENSTACK_WORKERS that will do vm jobs
-    _openstack_workers = openstack_workers.setup_openstack_workers(
+    _openstack_workers = setup_openstack_workers(
         max_openstack_workers=max_openstack_workers,
         worker_suffix=worker_suffix,
         master_fqdn=master_fqdn,
@@ -96,7 +100,7 @@ def setup_backend_only(conf, master_name, max_local_workers, worker_suffix,
     # #########################
     # Bootstrap Sequence: Build step factory
     # #########################
-    conf['builders'].append(bootstrap.setup_bootstrap(
+    conf['builders'].append(setup_bootstrap(
         git_repo=git_repo,
         project_name=project_name,
         bootstrap_builder_name=bootstrap_builder_name,
@@ -143,7 +147,7 @@ def setup_backend_only(conf, master_name, max_local_workers, worker_suffix,
     # Reporters
     # #########################
     # Reporters send the build status when finished
-    conf['services'] = services.setup_reporters(
+    conf['services'] = setup_reporters(
         project_name, bootstrap_builder_name,
         docker_builder_name, openstack_builder_name)
 
@@ -163,4 +167,4 @@ def setup_backend_only(conf, master_name, max_local_workers, worker_suffix,
     # #########################
     # Hacks/Bugfixes
     # #########################
-    hacks.setup_hacks(conf)
+    setup_hacks(conf)

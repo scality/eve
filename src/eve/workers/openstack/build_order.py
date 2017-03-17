@@ -1,4 +1,4 @@
-from utils.build_order import BaseBuildOrder
+from ...utils.build_order import BaseBuildOrder
 
 
 class OpenStackBuildOrder(BaseBuildOrder):

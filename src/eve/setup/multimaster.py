@@ -1,6 +1,6 @@
 from os import environ
 
-from wamp import get_wamp_conf
+from ..wamp import get_wamp_conf
 
 
 def setup_multimaster(conf):

@@ -12,17 +12,21 @@ import tempfile
 import time
 import unittest
 
+import eve
 import requests
 import yaml
 from buildbot.process.results import FAILURE, SUCCESS, WARNINGS
 
-from tests.cmd import cmd
-from tests.codecov_io_server import CodecovIOMockServer
-
-from . import buildbot_api_client
+from .buildbot_api_client import BuildbotDataAPI
+from .cmd import cmd
+from .codecov_io_server import CodecovIOMockServer
 
 __dirpath__ = os.path.dirname(__file__)
 """Path of this directory (used to locate file in a docker context)."""
+
+__evedir__ = os.path.dirname(eve.__file__)
+"""Path to the module of eve (contains services, master config file, ...)."""
+
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(format='[%(levelname)s] %(message)s', level=logging.INFO)
@@ -104,6 +108,30 @@ def backend_local_job(jobnames):
     return decorate
 
 
+def setup_local_job(masterdir, job_files):
+    if job_files is None:
+        # allow creation of directory for ""
+        return
+    local_dirpath = os.path.join(
+        masterdir, os.environ.get('LOCAL_JOBS_DIRPATH', 'local'))
+    shutil.rmtree(local_dirpath, ignore_errors=True)
+    cmd('mkdir -p %s' % local_dirpath)
+    if not job_files:
+        return
+
+    os.chdir(local_dirpath)
+    if isinstance(job_files, list):
+        for job in job_files:
+            job_yaml_file = os.path.join(
+                __dirpath__, 'local', '%s.yml' % job)
+            cmd('cp -r %s .' % job_yaml_file)
+    else:
+        job_yaml_file = os.path.join(
+            __dirpath__, 'local', '%s.yml' % job_files)
+        cmd('cp -r %s .' % job_yaml_file)
+    os.chdir(masterdir)
+
+
 class BaseTest(unittest.TestCase):  # pylint: disable=too-many-public-methods
     """Base class for test classes
 
@@ -132,14 +160,15 @@ class BaseTest(unittest.TestCase):  # pylint: disable=too-many-public-methods
         if self.master_fqdn == 'auto':
             self.master_fqdn = get_master_fqdn()
 
-        self.git_dir = tempfile.mkdtemp(prefix='eve_test_')
-        self.top_dir = os.path.dirname((os.path.dirname(
-            os.path.abspath(__file__))))
-        self.test_dir = os.path.join(os.path.expanduser('~/.eve_test_data'))
+        tmpdir = os.getenv('WORKDIR', '/tmp/eve_tests')
+        self.test_dir = os.path.join(tmpdir, 'test_eve')
         try:
             self.shutdown_eve()
         except OSError:
             pass
+        cmd('mkdir -p %s' % self.test_dir)
+        self.git_dir = tempfile.mkdtemp(
+            prefix=os.path.join(tmpdir, 'eve_repo_'))
         os.environ['GIT_REPO'] = 'git@bitbucket.org:scality/mock.git'
         os.environ['LOCAL_GIT_REPO'] = self.git_dir
         self.url = 'http://%s:%d/' % (self.master_fqdn, BASE_HTTP_PORT)
@@ -148,7 +177,7 @@ class BaseTest(unittest.TestCase):  # pylint: disable=too-many-public-methods
         self.setup_eve_master_frontend(master_id=0, local_jobs=frontend_jobs)
         self.setup_eve_master_backend(master_id=1, local_jobs=backend_jobs)
         self.setup_eve_master_backend(master_id=2)
-        self.api = buildbot_api_client.BuildbotDataAPI(self.url)
+        self.api = BuildbotDataAPI(self.url)
         self.api.login("eve", "eve")
         self.setup_git()
 
@@ -216,51 +245,27 @@ class BaseTest(unittest.TestCase):  # pylint: disable=too-many-public-methods
         os.environ['WAMP_ROUTER_URL'] = 'ws://localhost:%d/ws' % WAMP_PORT
         os.environ['WAMP_REALM'] = 'buildbot'
 
-        master_cfg_dir = os.path.join(self.top_dir, 'eve', 'master')
+        master_cfg = os.path.join(__evedir__, 'etc', 'master.cfg')
 
         masterdir = os.path.join(self.test_dir, 'master%i' % master_id)
-        cmd('mkdir -p %s' % masterdir, ignore_exception=True)
+        cmd('mkdir -p %s' % masterdir)
         os.chdir(masterdir)
-        cmd('cp -r %s/* .' % master_cfg_dir)
+        cmd('cp %s .' % master_cfg)
 
-        self.setup_local_job(masterdir, local_jobs)
+        setup_local_job(masterdir, local_jobs)
 
         cmd('buildbot create-master --relocatable --db=%s .' %
             os.environ['DB_URL'])
 
         cmd('buildbot start .')
 
-    def setup_local_job(self, masterdir, job_files):
-        if job_files is None:
-            # allow creation of directory for ""
-            return
-        local_dirpath = os.path.join(
-            masterdir, os.environ.get('LOCAL_JOBS_DIRPATH', 'local'))
-        shutil.rmtree(local_dirpath, ignore_errors=True)
-        cmd('mkdir -p %s' % local_dirpath, ignore_exception=True)
-        if not job_files:
-            return
-
-        os.chdir(local_dirpath)
-        if isinstance(job_files, list):
-            for job in job_files:
-                job_yaml_file = os.path.join(self.top_dir, 'tests',
-                                             'local', '%s.yml' % job)
-                cmd('cp -r %s .' % job_yaml_file)
-        else:
-            job_yaml_file = os.path.join(
-                self.top_dir, 'tests',
-                'local', '%s.yml' % job_files)
-            cmd('cp -r %s .' % job_yaml_file)
-        os.chdir(masterdir)
-
     def setup_crossbar(self):
         """Spawns a local crossbar.
         """
         crossbar_dir = os.path.join(self.test_dir, 'crossbar')
-        cmd('mkdir -p %s' % crossbar_dir, ignore_exception=True)
+        cmd('mkdir -p %s' % crossbar_dir)
         crossbar_cfg_path = os.path.join(
-            self.top_dir, 'tests', 'crossbar.json')
+            __dirpath__, 'crossbar.json')
         os.chdir(crossbar_dir)
 
         cmd('cp %s %s' % (crossbar_cfg_path,
@@ -272,13 +277,13 @@ class BaseTest(unittest.TestCase):  # pylint: disable=too-many-public-methods
 
         for path, name, port in [('bitbucket_cache', 'bitbucket.org', 2222),
                                  ('github_cache', 'github.com', 2223)]:
-            cache_dir = os.path.join(self.top_dir, 'eve', 'master',
-                                     'services', path)
-            cmd('docker build -t %s %s' % (name, cache_dir))
+            builddir = os.path.join(__evedir__, 'services', path)
+            cmd('docker build -t %s %s' % (name, builddir))
             cmd('docker rm -f %s' % name, ignore_exception=True)
             self.git_cache_docker_id = cmd('docker run -d -p %s:22 '
                                            '--name %s %s' % (port, name, name))
         time.sleep(3)  # wait for bitbucket cache service to stabilize
+        cmd('mkdir -p %s' % self.git_dir)
         os.chdir(self.git_dir)
         cmd('git clone '
             'git+ssh://git@localhost:2222/home/git/scality/mock.git .')
@@ -297,11 +302,11 @@ class BaseTest(unittest.TestCase):  # pylint: disable=too-many-public-methods
             eve_dir (str): directory of the yaml test file.
         """
         os.chdir(self.git_dir)
-        src_ctxt = os.path.join(self.top_dir, 'tests', 'contexts')
+        src_ctxt = os.path.join(__dirpath__, 'contexts')
         shutil.rmtree('eve', ignore_errors=True)
         shutil.copytree(src_ctxt, 'eve')
-        eve_yaml_file = os.path.join(self.top_dir, 'tests',
-                                     'yaml', eve_dir, 'main.yml')
+        eve_yaml_file = os.path.join(
+            __dirpath__, 'yaml', eve_dir, 'main.yml')
         shutil.copy(eve_yaml_file, 'eve')
         cmd('git add -A')
         cmd('git commit -m "add %s"' % eve_yaml_file)
@@ -1010,15 +1015,13 @@ class TestServices(unittest.TestCase):
     """Test services."""
 
     def setUp(self):
-        self.test_dir = tempfile.mkdtemp(prefix='eve_test_')
-        self.top_dir = os.path.dirname((os.path.dirname(
-            os.path.abspath(__file__))))
+        self.test_dir = tempfile.mkdtemp(prefix='test_service_')
         cmd('docker rm -f github.com', ignore_exception=True)
 
     def test_github_docker_cache(self):
         """Check github docker cache can build and works."""
-        github_cache_dir = os.path.join(self.top_dir, 'eve', 'master',
-                                        'services', 'github_cache')
+        github_cache_dir = os.path.join(
+            __evedir__, 'services', 'github_cache')
         cmd('docker build -t github.com %s' % github_cache_dir)
         cmd('docker run -d -p 2223:22 --name github.com github.com')
         time.sleep(3)  # wait for cache service to stabilize

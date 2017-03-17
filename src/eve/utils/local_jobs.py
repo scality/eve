@@ -1,5 +1,5 @@
 """Local jobs."""
-from os import environ, path, walk
+from os import environ, getcwd, path, walk
 
 import yaml
 from buildbot.config import BuilderConfig
@@ -7,13 +7,13 @@ from buildbot.plugins import schedulers
 from buildbot.process.factory import BuildFactory
 from twisted.logger import Logger
 
-from utils.step_factory import step_factory
+from .step_factory import step_factory
 
 
 def get_local_jobs(workers, suffix):
     """Load yaml local jobs in Eve config."""
     local_dirpath = path.join(
-        path.dirname(__file__), '..',
+        getcwd(),
         environ.get('LOCAL_JOBS_DIRPATH', 'local'))
     builders = []
     scheds = []

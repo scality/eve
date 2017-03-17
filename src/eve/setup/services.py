@@ -2,7 +2,7 @@ from os import environ
 
 from buildbot.reporters.github import GitHubStatusPush
 
-from reporters.base import BitbucketBuildStatusPush, HipChatBuildStatusPush
+from ..reporters.base import BitbucketBuildStatusPush, HipChatBuildStatusPush
 
 
 # pylint: disable=relative-import

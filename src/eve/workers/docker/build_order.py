@@ -4,8 +4,8 @@ import buildbot
 from buildbot.process.properties import Interpolate
 from buildbot.process.results import SKIPPED
 
-from utils.build_order import BaseBuildOrder
-from workers.docker.build_step import DockerBuild
+from ...utils.build_order import BaseBuildOrder
+from .build_step import DockerBuild
 
 
 class DockerBuildOrder(BaseBuildOrder):

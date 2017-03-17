@@ -11,9 +11,9 @@ from buildbot.steps.master import SetProperty
 from buildbot.steps.shell import SetPropertyFromCommand, ShellCommand
 from buildbot.steps.source.git import Git
 
-from steps.artifacts import CloudfilesAuthenticate
-from steps.cancel import CancelNonTipBuild
-from steps.yaml_parser import ReadConfFromYaml
+from ..steps.artifacts import CloudfilesAuthenticate
+from ..steps.cancel import CancelNonTipBuild
+from ..steps.yaml_parser import ReadConfFromYaml
 
 
 def setup_bootstrap(git_repo, project_name,

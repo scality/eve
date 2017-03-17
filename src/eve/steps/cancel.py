@@ -2,7 +2,7 @@ from buildbot.process.properties import Interpolate
 from buildbot.process.results import CANCELLED, SUCCESS
 from buildbot.steps.master import MasterShellCommand
 
-from steps.yaml_parser import MASTER_START_TIME
+from .yaml_parser import MASTER_START_TIME
 
 
 class CancelCommand(MasterShellCommand):

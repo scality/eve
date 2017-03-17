@@ -1,7 +1,7 @@
 from buildbot.process.properties import Property
 
-from utils.password_generator import password_generator
-from workers.docker.docker_worker import EveDockerLatentWorker
+from ..utils.password_generator import password_generator
+from ..workers.docker.docker_worker import EveDockerLatentWorker
 
 
 def setup_docker_workers(max_docker_workers, worker_suffix, master_fqdn):
