@@ -19,8 +19,8 @@ from buildbot.plugins import steps
 from buildbot.process.factory import BuildFactory
 from buildbot.process.results import SUCCESS
 
-from ..workers.docker.build_order import DockerBuildOrder
-from ..workers.openstack.build_order import OpenStackBuildOrder
+from ..worker.docker.build_order import DockerBuildOrder
+from ..worker.openstack.build_order import OpenStackBuildOrder
 from .bootstrap import setup_bootstrap
 from .docker_workers import setup_docker_workers
 from .hacks import setup_hacks

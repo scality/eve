@@ -65,8 +65,8 @@ setup(
             'step_factory=eve.util.step_factory:step_factory'
         ],
         'buildbot.worker': [
-            'EveDockerLatentWorker=eve.workers.docker.docker_worker:EveDockerLatentWorker',
-            'EveOpenStackLatentWorker=eve.workers.openstack.openstack_worker:EveOpenStackLatentWorker'
+            'EveDockerLatentWorker=eve.worker.docker.docker_worker:EveDockerLatentWorker',
+            'EveOpenStackLatentWorker=eve.worker.openstack.openstack_worker:EveOpenStackLatentWorker'
         ]
     },
     zip_safe=False
