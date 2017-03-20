@@ -60,6 +60,7 @@ setup(
             'BaseBuildOrder=eve.util.build_order:BaseBuildOrder',
             'get_local_jobs=eve.util.local_jobs:get_local_jobs',
             'hide_interpolatable_name=eve.util.interpolate:hide_interpolatable_name',
+            'init_sentry_logging=eve.util.sentry:init_sentry_logging',
             'password_generator=eve.util.password_generator:password_generator',
             'render_interpolatable_name=eve.util.interpolate:render_interpolatable_name',
             'step_factory=eve.util.step_factory:step_factory'
