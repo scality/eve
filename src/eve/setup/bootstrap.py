@@ -12,8 +12,6 @@ from buildbot.steps.master import SetProperty
 from buildbot.steps.shell import SetPropertyFromCommand, ShellCommand
 from buildbot.steps.source.git import Git
 
-from ..steps.yaml_parser import ReadConfFromYaml
-
 
 def setup_bootstrap(git_repo, project_name,
                     bootstrap_builder_name, local_workers,
@@ -70,7 +68,7 @@ def setup_bootstrap(git_repo, project_name,
             hideStepIf=lambda results, s: results == SUCCESS,
             haltOnFailure=True))
     # Read conf from yaml file
-    bootstrap_factory.addStep(ReadConfFromYaml())
+    bootstrap_factory.addStep(steps.ReadConfFromYaml())
 
     docker_host_ip = '127.0.0.1'  # Dummy default value
     try:

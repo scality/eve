@@ -44,7 +44,9 @@ setup(
             'CancelOldBuild=eve.steps.cancel:CancelOldBuild',
             'PublishCoverageReport=eve.steps.publish_coverage_report:PublishCoverageReport',
             'ShellCommandWithSecrets=eve.steps.shell_command_with_secrets:ShellCommandWithSecrets',
-            'TriggerStages=eve.steps.trigger_stages:TriggerStages'
+            'TriggerStages=eve.steps.trigger_stages:TriggerStages',
+            'ReadConfFromYaml=eve.steps.yaml_parser:ReadConfFromYaml',
+            'StepExtractor=eve.steps.yaml_parser:StepExtractor'
         ]
     },
     zip_safe=False
