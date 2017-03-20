@@ -4,6 +4,7 @@ from tempfile import mkdtemp
 import netifaces
 from buildbot.config import BuilderConfig
 from buildbot.locks import MasterLock
+from buildbot.plugins import steps
 from buildbot.process.factory import BuildFactory
 from buildbot.process.properties import Interpolate, Property
 from buildbot.process.results import SUCCESS
@@ -11,7 +12,6 @@ from buildbot.steps.master import SetProperty
 from buildbot.steps.shell import SetPropertyFromCommand, ShellCommand
 from buildbot.steps.source.git import Git
 
-from ..steps.artifacts import CloudfilesAuthenticate
 from ..steps.cancel import CancelNonTipBuild
 from ..steps.yaml_parser import ReadConfFromYaml
 
@@ -27,8 +27,9 @@ def setup_bootstrap(git_repo, project_name,
     git_cache_dir_host = mkdtemp(prefix=git_repo_short)
     if openstack_credentials['login']:
         bootstrap_factory.addStep(
-            CloudfilesAuthenticate(rax_login=openstack_credentials['login'],
-                                   rax_pwd=openstack_credentials['password']))
+            steps.CloudfilesAuthenticate(
+                rax_login=openstack_credentials['login'],
+                rax_pwd=openstack_credentials['password']))
 
     # Check out the source
     git_cache_update_lock = MasterLock('git_cache_update')

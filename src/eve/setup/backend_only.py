@@ -15,11 +15,11 @@ from os import environ, path
 import buildbot
 from buildbot.config import BuilderConfig
 from buildbot.plugins import schedulers
+from buildbot.plugins import steps
 from buildbot.process.factory import BuildFactory
 from buildbot.process.results import SUCCESS
 
 from ..steps import trigger_stages
-from ..steps.artifacts import Upload
 from ..steps.cancel import CancelOldBuild
 from ..steps.yaml_parser import StepExtractor
 from ..workers.docker.build_order import DockerBuildOrder
@@ -53,9 +53,9 @@ def setup_backend_only(conf, master_name, max_local_workers, worker_suffix,
         'ARTIFACTS_PREFIX',
         'staging-')
 
-    Upload.CLOUDFILES_URL = cloudfiles_url
-    Upload.ARTIFACTS_URL = artifacts_url
-    Upload.ARTIFACTS_PREFIX = artifacts_prefix
+    steps.Upload.CLOUDFILES_URL = cloudfiles_url
+    steps.Upload.ARTIFACTS_URL = artifacts_url
+    steps.Upload.ARTIFACTS_PREFIX = artifacts_prefix
 
     ##########################
     # Latent Workers

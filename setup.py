@@ -36,6 +36,9 @@ setup(
             'eve=eve.scripts.runner:main'
         ],
         'buildbot.steps': [
+            'GetArtifactsFromStage=eve.steps.artifacts:GetArtifactsFromStage',
+            'CloudfilesAuthenticate=eve.steps.artifacts:CloudfilesAuthenticate',
+            'Upload=eve.steps.artifacts:Upload',
             'JUnitShellCommand=eve.steps.junit:JUnitShellCommand'
         ]
     },
