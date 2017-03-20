@@ -19,7 +19,6 @@ from buildbot.plugins import steps
 from buildbot.process.factory import BuildFactory
 from buildbot.process.results import SUCCESS
 
-from ..steps import trigger_stages
 from ..steps.yaml_parser import StepExtractor
 from ..workers.docker.build_order import DockerBuildOrder
 from ..workers.openstack.build_order import OpenStackBuildOrder
@@ -90,8 +89,8 @@ def setup_backend_only(conf, master_name, max_local_workers, worker_suffix,
         credentials=rackspace_credentials)
     conf['workers'].extend(_openstack_workers)
 
-    trigger_stages.TriggerStages.git_repo = git_repo
-    trigger_stages.TriggerStages.workers = {
+    steps.TriggerStages.git_repo = git_repo
+    steps.TriggerStages.workers = {
         'docker': (DockerBuildOrder, docker_scheduler_name),
         'openstack': (OpenStackBuildOrder, openstack_scheduler_name)
     }

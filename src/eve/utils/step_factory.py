@@ -1,9 +1,9 @@
 from os import environ
 
+from buildbot.plugins import steps
 from buildbot.process.properties import Interpolate
 from buildbot.steps.http import HTTPStep
 from buildbot.steps.source.git import Git
-from buildbot.plugins import steps
 from requests.auth import HTTPBasicAuth
 
 

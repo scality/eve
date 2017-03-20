@@ -3,6 +3,7 @@ from fnmatch import fnmatch
 from tempfile import mktemp
 
 import yaml
+from buildbot.plugins import steps
 from buildbot.process.buildstep import BuildStep
 from buildbot.process.properties import Interpolate
 from buildbot.process.results import CANCELLED, FAILURE, SUCCESS
@@ -13,7 +14,6 @@ from packaging import version
 from twisted.internet import defer
 from twisted.logger import Logger
 
-from ..steps.trigger_stages import TriggerStages
 from ..utils.step_factory import step_factory
 
 MASTER_START_TIME = time.time()
@@ -105,7 +105,7 @@ class ReadConfFromYaml(FileUpload):
                 property='eve_api_version',
                 hideStepIf=lambda results, s: results == SUCCESS,
                 value=eve_api_version),
-            TriggerStages([
+            steps.TriggerStages([
                 stage_name
             ], waitForFinish=True, haltOnFailure=True)
         ])

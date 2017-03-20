@@ -43,7 +43,8 @@ setup(
             'CancelNonTipBuild=eve.steps.cancel:CancelNonTipBuild',
             'CancelOldBuild=eve.steps.cancel:CancelOldBuild',
             'PublishCoverageReport=eve.steps.publish_coverage_report:PublishCoverageReport',
-            'ShellCommandWithSecrets=eve.steps.shell_command_with_secrets:ShellCommandWithSecrets'
+            'ShellCommandWithSecrets=eve.steps.shell_command_with_secrets:ShellCommandWithSecrets',
+            'TriggerStages=eve.steps.trigger_stages:TriggerStages'
         ]
     },
     zip_safe=False
