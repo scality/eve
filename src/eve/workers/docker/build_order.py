@@ -1,11 +1,11 @@
 import time
 
 import buildbot
+from buildbot.plugins import steps
 from buildbot.process.properties import Interpolate
 from buildbot.process.results import SKIPPED
 
 from ...utils.build_order import BaseBuildOrder
-from .build_step import DockerBuild
 
 
 class DockerBuildOrder(BaseBuildOrder):
@@ -47,7 +47,7 @@ class DockerBuildOrder(BaseBuildOrder):
             }
         }
 
-        self.preliminary_steps.append(DockerBuild(
+        self.preliminary_steps.append(steps.DockerBuild(
             name='build docker image from {0}'.format(
                 self.properties['worker_path']
             ),
@@ -69,7 +69,7 @@ class DockerBuildOrder(BaseBuildOrder):
             prec_failed_image = properties.getProperty('DockerBuildFailed', '')
             return prec_failed_image == step.image
 
-        self.preliminary_steps.append(DockerBuild(
+        self.preliminary_steps.append(steps.DockerBuild(
             name='docker build retry from {0}'.format(
                 self.properties['worker_path']
             ),

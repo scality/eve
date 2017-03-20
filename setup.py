@@ -40,6 +40,7 @@ setup(
             'HipChatBuildStatusPush=eve.reporters.base:HipChatBuildStatusPush'
         ],
         'buildbot.steps': [
+            'DockerBuild=eve.steps.docker_build:DockerBuild',
             'GetArtifactsFromStage=eve.steps.artifacts:GetArtifactsFromStage',
             'CloudfilesAuthenticate=eve.steps.artifacts:CloudfilesAuthenticate',
             'Upload=eve.steps.artifacts:Upload',
