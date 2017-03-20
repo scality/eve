@@ -51,6 +51,10 @@ setup(
             'TriggerStages=eve.steps.trigger_stages:TriggerStages',
             'ReadConfFromYaml=eve.steps.yaml_parser:ReadConfFromYaml',
             'StepExtractor=eve.steps.yaml_parser:StepExtractor'
+        ],
+        'buildbot.worker': [
+            'EveDockerLatentWorker=eve.workers.docker.docker_worker:EveDockerLatentWorker',
+            'EveOpenStackLatentWorker=eve.workers.openstack.openstack_worker:EveOpenStackLatentWorker'
         ]
     },
     zip_safe=False
