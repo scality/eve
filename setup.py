@@ -35,6 +35,10 @@ setup(
         'console_scripts': [
             'eve=eve.scripts.runner:main'
         ],
+        'buildbot.reporters': [
+            'BitbucketBuildStatusPush=eve.reporters.base:BitbucketBuildStatusPush',
+            'HipChatBuildStatusPush=eve.reporters.base:HipChatBuildStatusPush'
+        ],
         'buildbot.steps': [
             'GetArtifactsFromStage=eve.steps.artifacts:GetArtifactsFromStage',
             'CloudfilesAuthenticate=eve.steps.artifacts:CloudfilesAuthenticate',
