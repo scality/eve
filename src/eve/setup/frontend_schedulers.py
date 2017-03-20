@@ -1,11 +1,10 @@
 from os import environ
 
 from buildbot.changes.filter import ChangeFilter
-from buildbot.plugins import util
+from buildbot.plugins import schedulers, util
 from buildbot.scheduler import AnyBranchScheduler
 from buildbot.schedulers.trysched import Try_Userpass
 
-from ..schedulers.force import EveForceScheduler
 
 BOOTSTRAP_SCHEDULER_NAME = 'bootstrap-scheduler'
 
@@ -18,7 +17,7 @@ def setup_frontend_schedulers(conf, bootstrap_builder_name, git_repo,
         change_filter=ChangeFilter(branch_re='.+'),  # build only branches
         builderNames=[bootstrap_builder_name]))
 
-    conf['schedulers'].append(EveForceScheduler(
+    conf['schedulers'].append(schedulers.EveForceScheduler(
         name='force',
         builderNames=[bootstrap_builder_name],
         reason=util.StringParameter(name='reason',

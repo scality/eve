@@ -39,6 +39,9 @@ setup(
             'BitbucketBuildStatusPush=eve.reporters.base:BitbucketBuildStatusPush',
             'HipChatBuildStatusPush=eve.reporters.base:HipChatBuildStatusPush'
         ],
+        'buildbot.schedulers': [
+            'EveForceScheduler=eve.schedulers.force:EveForceScheduler'
+        ],
         'buildbot.steps': [
             'DockerBuild=eve.steps.docker_build:DockerBuild',
             'GetArtifactsFromStage=eve.steps.artifacts:GetArtifactsFromStage',
