@@ -1,8 +1,5 @@
-"""Module to configure eve connection to wamp mq."""
-
-# HACK
-# Avoid compatibility issue between buildbot and newer versions of autobahn
-from autobahn.twisted.wamp import Service
+"""HACK to avoid compatibility issue between buildbot and newer versions
+of autobahn."""
 
 
 def monkey_patch_discard_extra_args(func):
@@ -39,23 +36,3 @@ def monkey_patch_discard_extra_args(func):
     wrap.__doc__ = func.__doc__
     wrap.__dict__.update(func.__dict__)
     return wrap
-
-
-Service.__init__ = monkey_patch_discard_extra_args(Service.__init__)
-
-
-def get_wamp_conf(router_url, realm):
-    """Generate a wamp config.
-
-    Args:
-        router_url (str): The complete URL to the wamp router.
-        realm (str): The realm eve will use on this router.
-    """
-    return {
-        'type': 'wamp',
-        'router_url': router_url,
-        'realm': realm.decode(),  # wamp wants a unicode string here
-        'debug': True,
-        'debug_websockets': False,
-        'debug_lowlevel': False,
-    }
