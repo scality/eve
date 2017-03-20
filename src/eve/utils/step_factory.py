@@ -6,7 +6,6 @@ from buildbot.steps.source.git import Git
 from buildbot.plugins import steps
 from requests.auth import HTTPBasicAuth
 from ..steps.shell_command_with_secrets import ShellCommandWithSecrets  # noqa: F401, pylint: disable=relative-import,unused-import
-from ..steps.publish_coverage_report import PublishCoverageReport  # noqa: F401, pylint: disable=relative-import,unused-import
 
 
 def step_factory(custom_steps, step_type, **params):

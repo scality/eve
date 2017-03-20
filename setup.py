@@ -41,7 +41,8 @@ setup(
             'Upload=eve.steps.artifacts:Upload',
             'JUnitShellCommand=eve.steps.junit:JUnitShellCommand',
             'CancelNonTipBuild=eve.steps.cancel:CancelNonTipBuild',
-            'CancelOldBuild=eve.steps.cancel:CancelOldBuild'
+            'CancelOldBuild=eve.steps.cancel:CancelOldBuild',
+            'PublishCoverageReport=eve.steps.publish_coverage_report:PublishCoverageReport'
         ]
     },
     zip_safe=False
