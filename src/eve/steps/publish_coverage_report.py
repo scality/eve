@@ -441,7 +441,7 @@ class PublishCoverageReport(_UploadCoverageReportsMixin, BuildStep):
     """Publish a code coverage report to an external service."""
 
     publication_cls = CodecovIOPublication
-    """Publisment class to use."""
+    """Publication class to use."""
 
     name = 'publish code coverage report'
     """Name of the buildbot step."""
