@@ -1,18 +1,17 @@
 import buildbot.process.build
+from buildbot.plugins import util
 from buildbot.process import buildrequest
 from buildbot.process.buildstep import BuildStep
 from buildbot.process.results import FAILURE
 from twisted.python.reflect import namedModule
 
 from ..bugfixes.tempsourcestamp import TempSourceStamp
-from ..utils.interpolate import (hide_interpolatable_name,
-                                 render_interpolatable_name)
 
 
 def setup_hacks(conf):
     # Hack to allow build step name interpolation
-    BuildStep.__init__ = hide_interpolatable_name(BuildStep.__init__)
-    BuildStep.startStep = render_interpolatable_name(BuildStep.startStep)
+    BuildStep.__init__ = util.hide_interpolatable_name(BuildStep.__init__)
+    BuildStep.startStep = util.render_interpolatable_name(BuildStep.startStep)
 
     # Hack to fix a bug stating that LocalWorkers do not have a valid
     # path_module

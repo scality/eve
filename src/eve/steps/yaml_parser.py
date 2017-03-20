@@ -3,7 +3,7 @@ from fnmatch import fnmatch
 from tempfile import mktemp
 
 import yaml
-from buildbot.plugins import steps
+from buildbot.plugins import steps, util
 from buildbot.process.buildstep import BuildStep
 from buildbot.process.properties import Interpolate
 from buildbot.process.results import CANCELLED, FAILURE, SUCCESS
@@ -14,7 +14,6 @@ from packaging import version
 from twisted.internet import defer
 from twisted.logger import Logger
 
-from ..utils.step_factory import step_factory
 
 MASTER_START_TIME = time.time()
 
@@ -164,7 +163,7 @@ class StepExtractor(BuildStep):
         stage_conf = conf['stages'][stage_name]
         for step in stage_conf['steps']:
             step_type, params = next(step.iteritems())
-            bb_step = step_factory(globals(), step_type, **params)
+            bb_step = util.step_factory(globals(), step_type, **params)
             self.build.addStepsAfterLastStep([bb_step])
             self.logger.debug('Add {step} with params : {params}',
                               step=step_type, params=params)

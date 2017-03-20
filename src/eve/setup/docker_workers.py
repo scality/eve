@@ -1,7 +1,5 @@
-from buildbot.plugins import worker
+from buildbot.plugins import util, worker
 from buildbot.process.properties import Property
-
-from ..utils.password_generator import password_generator
 
 
 def setup_docker_workers(max_docker_workers, worker_suffix, master_fqdn):
@@ -10,7 +8,7 @@ def setup_docker_workers(max_docker_workers, worker_suffix, master_fqdn):
         docker_workers.append(
             worker.EveDockerLatentWorker(
                 name='dw%03d-%s' % (i, worker_suffix),
-                password=password_generator(),
+                password=util.password_generator(),
                 master_fqdn=master_fqdn,
                 image=Property('docker_image'),
                 keepalive_interval=300,

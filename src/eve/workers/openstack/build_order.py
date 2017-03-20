@@ -1,7 +1,7 @@
-from ...utils.build_order import BaseBuildOrder
+from buildbot.plugins import util
 
 
-class OpenStackBuildOrder(BaseBuildOrder):
+class OpenStackBuildOrder(util.BaseBuildOrder):
     """Base class representing a build to trigger on an OpenStack instance
     (Scheduler, properties and OpenStack config)
     """

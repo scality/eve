@@ -1,9 +1,7 @@
 from os import environ, path
 
-from buildbot.plugins import worker
+from buildbot.plugins import util, worker
 from buildbot.process.properties import Property
-
-from ..utils.password_generator import password_generator
 
 
 def setup_openstack_workers(max_openstack_workers, worker_suffix, master_fqdn,
@@ -22,7 +20,7 @@ def setup_openstack_workers(max_openstack_workers, worker_suffix, master_fqdn,
         openstack_workers.append(
             worker.EveOpenStackLatentWorker(
                 name='ow%03d-%s' % (i, worker_suffix),
-                password=password_generator(),
+                password=util.password_generator(),
                 image=Property('openstack_image'),
                 flavor=Property('openstack_flavor'),
                 block_devices=None,

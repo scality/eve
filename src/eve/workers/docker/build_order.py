@@ -1,14 +1,12 @@
 import time
 
 import buildbot
-from buildbot.plugins import steps
+from buildbot.plugins import steps, util
 from buildbot.process.properties import Interpolate
 from buildbot.process.results import SKIPPED
 
-from ...utils.build_order import BaseBuildOrder
 
-
-class DockerBuildOrder(BaseBuildOrder):
+class DockerBuildOrder(util.BaseBuildOrder):
     """Base class representing a build to trigger on a Docker container
     (Scheduler, properties and docker config)
     """
