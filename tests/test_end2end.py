@@ -557,6 +557,8 @@ class Test(BaseTest):  # pylint: disable=too-many-public-methods
         self.notify_webhook()
         self.get_build_result(expected_result='success')
 
+    @unittest.skip('Test flaky on developer''s machine '
+                   'which need to be investigated and fixed.')
     def test_lost_slave_recovery(self):
         """Ensures test can recover when slave is lost.
 
