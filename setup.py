@@ -39,7 +39,9 @@ setup(
             'GetArtifactsFromStage=eve.steps.artifacts:GetArtifactsFromStage',
             'CloudfilesAuthenticate=eve.steps.artifacts:CloudfilesAuthenticate',
             'Upload=eve.steps.artifacts:Upload',
-            'JUnitShellCommand=eve.steps.junit:JUnitShellCommand'
+            'JUnitShellCommand=eve.steps.junit:JUnitShellCommand',
+            'CancelNonTipBuild=eve.steps.cancel:CancelNonTipBuild',
+            'CancelOldBuild=eve.steps.cancel:CancelOldBuild'
         ]
     },
     zip_safe=False

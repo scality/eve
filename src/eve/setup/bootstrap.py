@@ -12,7 +12,6 @@ from buildbot.steps.master import SetProperty
 from buildbot.steps.shell import SetPropertyFromCommand, ShellCommand
 from buildbot.steps.source.git import Git
 
-from ..steps.cancel import CancelNonTipBuild
 from ..steps.yaml_parser import ReadConfFromYaml
 
 
@@ -43,7 +42,8 @@ def setup_bootstrap(git_repo, project_name,
                      hideStepIf=lambda results, s: results == SUCCESS,
                      haltOnFailure=True))
 
-    bootstrap_factory.addStep(CancelNonTipBuild(workdir=git_cache_dir_host))
+    bootstrap_factory.addStep(
+        steps.CancelNonTipBuild(workdir=git_cache_dir_host))
 
     bootstrap_factory.addStep(
         SetPropertyFromCommand(

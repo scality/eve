@@ -20,7 +20,6 @@ from buildbot.process.factory import BuildFactory
 from buildbot.process.results import SUCCESS
 
 from ..steps import trigger_stages
-from ..steps.cancel import CancelOldBuild
 from ..steps.yaml_parser import StepExtractor
 from ..workers.docker.build_order import DockerBuildOrder
 from ..workers.openstack.build_order import OpenStackBuildOrder
@@ -127,7 +126,7 @@ def setup_backend_only(conf, master_name, max_local_workers, worker_suffix,
             (docker_builder_name, _docker_workers),
             (openstack_builder_name, _openstack_workers)):
         factory = BuildFactory()
-        factory.addStep(CancelOldBuild())
+        factory.addStep(steps.CancelOldBuild())
         # Extract steps from conf
         factory.addStep(StepExtractor(
             name='extract steps from yaml',
