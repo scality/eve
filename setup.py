@@ -59,6 +59,7 @@ setup(
         'buildbot.util': [
             'BaseBuildOrder=eve.util.build_order:BaseBuildOrder',
             'get_local_jobs=eve.util.local_jobs:get_local_jobs',
+            'get_wamp_conf=eve.util.wamp:get_wamp_conf',
             'hide_interpolatable_name=eve.util.interpolate:hide_interpolatable_name',
             'init_sentry_logging=eve.util.sentry:init_sentry_logging',
             'password_generator=eve.util.password_generator:password_generator',
