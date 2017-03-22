@@ -1,7 +1,5 @@
 """Allow eve to send reports."""
-
 import re
-from os import environ
 
 from buildbot.process.results import (CANCELLED, EXCEPTION, FAILURE, RETRY,
                                       SKIPPED, SUCCESS, WARNINGS, Results)
@@ -11,14 +9,6 @@ from buildbot.util.httpclientservice import HTTPClientService
 from twisted.internet import defer
 from twisted.logger import Logger
 
-# pylint: disable=invalid-name
-# pylint: disable=attribute-defined-outside-init
-
-EXTERNAL_URL = environ.get('EXTERNAL_URL')
-
-##########################
-# HipChat Configuration
-##########################
 REPO_ICON = 'http://www.packal.org/sites/default/files/public/styles/icon_' \
             'large/public/workflow-files/netdeanishealfred-git-repos/icon/' \
             'icon.png?itok=1zkuMgPa'
@@ -27,20 +17,12 @@ BRANCH_ICON = 'http://plainicon.com/dboard/userprod/2800_a1826/prod_thumb/' \
 CLOCK_ICON = 'https://image.freepik.com/free-icon/clock-of-circular-shape-at' \
              '-two-o-clock_318-48022.jpg'
 
-HIPCHAT_TOKEN = environ.pop('HIPCHAT_TOKEN', None)
-HIPCHAT_ROOM = environ.pop('HIPCHAT_ROOM', None)
-
-###########################
-# bitbucket Configuration
-###########################
-EVE_GITHOST_LOGIN = environ.pop('EVE_GITHOST_LOGIN')
-EVE_GITHOST_PWD = environ.pop('EVE_GITHOST_PWD')
-
 
 class BaseBuildStatusPush(HttpStatusPushBase):
     """
     Base class for pushing build status
     """
+    repo = None
     neededDetails = dict(wantProperties=True, wantSteps=True)
     RESULT_COLOR_CORRESP = {
         SUCCESS: 'green',
@@ -167,6 +149,11 @@ class HipChatBuildStatusPush(BaseBuildStatusPush):
         CANCELLED: 'gray',
         None: 'gray'}
 
+    def __init__(self, room_id, token, **kwargs):
+        self.room_id = room_id
+        self.token = token
+        super(HipChatBuildStatusPush, self).__init__(**kwargs)
+
     def add_tag(self, name, value, icon, color=None):
         attr = dict(label=name, value=dict(label=value))
         if color in self.COLOR_STYLE_CORRESP:
@@ -178,7 +165,7 @@ class HipChatBuildStatusPush(BaseBuildStatusPush):
     @defer.inlineCallbacks
     def send(self, build):
         """Send build status to HipChat."""
-        if not HIPCHAT_ROOM or not HIPCHAT_TOKEN:
+        if not self.room_id or not self.token:
             self.logger.info(
                 'Hipchat status not sent'
                 ' (HIPCHAT_* variables not defined))'
@@ -206,11 +193,11 @@ class HipChatBuildStatusPush(BaseBuildStatusPush):
             card=card,
             color=self.HIPCHAT_COLOR_CORRESP[result])
 
-        url = 'https://api.hipchat.com/v2/room/%s/notification' % HIPCHAT_ROOM
+        url = 'https://api.hipchat.com/v2/room/%s/notification' % self.room_id
 
         http_service = yield HTTPClientService.getService(self.master, url)
         response = yield http_service.post('', json=data, params={
-            'auth_token': HIPCHAT_TOKEN
+            'auth_token': self.token
         })
 
         if response.code != 204:
@@ -237,6 +224,11 @@ class BitbucketBuildStatusPush(BaseBuildStatusPush):
         RETRY: 'INPROGRESS',
         None: 'INPROGRESS',
     }
+
+    def __init__(self, login, password, **kwargs):
+        self.login = login
+        self.password = password
+        super(BitbucketBuildStatusPush, self).__init__(**kwargs)
 
     def forge_url(self, build):
         """Forge the BB API URL on which the build status will be posted."""
@@ -271,15 +263,8 @@ class BitbucketBuildStatusPush(BaseBuildStatusPush):
         }
         url = self.forge_url(build)
 
-        if 'eve.devsca.com' not in EXTERNAL_URL:
-            self.logger.info('Bitbucket status not sent (not in prod) '
-                             '(%s:%s on %s)' % (
-                                 self.BITBUCKET_STATUS_CORRESP[result],
-                                 key,
-                                 url))
-            return  # Don't really push status for tests
         http_service = yield HTTPClientService.getService(
-            self.master, url, auth=(EVE_GITHOST_LOGIN, EVE_GITHOST_PWD))
+            self.master, url, auth=(self.login, self.password))
         response = yield http_service.post('', json=data)
         # 200 means that the key already exists
         # 201 means that the key has been created successfully

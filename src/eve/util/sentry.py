@@ -1,14 +1,17 @@
 """Utils to log errors to sentry."""
 
+from buildbot.plugins import util
 from raven import Client
 from raven.transport.twisted import TwistedHTTPTransport
 from twisted.logger import ILogObserver, globalLogPublisher
 from zope.interface import provider
 
 
-def init_sentry_logging(sentry_dsn):
+def init_sentry_logging():
     """Start logging of all failure to sentry."""
-    client = Client(sentry_dsn,
+    if not util.env.SENTRY_DSN:
+        return
+    client = Client(util.env.SENTRY_DSN,
                     transport=TwistedHTTPTransport,
                     auto_log_stacks=True)
 

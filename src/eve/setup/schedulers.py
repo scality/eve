@@ -1,25 +1,22 @@
-from os import environ
-
 from buildbot.changes.filter import ChangeFilter
 from buildbot.plugins import schedulers, util
 from buildbot.scheduler import AnyBranchScheduler
+from buildbot.schedulers.triggerable import Triggerable
 from buildbot.schedulers.trysched import Try_Userpass
 
 
-BOOTSTRAP_SCHEDULER_NAME = 'bootstrap-scheduler'
-
-
-def setup_frontend_schedulers(conf, bootstrap_builder_name, git_repo,
-                              project_name):
-    conf['schedulers'].append(AnyBranchScheduler(
-        name=BOOTSTRAP_SCHEDULER_NAME,
+def any_branch_scheduler():
+    return AnyBranchScheduler(
+        name=util.env.BOOTSTRAP_SCHEDULER_NAME,
         treeStableTimer=5,
         change_filter=ChangeFilter(branch_re='.+'),  # build only branches
-        builderNames=[bootstrap_builder_name]))
+        builderNames=[util.env.BOOTSTRAP_BUILDER_NAME])
 
-    conf['schedulers'].append(schedulers.EveForceScheduler(
-        name='force',
-        builderNames=[bootstrap_builder_name],
+
+def force_scheduler():
+    return schedulers.EveForceScheduler(
+        name=util.env.FORCE_SCHEDULER_NAME,
+        builderNames=[util.env.BOOTSTRAP_BUILDER_NAME],
         reason=util.StringParameter(name='reason',
                                     label='Reason:',
                                     default='force build',
@@ -33,16 +30,23 @@ def setup_frontend_schedulers(conf, bootstrap_builder_name, git_repo,
                 revision=util.FixedParameter(name='revision',
                                              default=''),
                 repository=util.FixedParameter(name='repository',
-                                               default=git_repo),
+                                               default=util.env.GIT_REPO),
                 project=util.FixedParameter(name='project',
-                                            default=project_name),
+                                            default=util.env.PROJECT_NAME),
             )
-        ],
-    ))
+        ]
+    )
 
-    try_pwd = environ.pop('TRY_PWD')
-    conf['schedulers'].append(Try_Userpass(
-        name='try',
-        port=environ['TRY_PORT'],
-        userpass=[('try', try_pwd)],
-        builderNames=[bootstrap_builder_name]))
+
+def try_scheduler():
+    return Try_Userpass(
+        name=util.env.TRY_SCHEDULER_NAME,
+        port=util.env.TRY_PORT,
+        userpass=[('try', util.env.TRY_PASSWORD)],
+        builderNames=[util.env.BOOTSTRAP_BUILDER_NAME])
+
+
+def triggerable_scheduler(scheduler_name, builder_name):
+    return Triggerable(
+        name=scheduler_name,
+        builderNames=[builder_name])

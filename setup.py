@@ -43,28 +43,29 @@ setup(
             'EveForceScheduler=eve.schedulers.force:EveForceScheduler'
         ],
         'buildbot.steps': [
-            'DockerBuild=eve.steps.docker_build:DockerBuild',
-            'GetArtifactsFromStage=eve.steps.artifacts:GetArtifactsFromStage',
-            'CloudfilesAuthenticate=eve.steps.artifacts:CloudfilesAuthenticate',
-            'Upload=eve.steps.artifacts:Upload',
-            'JUnitShellCommand=eve.steps.junit:JUnitShellCommand',
             'CancelNonTipBuild=eve.steps.cancel:CancelNonTipBuild',
             'CancelOldBuild=eve.steps.cancel:CancelOldBuild',
+            'CloudfilesAuthenticate=eve.steps.artifacts:CloudfilesAuthenticate',
+            'DockerBuild=eve.steps.docker_build:DockerBuild',
+            'GetArtifactsFromStage=eve.steps.artifacts:GetArtifactsFromStage',
+            'JUnitShellCommand=eve.steps.junit:JUnitShellCommand',
             'PublishCoverageReport=eve.steps.publish_coverage_report:PublishCoverageReport',
-            'ShellCommandWithSecrets=eve.steps.shell_command_with_secrets:ShellCommandWithSecrets',
-            'TriggerStages=eve.steps.trigger_stages:TriggerStages',
             'ReadConfFromYaml=eve.steps.yaml_parser:ReadConfFromYaml',
-            'StepExtractor=eve.steps.yaml_parser:StepExtractor'
+            'ShellCommandWithSecrets=eve.steps.shell_command_with_secrets:ShellCommandWithSecrets',
+            'StepExtractor=eve.steps.yaml_parser:StepExtractor',
+            'TriggerStages=eve.steps.trigger_stages:TriggerStages',
+            'Upload=eve.steps.artifacts:Upload'
         ],
         'buildbot.util': [
             'BaseBuildOrder=eve.util.build_order:BaseBuildOrder',
+            'env=eve.util.env:SETTINGS',
             'get_local_jobs=eve.util.local_jobs:get_local_jobs',
-            'get_wamp_conf=eve.util.wamp:get_wamp_conf',
-            'hide_interpolatable_name=eve.util.interpolate:hide_interpolatable_name',
+            'get_secrets=eve.util.env:get_secrets',
             'init_sentry_logging=eve.util.sentry:init_sentry_logging',
+            'load_env=eve.util.env:load_env',
             'password_generator=eve.util.password_generator:password_generator',
-            'render_interpolatable_name=eve.util.interpolate:render_interpolatable_name',
-            'step_factory=eve.util.step_factory:step_factory'
+            'step_factory=eve.util.step_factory:step_factory',
+            'verify_docker_certificates=eve.util.docker:verify_docker_certificates'
         ],
         'buildbot.worker': [
             'EveDockerLatentWorker=eve.worker.docker.docker_worker:EveDockerLatentWorker',

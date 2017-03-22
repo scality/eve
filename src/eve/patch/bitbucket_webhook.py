@@ -1,5 +1,6 @@
 import json
 
+from buildbot.www.hooks import bitbucket
 from twisted.python import log
 
 
@@ -11,8 +12,8 @@ def getChanges(request, _options=None):
 
     :param request: the http request Twisted object
     :param _options: additional options
-    """
 
+    """
     log.msg('Processing changes from bitbucket')
     payload = json.loads(request.content.read())
     repo_url = payload['repository']['links']['html']['href']
@@ -52,3 +53,7 @@ def getChanges(request, _options=None):
         changes.append(change)
 
     return (changes, payload['repository']['scm'])
+
+
+def patch():
+    bitbucket.getChanges = getChanges

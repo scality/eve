@@ -1,16 +1,22 @@
 from collections import OrderedDict
 
 from buildbot.process.buildstep import BuildStep
+from buildbot.plugins import util
 from buildbot.process.results import FAILURE, SUCCESS
 from buildbot.steps.trigger import Trigger
 from twisted.internet import defer
+
+from ..worker.docker.build_order import DockerBuildOrder
+from ..worker.openstack.build_order import OpenStackBuildOrder
 
 
 class TriggerStages(BuildStep):
     """Start a list of stages."""
 
-    workers = None
-    git_repo = None
+    workers = {
+        'docker': (DockerBuildOrder, util.env.DOCKER_SCHEDULER_NAME),
+        'openstack': (OpenStackBuildOrder, util.env.OPENSTACK_SCHEDULER_NAME)
+    }
 
     def __init__(self, stage_names, **kwargs_for_exec_trigger_stages):
         self.stage_names = stage_names
@@ -43,7 +49,7 @@ class TriggerStages(BuildStep):
                 defer.returnValue(FAILURE)
 
             build_order = build_order_class(
-                scheduler_name, self.git_repo,
+                scheduler_name, util.env.GIT_REPO,
                 stage_name, stage, worker, self
             )
 

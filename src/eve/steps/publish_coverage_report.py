@@ -22,6 +22,7 @@ import stat
 import tempfile
 
 import six
+from buildbot.plugins import util
 from buildbot.process import remotecommand, remotetransfer
 from buildbot.process.buildstep import BuildStep
 from buildbot.process.results import FAILURE, SKIPPED, SUCCESS, WARNINGS
@@ -34,15 +35,6 @@ try:
     from urllib.parse import urlparse
 except ImportError:
     import urlparse
-
-
-CODECOV_IO_BASE_URL = os.environ.pop(
-    'CODECOV_IO_BASE_URL', 'https://codecov.io'
-)
-"""Location of codecov server to publish code coverage report."""
-
-CODECOV_IO_UPLOAD_TOKEN = os.environ.pop('CODECOV_IO_UPLOAD_TOKEN', None)
-"""Upload token for codecov service."""
 
 
 @six.add_metaclass(abc.ABCMeta)
@@ -78,12 +70,6 @@ class PublicationBase(object):
 class CodecovIOPublication(PublicationBase):
     """Code coverage publication class for codecov.io service."""
 
-    base_url = CODECOV_IO_BASE_URL
-    """The base URL to use to upload code coverage report."""
-
-    upload_token = CODECOV_IO_UPLOAD_TOKEN
-    """The UUID token used to identify the codecov.io project."""
-
     url_name = 'codecov.io'
     """Name of the URL given to buildbot."""
 
@@ -115,7 +101,7 @@ class CodecovIOPublication(PublicationBase):
                 (FAILURE, 'error', 'Missing revision')
             )
 
-        if not self.upload_token:
+        if not util.env.CODECOV_IO_UPLOAD_TOKEN:
             defer.returnValue(
                 (SKIPPED, 'reason',
                  'Codecov.io upload token not given to Eve')
@@ -156,7 +142,7 @@ class CodecovIOPublication(PublicationBase):
           - *pr*: The pull request number this commit is currently found in.
         """
         http = yield httpclientservice.HTTPClientService.getService(
-            build.master, self.base_url, headers={
+            build.master, util.env.CODECOV_IO_BASE_URL, headers={
                 'Accept': 'text/plain'
             }
         )
@@ -164,7 +150,7 @@ class CodecovIOPublication(PublicationBase):
         build_url = yield build.getUrl()
         params = {
             'commit': self.revision,
-            'token': self.upload_token,
+            'token': util.env.CODECOV_IO_UPLOAD_TOKEN,
             'build': build.number,
             'build_url': build_url,
             'service': 'buildbot',
@@ -195,7 +181,7 @@ class CodecovIOPublication(PublicationBase):
 
         if result == FAILURE:
             error = 'Unable to send request to "{0}": {1}'.format(
-                self.base_url, content
+                util.env.CODECOV_IO_BASE_URL, content
             )
             defer.returnValue((FAILURE, 'error', error))
 
