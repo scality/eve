@@ -260,7 +260,7 @@ class BitbucketBuildStatusPush(BaseBuildStatusPush):
         key, result, _, summary, description = self.gather_data(build)
         # Temporary hack to keep previous behaviour
         # Do not send status for other stagename than 'pre-merge' for now
-        if key != 'pre-merge':
+        if key not in ['pre-merge', 'post-merge']:
             return
         data = {
             'state': self.BITBUCKET_STATUS_CORRESP[result],
