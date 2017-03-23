@@ -1,32 +1,94 @@
 import datetime
-from os import environ
 
-import buildbot.www.authz.endpointmatchers as bb_endpointmatchers
+from buildbot.plugins import util
 from buildbot.www.auth import UserPasswordAuth
-from buildbot.www.authz import Authz
-from buildbot.www.hooks import bitbucket
+from buildbot.www.authz import Authz, Forbidden
+from buildbot.www.authz.endpointmatchers import (AnyEndpointMatcher,
+                                                 EndpointMatcherBase)
+from buildbot.www.authz.roles import RolesFromBase
 from buildbot.www.oauth2 import GoogleAuth
-
-from ..authz.endpointmatchers import DenyRebuildIntermediateBuild
-from ..authz.roles import DeveloperRoleIfConnected
-from ..webhooks.bitbucket import getChanges
+from twisted.internet import defer
 
 
-def setup_www(conf, bootstrap_builder_name):
-    #########################################
-    # HACK: Replace default bitbucket webhook
-    #########################################
+class DenyRebuildIntermediateBuild(EndpointMatcherBase):
+    """Build endpoint matcher class to deny rebuild on intermediate build.
 
-    bitbucket.getChanges = getChanges
+    This class differs from `~.endpointmatchers.RebuildBuildEndpointMatcher`.
+    This latter class is incomplete and doesn't match any builder.
 
-    ###########################
-    # Web UI
-    ###########################
-    oauth2_client_id = environ.pop('OAUTH2_CLIENT_ID', None)
-    oauth2_client_secret = environ.pop('OAUTH2_CLIENT_SECRET', None)
+    `~.endpointmatchers.EndpointMatcherBase` is built to return if the
+    endpoint match.
+    It is the responsibility of :meth:`~.authz.Autz.assertUserAllowed`
+    to deny access if the role doesn't match.
 
-    conf['www'] = {
-        'port': environ['HTTP_PORT'],
+    Here we need to deny the endpoint for all roles if the build is an
+    intermediate build of the given builder.
+    """
+
+    def __init__(self, root_builder_name, **kwargs):
+        """`DenyRebuildBuildEndpointMatcher` constructor.
+
+        :args root_builder_name: Name of the root builder.
+        """
+        self.root_builder_name = root_builder_name
+
+        EndpointMatcherBase.__init__(self, **kwargs)
+
+    @defer.inlineCallbacks
+    def match_BuildEndpoint_rebuild(self, epobject, epdict, _):
+        """Called by `~.EndpointMatcherBase.match` for rebuild endpoint.
+
+        :raises Forbidden: If the builder name is an intermediate
+                             build of the given root builder.
+        """
+        build = yield epobject.get({}, epdict)
+        buildrequest = yield self.master.data.get(
+            ('buildrequests', build['buildrequestid'])
+        )
+        buildset = yield self.master.data.get(
+            ('buildsets', buildrequest['buildsetid'])
+        )
+
+        if buildset['parent_buildid'] is None:
+            defer.returnValue(None)
+
+        while buildset['parent_buildid'] is not None:
+            build = yield self.master.data.get(
+                ('builds', buildset['parent_buildid'])
+            )
+            buildrequest = yield self.master.data.get(
+                ('buildrequests', build['buildrequestid'])
+            )
+            buildset = yield self.master.data.get(
+                ('buildsets', buildrequest['buildsetid'])
+            )
+
+        builder = yield self.master.data.get(
+            ('builders', build['builderid'])
+        )
+
+        if self.authz.match(builder['name'], self.root_builder_name):
+            raise Forbidden(
+                'This builder is not allowed to be rebuilt.'
+                ' Please select the "{0}" builder.'.format(
+                    builder['name']
+                )
+            )
+
+
+class DeveloperRoleIfConnected(RolesFromBase):
+    """Sets the 'developer' role to all authenticated users."""
+
+    def getRolesFromUser(self, userDetails):
+        roles = []
+        if 'email' in userDetails:
+            roles.append('developer')
+        return roles
+
+
+def www():
+    return {
+        'port': util.env.HTTP_PORT,
         'plugins': {},
         'change_hook_dialects': {
             'bitbucket': True,
@@ -36,21 +98,27 @@ def setup_www(conf, bootstrap_builder_name):
         'cookie_expiration_time': datetime.timedelta(weeks=1),
     }
 
-    if oauth2_client_id and oauth2_client_secret:
-        conf['www']['auth'] = GoogleAuth(
-            oauth2_client_id, oauth2_client_secret
+
+def auth():
+    if util.env.OAUTH2_CLIENT_ID:
+        return GoogleAuth(
+            util.env.OAUTH2_CLIENT_ID,
+            util.env.OAUTH2_CLIENT_SECRET
         )
     else:
-        conf['www']['auth'] = UserPasswordAuth({'eve': 'eve'})
+        return UserPasswordAuth({
+            util.env.WWW_PLAIN_PASSWORD: util.env.WWW_PLAIN_LOGIN})
 
-    conf['www']['authz'] = Authz(
+
+def authz():
+    return Authz(
         allowRules=[
             DenyRebuildIntermediateBuild(
-                bootstrap_builder_name,
+                util.env.BOOTSTRAP_BUILDER_NAME,
                 role='developer'  # This parameter is not necessary,
                                   #   the next rule will deny access.
             ),
-            bb_endpointmatchers.AnyEndpointMatcher(role='developer'),
+            AnyEndpointMatcher(role='developer'),
         ],
         roleMatchers=[
             DeveloperRoleIfConnected()

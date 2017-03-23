@@ -1,5 +1,7 @@
+"""HACK to allow build step name interpolation."""
 from functools import wraps
 
+from buildbot.process.buildstep import BuildStep
 from buildbot.process.properties import Interpolate
 from twisted.internet import defer
 
@@ -29,3 +31,8 @@ def render_interpolatable_name(func):
         res = yield func(self, *args, **kwargs)
         defer.returnValue(res)
     return wrapper
+
+
+def patch():
+    BuildStep.__init__ = hide_interpolatable_name(BuildStep.__init__)
+    BuildStep.startStep = render_interpolatable_name(BuildStep.startStep)

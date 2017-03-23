@@ -14,9 +14,6 @@ from packaging import version
 from twisted.internet import defer
 from twisted.logger import Logger
 
-
-MASTER_START_TIME = time.time()
-
 EVE_FOLDER = 'eve'
 EVE_MAIN_YAML = 'main.yml'
 EVE_MAIN_YAML_FULL_PATH = '%s/%s' % (EVE_FOLDER, EVE_MAIN_YAML)
@@ -73,7 +70,7 @@ class ReadConfFromYaml(FileUpload):
                 new_branches[branch_pattern.strip()] = branch_conf
         conf['branches'] = new_branches
         self.setProperty('conf', conf, 'ReadConfFromYaml')
-        self.setProperty('master_start_time', MASTER_START_TIME)
+        self.setProperty('start_time', str(time.time()))
 
         # Find the stage name from the branch name
         branch = self.getProperty('branch')

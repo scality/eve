@@ -1,8 +1,7 @@
+from buildbot.plugins import util
 from buildbot.process.properties import Interpolate
 from buildbot.process.results import CANCELLED, SUCCESS
 from buildbot.steps.master import MasterShellCommand
-
-from .yaml_parser import MASTER_START_TIME
 
 
 class CancelCommand(MasterShellCommand):
@@ -34,9 +33,10 @@ class CancelOldBuild(CancelCommand):
     """Cancel if the build is previous buildbot instance."""
 
     def __init__(self, **kwargs):
+        # pylint: disable=anomalous-backslash-in-string
         super(CancelOldBuild, self).__init__(
             name='prevent unuseful restarts',
             hideStepIf=lambda results, s: results == SUCCESS,
-            command=Interpolate('[ "' + str(MASTER_START_TIME) +
-                                '" = "%(prop:master_start_time)s" ]'),
+            command=Interpolate('[ $(expr "' + util.env.MASTER_START_TIME +
+                                '" \< "%(prop:start_time)s") -eq 1 ]'),
         )

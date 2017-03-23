@@ -2,7 +2,6 @@
 
 import time
 from json import loads
-from os import environ
 from subprocess import STDOUT, CalledProcessError, check_output
 
 import netifaces
@@ -12,9 +11,6 @@ from twisted.internet import defer, threads
 from twisted.logger import Logger
 from twisted.python import log
 
-BUILD_CONTAINER_MAX_MEMORY = environ.get('BUILD_CONTAINER_MAX_MEMORY', '4G')
-BUILD_CONTAINER_MAX_CPU = environ.get('BUILD_CONTAINER_MAX_CPU', '4')
-
 
 class EveDockerLatentWorker(AbstractLatentWorker):
     """Improved version of DockerLatentWorker using the docker command line
@@ -23,9 +19,15 @@ class EveDockerLatentWorker(AbstractLatentWorker):
     logger = Logger('eve.workers.EveDockerLatentWorker')
     instance = None
 
-    def __init__(self, name, password, image, master_fqdn, **kwargs):
+    def __init__(self, name, password, image, master_fqdn, pb_port,
+                 artifacts_prefix, max_memory, max_cpus, **kwargs):
+        # pylint: disable=too-many-arguments
         self.image = image
         self.master_fqdn = master_fqdn,
+        self.pb_port = pb_port
+        self.artifacts_prefix = artifacts_prefix
+        self.max_memory = max_memory
+        self.max_cpus = max_cpus
         kwargs.setdefault('build_wait_timeout', 0)
         kwargs.setdefault('keepalive_interval', None)
         AbstractLatentWorker.__init__(self, name, password, **kwargs)
@@ -60,13 +62,12 @@ class EveDockerLatentWorker(AbstractLatentWorker):
             '--env', 'BUILDMASTER=%s' % self.master_fqdn,
             '--env', 'WORKERNAME=%s' % self.name,
             '--env', 'WORKERPASS=%s' % self.password,
-            '--env', 'BUILDMASTER_PORT=%s' % environ['PB_PORT'],
+            '--env', 'BUILDMASTER_PORT=%s' % self.pb_port,
             '--env', 'DOCKER_HOST_IP=%s' % docker_host_ip,
-            '--env', 'ARTIFACTS_PREFIX=%s' % environ.get('ARTIFACTS_PREFIX',
-                                                         'staging-'),
+            '--env', 'ARTIFACTS_PREFIX=%s' % self.artifacts_prefix,
             '--detach',
-            '--memory=%s' % BUILD_CONTAINER_MAX_MEMORY,
-            '--cpus=%s' % BUILD_CONTAINER_MAX_CPU,
+            '--memory=%s' % self.max_memory,
+            '--cpus=%s' % self.max_cpus
         ]
 
         link = 'bitbucket.org'  # Default value to support legacy behaviour

@@ -240,7 +240,7 @@ class BaseTest(unittest.TestCase):  # pylint: disable=too-many-public-methods
         os.environ['HTTP_PORT'] = str(BASE_HTTP_PORT + master_id)
         os.environ['MASTER_FQDN'] = self.master_fqdn
         os.environ['MASTER_NAME'] = 'master%d' % master_id
-        os.environ['WORKER_SUFFIX'] = 'test-eve%d' % master_id
+        os.environ['SUFFIX'] = 'test-eve%d' % master_id
         os.environ['PB_PORT'] = str(BASE_PB_PORT + master_id)
         os.environ['MAX_LOCAL_WORKERS'] = '1'
         self.setup_eve_master(
@@ -253,7 +253,13 @@ class BaseTest(unittest.TestCase):  # pylint: disable=too-many-public-methods
         """
         os.environ['MASTER_FQDN'] = self.master_fqdn
         os.environ['MASTER_NAME'] = 'master%d' % master_id
-        os.environ['WORKER_SUFFIX'] = 'test-eve%d' % master_id
+        os.environ['DOCKER_BUILDER_NAME'] = 'docker-master%d' % master_id
+        os.environ['OPENSTACK_BUILDER_NAME'] = 'openstack-master%d' % master_id
+        os.environ['DOCKER_SCHEDULER_NAME'] = \
+            'docker-scheduler-master%d' % master_id
+        os.environ['OPENSTACK_SCHEDULER_NAME'] = \
+            'openstack-scheduler-master%d' % master_id
+        os.environ['SUFFIX'] = 'test-eve%d' % master_id
 
         os.environ['PB_PORT'] = str(BASE_PB_PORT + master_id)
         os.environ['MAX_LOCAL_WORKERS'] = '1'

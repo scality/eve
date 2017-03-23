@@ -2,10 +2,10 @@
 
 import re
 import time
-from os import environ
 from subprocess import STDOUT, CalledProcessError, check_output
 
 import novaclient
+from buildbot.plugins import util
 from buildbot.process.properties import Property
 from buildbot.worker import AbstractWorker
 from buildbot.worker.openstack import OpenStackLatentWorker
@@ -33,15 +33,15 @@ class EveOpenStackLatentWorker(OpenStackLatentWorker):
     def get_reachable_address(self):
         """Get the address to the eve master reachable by the worker."""
         if not self._reachable_address:
-            if 'NGROK' in environ:
-                self._ngrok = Ngrok(command=environ['NGROK'])
+            if util.env.NGROK:
+                self._ngrok = Ngrok(command=util.env.NGROK)
                 self._reachable_address = self._ngrok.start(
-                    'tcp', environ['PB_PORT'], 'us')
+                    'tcp', self.pb_port, 'us')
             else:
-                self._reachable_address = self.masterFQDN, environ['PB_PORT']
+                self._reachable_address = self.masterFQDN, self.pb_port
         return self._reachable_address
 
-    def __init__(self, region, ssh_key, masterFQDN,
+    def __init__(self, region, ssh_key, masterFQDN, pb_port,
                  cloud_init=None, **kwargs):  # flake8: noqa
         super(EveOpenStackLatentWorker, self).__init__(**kwargs)
         # fixme: This is a fragile hack because the original class does not
@@ -51,6 +51,7 @@ class EveOpenStackLatentWorker(OpenStackLatentWorker):
         self.cloud_init = cloud_init
         self.ip_address = None
         self.masterFQDN = masterFQDN
+        self.pb_port = pb_port
         self._ngrok = None
         self._starting_instance = False
 

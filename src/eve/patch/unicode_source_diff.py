@@ -1,8 +1,9 @@
-class TempSourceStamp(object):
-    """ This is a Hack to fix a bug where the git diff is sent as an str
-    instead of unicode and triggers an exception
-    """
+"""HACK to fix a bug where the git diff is sent as an str instead of
+unicode and triggers an exception."""
+from buildbot.process import buildrequest
 
+
+class TempSourceStamp(object):
     def asDict(self):  # pylint: disable=invalid-name,missing-docstring
         result = vars(self).copy()
         del result['ssid']
@@ -18,3 +19,7 @@ class TempSourceStamp(object):
             for attr, val in result.items()
         ), result
         return result
+
+
+def patch():
+    buildrequest.TempSourceStamp = TempSourceStamp

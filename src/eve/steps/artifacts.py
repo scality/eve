@@ -13,8 +13,6 @@ from packaging import version
 from twisted.internet import defer, reactor
 
 
-# pylint: disable=attribute-defined-outside-init
-
 CURL_CMD = """curl -s -X POST -H "Content-type: application/json" \
 --progress-bar https://identity.api.rackspacecloud.com/v2.0/tokens \
 -d '{ \
@@ -88,8 +86,10 @@ class CloudfilesAuthenticate(SetPropertyFromCommand):
 class Upload(ShellCommand):
     """Upload files to rackspace."""
 
-    # maximum upload time, in seconds.
+    _links = []
+
     UPLOAD_MAX_TIME = 900
+    """Maximum upload time, in seconds."""
 
     def __init__(self, source, urls=None, **kwargs):
         name = kwargs.pop('name', 'send artifacts to artifact repository')
@@ -118,7 +118,7 @@ class Upload(ShellCommand):
         if version.parse(eve_api_version) >= version.parse('0.2'):
             return self.getProperty('artifacts_name')
         else:
-            return self.ARTIFACTS_PREFIX + self.getProperty('build_id')
+            return util.env.ARTIFACTS_PREFIX + self.getProperty('build_id')
 
     def set_command(self, urls):
         artifacts_container = self.get_artifacts_container()
@@ -131,7 +131,7 @@ class Upload(ShellCommand):
             ('curl --verbose --max-time {max_time} -s -T ../artifacts.tar.gz '
              '-X PUT -H"x-auth-token: ' +
              self.getProperty('cloudfiles_token') + '" ' +
-             self.CLOUDFILES_URL + artifacts_container +
+             util.env.CLOUDFILES_URL + artifacts_container +
              '?extract-archive=tar.gz').format(max_time=self.UPLOAD_MAX_TIME)
         ]
 
@@ -214,7 +214,7 @@ class Upload(ShellCommand):
         artifacts_container = self.get_artifacts_container()
         for (name, upath) in links:
             url = ('{url}/{artifacts_container}/{path}'.format(
-                url=self.ARTIFACTS_URL,
+                url=util.env.ARTIFACTS_URL,
                 artifacts_container=artifacts_container,
                 path=upath
             ))

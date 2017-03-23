@@ -1,10 +1,9 @@
-from os import environ
 from tempfile import mkdtemp
 
 import netifaces
 from buildbot.config import BuilderConfig
 from buildbot.locks import MasterLock
-from buildbot.plugins import steps
+from buildbot.plugins import steps, util
 from buildbot.process.factory import BuildFactory
 from buildbot.process.properties import Interpolate, Property
 from buildbot.process.results import SUCCESS
@@ -13,20 +12,16 @@ from buildbot.steps.shell import SetPropertyFromCommand, ShellCommand
 from buildbot.steps.source.git import Git
 
 
-def setup_bootstrap(git_repo, project_name,
-                    bootstrap_builder_name, local_workers,
-                    openstack_credentials,
-                    artifacts_url, artifacts_prefix):
-    local_git_repo = environ.pop('LOCAL_GIT_REPO')
+def bootstrap_builder(workers):
     bootstrap_factory = BuildFactory()
-    git_repo_short = git_repo.split('/')[-1].replace('.git', '')
+    git_repo_short = util.env.GIT_REPO.split('/')[-1].replace('.git', '')
 
     git_cache_dir_host = mkdtemp(prefix=git_repo_short)
-    if openstack_credentials['login']:
+    if util.env.RAX_LOGIN:
         bootstrap_factory.addStep(
             steps.CloudfilesAuthenticate(
-                rax_login=openstack_credentials['login'],
-                rax_pwd=openstack_credentials['password']))
+                rax_login=util.env.RAX_LOGIN,
+                rax_pwd=util.env.RAX_PWD))
 
     # Check out the source
     git_cache_update_lock = MasterLock('git_cache_update')
@@ -35,7 +30,7 @@ def setup_bootstrap(git_repo, project_name,
                      workdir=git_cache_dir_host,
                      command=(
                          'git clone --mirror --recursive %s . || '
-                         'git remote update' % local_git_repo),
+                         'git remote update' % util.env.LOCAL_GIT_REPO),
                      locks=[git_cache_update_lock.access('exclusive')],
                      hideStepIf=lambda results, s: results == SUCCESS,
                      haltOnFailure=True))
@@ -81,7 +76,7 @@ def setup_bootstrap(git_repo, project_name,
                               [0]['addr'])
         except KeyError:
             pass
-    git_host, git_owner, git_slug = project_name.split('_', 2)
+    git_host, git_owner, git_slug = util.env.PROJECT_NAME.split('_', 2)
 
     bootstrap_factory.addStep(SetProperty(
         name='get the git host',
@@ -136,17 +131,17 @@ def setup_bootstrap(git_repo, project_name,
         property='artifacts_private_url'))
     bootstrap_factory.addStep(SetPropertyFromCommand(
         name='set the artifacts public url',
-        command=Interpolate('echo ' + artifacts_url +
+        command=Interpolate('echo ' + util.env.ARTIFACTS_URL +
                             '/%(prop:artifacts_name)s'),
         hideStepIf=lambda results, s: results == SUCCESS,
         property='artifacts_public_url'))
 
     return BuilderConfig(
-        name=bootstrap_builder_name,
-        workernames=[lw.name for lw in local_workers],
+        name=util.env.BOOTSTRAP_BUILDER_NAME,
+        workernames=[lw.name for lw in workers],
         factory=bootstrap_factory,
         properties={
-            'artifacts_url': artifacts_url,
-            'artifacts_prefix': artifacts_prefix,
+            'artifacts_url': util.env.ARTIFACTS_URL,
+            'artifacts_prefix': util.env.ARTIFACTS_PREFIX,
         },
     )
