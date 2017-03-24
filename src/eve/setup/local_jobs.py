@@ -19,7 +19,7 @@ def local_jobs(workers):
             filename = path.join(local_dirpath, job_conf_file)
             try:
                 blder, schdler = define_local_job(
-                    filename, workers, util.env.MASTER_NAME)
+                    filename, workers, util.env.SUFFIX)
                 builders.append(blder)
                 scheds.append(schdler)
             except Exception as error:

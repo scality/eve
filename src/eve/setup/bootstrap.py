@@ -76,23 +76,22 @@ def bootstrap_builder(workers):
                               [0]['addr'])
         except KeyError:
             pass
-    git_host, git_owner, git_slug = util.env.PROJECT_NAME.split('_', 2)
 
     bootstrap_factory.addStep(SetProperty(
         name='get the git host',
         property='git_host',
         hideStepIf=lambda results, s: results == SUCCESS,
-        value=git_host))
+        value=util.env.GIT_HOST))
     bootstrap_factory.addStep(SetProperty(
         name='get the git owner',
         property='git_owner',
         hideStepIf=lambda results, s: results == SUCCESS,
-        value=git_owner))
+        value=util.env.GIT_OWNER))
     bootstrap_factory.addStep(SetProperty(
         name='get the repository name',
         property='git_slug',
         hideStepIf=lambda results, s: results == SUCCESS,
-        value=git_slug))
+        value=util.env.GIT_SLUG))
     bootstrap_factory.addStep(SetPropertyFromCommand(
         name='get the product version',
         command=('./eve/get_product_version.sh 2> /dev/null'

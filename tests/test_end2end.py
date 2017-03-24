@@ -239,7 +239,6 @@ class BaseTest(unittest.TestCase):  # pylint: disable=too-many-public-methods
         os.environ['TRY_PORT'] = str(BASE_TRY_PORT + master_id)
         os.environ['HTTP_PORT'] = str(BASE_HTTP_PORT + master_id)
         os.environ['MASTER_FQDN'] = self.master_fqdn
-        os.environ['MASTER_NAME'] = 'master%d' % master_id
         os.environ['SUFFIX'] = 'test-eve%d' % master_id
         os.environ['PB_PORT'] = str(BASE_PB_PORT + master_id)
         os.environ['MAX_LOCAL_WORKERS'] = '1'
@@ -252,13 +251,6 @@ class BaseTest(unittest.TestCase):  # pylint: disable=too-many-public-methods
         It will wait until it is up and running.
         """
         os.environ['MASTER_FQDN'] = self.master_fqdn
-        os.environ['MASTER_NAME'] = 'master%d' % master_id
-        os.environ['DOCKER_BUILDER_NAME'] = 'docker-master%d' % master_id
-        os.environ['OPENSTACK_BUILDER_NAME'] = 'openstack-master%d' % master_id
-        os.environ['DOCKER_SCHEDULER_NAME'] = \
-            'docker-scheduler-master%d' % master_id
-        os.environ['OPENSTACK_SCHEDULER_NAME'] = \
-            'openstack-scheduler-master%d' % master_id
         os.environ['SUFFIX'] = 'test-eve%d' % master_id
 
         os.environ['PB_PORT'] = str(BASE_PB_PORT + master_id)
@@ -412,7 +404,7 @@ class BaseTest(unittest.TestCase):  # pylint: disable=too-many-public-methods
                         'builderid=%d, build_number=%d' %
                         (builder['builderid'], build_number))
 
-    def get_build_steps(self, builder='bootstrap', build_number=1):
+    def get_build_steps(self, builder='test_bootstrap', build_number=1):
         """Returns steps from specified builder and build."""
         builder = self.get_builder(builder)
         try:
@@ -424,7 +416,7 @@ class BaseTest(unittest.TestCase):  # pylint: disable=too-many-public-methods
                             'builderid=%d, build_number=%d' %
                             (builder['builderid'], build_number))
 
-    def get_step(self, name, builder='bootstrap', build_number=1):
+    def get_step(self, name, builder='test_bootstrap', build_number=1):
         """Returns matching step from specified builder and build number."""
         steps = self.get_build_steps(
             builder=builder, build_number=build_number)
@@ -435,7 +427,7 @@ class BaseTest(unittest.TestCase):  # pylint: disable=too-many-public-methods
                             (name, builder['builderid'], build_number))
         return step[0]
 
-    def get_build_result(self, builder='bootstrap', build_number=1,
+    def get_build_result(self, builder='test_bootstrap', build_number=1,
                          expected_result='success'):
         """Get the result of the build `build_number`."""
         for _ in range(900):
@@ -671,12 +663,12 @@ class Test(BaseTest):  # pylint: disable=too-many-public-methods
         self.get_build_result(expected_result='failure')
 
         # crude method to determine which builder executed the steps
-        builder = 'docker-master1'
+        builder = 'test_docker_builder-test-eve1'
         try:
             step = self.get_step(
                 name=u'single report with one pass', builder=builder)
         except:  # pylint: disable=bare-except
-            builder = 'docker-master2'
+            builder = 'test_docker_builder-test-eve2'
             step = self.get_step(
                 name=u'single report with one pass', builder=builder)
 
@@ -865,9 +857,9 @@ class Test(BaseTest):  # pylint: disable=too-many-public-methods
             self.get_builder('my-periodic-builder')
             scheduler = self.get_scheduler('my-periodic-scheduler')
             assert 'master0' in scheduler['master']['name']
-            scheduler = self.get_scheduler('nightly-scheduler-master0')
+            scheduler = self.get_scheduler('nightly-scheduler-test-eve0')
             assert 'master0' in scheduler['master']['name']
-            scheduler = self.get_scheduler('nightly-scheduler-master1')
+            scheduler = self.get_scheduler('nightly-scheduler-test-eve1')
             assert 'master1' in scheduler['master']['name']
         finally:
             # stop eve manually to prevent periodic job from running
@@ -960,7 +952,7 @@ class TestPublishCodeCoverage(BaseTest):
             if varname in os.environ:
                 del os.environ[varname]
 
-    def _get_publish_codecov_build(self, builder_name="docker-master"):
+    def _get_publish_codecov_build(self, builder_name="test_docker_builder"):
         """Search the build of the code coverage report publication step.
 
         :args builder_name: Root builder name rather than bootstrap.
