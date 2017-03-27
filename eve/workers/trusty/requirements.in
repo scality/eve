@@ -1,3 +1,8 @@
+-r ../../../requirements/autoformat.in
 -r ../../../requirements/base.in
--r ../../../requirements/lint.in
+-r ../../../requirements/flake8.in
+-r ../../../requirements/prospector.in
+-r ../../../requirements/pylint.in
+-r ../../../requirements/system_tests.in
+-r ../../../requirements/unit.in
 tox

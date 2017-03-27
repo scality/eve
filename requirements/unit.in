@@ -1,0 +1,4 @@
+mock
+
+# buildbot depends pbr==1.10.0
+pbr==1.10.0
