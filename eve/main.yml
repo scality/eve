@@ -32,7 +32,7 @@ stages:
           retryFetch: True
       - ShellCommand:
           name: run static analysis tools
-          command: tox --sitepackages -e flake8,prospector,pylint
+          command: tox --sitepackages -e lint
   system tests:
     worker:
       type: openstack
@@ -59,7 +59,7 @@ stages:
           haltOnFailure: True
       - ShellCommand:
           name: run tests
-          command: HOME=/home/eve tox -e test
+          command: HOME=/home/eve tox -e system
           logfiles:
             master0.twistd.log: /home/eve/.eve_test_data/master0/twistd.log
             master1.twistd.log: /home/eve/.eve_test_data/master1/twistd.log

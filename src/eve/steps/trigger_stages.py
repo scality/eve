@@ -1,7 +1,7 @@
 from collections import OrderedDict
 
-from buildbot.process.buildstep import BuildStep
 from buildbot.plugins import util
+from buildbot.process.buildstep import BuildStep
 from buildbot.process.results import FAILURE, SUCCESS
 from buildbot.steps.trigger import Trigger
 from twisted.internet import defer
