@@ -17,6 +17,8 @@ import requests
 import yaml
 from buildbot.process.results import FAILURE, SUCCESS, WARNINGS
 
+from dotenv import load_dotenv
+
 from .buildbot_api_client import BuildbotDataAPI
 from .cmd import cmd
 from .codecov_io_server import CodecovIOMockServer
@@ -144,6 +146,8 @@ class BaseTest(unittest.TestCase):  # pylint: disable=too-many-public-methods
     eve = None
 
     def setUp(self):
+        dotenv_path = os.path.join(os.path.dirname(__file__), 'test_env')
+        load_dotenv(dotenv_path)
         # Set extra environment variables
         test_method = getattr(self, self._testMethodName)
         extra_environ = getattr(test_method, "__eve_environ__", False)
@@ -332,7 +336,7 @@ class BaseTest(unittest.TestCase):  # pylint: disable=too-many-public-methods
             'repository': {
                 'links': {
                     'html': {
-                        'href': 'https://mock/test_owner/test'
+                        'href': 'https://mock/test_owner/mock'
                     }
                 },
                 'scm': 'git',
@@ -354,7 +358,7 @@ class BaseTest(unittest.TestCase):  # pylint: disable=too-many-public-methods
         """Get scheduler named name from the Buildbot's API."""
         return self.api.get('schedulers?name=%s' % name)['schedulers'][0]
 
-    def get_build(self, builder='boostrap', build_number=1):
+    def get_build(self, builder='test_boostrap', build_number=1):
         """Wait for build to start and return its infos."""
         builder = self.get_builder(builder)
         for _ in range(10):

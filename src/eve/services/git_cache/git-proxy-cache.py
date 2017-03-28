@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
-import subprocess
 import os
+import subprocess
 
 project_root = os.environ['GIT_PROJECT_ROOT']
 reporelpath = os.environ['PATH_INFO']

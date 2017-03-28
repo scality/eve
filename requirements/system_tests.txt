@@ -14,6 +14,7 @@ Pygments==2.2.0
 PyNaCl==1.0.1
 PyQRCode==1.2.1
 pytest==3.0.6
+python-dotenv==0.6.3
 PyTrie==0.3
 sdnotify==0.3.1
 setproctitle==1.1.10

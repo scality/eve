@@ -3,6 +3,7 @@
 buildbot
 crossbar < 17
 pytest
+python-dotenv
 PyYAML
 requests
 Twisted < 17
