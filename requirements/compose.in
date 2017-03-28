@@ -1,0 +1,3 @@
+-c buildbot-constraints.txt
+
+docker-compose
