@@ -18,6 +18,17 @@ def bootstrap_builder(workers):
                 rax_login=util.env.RAX_LOGIN,
                 rax_pwd=util.env.RAX_PWD))
 
+    # EVE-361 adding git_config:
+    # temporary workaround until we have bootstrap
+    # running in a container linked to git_cache
+    git_config = {
+        'url.http://localhost:2222/bitbucket.org/.insteadOf':
+            'git@bitbucket.org:',
+        'url.http://localhost:2222/github.com/.insteadOf':
+            'git@github.com:',
+        'url.http://localhost:2222/mock/.insteadOf':
+            'git@mock:'
+    }
     bootstrap_factory.addStep(
         Git(name='checkout git branch',
             repourl=util.env.GIT_REPO,
@@ -26,7 +37,8 @@ def bootstrap_builder(workers):
             branch=Property('branch'),
             mode='incremental',
             hideStepIf=lambda results, s: results == SUCCESS,
-            haltOnFailure=True))
+            haltOnFailure=True,
+            config=git_config))
 
     bootstrap_factory.addStep(
         steps.CancelNonTipBuild())
