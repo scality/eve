@@ -41,28 +41,6 @@ BASE_PB_PORT = 9990
 WAMP_PORT = 10990
 
 
-def remove_bitbucket_cache_keys(host, port, filename=None):
-    if filename is None:
-        filename = os.path.expanduser("~/.ssh/known_hosts")
-
-    # Remove previous key, just in case
-    cmd("ssh-keygen -R '[{host}]:{port}' -f {filename}".format(
-        host=host, port=port, filename=filename))
-
-
-def setup_bitbucket_cache_keys(host, port):
-    known_host_file = os.path.expanduser("~/.ssh/known_hosts")
-
-    # Remove previous key, just in case
-    remove_bitbucket_cache_keys(host, port, known_host_file)
-
-    # Add the new ones
-    cmd("ssh-keyscan -p {port} {host} >> {filename}".format(
-        host=host,
-        port=port,
-        filename=known_host_file))
-
-
 def need_env_vars(varnames, reason):
     """Decorator to skip test if environment variables are not passsed."""
     return unittest.skipIf(
@@ -191,7 +169,7 @@ class BaseTest(unittest.TestCase):  # pylint: disable=too-many-public-methods
         cmd('mkdir -p %s' % self.test_dir)
         self.git_dir = tempfile.mkdtemp(
             prefix=os.path.join(tmpdir, 'eve_repo_'))
-        os.environ['GIT_REPO'] = 'git@bitbucket.org:scality/mock.git'
+        os.environ['GIT_REPO'] = 'git@mock:owner/test'
         os.environ['LOCAL_GIT_REPO'] = self.git_dir
         self.url = 'http://%s:%d/' % (self.master_fqdn, BASE_HTTP_PORT)
         os.environ['EXTERNAL_URL'] = self.url
@@ -206,10 +184,6 @@ class BaseTest(unittest.TestCase):  # pylint: disable=too-many-public-methods
 
     def tearDown(self):
         # Restore extra environment variables
-
-        # Remove keys from known_hosts
-        remove_bitbucket_cache_keys('localhost', 2222)
-
         test_method = getattr(self, self._testMethodName)
         old_environ = getattr(test_method, "__old_eve_environ__", False)
         if old_environ:
@@ -300,22 +274,15 @@ class BaseTest(unittest.TestCase):  # pylint: disable=too-many-public-methods
     def setup_git(self):
         """Create a new git repo."""
 
-        for path, name, port in [('bitbucket_cache', 'bitbucket.org', 2222),
-                                 ('github_cache', 'github.com', 2223)]:
-            builddir = os.path.join(__evedir__, 'services', path)
-            cmd('docker build -t %s %s' % (name, builddir))
-            cmd('docker rm -f %s' % name, ignore_exception=True)
-            self.git_cache_docker_id = cmd('docker run -d -p %s:22 '
-                                           '--name %s %s' % (port, name, name))
+        builddir = os.path.join(__evedir__, 'services/git_cache')
+        cmd('docker build -t git_cache %s' % builddir)
+        cmd('docker rm -f git_cache', ignore_exception=True)
+        cmd('docker run -d -p 2222:80 --name git_cache git_cache')
+        time.sleep(3)  # wait for cache service to stabilize
 
-        # setup bitbucket_cache keys right after the docker run
-        setup_bitbucket_cache_keys('localhost', 2222)
-
-        time.sleep(3)  # wait for bitbucket cache service to stabilize
         cmd('mkdir -p %s' % self.git_dir)
         os.chdir(self.git_dir)
-        cmd('git clone '
-            'git+ssh://git@localhost:2222/home/git/scality/mock.git .')
+        cmd('git clone http://localhost:2222/mock/owner/test.git .')
 
         cmd('git config user.email "john.doe@example.com"')
         cmd('git config user.name "John Doe"')
@@ -367,7 +334,7 @@ class BaseTest(unittest.TestCase):  # pylint: disable=too-many-public-methods
             'repository': {
                 'links': {
                     'html': {
-                        'href': 'https://bitbucket.org/scality/test'
+                        'href': 'https://mock/owner/test'
                     }
                 },
                 'scm': 'git',
@@ -1040,33 +1007,3 @@ class TestPublishCodeCoverage(BaseTest):
                 'x-amz-storage-class': 'REDUCED_REDUNDANCY',
             }
         ))
-
-
-class TestServices(unittest.TestCase):
-    # pylint: disable=too-many-public-methods
-    """Test services."""
-
-    def setUp(self):
-        self.test_dir = tempfile.mkdtemp(prefix='test_service_')
-        cmd('docker rm -f github.com', ignore_exception=True)
-
-    def test_github_docker_cache(self):
-        """Check github docker cache can build and works."""
-        github_cache_dir = os.path.join(
-            __evedir__, 'services', 'github_cache')
-        cmd('docker build -t github.com %s' % github_cache_dir)
-        cmd('docker run -d -p 2223:22 --name github.com github.com')
-        time.sleep(3)  # wait for cache service to stabilize
-        # check clone via ssh and path
-        cmd('GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null '
-            '-o StrictHostKeyChecking=no" git clone '
-            'git+ssh://git@localhost:2223/home/git/scality/mock.git '
-            '%s/1' % self.test_dir)
-        # check clone via git ssh
-        docker_ip = cmd(
-            'docker inspect --format '
-            '"{{ .NetworkSettings.IPAddress }}" github.com').strip()
-        cmd('GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null '
-            '-o StrictHostKeyChecking=no" '
-            'git clone git@%s:scality/mock.git '
-            '%s/2' % (docker_ip, self.test_dir))

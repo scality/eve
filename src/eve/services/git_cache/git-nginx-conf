@@ -1,0 +1,36 @@
+error_log /dev/stdout info;
+access_log /dev/stdout;
+
+server {
+	listen 80 default_server;
+	listen [::]:80 default_server;
+	root /var/www/html;
+	index index.html index.htm index.nginx-debian.html;
+
+	server_name _;
+
+	# git static
+	location ~ ^.*\.git/objects/([0-9a-f]+/[0-9a-f]+|pack/pack-[0-9a-f]+.(pack|idx))$ {
+	    root /var/lib/git;
+    }
+
+    # git http-backend
+    proxy_connect_timeout       600;
+    proxy_send_timeout          600;
+    proxy_read_timeout          600;
+    send_timeout                600;
+    proxy_max_temp_file_size      0;
+
+    location ~ ^.*\.git/(HEAD|info/refs|objects/info/.*|git-(upload|receive)-pack)$ {
+        fastcgi_read_timeout 300;
+
+        include fastcgi_params;
+        fastcgi_param SCRIPT_FILENAME /usr/lib/git-core/git-proxy-cache-and-http-backend;
+        fastcgi_param GIT_HTTP_EXPORT_ALL "";
+        fastcgi_param GIT_PROJECT_ROOT /var/lib/git;
+        fastcgi_param PATH_INFO $uri;
+        fastcgi_param REMOTE_USER $remote_user;
+        fastcgi_index /root/git-upload-pack.py;
+        fastcgi_pass unix:/var/run/fcgiwrap.socket;
+    }
+}

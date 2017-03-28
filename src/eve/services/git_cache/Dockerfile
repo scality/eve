@@ -1,0 +1,31 @@
+FROM ubuntu:xenial
+
+
+ENV \
+  GIT_GROUP="${GIT_GROUP:-www-data}"
+
+RUN \
+  apt-get update && \
+  apt-get install -y fcgiwrap git nginx python && \
+  echo "\ndaemon off;" >> /etc/nginx/nginx.conf && \
+  rm -rf /var/lib/apt/lists/* && \
+  chown -R www-data:www-data /var/lib/nginx
+
+VOLUME ["/var/lib/git"]
+
+EXPOSE 80
+
+COPY git-proxy-cache.py /usr/lib/git-core/git-proxy-cache.py
+COPY git-proxy-cache-and-http-backend /usr/lib/git-core/git-proxy-cache-and-http-backend
+COPY git-nginx-conf /etc/nginx/sites-enabled/default
+
+RUN \
+  chmod 777 /usr/lib/git-core/git-proxy-cache-and-http-backend && \
+  git config --global credential.helper 'store --file=/.git-credentials'
+
+CMD \
+  echo $GIT_CREDENTIALS >  /.git-credentials && \
+  chown -R www-data:www-data /var/lib/git  /.git-credentials && \
+  echo "FCGI_GROUP=${GIT_GROUP}" > /etc/default/fcgiwrap && \
+  service fcgiwrap start && \
+  service nginx start
