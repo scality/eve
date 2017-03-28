@@ -180,8 +180,6 @@ class BaseTest(unittest.TestCase):  # pylint: disable=too-many-public-methods
         self.setup_eve_master_backend(master_id=1, local_jobs=backend_jobs)
         self.setup_eve_master_backend(master_id=2)
         self.api = BuildbotDataAPI(self.url)
-        self.api.login("eve", "eve")
-
         self.setup_git()
 
     def tearDown(self):

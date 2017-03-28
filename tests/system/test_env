@@ -37,5 +37,3 @@ TRY_PWD=test_try_pwd
 TRY_SCHEDULER_NAME=test_try_scheduler_name
 WAMP_REALM=buildbot
 WAMP_ROUTER_URL=ws://127.0.0.1:8080/ws
-WWW_PLAIN_LOGIN=eve
-WWW_PLAIN_PASSWORD=eve

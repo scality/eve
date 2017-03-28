@@ -1,7 +1,7 @@
 import datetime
 
 from buildbot.plugins import util
-from buildbot.www.auth import UserPasswordAuth
+from buildbot.www.auth import NoAuth, UserPasswordAuth
 from buildbot.www.authz import Authz, Forbidden
 from buildbot.www.authz.endpointmatchers import (AnyEndpointMatcher,
                                                  EndpointMatcherBase)
@@ -99,12 +99,18 @@ def auth():
             util.env.OAUTH2_CLIENT_ID,
             util.env.OAUTH2_CLIENT_SECRET
         )
-    else:
+
+    if util.env.WWW_PLAIN_LOGIN:
         return UserPasswordAuth({
-            util.env.WWW_PLAIN_PASSWORD: util.env.WWW_PLAIN_LOGIN})
+            util.env.WWW_PLAIN_LOGIN: util.env.WWW_PLAIN_PASSWORD})
+
+    return NoAuth()
 
 
 def authz():
+    if not util.env.OAUTH2_CLIENT_ID and not util.env.WWW_PLAIN_LOGIN:
+        return Authz()
+
     if util.env.OAUTH2_CLIENT_ID:
         role_matchers = [RolesFromGroups()]
     else:
