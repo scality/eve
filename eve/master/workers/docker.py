@@ -37,13 +37,13 @@ class EveDockerLatentWorker(AbstractLatentWorker):
             raise ValueError('instance active')
         image = yield build.render(self.image)
         volumes = build.getProperty('docker_volumes')
-        project = build.getProperty('project')
+        git_host = build.getProperty('git_host')
         buildnumber = yield build.render(Property('buildnumber'))
         res = yield threads.deferToThread(self._thd_start, image,
-                                          volumes, buildnumber, project)
+                                          volumes, buildnumber, git_host)
         defer.returnValue(res)
 
-    def _thd_start(self, image, volumes, buildnumber, project):
+    def _thd_start(self, image, volumes, buildnumber, git_host):
         docker_host_ip = None
         try:
             docker_addresses = netifaces.ifaddresses('docker0')
@@ -71,9 +71,7 @@ class EveDockerLatentWorker(AbstractLatentWorker):
         ]
 
         link = 'bitbucket.org'  # Default value to support legacy behaviour
-        if project.startswith('bitbucket_'):
-            link = 'bitbucket.org'
-        if project.startswith('github_'):
+        if git_host == 'github':
             link = 'github.com'
         cmd.extend(['--link', link])
 
