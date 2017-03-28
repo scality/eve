@@ -1,7 +1,7 @@
+from buildbot.test.util import config as configmixin
+from buildbot.test.util import steps as testutil
 from eve.steps.artifacts import Upload
 from twisted.trial import unittest
-from buildbot.test.util import steps as testutil
-from buildbot.test.util import config as configmixin
 
 
 class TestUpload(testutil.BuildStepMixin, unittest.TestCase,

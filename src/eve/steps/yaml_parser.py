@@ -128,7 +128,6 @@ class ReadConfFromYaml(FileUpload):
                     hideStepIf=lambda results, s: results == SUCCESS,
                     haltOnFailure=True,
                     value=buildnumber.zfill(8)),
-
             ])
 
         defer.returnValue(SUCCESS)

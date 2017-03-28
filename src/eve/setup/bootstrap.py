@@ -70,22 +70,26 @@ def bootstrap_builder(workers):
         property='git_host',
         hideStepIf=lambda results, s: results == SUCCESS,
         value=util.env.GIT_HOST))
+
     bootstrap_factory.addStep(SetProperty(
         name='get the git owner',
         property='git_owner',
         hideStepIf=lambda results, s: results == SUCCESS,
         value=util.env.GIT_OWNER))
+
     bootstrap_factory.addStep(SetProperty(
         name='get the repository name',
         property='git_slug',
         hideStepIf=lambda results, s: results == SUCCESS,
         value=util.env.GIT_SLUG))
+
     bootstrap_factory.addStep(SetPropertyFromCommand(
         name='get the product version',
         command=('./eve/get_product_version.sh 2> /dev/null'
                  ' || echo 0.0.0'),
         hideStepIf=lambda results, s: results == SUCCESS,
         property='product_version'))
+
     bootstrap_factory.addStep(SetPropertyFromCommand(
         name='set the artifacts base name',
         command=Interpolate('echo %(prop:git_host)s'
@@ -97,6 +101,7 @@ def bootstrap_builder(workers):
                             '.%(prop:commit_short_revision)s'),
         hideStepIf=lambda results, s: results == SUCCESS,
         property='artifacts_base_name'))
+
     bootstrap_factory.addStep(SetPropertyFromCommand(
         name='set the artifacts name',
         command=Interpolate('echo %(prop:artifacts_base_name)s'
@@ -104,11 +109,13 @@ def bootstrap_builder(workers):
                             '.%(prop:b4nb)s'),
         hideStepIf=lambda results, s: results == SUCCESS,
         property='artifacts_name'))
+
     bootstrap_factory.addStep(SetProperty(
         name='set the artifacts local reverse proxy',
         property='artifacts_local_reverse_proxy',
         hideStepIf=lambda results, s: results == SUCCESS,
         value='http://' + docker_host_ip + ':1080/'))
+
     bootstrap_factory.addStep(SetPropertyFromCommand(
         name='set the artifacts private url',
         command=Interpolate('echo http://' + docker_host_ip +
@@ -116,6 +123,7 @@ def bootstrap_builder(workers):
                             '%(prop:artifacts_name)s'),
         hideStepIf=lambda results, s: results == SUCCESS,
         property='artifacts_private_url'))
+
     bootstrap_factory.addStep(SetPropertyFromCommand(
         name='set the artifacts public url',
         command=Interpolate('echo ' + util.env.ARTIFACTS_URL +
