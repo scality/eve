@@ -169,8 +169,6 @@ class BaseTest(unittest.TestCase):  # pylint: disable=too-many-public-methods
         cmd('mkdir -p %s' % self.test_dir)
         self.git_dir = tempfile.mkdtemp(
             prefix=os.path.join(tmpdir, 'eve_repo_'))
-        os.environ['GIT_REPO'] = 'git@mock:owner/test'
-        os.environ['LOCAL_GIT_REPO'] = self.git_dir
         self.url = 'http://%s:%d/' % (self.master_fqdn, BASE_HTTP_PORT)
         os.environ['EXTERNAL_URL'] = self.url
         self.setup_crossbar()
@@ -282,7 +280,7 @@ class BaseTest(unittest.TestCase):  # pylint: disable=too-many-public-methods
 
         cmd('mkdir -p %s' % self.git_dir)
         os.chdir(self.git_dir)
-        cmd('git clone http://localhost:2222/mock/owner/test.git .')
+        cmd('git clone http://localhost:2222/mock/test_owner/mock.git .')
 
         cmd('git config user.email "john.doe@example.com"')
         cmd('git config user.name "John Doe"')
@@ -334,7 +332,7 @@ class BaseTest(unittest.TestCase):  # pylint: disable=too-many-public-methods
             'repository': {
                 'links': {
                     'html': {
-                        'href': 'https://mock/owner/test'
+                        'href': 'https://mock/test_owner/test'
                     }
                 },
                 'scm': 'git',

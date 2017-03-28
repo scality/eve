@@ -1,50 +1,35 @@
-from tempfile import mkdtemp
-
 import netifaces
 from buildbot.config import BuilderConfig
-from buildbot.locks import MasterLock
 from buildbot.plugins import steps, util
 from buildbot.process.factory import BuildFactory
 from buildbot.process.properties import Interpolate, Property
 from buildbot.process.results import SUCCESS
 from buildbot.steps.master import SetProperty
-from buildbot.steps.shell import SetPropertyFromCommand, ShellCommand
+from buildbot.steps.shell import SetPropertyFromCommand
 from buildbot.steps.source.git import Git
 
 
 def bootstrap_builder(workers):
     bootstrap_factory = BuildFactory()
-    git_repo_short = util.env.GIT_REPO.split('/')[-1].replace('.git', '')
 
-    git_cache_dir_host = mkdtemp(prefix=git_repo_short)
     if util.env.RAX_LOGIN:
         bootstrap_factory.addStep(
             steps.CloudfilesAuthenticate(
                 rax_login=util.env.RAX_LOGIN,
                 rax_pwd=util.env.RAX_PWD))
 
-    # Check out the source
-    git_cache_update_lock = MasterLock('git_cache_update')
     bootstrap_factory.addStep(
-        ShellCommand(name='update git repo cache',
-                     workdir=git_cache_dir_host,
-                     command=(
-                         'git clone --mirror --recursive %s . || '
-                         'git remote update' % util.env.LOCAL_GIT_REPO),
-                     locks=[git_cache_update_lock.access('exclusive')],
-                     hideStepIf=lambda results, s: results == SUCCESS,
-                     haltOnFailure=True))
-
-    bootstrap_factory.addStep(
-        steps.CancelNonTipBuild(workdir=git_cache_dir_host))
-
-    bootstrap_factory.addStep(
-        SetPropertyFromCommand(
-            name='get the git sha1 from the branch name',
-            command=Interpolate('cd ' + git_cache_dir_host +
-                                ' && git rev-list -1 %(prop:branch)s'),
+        Git(name='checkout git branch',
+            repourl=util.env.GIT_REPO,
+            retry=(60, 10),
+            submodules=True,
+            branch=Property('branch'),
+            mode='incremental',
             hideStepIf=lambda results, s: results == SUCCESS,
-            property='revision'))
+            haltOnFailure=True))
+
+    bootstrap_factory.addStep(
+        steps.CancelNonTipBuild())
 
     bootstrap_factory.addStep(
         SetProperty(
@@ -53,15 +38,6 @@ def bootstrap_builder(workers):
             hideStepIf=lambda results, s: results == SUCCESS,
             value=Property('builddir')))
 
-    bootstrap_factory.addStep(
-        Git(name='checkout git branch',
-            repourl=git_cache_dir_host,
-            shallow=True,
-            retry=(60, 10),
-            submodules=True,
-            mode='incremental',
-            hideStepIf=lambda results, s: results == SUCCESS,
-            haltOnFailure=True))
     # Read conf from yaml file
     bootstrap_factory.addStep(steps.ReadConfFromYaml())
 
