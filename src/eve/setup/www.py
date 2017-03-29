@@ -5,8 +5,8 @@ from buildbot.www.auth import UserPasswordAuth
 from buildbot.www.authz import Authz, Forbidden
 from buildbot.www.authz.endpointmatchers import (AnyEndpointMatcher,
                                                  EndpointMatcherBase)
-from buildbot.www.authz.roles import RolesFromBase
-from buildbot.www.oauth2 import GoogleAuth
+from buildbot.www.authz.roles import RolesFromGroups, RolesFromUsername
+from buildbot.www.oauth2 import BitbucketAuth, GitHubAuth
 from twisted.internet import defer
 
 
@@ -76,16 +76,6 @@ class DenyRebuildIntermediateBuild(EndpointMatcherBase):
             )
 
 
-class DeveloperRoleIfConnected(RolesFromBase):
-    """Sets the 'developer' role to all authenticated users."""
-
-    def getRolesFromUser(self, userDetails):
-        roles = []
-        if 'email' in userDetails:
-            roles.append('developer')
-        return roles
-
-
 def www():
     return {
         'port': util.env.HTTP_PORT,
@@ -101,7 +91,11 @@ def www():
 
 def auth():
     if util.env.OAUTH2_CLIENT_ID:
-        return GoogleAuth(
+        auth_method = {
+            'bitbucket': BitbucketAuth,
+            'github': GitHubAuth,
+        }[util.env.OAUTH2_PROVIDER.lower()]
+        return auth_method(
             util.env.OAUTH2_CLIENT_ID,
             util.env.OAUTH2_CLIENT_SECRET
         )
@@ -111,16 +105,19 @@ def auth():
 
 
 def authz():
+    if util.env.OAUTH2_CLIENT_ID:
+        role_matchers = [RolesFromGroups()]
+    else:
+        util.env.OAUTH2_GROUP = 'admin'
+        role_matchers = [RolesFromUsername(
+            roles=[util.env.OAUTH2_GROUP],
+            usernames=[util.env.WWW_PLAIN_LOGIN],
+        )]
     return Authz(
         allowRules=[
-            DenyRebuildIntermediateBuild(
-                util.env.BOOTSTRAP_BUILDER_NAME,
-                role='developer'  # This parameter is not necessary,
-                                  #   the next rule will deny access.
-            ),
-            AnyEndpointMatcher(role='developer'),
+            DenyRebuildIntermediateBuild(util.env.BOOTSTRAP_BUILDER_NAME,
+                                         role='*'),
+            AnyEndpointMatcher(role=util.env.OAUTH2_GROUP),
         ],
-        roleMatchers=[
-            DeveloperRoleIfConnected()
-        ]
+        roleMatchers=role_matchers,
     )
