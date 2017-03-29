@@ -3,3 +3,6 @@
 .cache
 .tox
 *.pyc
+.eggs
+eve.egg-info
+env
