@@ -1,19 +1,27 @@
--c buildbot-constraints.txt
+# requirements for successful installation of eve
+#
+# to reproduce frozen requirements:
+#    first install packages needed to be able to compile buildbot-www wheel:
+#    $ pip install -U -r base.txt
+#    $ pip install -U -r unit.txt
+#
+#    then:
+#    $ pip install freeze-requirements
+#    $ freeze-requirements freeze --separate-requirements base.in
+#    $ mv base-frozen.in base.txt
+-c constraints.txt
 
-autobahn
-buildbot-worker
-buildbot-www
-buildbot[tls]
-MySQL-python # Used in production with a mysql database
-netifaces
-python-dateutil
-python-novaclient # 2.35.0
-PyYAML
-raven
-requests[security]
-retrying
-six
-treq # Used by buildbot for the HTTP service
-Twisted < 17
-xunitparser
-zope.interface
+buildbot[tls]       # core technology
+buildbot-worker     # used in workers setup
+buildbot-www        # used in www setup
+MySQL-python        # used in production with a mysql database
+netifaces           # used by bootstrap job
+python-novaclient   # used by EveOpenStackLatentWorker
+PyYAML              # used by yaml_parser
+raven               # used by sentry
+requests[security]  # used by step_factory
+retrying            # used by EveOpenStackLatentWorker
+six                 # used by CodecovIOPublication
+treq                # used by buildbot for the HTTP service
+xunitparser         # used by JunitShellCommand
+zope.interface      # used by sentry

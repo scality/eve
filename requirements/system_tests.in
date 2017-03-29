@@ -1,9 +1,9 @@
--c buildbot-constraints.txt
+# ADDITIONAL Requirements for system testing
+# check instruction on how to reproduce in base.in
+-c constraints.txt
 
-buildbot
-crossbar < 17
+crossbar
 pytest
 python-dotenv
 PyYAML
 requests
-Twisted < 17

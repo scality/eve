@@ -1,4 +1,5 @@
-mock
+# ADDITIONAL Requirements for unit testing
+# check instruction on how to reproduce in base.in
+-c constraints.txt
 
-# buildbot depends pbr==1.10.0
-pbr==1.10.0
+mock

@@ -1,5 +1,5 @@
-prospector
+# ADDITIONAL Requirements for prospector testing
+# check instruction on how to reproduce in base.in
+-c constraints.txt
 
-# base            depends >=1.10.8
-# but pip install wrapt>1.10.10
-wrapt==1.10.8
+prospector
