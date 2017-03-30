@@ -1,0 +1,9 @@
+# This file has been automatically generated, DO NOT EDIT!
+
+# Frozen requirements for "unit.in"
+
+funcsigs==1.0.2
+mock==2.0.0
+pbr==2.0.0
+six==1.10.0
+

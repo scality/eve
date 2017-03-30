@@ -1,0 +1,9 @@
+# ADDITIONAL Requirements for system testing
+# check instruction on how to reproduce in base.in
+-c constraints.txt
+
+crossbar
+pytest
+python-dotenv
+PyYAML
+requests

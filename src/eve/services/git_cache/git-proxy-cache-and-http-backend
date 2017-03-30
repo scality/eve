@@ -1,0 +1,5 @@
+#!/bin/bash
+
+set -e
+
+python /usr/lib/git-core/git-proxy-cache.py && /usr/lib/git-core/git-http-backend $@

@@ -1,0 +1,5 @@
+# ADDITIONAL Requirements for pylint testing
+# check instruction on how to reproduce in base.in
+-c constraints.txt
+
+pylint

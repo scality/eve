@@ -1,3 +1,20 @@
+# requirements for successful installation of eve
+# (pre-installed in Dockerfile to benefit from cache)
+#
+# to reproduce frozen requirements:
+#    first install packages needed to be able to compile buildbot-www wheel:
+#    $ pip install -U -r base.txt
+#    $ pip install -U -r unit.txt
+#
+#    then:
+#    $ pip install freeze-requirements
+#    $ freeze-requirements freeze --separate-requirements requirements.in
+#    $ mv requirements-frozen.in requirements.txt
+-r ../../../requirements/autoformat.in
 -r ../../../requirements/base.in
--r ../../../requirements/lint.in
+-r ../../../requirements/flake8.in
+-r ../../../requirements/prospector.in
+-r ../../../requirements/pylint.in
+-r ../../../requirements/system_tests.in
+-r ../../../requirements/unit.in
 tox

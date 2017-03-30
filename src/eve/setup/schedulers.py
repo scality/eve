@@ -14,6 +14,8 @@ def any_branch_scheduler():
 
 
 def force_scheduler():
+    default_project = "%s_%s_%s" % (
+        util.env.GIT_HOST, util.env.GIT_OWNER, util.env.GIT_SLUG)
     return schedulers.EveForceScheduler(
         name=util.env.FORCE_SCHEDULER_NAME,
         builderNames=[util.env.BOOTSTRAP_BUILDER_NAME],
@@ -32,7 +34,7 @@ def force_scheduler():
                 repository=util.FixedParameter(name='repository',
                                                default=util.env.GIT_REPO),
                 project=util.FixedParameter(name='project',
-                                            default=util.env.PROJECT_NAME),
+                                            default=default_project),
             )
         ]
     )
@@ -42,7 +44,7 @@ def try_scheduler():
     return Try_Userpass(
         name=util.env.TRY_SCHEDULER_NAME,
         port=util.env.TRY_PORT,
-        userpass=[('try', util.env.TRY_PASSWORD)],
+        userpass=[('try', util.env.TRY_PWD)],
         builderNames=[util.env.BOOTSTRAP_BUILDER_NAME])
 
 

@@ -1,0 +1,33 @@
+version: '3'
+
+services:
+  master:
+    build: .
+    ports:
+      - "8990:8990"
+    depends_on:
+      - db
+      - crossbario
+    links:
+      - git_cache
+    env_file:
+      - env
+
+  db:
+    image: mysql/mysql-server:5.7
+    restart: always
+    env_file:
+      - env
+
+  crossbario:
+    image: crossbario/crossbar
+    restart: always
+
+  git_cache:
+    container_name: git_cache
+    build: src/eve/services/git_cache
+    ports:
+      - "8888:80"
+    env_file:
+      - env
+

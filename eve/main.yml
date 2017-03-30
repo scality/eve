@@ -17,6 +17,7 @@ stages:
           name: trigger static checks and test stages simultaneously
           stage_names:
             - static checks
+            - unit tests
             - system tests
   static checks:
     worker:
@@ -32,7 +33,22 @@ stages:
           retryFetch: True
       - ShellCommand:
           name: run static analysis tools
-          command: tox --sitepackages -e flake8,prospector,pylint
+          command: tox --sitepackages -e lint
+  unit tests:
+    worker:
+      type: docker
+      path: eve/workers/trusty
+      volumes:
+        - '/home/eve/workspace'
+    steps:
+      - Git:
+          name: fetch source
+          repourl: '%(prop:git_reference)s'
+          shallow: True
+          retryFetch: True
+      - ShellCommand:
+          name: run unit tests
+          command: tox --sitepackages -e unit
   system tests:
     worker:
       type: openstack
@@ -59,7 +75,7 @@ stages:
           haltOnFailure: True
       - ShellCommand:
           name: run tests
-          command: HOME=/home/eve tox -e test
+          command: HOME=/home/eve tox -e system
           logfiles:
             master0.twistd.log: /home/eve/.eve_test_data/master0/twistd.log
             master1.twistd.log: /home/eve/.eve_test_data/master1/twistd.log

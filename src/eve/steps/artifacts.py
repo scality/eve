@@ -96,8 +96,6 @@ class Upload(ShellCommand):
         self._retry = kwargs.pop('retry', (0, 1))
         self._source = source
         self._kwargs = kwargs
-        # retry 5 times if upload step fails, wait 60s between retries
-        retry = kwargs.pop('retry', (60, 5))
         self._urls = urls
 
         kwargs['workdir'] = kwargs.get('workdir', 'build/' + source)
@@ -106,7 +104,6 @@ class Upload(ShellCommand):
             haltOnFailure=True,
             command=util.Transform(self.set_command, urls),
             maxTime=self.UPLOAD_MAX_TIME + 10,
-            retry=retry,
             **kwargs
         )
         self.observer = logobserver.BufferLogObserver(wantStdout=True,

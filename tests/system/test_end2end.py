@@ -17,6 +17,8 @@ import requests
 import yaml
 from buildbot.process.results import FAILURE, SUCCESS, WARNINGS
 
+from dotenv import load_dotenv
+
 from .buildbot_api_client import BuildbotDataAPI
 from .cmd import cmd
 from .codecov_io_server import CodecovIOMockServer
@@ -39,28 +41,6 @@ BASE_TRY_PORT = 7990
 BASE_HTTP_PORT = 8990
 BASE_PB_PORT = 9990
 WAMP_PORT = 10990
-
-
-def remove_bitbucket_cache_keys(host, port, filename=None):
-    if filename is None:
-        filename = os.path.expanduser("~/.ssh/known_hosts")
-
-    # Remove previous key, just in case
-    cmd("ssh-keygen -R '[{host}]:{port}' -f {filename}".format(
-        host=host, port=port, filename=filename))
-
-
-def setup_bitbucket_cache_keys(host, port):
-    known_host_file = os.path.expanduser("~/.ssh/known_hosts")
-
-    # Remove previous key, just in case
-    remove_bitbucket_cache_keys(host, port, known_host_file)
-
-    # Add the new ones
-    cmd("ssh-keyscan -p {port} {host} >> {filename}".format(
-        host=host,
-        port=port,
-        filename=known_host_file))
 
 
 def need_env_vars(varnames, reason):
@@ -166,6 +146,8 @@ class BaseTest(unittest.TestCase):  # pylint: disable=too-many-public-methods
     eve = None
 
     def setUp(self):
+        dotenv_path = os.path.join(os.path.dirname(__file__), 'test_env')
+        load_dotenv(dotenv_path)
         # Set extra environment variables
         test_method = getattr(self, self._testMethodName)
         extra_environ = getattr(test_method, "__eve_environ__", False)
@@ -191,8 +173,6 @@ class BaseTest(unittest.TestCase):  # pylint: disable=too-many-public-methods
         cmd('mkdir -p %s' % self.test_dir)
         self.git_dir = tempfile.mkdtemp(
             prefix=os.path.join(tmpdir, 'eve_repo_'))
-        os.environ['GIT_REPO'] = 'git@bitbucket.org:scality/mock.git'
-        os.environ['LOCAL_GIT_REPO'] = self.git_dir
         self.url = 'http://%s:%d/' % (self.master_fqdn, BASE_HTTP_PORT)
         os.environ['EXTERNAL_URL'] = self.url
         self.setup_crossbar()
@@ -206,10 +186,6 @@ class BaseTest(unittest.TestCase):  # pylint: disable=too-many-public-methods
 
     def tearDown(self):
         # Restore extra environment variables
-
-        # Remove keys from known_hosts
-        remove_bitbucket_cache_keys('localhost', 2222)
-
         test_method = getattr(self, self._testMethodName)
         old_environ = getattr(test_method, "__old_eve_environ__", False)
         if old_environ:
@@ -239,7 +215,6 @@ class BaseTest(unittest.TestCase):  # pylint: disable=too-many-public-methods
         os.environ['TRY_PORT'] = str(BASE_TRY_PORT + master_id)
         os.environ['HTTP_PORT'] = str(BASE_HTTP_PORT + master_id)
         os.environ['MASTER_FQDN'] = self.master_fqdn
-        os.environ['MASTER_NAME'] = 'master%d' % master_id
         os.environ['SUFFIX'] = 'test-eve%d' % master_id
         os.environ['PB_PORT'] = str(BASE_PB_PORT + master_id)
         os.environ['MAX_LOCAL_WORKERS'] = '1'
@@ -252,13 +227,6 @@ class BaseTest(unittest.TestCase):  # pylint: disable=too-many-public-methods
         It will wait until it is up and running.
         """
         os.environ['MASTER_FQDN'] = self.master_fqdn
-        os.environ['MASTER_NAME'] = 'master%d' % master_id
-        os.environ['DOCKER_BUILDER_NAME'] = 'docker-master%d' % master_id
-        os.environ['OPENSTACK_BUILDER_NAME'] = 'openstack-master%d' % master_id
-        os.environ['DOCKER_SCHEDULER_NAME'] = \
-            'docker-scheduler-master%d' % master_id
-        os.environ['OPENSTACK_SCHEDULER_NAME'] = \
-            'openstack-scheduler-master%d' % master_id
         os.environ['SUFFIX'] = 'test-eve%d' % master_id
 
         os.environ['PB_PORT'] = str(BASE_PB_PORT + master_id)
@@ -308,22 +276,15 @@ class BaseTest(unittest.TestCase):  # pylint: disable=too-many-public-methods
     def setup_git(self):
         """Create a new git repo."""
 
-        for path, name, port in [('bitbucket_cache', 'bitbucket.org', 2222),
-                                 ('github_cache', 'github.com', 2223)]:
-            builddir = os.path.join(__evedir__, 'services', path)
-            cmd('docker build -t %s %s' % (name, builddir))
-            cmd('docker rm -f %s' % name, ignore_exception=True)
-            self.git_cache_docker_id = cmd('docker run -d -p %s:22 '
-                                           '--name %s %s' % (port, name, name))
+        builddir = os.path.join(__evedir__, 'services/git_cache')
+        cmd('docker build -t git_cache %s' % builddir)
+        cmd('docker rm -f git_cache', ignore_exception=True)
+        cmd('docker run -d -p 2222:80 --name git_cache git_cache')
+        time.sleep(3)  # wait for cache service to stabilize
 
-        # setup bitbucket_cache keys right after the docker run
-        setup_bitbucket_cache_keys('localhost', 2222)
-
-        time.sleep(3)  # wait for bitbucket cache service to stabilize
         cmd('mkdir -p %s' % self.git_dir)
         os.chdir(self.git_dir)
-        cmd('git clone '
-            'git+ssh://git@localhost:2222/home/git/scality/mock.git .')
+        cmd('git clone http://localhost:2222/mock/test_owner/mock.git .')
 
         cmd('git config user.email "john.doe@example.com"')
         cmd('git config user.name "John Doe"')
@@ -375,7 +336,7 @@ class BaseTest(unittest.TestCase):  # pylint: disable=too-many-public-methods
             'repository': {
                 'links': {
                     'html': {
-                        'href': 'https://bitbucket.org/scality/test'
+                        'href': 'https://mock/test_owner/mock'
                     }
                 },
                 'scm': 'git',
@@ -397,7 +358,7 @@ class BaseTest(unittest.TestCase):  # pylint: disable=too-many-public-methods
         """Get scheduler named name from the Buildbot's API."""
         return self.api.get('schedulers?name=%s' % name)['schedulers'][0]
 
-    def get_build(self, builder='boostrap', build_number=1):
+    def get_build(self, builder='test_boostrap', build_number=1):
         """Wait for build to start and return its infos."""
         builder = self.get_builder(builder)
         for _ in range(10):
@@ -412,7 +373,7 @@ class BaseTest(unittest.TestCase):  # pylint: disable=too-many-public-methods
                         'builderid=%d, build_number=%d' %
                         (builder['builderid'], build_number))
 
-    def get_build_steps(self, builder='bootstrap', build_number=1):
+    def get_build_steps(self, builder='test_bootstrap', build_number=1):
         """Returns steps from specified builder and build."""
         builder = self.get_builder(builder)
         try:
@@ -424,7 +385,7 @@ class BaseTest(unittest.TestCase):  # pylint: disable=too-many-public-methods
                             'builderid=%d, build_number=%d' %
                             (builder['builderid'], build_number))
 
-    def get_step(self, name, builder='bootstrap', build_number=1):
+    def get_step(self, name, builder='test_bootstrap', build_number=1):
         """Returns matching step from specified builder and build number."""
         steps = self.get_build_steps(
             builder=builder, build_number=build_number)
@@ -435,7 +396,7 @@ class BaseTest(unittest.TestCase):  # pylint: disable=too-many-public-methods
                             (name, builder['builderid'], build_number))
         return step[0]
 
-    def get_build_result(self, builder='bootstrap', build_number=1,
+    def get_build_result(self, builder='test_bootstrap', build_number=1,
                          expected_result='success'):
         """Get the result of the build `build_number`."""
         for _ in range(900):
@@ -671,12 +632,12 @@ class Test(BaseTest):  # pylint: disable=too-many-public-methods
         self.get_build_result(expected_result='failure')
 
         # crude method to determine which builder executed the steps
-        builder = 'docker-master1'
+        builder = 'test_docker_builder-test-eve1'
         try:
             step = self.get_step(
                 name=u'single report with one pass', builder=builder)
         except:  # pylint: disable=bare-except
-            builder = 'docker-master2'
+            builder = 'test_docker_builder-test-eve2'
             step = self.get_step(
                 name=u'single report with one pass', builder=builder)
 
@@ -865,9 +826,9 @@ class Test(BaseTest):  # pylint: disable=too-many-public-methods
             self.get_builder('my-periodic-builder')
             scheduler = self.get_scheduler('my-periodic-scheduler')
             assert 'master0' in scheduler['master']['name']
-            scheduler = self.get_scheduler('nightly-scheduler-master0')
+            scheduler = self.get_scheduler('nightly-scheduler-test-eve0')
             assert 'master0' in scheduler['master']['name']
-            scheduler = self.get_scheduler('nightly-scheduler-master1')
+            scheduler = self.get_scheduler('nightly-scheduler-test-eve1')
             assert 'master1' in scheduler['master']['name']
         finally:
             # stop eve manually to prevent periodic job from running
@@ -960,7 +921,7 @@ class TestPublishCodeCoverage(BaseTest):
             if varname in os.environ:
                 del os.environ[varname]
 
-    def _get_publish_codecov_build(self, builder_name="docker-master"):
+    def _get_publish_codecov_build(self, builder_name="test_docker_builder"):
         """Search the build of the code coverage report publication step.
 
         :args builder_name: Root builder name rather than bootstrap.
@@ -1048,33 +1009,3 @@ class TestPublishCodeCoverage(BaseTest):
                 'x-amz-storage-class': 'REDUCED_REDUNDANCY',
             }
         ))
-
-
-class TestServices(unittest.TestCase):
-    # pylint: disable=too-many-public-methods
-    """Test services."""
-
-    def setUp(self):
-        self.test_dir = tempfile.mkdtemp(prefix='test_service_')
-        cmd('docker rm -f github.com', ignore_exception=True)
-
-    def test_github_docker_cache(self):
-        """Check github docker cache can build and works."""
-        github_cache_dir = os.path.join(
-            __evedir__, 'services', 'github_cache')
-        cmd('docker build -t github.com %s' % github_cache_dir)
-        cmd('docker run -d -p 2223:22 --name github.com github.com')
-        time.sleep(3)  # wait for cache service to stabilize
-        # check clone via ssh and path
-        cmd('GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null '
-            '-o StrictHostKeyChecking=no" git clone '
-            'git+ssh://git@localhost:2223/home/git/scality/mock.git '
-            '%s/1' % self.test_dir)
-        # check clone via git ssh
-        docker_ip = cmd(
-            'docker inspect --format '
-            '"{{ .NetworkSettings.IPAddress }}" github.com').strip()
-        cmd('GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null '
-            '-o StrictHostKeyChecking=no" '
-            'git clone git@%s:scality/mock.git '
-            '%s/2' % (docker_ip, self.test_dir))

@@ -7,7 +7,8 @@ from twisted.python.reflect import namedModule
 def local_workers():
     workers = []
     for i in range(util.env.MAX_LOCAL_WORKERS):
-        worker_ = LocalWorker('lw%03d-%s' % (i, util.env.SUFFIX))
+        worker_ = LocalWorker('lw%03d-%s-%s' % (
+            i, util.env.GIT_SLUG, util.env.SUFFIX))
         # Hack to fix a bug stating that LocalWorkers
         # do not have a valid path_module
         worker_.path_module = namedModule('posixpath')
@@ -20,7 +21,7 @@ def docker_workers():
     for i in range(util.env.MAX_DOCKER_WORKERS):
         workers.append(
             worker.EveDockerLatentWorker(
-                name='dw%03d-%s' % (i, util.env.SUFFIX),
+                name='dw%03d-%s-%s' % (i, util.env.GIT_SLUG, util.env.SUFFIX),
                 password=util.password_generator(),
                 master_fqdn=util.env.MASTER_FQDN,
                 pb_port=util.env.PB_PORT,
@@ -38,16 +39,16 @@ def openstack_workers():
     for i in range(util.env.MAX_OPENSTACK_WORKERS):
         workers.append(
             worker.EveOpenStackLatentWorker(
-                name='ow%03d-%s' % (i, util.env.SUFFIX),
+                name='ow%03d-%s-%s' % (i, util.env.GIT_SLUG, util.env.SUFFIX),
                 password=util.password_generator(),
                 image=Property('openstack_image'),
                 flavor=Property('openstack_flavor'),
                 block_devices=None,
                 os_auth_url=util.env.OS_AUTH_URL,
-                os_tenant_name=util.env.OS_TENANT,
-                os_username=util.env.RAX_LOGIN,
-                os_password=util.env.RAX_PWD,
-                region=util.env.OS_REGION,
+                os_tenant_name=util.env.OS_TENANT_NAME,
+                os_username=util.env.OS_USERNAME,
+                os_password=util.env.SECRET_OS_PASSWORD,
+                region=util.env.OS_REGION_NAME,
                 ssh_key=util.env.OS_SSH_KEY,
                 cloud_init=util.env.CLOUD_INIT_SCRIPT,
                 meta=None,

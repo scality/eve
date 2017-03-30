@@ -1,0 +1,9 @@
+.cache
+venv
+.tox
+docker-compose.yml
+*.pyc
+*~
+.DS_Store
+.idea
+tests

@@ -1,0 +1,11 @@
+# This file has been automatically generated, DO NOT EDIT!
+
+# Frozen requirements for "flake8.in"
+
+configparser==3.5.0
+enum34==1.1.6
+flake8==3.3.0
+mccabe==0.6.1
+pycodestyle==2.0.0
+pyflakes==1.5.0
+
