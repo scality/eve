@@ -39,7 +39,7 @@ class StepPatcherConfig(BuildStep):
         try:
             with open(self.conf_path) as patch_file:
                 config = yaml.load(patch_file.read())
-        except (OSError, yaml.error) as err:
+        except (OSError, yaml.YAMLError) as err:
             self.logger.error(
                 'An error occured while loading the patcher config file at '
                 '{path}: {err}', path=self.conf_path, err=err)
