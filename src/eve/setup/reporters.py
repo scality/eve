@@ -20,6 +20,7 @@ def hipchat_reporter():
 
 def github_reporter():
     assert util.env.GITHUB_TOKEN
+    assert util.env.GITHUB_CONTEXT_STATUS
 
     builders = [
         util.env.DOCKER_BUILDER_NAME,
@@ -28,6 +29,7 @@ def github_reporter():
 
     return GitHubStatusPush(
         util.env.GITHUB_TOKEN,
+        context=util.env.GITHUB_CONTEXT_STATUS,
         builders=builders
     )
 
