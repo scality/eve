@@ -51,6 +51,8 @@ setup(
             'JUnitShellCommand=eve.steps.junit:JUnitShellCommand',
             'PublishCoverageReport=eve.steps.publish_coverage_report:PublishCoverageReport',
             'ReadConfFromYaml=eve.steps.yaml_parser:ReadConfFromYaml',
+            'StepPatcher=eve.steps.step_patcher:StepPatcher',
+            'StepPatcherConfig=eve.steps.step_patcher:StepPatcherConfig',
             'ShellCommandWithSecrets=eve.steps.shell_command_with_secrets:ShellCommandWithSecrets',
             'StepExtractor=eve.steps.yaml_parser:StepExtractor',
             'TriggerStages=eve.steps.trigger_stages:TriggerStages',

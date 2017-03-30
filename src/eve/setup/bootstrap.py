@@ -50,6 +50,13 @@ def bootstrap_builder(workers):
             hideStepIf=lambda results, s: results == SUCCESS,
             value=Property('builddir')))
 
+    # Read patcher conf and populate related properties
+    bootstrap_factory.addStep(
+        steps.StepPatcherConfig(
+            conf_path=util.env.PATCHER_FILE_PATH,
+            name='check if any steps should currently be patched',
+            hideStepIf=lambda results, s: results == SUCCESS))
+
     # Read conf from yaml file
     bootstrap_factory.addStep(steps.ReadConfFromYaml())
 
