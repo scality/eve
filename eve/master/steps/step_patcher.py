@@ -5,7 +5,7 @@ import yaml
 
 from buildbot.process.buildstep import BuildStep
 from buildbot.process.results import (
-    ERROR, SUCCESS, SKIPPED, WARNING
+    FAILURE, SUCCESS, SKIPPED, WARNINGS
 )
 
 from twisted.internet import defer
@@ -44,7 +44,7 @@ class StepPatcherConfig(BuildStep):
                 'An error occured while loading the patcher config file at '
                 '{path}: {err}', path=self.conf_path, err=err)
             self.setProperty(prop, {}, 'StepPatcherConfig')
-            return defer.succeed(ERROR)
+            return defer.succeed(FAILURE)
 
         self.setProperty('step_patcher_config', config, 'StepPatcherConfig')
         if not config:
@@ -52,7 +52,7 @@ class StepPatcherConfig(BuildStep):
         else:
             self.logger.info("Setting patching config: {conf}",
                              conf=config)
-            defer.succeed(WARNING)
+            defer.succeed(WARNINGS)
 
 
 class StepPatcher(object):
