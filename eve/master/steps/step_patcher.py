@@ -39,7 +39,7 @@ class StepPatcherConfig(BuildStep):
         try:
             with open(self.conf_path) as patch_file:
                 config = yaml.load(patch_file.read())
-        except Exception as err:
+        except (OSError, yaml.error) as err:
             self.logger.error(
                 'An error occured while loading the patcher config file at '
                 '{path}: {err}', path=self.conf_path, err=err)
@@ -60,7 +60,8 @@ class StepPatcher(object):
 
     logger = Logger('eve.steps.StepPatcher')
 
-    def __init__(self, config={}):
+    def __init__(self, config=None):
+        config = config or {}
         skip_tests = config.get('skip_tests', [])
         self.skip_regexp = None
         if isinstance(skip_tests, basestring):
