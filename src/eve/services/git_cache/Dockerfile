@@ -9,7 +9,9 @@ RUN \
   apt-get install -y fcgiwrap git nginx python && \
   echo "\ndaemon off;" >> /etc/nginx/nginx.conf && \
   rm -rf /var/lib/apt/lists/* && \
-  chown -R www-data:www-data /var/lib/nginx
+  chown -R www-data:www-data /var/lib/nginx && \
+  mkdir /git && \
+  touch /git/.git-credentials  # empty by default, override in a volume if required
 
 VOLUME ["/var/lib/git"]
 
@@ -21,11 +23,11 @@ COPY git-nginx-conf /etc/nginx/sites-enabled/default
 
 RUN \
   chmod 777 /usr/lib/git-core/git-proxy-cache-and-http-backend && \
-  git config --global credential.helper 'store --file=/.git-credentials'
+  git config --global credential.helper 'store --file=/var/lib/git/.git-credentials'
 
 CMD \
-  echo $GIT_CREDENTIALS >  /.git-credentials && \
-  chown -R www-data:www-data /var/lib/git  /.git-credentials && \
+  cp /git/.git-credentials /var/lib/git && \
+  chown -R www-data:www-data /var/lib/git && \
   echo "FCGI_GROUP=${GIT_GROUP}" > /etc/default/fcgiwrap && \
   service fcgiwrap start && \
   service nginx start
