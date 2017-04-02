@@ -23,7 +23,7 @@ COPY git-nginx-conf /etc/nginx/sites-enabled/default
 
 RUN \
   chmod 777 /usr/lib/git-core/git-proxy-cache-and-http-backend && \
-  git config --global credential.helper 'store --file=/var/lib/git/.git-credentials'
+  git config --system credential.helper 'store --file=/var/lib/git/.git-credentials'
 
 CMD \
   cp /git/.git-credentials /var/lib/git && \
