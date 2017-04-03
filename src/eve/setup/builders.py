@@ -24,7 +24,9 @@ def triggerable_builder(builder_name, workers):
                     'git@github.com: && '
                     'git config --global '
                     'url.http://%(git_cache)s/mock/.insteadOf '
-                    'git@mock:' % {'git_cache': util.env.GIT_CACHE_NAME}
+                    'http://localhost:2222/mock/' % {
+                        'git_cache': util.env.GIT_CACHE_NAME
+                    }
         ))
 
     # Extract steps from conf
