@@ -4,6 +4,7 @@ import re
 from buildbot.process.results import (CANCELLED, EXCEPTION, FAILURE, RETRY,
                                       SKIPPED, SUCCESS, WARNINGS, Results)
 from buildbot.reporters import utils
+from buildbot.reporters.github import GitHubStatusPush
 from buildbot.reporters.http import HttpStatusPushBase
 from buildbot.util.httpclientservice import HTTPClientService
 from twisted.internet import defer
@@ -245,6 +246,16 @@ class BitbucketBuildStatusPush(BaseBuildStatusPush):
         name_value = '[%s: %s]' % (name, value)
         self.description_suffix = name_value + self.description_suffix
 
+    def filterBuilds(self, build):
+        try:
+            key = build['properties']['stage_name'][0]
+        except (KeyError, IndexError):
+            self.logger.error('no valid stage_name property found')
+        else:
+            if key not in ['pre-merge', 'post-merge']:
+                return False
+        return super(BitbucketBuildStatusPush, self).filterBuilds(build)
+
     @defer.inlineCallbacks
     def send(self, build):
         """Send build status to Bitbucket."""
@@ -252,8 +263,6 @@ class BitbucketBuildStatusPush(BaseBuildStatusPush):
         key, result, _, summary, description = self.gather_data(build)
         # Temporary hack to keep previous behaviour
         # Do not send status for other stages than 'pre-merge' or 'post-merge'
-        if key not in ['pre-merge', 'post-merge']:
-            return
         data = {
             'state': self.BITBUCKET_STATUS_CORRESP[result],
             'key': key,
@@ -277,3 +286,24 @@ class BitbucketBuildStatusPush(BaseBuildStatusPush):
             self.BITBUCKET_STATUS_CORRESP[result],
             key,
             url))
+
+
+class GithubBuildStatusPush(GitHubStatusPush):
+    """Send build result to github build status API."""
+    logger = Logger('eve.steps.GithubBuildStatusPush')
+
+    def filterBuilds(self, build):
+        try:
+            key = build['properties']['stage_name'][0]
+        except (KeyError, IndexError):
+            self.logger.error('no valid stage_name property found')
+        else:
+            if key not in ['pre-merge', 'post-merge']:
+                return False
+        return super(GithubBuildStatusPush, self).filterBuilds(build)
+
+    @defer.inlineCallbacks
+    def send(self, build):
+        key = build['properties']['stage_name'][0]
+        self.context = key  # pylint: disable=attribute-defined-outside-init
+        return super(GithubBuildStatusPush, self).send(build)
