@@ -1,18 +1,18 @@
 from buildbot.plugins import util
 from buildbot.process.properties import Interpolate
 from buildbot.process.results import CANCELLED, SUCCESS
-from buildbot.steps.shell import ShellCommand
+from buildbot.steps.master import MasterShellCommand
 
 
-class CancelCommand(ShellCommand):
+class CancelCommand(MasterShellCommand):
     """Cancel a build according to result of command."""
 
-    def commandComplete(self, cmd):
-        if cmd.didFail():
+    def processEnded(self, status_object):
+        """If the return code is non-zero set build to CANCELLED."""
+        if status_object.value.exitCode != 0:
             self.finished(CANCELLED)
-            return
-
-        return super(CancelCommand, self).commandComplete(cmd)
+        else:
+            super(CancelCommand, self).processEnded(status_object)
 
 
 class CancelNonTipBuild(CancelCommand):
