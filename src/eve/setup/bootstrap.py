@@ -62,8 +62,6 @@ def bootstrap_builder(workers):
             mode='incremental',
             hideStepIf=lambda results, s: results == SUCCESS,
             haltOnFailure=True))
-    # Read conf from yaml file
-    bootstrap_factory.addStep(steps.ReadConfFromYaml())
 
     docker_host_ip = '127.0.0.1'  # Dummy default value
     try:
@@ -142,6 +140,9 @@ def bootstrap_builder(workers):
                             '/%(prop:artifacts_name)s'),
         hideStepIf=lambda results, s: results == SUCCESS,
         property='artifacts_public_url'))
+
+    # Read conf from yaml file
+    bootstrap_factory.addStep(steps.ReadConfFromYaml())
 
     return BuilderConfig(
         name=util.env.BOOTSTRAP_BUILDER_NAME,
