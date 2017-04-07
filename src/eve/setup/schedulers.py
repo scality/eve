@@ -14,8 +14,8 @@ def any_branch_scheduler():
 
 
 def force_scheduler():
-    default_project = "%s_%s_%s" % (
-        util.env.GIT_HOST, util.env.GIT_OWNER, util.env.GIT_SLUG)
+    default_project = "%s/%s" % (
+        util.env.GIT_OWNER, util.env.GIT_SLUG)
     return schedulers.EveForceScheduler(
         name=util.env.FORCE_SCHEDULER_NAME,
         builderNames=[util.env.BOOTSTRAP_BUILDER_NAME],
