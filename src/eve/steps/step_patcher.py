@@ -38,7 +38,7 @@ class StepPatcherConfig(BuildStep):
         try:
             with open(self.conf_path) as patch_file:
                 config = yaml.load(patch_file.read())
-        except (OSError, yaml.YAMLError) as err:
+        except (OSError, IOError, yaml.YAMLError) as err:
             self.logger.error(
                 'An error occured while loading the patcher config file at '
                 '{path}: {err}', path=self.conf_path, err=err)
@@ -51,4 +51,4 @@ class StepPatcherConfig(BuildStep):
         else:
             self.logger.info("Setting patching config: {conf}",
                              conf=config)
-            defer.succeed(WARNINGS)
+            return defer.succeed(WARNINGS)
