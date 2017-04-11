@@ -62,6 +62,7 @@ class StepPatcher(object):
 
     def __init__(self, config=None):
         config = config or {}
+        self.logger.info("Running with conf {conf}", conf=config)
         skip_tests = config.get('skip_tests', [])
         self.skip_regexp = None
         if not skip_tests:
@@ -88,7 +89,10 @@ class StepPatcher(object):
         if not self.skip_regexp:
             return step_type, params
 
-        if self.skip_regexp.match(params.get('name', '')):
+        name = params.get('name', '')
+        self.logger.info("name: {name} regexp: {regexp}", name=name,
+                         regexp=self.skip_regexp)
+        if name and self.skip_regexp.match(name):
             params['doStepIf'] = False
             params['descriptionDone'] = 'Temporarily disabled'
 
