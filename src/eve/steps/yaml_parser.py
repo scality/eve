@@ -1,3 +1,4 @@
+import re
 import time
 from fnmatch import fnmatch
 from tempfile import mktemp
@@ -144,6 +145,50 @@ class ReadConfFromYaml(FileUpload):
         defer.returnValue(SUCCESS)
 
 
+class StepPatcher(object):
+    """Generic hook to patch step types and parameters."""
+
+    logger = Logger('eve.steps.StepPatcher')
+
+    def __init__(self, config=None):
+        config = config or {}
+        self.logger.info("Running with conf {conf}", conf=config)
+        skip_tests = config.get('skip_steps', [])
+        self.skip_regexp = None
+        if not skip_tests:
+            return
+
+        if isinstance(skip_tests, basestring):
+            try:
+                self.skip_regexp = re.compile(skip_tests)
+            except re.error as err:
+                self.logger.error(
+                    "Couldn't compile a regexp from '{regexp}': {err}",
+                    regexp=skip_tests, err=err
+                )
+        elif isinstance(skip_tests, (list, tuple)):
+            try:
+                self.skip_regexp = re.compile('|'.join(skip_tests))
+            except (TypeError, re.error) as err:
+                self.logger.error(
+                    "Couldn't compile a master regexp from '{regexp}': {err}",
+                    regexp=skip_tests, err=err
+                )
+
+    def patch(self, step_type, params):
+        if not self.skip_regexp:
+            return step_type, params
+
+        name = params.get('name', '')
+        self.logger.info("name: {name} regexp: {regexp}", name=name,
+                         regexp=self.skip_regexp)
+        if name and self.skip_regexp.match(name):
+            params['doStepIf'] = False
+            params['descriptionDone'] = 'Temporarily disabled'
+
+        return step_type, params
+
+
 class StepExtractor(BuildStep):
     """Extracts and adds the build steps to the current builder.
 
@@ -155,10 +200,13 @@ class StepExtractor(BuildStep):
 
     def run(self):
         conf = self.getProperty('conf')
+        step_patcher_config = self.getProperty('step_patcher_config')
+        patcher = StepPatcher(step_patcher_config)
         stage_name = self.getProperty('stage_name')
         stage_conf = conf['stages'][stage_name]
         for step in stage_conf['steps']:
             step_type, params = next(step.iteritems())
+            step_type, params = patcher.patch(step_type, params)
             bb_step = util.step_factory(globals(), step_type, **params)
             self.build.addStepsAfterLastStep([bb_step])
             self.logger.debug('Add {step} with params : {params}',
