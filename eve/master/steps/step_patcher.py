@@ -63,7 +63,7 @@ class StepPatcher(object):
     def __init__(self, config=None):
         config = config or {}
         self.logger.info("Running with conf {conf}", conf=config)
-        skip_tests = config.get('skip_tests', [])
+        skip_tests = config.get('skip_steps', [])
         self.skip_regexp = None
         if not skip_tests:
             return
