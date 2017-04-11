@@ -10,6 +10,7 @@ from buildbot.process.results import SUCCESS
 from buildbot.steps.master import SetProperty
 from buildbot.steps.shell import SetPropertyFromCommand, ShellCommand
 from buildbot.steps.source.git import Git
+from eve.setup.step_patcher import StepPatcherConfig
 
 
 def bootstrap_builder(workers):
@@ -55,7 +56,7 @@ def bootstrap_builder(workers):
 
     # Read patcher conf and populate related properties
     bootstrap_factory.addStep(
-        steps.StepPatcherConfig(
+        StepPatcherConfig(
             conf_path=util.env.PATCHER_FILE_PATH,
             name='check if any steps should currently be patched',
             hideStepIf=lambda results, s: results == SUCCESS))

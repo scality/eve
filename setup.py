@@ -53,7 +53,6 @@ setup(
             'ReadConfFromYaml=eve.steps.yaml_parser:ReadConfFromYaml',
             'ShellCommandWithSecrets=eve.steps.shell_command_with_secrets:ShellCommandWithSecrets',
             'StepExtractor=eve.steps.yaml_parser:StepExtractor',
-            'StepPatcherConfig=eve.steps.step_patcher:StepPatcherConfig',
             'TriggerStages=eve.steps.trigger_stages:TriggerStages',
             'Upload=eve.steps.artifacts:Upload'
         ],
