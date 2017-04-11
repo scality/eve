@@ -14,8 +14,8 @@ from twisted.logger import Logger
 class StepPatcherConfig(BuildStep):
     """Parses the patch config file and sets the corresponding property.
 
-    The config file path should be set in the PATCHER_FILE_PATH environment
-    variable. If this variable is not set, the step patching feature is
+    The config file path should be set in the conf_path argument.
+    If this variable is not set, the step patching feature is
     disabled.
 
     """
