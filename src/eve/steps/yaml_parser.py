@@ -1,4 +1,5 @@
 import time
+import re
 from fnmatch import fnmatch
 from tempfile import mktemp
 
@@ -17,6 +18,43 @@ from twisted.logger import Logger
 EVE_FOLDER = 'eve'
 EVE_MAIN_YAML = 'main.yml'
 EVE_MAIN_YAML_FULL_PATH = '%s/%s' % (EVE_FOLDER, EVE_MAIN_YAML)
+
+
+class StepPatcher(object):
+    """Generic hook to patch step types and parameters."""
+
+    logger = Logger('eve.steps.StepPatcher')
+
+    def __init__(self, config=None):
+        config = config or {}
+        skip_tests = config.get('skip_tests', [])
+        self.skip_regexp = None
+        if isinstance(skip_tests, basestring):
+            try:
+                self.skip_regexp = re.compile(skip_tests)
+            except re.error as err:
+                self.logger.error(
+                    "Couldn't compile a regexp from '{regexp}': {err}",
+                    regexp=skip_tests, err=err
+                )
+        elif isinstance(skip_tests, (list, tuple)):
+            try:
+                self.skip_regexp = re.compile('|'.join(skip_tests))
+            except (TypeError, re.error) as err:
+                self.logger.error(
+                    "Couldn't compile a master regexp from '{regexp}': {err}",
+                    regexp=skip_tests, err=err
+                )
+
+    def patch(self, step_type, params):
+        if not self.skip_regexp:
+            return step_type, params
+
+        if self.skip_regexp.match(params.get('name', '')):
+            params['doStepIf'] = False
+            params['descriptionDone'] = 'Temporarily disabled'
+
+        return step_type, params
 
 
 class ReadConfFromYaml(FileUpload):
@@ -156,7 +194,7 @@ class StepExtractor(BuildStep):
     def run(self):
         conf = self.getProperty('conf')
         step_patcher_config = self.getProperty('step_patcher_config')
-        patcher = util.StepPatcher(step_patcher_config)
+        patcher = StepPatcher(step_patcher_config)
         stage_name = self.getProperty('stage_name')
         stage_conf = conf['stages'][stage_name]
         for step in stage_conf['steps']:

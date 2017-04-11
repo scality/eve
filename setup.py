@@ -67,7 +67,6 @@ setup(
             'password_generator=eve.util.password_generator:password_generator',
             'step_factory=eve.util.step_factory:step_factory',
             'verify_docker_certificates=eve.util.docker:verify_docker_certificates'
-            'StepPatcher=eve.steps.step_patcher:StepPatcher',
         ],
         'buildbot.worker': [
             'EveDockerLatentWorker=eve.worker.docker.docker_worker:EveDockerLatentWorker',
