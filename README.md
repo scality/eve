@@ -77,4 +77,4 @@ for the tests.
 
 Run tests with:
 
-    $ tox -e test
+    $ tox -e system

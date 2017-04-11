@@ -5,6 +5,7 @@ from json import loads
 from subprocess import STDOUT, CalledProcessError, check_output
 
 import netifaces
+from buildbot.plugins import util
 from buildbot.process.properties import Property
 from buildbot.worker.latent import AbstractLatentWorker
 from twisted.internet import defer, threads
@@ -69,7 +70,7 @@ class EveDockerLatentWorker(AbstractLatentWorker):
             '--cpus=%s' % self.max_cpus
         ]
 
-        cmd.extend(['--link', 'git_cache'])
+        cmd.extend(['--link', util.env.GIT_CACHE_NAME])
 
         for volume in volumes:
             if isinstance(volume, dict):

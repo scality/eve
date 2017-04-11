@@ -15,14 +15,18 @@ def triggerable_builder(builder_name, workers):
             name='customize git settings to hit on cache',
             hideStepIf=lambda results, s: results == SUCCESS,
             haltOnFailure=True,
+
             command='git config --global '
-                    'url.http://git_cache/bitbucket.org/.insteadOf '
+                    'url.http://%(git_cache)s/bitbucket.org/.insteadOf '
                     'git@bitbucket.org: && '
                     'git config --global '
-                    'url.http://git_cache/github.com/.insteadOf '
+                    'url.http://%(git_cache)s/github.com/.insteadOf '
                     'git@github.com: && '
                     'git config --global '
-                    'url.http://git_cache/mock/.insteadOf git@mock:'
+                    'url.http://%(git_cache)s/mock/.insteadOf '
+                    'http://localhost:2222/mock/' % {
+                        'git_cache': util.env.GIT_CACHE_NAME
+                    }
         ))
 
     # Extract steps from conf

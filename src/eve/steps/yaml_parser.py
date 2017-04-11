@@ -5,6 +5,7 @@ from tempfile import mktemp
 import yaml
 from buildbot.plugins import steps, util
 from buildbot.process.buildstep import BuildStep
+from buildbot.process.properties import Interpolate
 from buildbot.process.results import CANCELLED, FAILURE, SUCCESS
 from buildbot.steps.master import SetProperty
 from buildbot.steps.shell import SetPropertyFromCommand
@@ -110,23 +111,33 @@ class ReadConfFromYaml(FileUpload):
             buildnumber = str(self.getProperty('buildnumber'))
             self.build.addStepsAfterCurrentStep([
                 SetPropertyFromCommand(
-                    name='get the commit timestamp',
-                    command='git log -1 --format=%cd '
-                            '--date="format-local:%y%m%d%H%M%S"',
+                    name='get the commit short_revision',
+                    command=Interpolate(
+                        'git -C %(prop:master_builddir)s/build' +
+                        ' rev-parse --verify --short ' +
+                        branch
+                    ),
                     hideStepIf=lambda results, s: results == SUCCESS,
-                    haltOnFailure=True,
+                    property='commit_short_revision'),
+                SetPropertyFromCommand(
+                    name='get the commit timestamp',
+                    command=Interpolate(
+                        'date -u --date=@' +
+                        '`git -C %(prop:master_builddir)s/build' +
+                        ' show -s --format=%%ct ' + branch +
+                        '` +%%y%%m%%d%%H%%M%%S'
+                    ),
+                    hideStepIf=lambda results, s: results == SUCCESS,
                     property='commit_timestamp'),
                 SetProperty(
                     name='get the pipeline name',
                     property='pipeline',
                     hideStepIf=lambda results, s: results == SUCCESS,
-                    haltOnFailure=True,
                     value=stage_name),
                 SetProperty(
                     name='get the b4nb',
                     property='b4nb',
                     hideStepIf=lambda results, s: results == SUCCESS,
-                    haltOnFailure=True,
                     value=buildnumber.zfill(8)),
             ])
 
