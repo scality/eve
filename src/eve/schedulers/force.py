@@ -21,9 +21,12 @@ class EveForceScheduler(ForceScheduler):
     def add_missing_revisions(sourcestamps):
         for _, sourcestamp in sourcestamps.iteritems():
             if not sourcestamp['revision']:
-                # Retrieve revision from branch for sourcestamps without one
-                sourcestamp['revision'] = subprocess.check_output(
-                    ['git', 'ls-remote', sourcestamp['repository'],
-                     sourcestamp['branch']],
-                    stderr=subprocess.PIPE,
-                ).split()[0]
+                try:
+                    # Retrieve revision from branch for sourcestamps without one
+                    sourcestamp['revision'] = subprocess.check_output(
+                        ['git', 'ls-remote', sourcestamp['repository'],
+                         sourcestamp['branch']],
+                        stderr=subprocess.PIPE,
+                    ).split()[0]
+                except IndexError:
+                    sourcestamp['revision'] = None
