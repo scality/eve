@@ -175,6 +175,10 @@ class HipChatBuildStatusPush(BaseBuildStatusPush):
         self.attributes = []
         key, result, title, summary, description = self.gather_data(build)
 
+        # Do not send status for other stages than 'pre-merge' or 'post-merge'
+        if key not in ['pre-merge', 'post-merge']:
+            return
+
         card = dict(
             style='application',
             url=build['url'],
