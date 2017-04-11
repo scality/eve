@@ -64,6 +64,9 @@ class StepPatcher(object):
         config = config or {}
         skip_tests = config.get('skip_tests', [])
         self.skip_regexp = None
+        if not skip_tests:
+            return
+
         if isinstance(skip_tests, basestring):
             try:
                 self.skip_regexp = re.compile(skip_tests)
