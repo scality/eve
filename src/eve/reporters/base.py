@@ -125,7 +125,20 @@ class BaseBuildStatusPush(HttpStatusPushBase):
         raise NotImplementedError()
 
 
-class HipChatBuildStatusPush(BaseBuildStatusPush):
+class BuildStatusPushMixin(object):
+    # pylint: disable=too-few-public-methods
+    def _filterBuilds(self, filter_build, build):
+        try:
+            key = build['properties']['stage_name'][0]
+        except (KeyError, IndexError):
+            self.logger.error('no valid stage_name property found')
+        else:
+            if key not in ['pre-merge', 'post-merge']:
+                return False
+        return filter_build(build)
+
+
+class HipChatBuildStatusPush(BaseBuildStatusPush, BuildStatusPushMixin):
     """Send build result to HipChat build status API."""
     name = 'HipChatBuildStatusPush'
     logger = Logger('eve.steps.HipChatBuildStatusPush')
@@ -162,6 +175,11 @@ class HipChatBuildStatusPush(BaseBuildStatusPush):
         if icon:
             attr['value']['icon'] = dict(url=icon)
         self.attributes.append(attr)
+
+    def filterBuilds(self, build):
+        return self._filterBuilds(
+            super(HipChatBuildStatusPush, self).filterBuilds,
+            build)
 
     @defer.inlineCallbacks
     def send(self, build):
@@ -210,7 +228,7 @@ class HipChatBuildStatusPush(BaseBuildStatusPush):
         self.logger.info('HipChat status sent')
 
 
-class BitbucketBuildStatusPush(BaseBuildStatusPush):
+class BitbucketBuildStatusPush(BaseBuildStatusPush, BuildStatusPushMixin):
     """Send build result to bitbucket build status API."""
     name = 'BitbucketBuildStatusPush'
     description_suffix = ''
@@ -247,14 +265,9 @@ class BitbucketBuildStatusPush(BaseBuildStatusPush):
         self.description_suffix = name_value + self.description_suffix
 
     def filterBuilds(self, build):
-        try:
-            key = build['properties']['stage_name'][0]
-        except (KeyError, IndexError):
-            self.logger.error('no valid stage_name property found')
-        else:
-            if key not in ['pre-merge', 'post-merge']:
-                return False
-        return super(BitbucketBuildStatusPush, self).filterBuilds(build)
+        return self._filterBuilds(
+            super(BitbucketBuildStatusPush, self).filterBuilds,
+            build)
 
     @defer.inlineCallbacks
     def send(self, build):
@@ -288,19 +301,14 @@ class BitbucketBuildStatusPush(BaseBuildStatusPush):
             url))
 
 
-class GithubBuildStatusPush(GitHubStatusPush):
+class GithubBuildStatusPush(GitHubStatusPush, BuildStatusPushMixin):
     """Send build result to github build status API."""
     logger = Logger('eve.steps.GithubBuildStatusPush')
 
     def filterBuilds(self, build):
-        try:
-            key = build['properties']['stage_name'][0]
-        except (KeyError, IndexError):
-            self.logger.error('no valid stage_name property found')
-        else:
-            if key not in ['pre-merge', 'post-merge']:
-                return False
-        return super(GithubBuildStatusPush, self).filterBuilds(build)
+        return self._filterBuilds(
+            super(GithubBuildStatusPush, self).filterBuilds,
+            build)
 
     @defer.inlineCallbacks
     def send(self, build):
