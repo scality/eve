@@ -1,5 +1,4 @@
 from buildbot.plugins import reporters, util
-from buildbot.reporters.github import GitHubStatusPush
 
 
 def hipchat_reporter():
@@ -20,16 +19,14 @@ def hipchat_reporter():
 
 def github_reporter():
     assert util.env.GITHUB_TOKEN
-    assert util.env.GITHUB_CONTEXT_STATUS
 
     builders = [
         util.env.DOCKER_BUILDER_NAME,
         util.env.OPENSTACK_BUILDER_NAME
     ]
 
-    return GitHubStatusPush(
+    return reporters.GithubBuildStatusPush(
         util.env.GITHUB_TOKEN,
-        context=util.env.GITHUB_CONTEXT_STATUS,
         builders=builders
     )
 

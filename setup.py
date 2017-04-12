@@ -37,7 +37,8 @@ setup(
         ],
         'buildbot.reporters': [
             'BitbucketBuildStatusPush=eve.reporters.base:BitbucketBuildStatusPush',
-            'HipChatBuildStatusPush=eve.reporters.base:HipChatBuildStatusPush'
+            'GithubBuildStatusPush=eve.reporters.base:GithubBuildStatusPush',
+            'HipChatBuildStatusPush=eve.reporters.base:HipChatBuildStatusPush',
         ],
         'buildbot.schedulers': [
             'EveForceScheduler=eve.schedulers.force:EveForceScheduler'
