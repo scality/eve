@@ -4,6 +4,7 @@ import re
 from buildbot.process.results import (CANCELLED, EXCEPTION, FAILURE, RETRY,
                                       SKIPPED, SUCCESS, WARNINGS, Results)
 from buildbot.reporters import utils
+from buildbot.reporters.github import GitHubStatusPush
 from buildbot.reporters.http import HttpStatusPushBase
 from buildbot.util.httpclientservice import HTTPClientService
 from twisted.internet import defer
@@ -124,7 +125,20 @@ class BaseBuildStatusPush(HttpStatusPushBase):
         raise NotImplementedError()
 
 
-class HipChatBuildStatusPush(BaseBuildStatusPush):
+class BuildStatusPushMixin(object):
+    # pylint: disable=too-few-public-methods
+    def _filterBuilds(self, filter_build, build):
+        try:
+            key = build['properties']['stage_name'][0]
+        except (KeyError, IndexError):
+            self.logger.error('no valid stage_name property found')
+        else:
+            if key not in ['pre-merge', 'post-merge']:
+                return False
+        return filter_build(build)
+
+
+class HipChatBuildStatusPush(BaseBuildStatusPush, BuildStatusPushMixin):
     """Send build result to HipChat build status API."""
     name = 'HipChatBuildStatusPush'
     logger = Logger('eve.steps.HipChatBuildStatusPush')
@@ -162,6 +176,11 @@ class HipChatBuildStatusPush(BaseBuildStatusPush):
             attr['value']['icon'] = dict(url=icon)
         self.attributes.append(attr)
 
+    def filterBuilds(self, build):
+        return self._filterBuilds(
+            super(HipChatBuildStatusPush, self).filterBuilds,
+            build)
+
     @defer.inlineCallbacks
     def send(self, build):
         """Send build status to HipChat."""
@@ -174,10 +193,6 @@ class HipChatBuildStatusPush(BaseBuildStatusPush):
 
         self.attributes = []
         key, result, title, summary, description = self.gather_data(build)
-
-        # Do not send status for other stages than 'pre-merge' or 'post-merge'
-        if key not in ['pre-merge', 'post-merge']:
-            return
 
         card = dict(
             style='application',
@@ -213,7 +228,7 @@ class HipChatBuildStatusPush(BaseBuildStatusPush):
         self.logger.info('HipChat status sent')
 
 
-class BitbucketBuildStatusPush(BaseBuildStatusPush):
+class BitbucketBuildStatusPush(BaseBuildStatusPush, BuildStatusPushMixin):
     """Send build result to bitbucket build status API."""
     name = 'BitbucketBuildStatusPush'
     description_suffix = ''
@@ -249,6 +264,11 @@ class BitbucketBuildStatusPush(BaseBuildStatusPush):
         name_value = '[%s: %s]' % (name, value)
         self.description_suffix = name_value + self.description_suffix
 
+    def filterBuilds(self, build):
+        return self._filterBuilds(
+            super(BitbucketBuildStatusPush, self).filterBuilds,
+            build)
+
     @defer.inlineCallbacks
     def send(self, build):
         """Send build status to Bitbucket."""
@@ -256,8 +276,6 @@ class BitbucketBuildStatusPush(BaseBuildStatusPush):
         key, result, _, summary, description = self.gather_data(build)
         # Temporary hack to keep previous behaviour
         # Do not send status for other stages than 'pre-merge' or 'post-merge'
-        if key not in ['pre-merge', 'post-merge']:
-            return
         data = {
             'state': self.BITBUCKET_STATUS_CORRESP[result],
             'key': key,
@@ -281,3 +299,19 @@ class BitbucketBuildStatusPush(BaseBuildStatusPush):
             self.BITBUCKET_STATUS_CORRESP[result],
             key,
             url))
+
+
+class GithubBuildStatusPush(GitHubStatusPush, BuildStatusPushMixin):
+    """Send build result to github build status API."""
+    logger = Logger('eve.steps.GithubBuildStatusPush')
+
+    def filterBuilds(self, build):
+        return self._filterBuilds(
+            super(GithubBuildStatusPush, self).filterBuilds,
+            build)
+
+    @defer.inlineCallbacks
+    def send(self, build):
+        key = build['properties']['stage_name'][0]
+        self.context = key  # pylint: disable=attribute-defined-outside-init
+        return super(GithubBuildStatusPush, self).send(build)
