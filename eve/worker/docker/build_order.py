@@ -48,7 +48,7 @@ class DockerBuildOrder(util.BaseBuildOrder):
         self.preliminary_steps.append(steps.DockerBuild(
             name='build docker image from {0}'.format(
                 self.properties['worker_path']
-            ),
+            )[0:49],  # buildbot raises an exception if name is too long
             flunkOnFailure=False,
             haltOnFailure=False,
             **common_args
@@ -70,7 +70,7 @@ class DockerBuildOrder(util.BaseBuildOrder):
         self.preliminary_steps.append(steps.DockerBuild(
             name='docker build retry from {0}'.format(
                 self.properties['worker_path']
-            ),
+            )[0:49],  # buildbot raises an exception if name is too long
             is_retry=True,
             hideStepIf=lambda results, s: results == SKIPPED,
             doStepIf=is_prev_build_failed,
