@@ -24,7 +24,7 @@ def docker_workers():
                 name='dw%03d-%s-%s' % (i, util.env.GIT_SLUG, util.env.SUFFIX),
                 password=util.password_generator(),
                 master_fqdn=util.env.MASTER_FQDN,
-                pb_port=util.env.PB_PORT,
+                pb_port=util.env.EXTERNAL_PB_PORT,
                 artifacts_prefix=util.env.ARTIFACTS_PREFIX,
                 max_memory=util.env.DOCKER_CONTAINER_MAX_MEMORY,
                 max_cpus=util.env.DOCKER_CONTAINER_MAX_CPU,
@@ -53,7 +53,7 @@ def openstack_workers():
                 cloud_init=util.env.CLOUD_INIT_SCRIPT,
                 meta=None,
                 masterFQDN=util.env.MASTER_FQDN,
-                pb_port=util.env.PB_PORT,
+                pb_port=util.env.EXTERNAL_PB_PORT,
                 nova_args=dict(key_name=util.env.OS_KEY_NAME),
                 build_wait_timeout=0,  # do not reuse the instance
                 keepalive_interval=300,
