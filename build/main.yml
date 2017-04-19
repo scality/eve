@@ -1,0 +1,77 @@
+---
+version: 0.2
+
+branches:
+  user/*, feature/*, improvement/*, bugfix/*, w/*, q/*:
+    stage: pre-merge
+
+stages:
+  pre-merge:
+    worker:
+      type: docker
+      path: build/workers/xenial
+      volumes:
+        - '/home/eve/workspace'
+    steps:
+      - Git:
+          name: fetch source
+          repourl: '%(prop:git_reference)s'
+          shallow: True
+          retryFetch: True
+      - ShellCommand:
+          name: install eve
+          command: sudo pip install .
+          haltOnFailure: True
+      - ShellCommand:
+          name: run static analysis tools
+          command: tox --sitepackages -e lint
+      - ShellCommand:
+          name: run unit tests
+          command: tox --sitepackages -e unit
+      - ShellCommand:
+          name: run system utils tests
+          command: tox --sitepackages -e testutil
+          haltOnFailure: True
+      - ShellCommand:
+          name: run system tests
+          command: tox --sitepackages -e system
+          haltOnFailure: True
+      #- Upload:
+      #    source: /tmp
+      #    urls:
+      #      - ['\1', '*']
+      #    alwaysRun: True
+      #- TriggerStages:
+      #    name: trigger docker tests
+      #    haltOnFailure: True
+      #    stage_names:
+      #      - docker tests
+
+  docker tests:
+    worker:
+      type: openstack
+      image: Ubuntu 16.04 LTS (Xenial Xerus) (PVHVM)
+      flavor: general1-4
+      path: build/workers/system_tests
+    steps:
+      - Git:
+          name: fetch source
+          repourl: '%(prop:git_reference)s'
+          shallow: True
+          retryFetch: True
+      - ShellCommand:
+          name: upgrade pip
+          command: sudo -H pip install --upgrade pip
+          haltOnFailure: True
+      - ShellCommand:
+          name: install mysql client
+          command: sudo apt-get install -qy libmysqlclient-dev
+          haltOnFailure: True
+      - ShellCommand:
+          name: install tox
+          command: sudo -H pip install tox==2.3.2
+          haltOnFailure: True
+      - ShellCommand:
+          name: run docker tests
+          command: HOME=/home/eve tox -e docker
+          haltOnFailure: True

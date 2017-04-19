@@ -7,4 +7,5 @@ libtool
 build-essential
 python
 python-dev
+sudo
 wget

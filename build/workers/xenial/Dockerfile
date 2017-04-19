@@ -1,12 +1,4 @@
-FROM ubuntu:trusty
-
-#
-# Add user eve
-#
-
-RUN adduser -u 1042 --home /home/eve --disabled-password --gecos "" eve \
-    && adduser eve sudo \
-    && sed -ri 's/(%sudo.*)ALL$/\1NOPASSWD:ALL/' /etc/sudoers
+FROM ubuntu:xenial
 
 #
 # Install packages needed by the buildchain
@@ -23,6 +15,15 @@ ARG BUILDBOT_VERSION
 RUN wget -q -O - https://bootstrap.pypa.io/get-pip.py | python2 - 'pip==9.0.1' \
  && pip install --no-binary buildbot --no-cache-dir -r /tmp/requirements.txt \
  && rm -f /tmp/requirements.txt
+
+
+#
+# Add user eve
+#
+
+RUN adduser -u 1042 --home /home/eve --disabled-password --gecos "" eve \
+    && adduser eve sudo \
+    && sed -ri 's/(%sudo.*)ALL$/\1NOPASSWD:ALL/' /etc/sudoers
 
 #
 # Eve configuration
