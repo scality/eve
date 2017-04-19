@@ -2,7 +2,7 @@ from buildbot.config import BuilderConfig
 from buildbot.plugins import steps, util
 from buildbot.process.factory import BuildFactory
 from buildbot.process.properties import Property
-from buildbot.process.results import SUCCESS
+from buildbot.process.results import SUCCESS, SKIPPED
 from buildbot.steps.master import SetProperty
 from buildbot.steps.shell import SetPropertyFromCommand
 from buildbot.steps.source.git import Git
@@ -56,7 +56,8 @@ def bootstrap_builder(workers):
         steps.StepPatcherConfig(
             conf_path=util.env.PATCHER_FILE_PATH,
             name='check if any steps should currently be patched',
-            hideStepIf=lambda results, s: results == SUCCESS))
+            doStepIf=bool(util.env.PATCHER_FILE_PATH),
+            hideStepIf=lambda results, s: results in (SUCCESS, SKIPPED)))
 
     bootstrap_factory.addStep(SetProperty(
         name='get the git host',

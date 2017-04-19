@@ -25,11 +25,6 @@ class StepPatcherConfig(BuildStep):
 
     def run(self):
         prop = 'step_patcher_config'
-        if not self.conf_path:
-            self.logger.debug('PATCHER_FILE_PATH is not set. Skipping')
-            self.setProperty(prop, {}, 'StepPatcherConfig')
-            return defer.succeed(SKIPPED)
-
         config = {}
         try:
             with open(self.conf_path) as patch_file:
