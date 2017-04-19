@@ -2,7 +2,7 @@ from buildbot.config import BuilderConfig
 from buildbot.plugins import steps, util
 from buildbot.process.factory import BuildFactory
 from buildbot.process.properties import Property
-from buildbot.process.results import SUCCESS, SKIPPED
+from buildbot.process.results import SKIPPED, SUCCESS
 from buildbot.steps.master import SetProperty
 from buildbot.steps.shell import SetPropertyFromCommand
 from buildbot.steps.source.git import Git

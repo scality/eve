@@ -15,6 +15,7 @@ class DockerizedCrossbar(Crossbar):
 
         conf = join(__file__, pardir, pardir, 'util', 'crossbar',
                     'crossbar.json')
+        cmd('docker pull crossbario/crossbar')
         self._start_cmd = [
             'docker', 'run',
             '--name', self._name,

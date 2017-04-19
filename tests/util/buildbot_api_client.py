@@ -77,7 +77,7 @@ class BuildbotDataAPI(object):
 
         return res.json()[object_name]
 
-    def getw(self, route, get_params=None, retry=60, expected_count=1):
+    def getw(self, route, get_params=None, retry=180, expected_count=1):
         """Get data from the REST API."""
         for i in xrange(retry):
             try:
@@ -316,7 +316,7 @@ class ApiResource(object):
             self._refresh()
         return self._dict[item]
 
-    def wait_for_finish(self, timeout=60):
+    def wait_for_finish(self, timeout=180):
         if self.results_field is None:
             return self
         for _ in range(timeout):
@@ -386,7 +386,7 @@ class Build(ApiResource):
     @property
     def first_failing_step(self):
         for step in self.steps:
-            if step.results != 0:
+            if step.results not in (0, 1, 3):  # success, warning, skipped
                 return step
         raise Exception('There is no failing steps under this build')
 

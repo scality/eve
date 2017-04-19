@@ -9,7 +9,8 @@ CWD = dirname(abspath(__file__))
 
 
 def requires():
-    reqs_file = join(CWD, 'requirements/base.in')
+    # FIXME: putting 'requirements/base.in' below does not work!
+    reqs_file = join(CWD, 'requirements/base.txt')
     reqs_install = parse_requirements(reqs_file, session=PipSession())
 
     return [str(ir.req) for ir in reqs_install]

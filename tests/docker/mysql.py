@@ -24,6 +24,7 @@ class DockerizedMySQL(Daemon):
     def pre_start_hook(self):
         """Spawns a local mysql.
         """
+        cmd('docker pull mysql/mysql-server:5.7')
         self._start_cmd = [
             'docker', 'run', '--name', self._name,
             '-p', '{}:3306'.format(self.port),

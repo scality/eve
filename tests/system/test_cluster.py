@@ -48,7 +48,7 @@ class TestCluster(unittest.TestCase):
                         'results': SUCCESS})
         bootstrap_steps = cluster.api.getw(
             '/builds/{}/steps'.format(bootstrap_build['buildid']),
-            expected_count=20)
+            expected_count=21)
 
         step_names_and_descriptions = [(step['name'], step['state_string'])
                                        for step in bootstrap_steps]
@@ -59,6 +59,8 @@ class TestCluster(unittest.TestCase):
                 (u'Cancel builds for commits that are not branch tips',
                  u'CancelNonTipBuild'),
                 (u'setting the master_builddir property', u'Set'),
+                (u'check if any steps should currently be patched',
+                 u'finished (skipped)'),
                 (u'get the git host', u'Set'),
                 (u'get the git owner', u'Set'),
                 (u'get the repository name', u'Set'),

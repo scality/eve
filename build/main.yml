@@ -13,6 +13,9 @@ stages:
       volumes:
         - '/home/eve/workspace'
     steps:
+      - SetProperty:
+          property: artifacts_name
+          value: "%(prop:build_id)s"
       - Git:
           name: fetch source
           repourl: '%(prop:git_reference)s'
@@ -36,16 +39,16 @@ stages:
           name: run system tests
           command: tox --sitepackages -e system
           haltOnFailure: True
-      #- Upload:
-      #    source: /tmp
-      #    urls:
-      #      - ['\1', '*']
-      #    alwaysRun: True
-      #- TriggerStages:
-      #    name: trigger docker tests
-      #    haltOnFailure: True
-      #    stage_names:
-      #      - docker tests
+      - Upload:
+          source: /tmp
+          urls:
+            - ['\1', '*']
+          alwaysRun: True
+      - TriggerStages:
+          name: trigger docker tests
+          haltOnFailure: True
+          stage_names:
+            - docker tests
 
   docker tests:
     worker:
