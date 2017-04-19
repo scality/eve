@@ -76,5 +76,9 @@ listed in tox.ini, `passenv` section. The other variables are hardcoded
 for the tests.
 
 Run tests with:
-
+    
+    $ tox -e unit
+    $ tox -e testutil
     $ tox -e system
+    $ tox -e docker
+    $ tox -e autoformatcheck
