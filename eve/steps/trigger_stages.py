@@ -32,13 +32,14 @@ from ..worker.openstack.build_order import OpenStackBuildOrder
 class TriggerStages(BuildStep):
     """Start a list of stages."""
 
-    workers = {
-        'local': (BaseBuildOrder, util.env.LOCAL_SCHEDULER_NAME),
-        'docker': (DockerBuildOrder, util.env.DOCKER_SCHEDULER_NAME),
-        'openstack': (OpenStackBuildOrder, util.env.OPENSTACK_SCHEDULER_NAME)
-    }
-
     def __init__(self, stage_names, **kwargs_for_exec_trigger_stages):
+        self.workers = {
+            'local': (BaseBuildOrder, util.env.LOCAL_SCHEDULER_NAME),
+            'docker': (DockerBuildOrder, util.env.DOCKER_SCHEDULER_NAME),
+            'openstack': (OpenStackBuildOrder,
+                          util.env.OPENSTACK_SCHEDULER_NAME)
+        }
+
         self.stage_names = stage_names
 
         kwargs_for_exec_trigger_stages.setdefault('waitForFinish', True)

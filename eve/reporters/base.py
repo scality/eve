@@ -253,6 +253,7 @@ class HipChatBuildStatusPush(BaseBuildStatusPush, BuildStatusPushMixin):
 class BitbucketBuildStatusPush(BaseBuildStatusPush, BuildStatusPushMixin):
     """Send build result to bitbucket build status API."""
 
+    base_url = "https://api.bitbucket.org"
     name = 'BitbucketBuildStatusPush'
     description_suffix = ''
     logger = Logger('eve.steps.BitbucketBuildStatusPush')
@@ -275,9 +276,10 @@ class BitbucketBuildStatusPush(BaseBuildStatusPush, BuildStatusPushMixin):
     def forge_url(self, build):
         """Forge the BB API URL on which the build status will be posted."""
         sha1 = build['buildset']['sourcestamps'][0]['revision']
-        return 'https://api.bitbucket.org/2.0/repositories/' \
+        return '%(base_url)s/2.0/repositories/' \
                '%(repo_owner)s/%(repo_name)s/commit/%(sha1)s/statuses/build' \
                % {
+                   'base_url': self.base_url,
                    'repo_owner': 'scality',
                    'repo_name': self.repo,
                    'sha1': sha1,

@@ -94,3 +94,17 @@ class SingleCommandYaml(PreMerge):
         shell_command_step = {'ShellCommand': {'command': command}}
         super(SingleCommandYaml, self).__init__(
             steps=[shell_command_step], worker=worker)
+
+
+class LocalJobsYaml(YamlFactory):
+    def filedump(self, file_):
+        data = dict(
+            steps=[{
+                'ShellCommand': {
+                    'command': 'exit 0'
+                }
+            }],
+            scheduler={'type': 'Periodic',
+                       'periodicBuildTimer': '5'})
+        with open(file_, 'w') as fhandle:
+            yaml.dump(data, fhandle, default_flow_style=False)

@@ -69,3 +69,4 @@ def load_env(variables):
     global SETTINGS  # pylint: disable=global-statement
     SETTINGS = Settings(variables)
     filter_secrets()
+    return SETTINGS

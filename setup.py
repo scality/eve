@@ -44,6 +44,9 @@ setup(
     use_scm_version={
         'local_scheme': 'dirty-tag'
     },
+    setup_requires=[
+        'setuptools_scm'
+    ],
     entry_points={
         'console_scripts': [
             'eve=eve.scripts.runner:main'

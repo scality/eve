@@ -56,6 +56,7 @@ class CancelOldBuild(CancelCommand):
         super(CancelOldBuild, self).__init__(
             name='prevent unuseful restarts',
             hideStepIf=lambda results, s: results == SUCCESS,
-            command=Interpolate('[ $(expr "' + util.env.MASTER_START_TIME +
-                                '" \< "%(prop:start_time)s") -eq 1 ]'),
+            command=Interpolate(
+                '[ $(expr "{}" \< "%(prop:start_time)s") -eq 1 ]'.format(
+                    util.env.MASTER_START_TIME)),
         )
