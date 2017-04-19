@@ -19,8 +19,6 @@ RUN mkdir /worker && chown buildbot:buildbot /worker
 RUN mkdir /root/.ssh/
 RUN /bin/echo -e "Host bitbucket.org\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
 
-COPY reports /tmp/reports
-
 WORKDIR /worker
 CMD buildbot-worker create-worker . "$BUILDMASTER:$BUILDMASTER_PORT" "$WORKERNAME" "$WORKERPASS" \
  && buildbot-worker start --nodaemon

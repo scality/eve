@@ -1,4 +1,4 @@
-FROM ubuntu:trusty
+FROM ubuntu:xenial
 
 RUN locale-gen en_US.UTF-8 \
     && echo "LANG=en_US.UTF-8\nLC_ALL=en_US.UTF-8" > /etc/default/locale

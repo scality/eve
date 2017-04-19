@@ -1,1 +1,616 @@
-<?xml version="1.0" encoding="utf-8"?><testsuite errors="0" failures="0" name="pytest" skips="24" tests="120" time="1532.762"><testcase classname="supervisor.test_01_deployment.TestGenericDeployment" file="supervisor/test_01_deployment.py" line="23" name="test_denethor[os_trusty]" time="139.415722847"></testcase><testcase classname="supervisor.test_01_deployment.TestGenericDeployment" file="supervisor/test_01_deployment.py" line="27" name="test_supervisor_configuration[os_trusty]" time="350.648134947"></testcase><testcase classname="supervisor.test_01_deployment.TestGenericDeployment" file="supervisor/test_01_deployment.py" line="42" name="test_supervisor_with_ring[gui-os_trusty]" time="86.5909798145"></testcase><testcase classname="supervisor.test_01_deployment.TestGenericDeployment" file="supervisor/test_01_deployment.py" line="59" name="test_supervisor_bad_auth[supervisor-os_trusty-gui]" time="28.1041693687"></testcase><testcase classname="supervisor.test_01_deployment.TestGenericDeployment" file="supervisor/test_01_deployment.py" line="59" name="test_supervisor_bad_auth[grafana-os_trusty-gui]" time="8.78640294075"></testcase><testcase classname="supervisor.test_01_deployment.TestGenericDeployment" file="supervisor/test_01_deployment.py" line="77" name="test_supervisor_good_auth[supervisor-os_trusty-gui]" time="22.5319859982"></testcase><testcase classname="supervisor.test_01_deployment.TestGenericDeployment" file="supervisor/test_01_deployment.py" line="77" name="test_supervisor_good_auth[grafana-os_trusty-gui]" time="7.05154275894"></testcase><testcase classname="supervisor.test_01_deployment.TestGenericDeployment" file="supervisor/test_01_deployment.py" line="42" name="test_supervisor_with_ring[api-os_trusty]" time="0.0484600067139"><skipped message="Supervisor operation not implemented on the API" type="pytest.skip">/home/eve/docker-prod-backend-4/build/tests/gollum/tests/supervisor/frameworks/supervisor.py:211: &lt;py._xmlgen.raw object at 0x7fa872b9cdd0&gt;</skipped></testcase><testcase classname="supervisor.test_01_deployment.TestGenericDeployment" file="supervisor/test_01_deployment.py" line="59" name="test_supervisor_bad_auth[supervisor-os_trusty-api]" time="0.0807800292969"></testcase><testcase classname="supervisor.test_01_deployment.TestGenericDeployment" file="supervisor/test_01_deployment.py" line="59" name="test_supervisor_bad_auth[grafana-os_trusty-api]" time="0.000911712646484"><skipped message="Not testing the grafana api" type="pytest.skip">/home/eve/docker-prod-backend-4/build/tests/gollum/tests/supervisor/fixtures/supervisor.py:141: &lt;py._xmlgen.raw object at 0x7fa872c63950&gt;</skipped></testcase><testcase classname="supervisor.test_01_deployment.TestGenericDeployment" file="supervisor/test_01_deployment.py" line="77" name="test_supervisor_good_auth[supervisor-os_trusty-api]" time="0.0407299995422"></testcase><testcase classname="supervisor.test_01_deployment.TestGenericDeployment" file="supervisor/test_01_deployment.py" line="77" name="test_supervisor_good_auth[grafana-os_trusty-api]" time="0.000735998153687"><skipped message="Not testing the grafana api" type="pytest.skip">/home/eve/docker-prod-backend-4/build/tests/gollum/tests/supervisor/fixtures/supervisor.py:141: &lt;py._xmlgen.raw object at 0x7fa872b9ee50&gt;</skipped></testcase><testcase classname="supervisor.test_01_deployment.TestGenericDeployment" file="supervisor/test_01_deployment.py" line="90" name="test_supervisor_audit_log[file-os_trusty]" time="39.5410401821"></testcase><testcase classname="supervisor.test_01_deployment.TestGenericDeployment" file="supervisor/test_01_deployment.py" line="90" name="test_supervisor_audit_log[syslog-os_trusty]" time="45.2605071068"></testcase><testcase classname="supervisor.test_01_deployment.TestGenericDeployment" file="supervisor/test_01_deployment.py" line="118" name="test_storenode[os_trusty]" time="93.6642892361"></testcase><testcase classname="supervisor.test_connectors.TestConnectorCRUD" file="supervisor/base.py" line="130" name="test_retrieve[os_trusty-gui]" time="9.14906477928"></testcase><testcase classname="supervisor.test_connectors.TestConnectorCRUD" file="supervisor/base.py" line="141" name="test_retrieve_not_found[os_trusty-gui]" time="4.34794688225"></testcase><testcase classname="supervisor.test_connectors.TestConnectorCRUD" file="supervisor/base.py" line="130" name="test_retrieve[os_trusty-api]" time="0.21022605896"></testcase><testcase classname="supervisor.test_connectors.TestConnectorCRUD" file="supervisor/base.py" line="141" name="test_retrieve_not_found[os_trusty-api]" time="0.0339550971985"></testcase><testcase classname="supervisor.test_connectors.TestConnectorQuerying" file="supervisor/base.py" line="235" name="test_query_empty[name-os_trusty-api]" time="0.0475332736969"></testcase><testcase classname="supervisor.test_connectors.TestConnectorQuerying" file="supervisor/base.py" line="235" name="test_query_empty[type-os_trusty-api]" time="0.0726132392883"></testcase><testcase classname="supervisor.test_connectors.TestConnectorQuerying" file="supervisor/base.py" line="235" name="test_query_empty[server-os_trusty-api]" time="0.0529911518097"></testcase><testcase classname="supervisor.test_connectors.TestConnectorQuerying" file="supervisor/base.py" line="235" name="test_query_empty[state-os_trusty-api]" time="0.0436339378357"></testcase><testcase classname="supervisor.test_connectors.TestConnectorQuerying" file="supervisor/base.py" line="235" name="test_query_empty[ring-os_trusty-api]" time="0.047611951828"></testcase><testcase classname="supervisor.test_connectors.TestConnectorQuerying" file="supervisor/base.py" line="258" name="test_query_matches[name-os_trusty-api]" time="0.163570165634"></testcase><testcase classname="supervisor.test_connectors.TestConnectorQuerying" file="supervisor/base.py" line="258" name="test_query_matches[type-os_trusty-api]" time="0.152004957199"></testcase><testcase classname="supervisor.test_connectors.TestConnectorQuerying" file="supervisor/base.py" line="258" name="test_query_matches[server-os_trusty-api]" time="0.160793066025"></testcase><testcase classname="supervisor.test_connectors.TestConnectorQuerying" file="supervisor/base.py" line="258" name="test_query_matches[state-os_trusty-api]" time="0.164515733719"></testcase><testcase classname="supervisor.test_connectors.TestConnectorQuerying" file="supervisor/base.py" line="258" name="test_query_matches[ring-os_trusty-api]" time="0.153678894043"></testcase><testcase classname="supervisor.test_connectors.TestConnectorQuerying" file="supervisor/base.py" line="292" name="test_query_db_wrong_param[os_trusty-api]" time="0.0206789970398"></testcase><testcase classname="supervisor.test_connectors.TestConnectorQuerying" file="supervisor/base.py" line="304" name="test_query_limit[no field-os_trusty-api]" time="0.551695108414"><skipped message="unconditional skip" type="pytest.skip">supervisor/base.py:304: &lt;py._xmlgen.raw object at 0x7fa8730052d0&gt;</skipped></testcase><testcase classname="supervisor.test_restapi.TestStatsDbAPIMisUse" file="supervisor/test_restapi.py" line="16" name="test_patch_header_stats_dbs[api-os_trusty]" time="0.0419180393219"></testcase><testcase classname="supervisor.test_restapi.TestStatsDbAPIMisUse" file="supervisor/test_restapi.py" line="26" name="test_wrong_fields_creation_stats_db[api-os_trusty]" time="0.0239160060883"></testcase><testcase classname="supervisor.test_restapi.TestStatsDbAPIMisUse" file="supervisor/test_restapi.py" line="38" name="test_patch_wrong_action[api-os_trusty]" time="0.0718252658844"></testcase><testcase classname="supervisor.test_restapi.TestStatsDbAPIMisUse" file="supervisor/test_restapi.py" line="44" name="test_patch_wrong_values[api-os_trusty]" time="0.0592129230499"></testcase><testcase classname="supervisor.test_restapi.TestStatsDbAPIMisUse" file="supervisor/test_restapi.py" line="53" name="test_patch_wrong_db[api-os_trusty]" time="0.0212569236755"></testcase><testcase classname="supervisor.test_restapi.TestStatsDbAPIMisUse" file="supervisor/test_restapi.py" line="59" name="test_put_name_stats_db[api-os_trusty]" time="0.0944788455963"></testcase><testcase classname="supervisor.test_restapi.TestStatsDbAPIMisUse" file="supervisor/test_restapi.py" line="80" name="test_wrong_stats_db_methods[api-os_trusty-DELETE]" time="0.0232028961182"></testcase><testcase classname="supervisor.test_restapi.TestStatsDbAPIMisUse" file="supervisor/test_restapi.py" line="80" name="test_wrong_stats_db_methods[api-os_trusty-PUT]" time="0.0137996673584"></testcase><testcase classname="supervisor.test_restapi.TestTrailingSlash" file="supervisor/test_restapi.py" line="111" name="test_resource[api-os_trusty-True]" time="0.130317211151"></testcase><testcase classname="supervisor.test_restapi.TestTrailingSlash" file="supervisor/test_restapi.py" line="111" name="test_resource[api-os_trusty-False]" time="0.143559217453"></testcase><testcase classname="supervisor.test_restapi.TestTrailingSlash" file="supervisor/test_restapi.py" line="89" name="test_navigation_endpoints[os_trusty-/api]" time="0.00838303565979"></testcase><testcase classname="supervisor.test_restapi.TestTrailingSlash" file="supervisor/test_restapi.py" line="89" name="test_navigation_endpoints[os_trusty-/api/v0.1]" time="0.0104517936707"></testcase><testcase classname="supervisor.test_ring.TestRingGuiAlert" file="supervisor/test_ring.py" line="78" name="test_check_no_alert[os_trusty-gui-Auto purge]" time="19.8966288567"></testcase><testcase classname="supervisor.test_ring.TestRingGuiAlert" file="supervisor/test_ring.py" line="78" name="test_check_no_alert[os_trusty-gui-Auto rebuild]" time="2.96036171913"></testcase><testcase classname="supervisor.test_ring.TestRingGuiAlert" file="supervisor/test_ring.py" line="85" name="test_purge_alert[os_trusty-gui]" time="27.7643098831"></testcase><testcase classname="supervisor.test_ring.TestRingGuiAlert" file="supervisor/test_ring.py" line="91" name="test_rebuild_alert[os_trusty-gui]" time="27.8533017635"></testcase><testcase classname="supervisor.test_ring.TestRingCRUD" file="supervisor/base.py" line="130" name="test_retrieve[os_trusty-gui]" time="16.525758028"></testcase><testcase classname="supervisor.test_ring.TestRingCRUD" file="supervisor/base.py" line="156" name="test_create[os_trusty-gui]" time="18.2318778038"></testcase><testcase classname="supervisor.test_ring.TestRingCRUD" file="supervisor/base.py" line="184" name="test_delete[os_trusty-gui]" time="22.1913759708"></testcase><testcase classname="supervisor.test_ring.TestRingCRUD" file="supervisor/base.py" line="197" name="test_double_delete[os_trusty-gui]" time="28.2908937931"></testcase><testcase classname="supervisor.test_ring.TestRingCRUD" file="supervisor/test_ring.py" line="101" name="test_create_duplicate[unique_fields_name0-os_trusty-gui]" time="24.9569563866"><skipped message="expected test failure"></skipped></testcase><testcase classname="supervisor.test_ring.TestRingCRUD" file="supervisor/test_ring.py" line="110" name="test_retrieve_not_found[gui-os_trusty]" time="4.16012001038"></testcase><testcase classname="supervisor.test_ring.TestRingCRUD" file="supervisor/base.py" line="130" name="test_retrieve[os_trusty-api]" time="17.3349621296"></testcase><testcase classname="supervisor.test_ring.TestRingCRUD" file="supervisor/base.py" line="156" name="test_create[os_trusty-api]" time="1.97322773933"><skipped message="ring is a read only. create action is unavailable" type="pytest.skip">/home/eve/docker-prod-backend-4/build/tests/gollum/tests/supervisor/frameworks/base.py:438: &lt;py._xmlgen.raw object at 0x7fa872a4c290&gt;</skipped></testcase><testcase classname="supervisor.test_ring.TestRingCRUD" file="supervisor/base.py" line="184" name="test_delete[os_trusty-api]" time="13.0363302231"><skipped message="ring is a read only. delete action is unavailable" type="pytest.skip">/home/eve/docker-prod-backend-4/build/tests/gollum/tests/supervisor/frameworks/base.py:433: &lt;py._xmlgen.raw object at 0x7fa872a4cc50&gt;</skipped></testcase><testcase classname="supervisor.test_ring.TestRingCRUD" file="supervisor/base.py" line="197" name="test_double_delete[os_trusty-api]" time="12.91857934"><skipped message="ring is a read only. delete action is unavailable" type="pytest.skip">/home/eve/docker-prod-backend-4/build/tests/gollum/tests/supervisor/frameworks/base.py:433: &lt;py._xmlgen.raw object at 0x7fa872a4c990&gt;</skipped></testcase><testcase classname="supervisor.test_ring.TestRingCRUD" file="supervisor/test_ring.py" line="101" name="test_create_duplicate[unique_fields_name0-os_trusty-api]" time="19.0993347168"><skipped message="ring is a read only. create action is unavailable" type="pytest.skip">/home/eve/docker-prod-backend-4/build/tests/gollum/tests/supervisor/frameworks/base.py:438: &lt;py._xmlgen.raw object at 0x7fa872a41e90&gt;</skipped></testcase><testcase classname="supervisor.test_ring.TestRingCRUD" file="supervisor/test_ring.py" line="110" name="test_retrieve_not_found[api-os_trusty]" time="2.45410084724"><skipped message="expected test failure">reason: bizstoresup does respond with Bad Command</skipped></testcase><testcase classname="supervisor.test_server.TestServerCRUD" file="supervisor/base.py" line="130" name="test_retrieve[os_trusty-gui]" time="2.55441594124"></testcase><testcase classname="supervisor.test_server.TestServerCRUD" file="supervisor/base.py" line="141" name="test_retrieve_not_found[os_trusty-gui]" time="2.60261631012"></testcase><testcase classname="supervisor.test_server.TestServerCRUD" file="supervisor/base.py" line="156" name="test_create[os_trusty-gui]" time="8.41548895836"></testcase><testcase classname="supervisor.test_server.TestServerCRUD" file="supervisor/base.py" line="184" name="test_delete[os_trusty-gui]" time="7.03992915154"></testcase><testcase classname="supervisor.test_server.TestServerCRUD" file="supervisor/test_server.py" line="28" name="test_double_delete[gui-os_trusty]" time="0.127729177475"><skipped message="expected test failure">reason: </skipped></testcase><testcase classname="supervisor.test_server.TestServerCRUD" file="supervisor/test_server.py" line="36" name="test_create_duplicate[unique_fields_name0-gui-os_trusty]" time="0.126738071442"><skipped message="expected test failure"></skipped></testcase><testcase classname="supervisor.test_server.TestServerCRUD" file="supervisor/test_server.py" line="44" name="test_create_existing_server[gui-os_trusty]" time="33.5701081753"></testcase><testcase classname="supervisor.test_server.TestServerCRUD" file="supervisor/test_server.py" line="69" name="test_update_server_zone[os_trusty-gui]" time="8.19035220146"></testcase><testcase classname="supervisor.test_server.TestServerCRUD" file="supervisor/test_server.py" line="88" name="test_create_server_with_zone[os_trusty-gui]" time="10.2423040867"></testcase><testcase classname="supervisor.test_server.TestServerCRUD" file="supervisor/test_server.py" line="105" name="test_create_server_with_ne_zone[os_trusty-gui]" time="10.185090065"></testcase><testcase classname="supervisor.test_server.TestServerCRUD" file="supervisor/base.py" line="130" name="test_retrieve[os_trusty-api]" time="0.151764154434"></testcase><testcase classname="supervisor.test_server.TestServerCRUD" file="supervisor/base.py" line="141" name="test_retrieve_not_found[os_trusty-api]" time="0.0239691734314"></testcase><testcase classname="supervisor.test_server.TestServerCRUD" file="supervisor/base.py" line="156" name="test_create[os_trusty-api]" time="0.115952968597"></testcase><testcase classname="supervisor.test_server.TestServerCRUD" file="supervisor/base.py" line="184" name="test_delete[os_trusty-api]" time="0.153603792191"></testcase><testcase classname="supervisor.test_server.TestServerCRUD" file="supervisor/test_server.py" line="28" name="test_double_delete[api-os_trusty]" time="0.151757001877"></testcase><testcase classname="supervisor.test_server.TestServerCRUD" file="supervisor/test_server.py" line="36" name="test_create_duplicate[unique_fields_name0-api-os_trusty]" time="0.202139139175"><skipped message="expected test failure"></skipped></testcase><testcase classname="supervisor.test_server.TestServerCRUD" file="supervisor/test_server.py" line="44" name="test_create_existing_server[api-os_trusty]" time="0.385885715485"></testcase><testcase classname="supervisor.test_server.TestServerCRUD" file="supervisor/test_server.py" line="69" name="test_update_server_zone[os_trusty-api]" time="0.329033136368"></testcase><testcase classname="supervisor.test_server.TestServerCRUD" file="supervisor/test_server.py" line="88" name="test_create_server_with_zone[os_trusty-api]" time="0.229118347168"></testcase><testcase classname="supervisor.test_server.TestServerCRUD" file="supervisor/test_server.py" line="105" name="test_create_server_with_ne_zone[os_trusty-api]" time="0.0466949939728"></testcase><testcase classname="supervisor.test_server.TestServerQuerying" file="supervisor/base.py" line="258" name="test_query_matches[name-os_trusty-api]" time="0.578811168671"></testcase><testcase classname="supervisor.test_server.TestServerQuerying" file="supervisor/base.py" line="258" name="test_query_matches[zone-os_trusty-api]" time="0.594351053238"></testcase><testcase classname="supervisor.test_server.TestServerQuerying" file="supervisor/base.py" line="258" name="test_query_matches[state-os_trusty-api]" time="0.614847183228"><skipped message="xfail-marked test passes unexpectedly">None</skipped></testcase><testcase classname="supervisor.test_server.TestServerQuerying" file="supervisor/base.py" line="292" name="test_query_db_wrong_param[os_trusty-api]" time="0.0169208049774"></testcase><testcase classname="supervisor.test_server.TestServerQuerying" file="supervisor/base.py" line="304" name="test_query_limit[zone-os_trusty-api]" time="0.909718036652"></testcase><testcase classname="supervisor.test_server.TestServerQuerying" file="supervisor/test_server.py" line="140" name="test_query_empty[name-os_trusty-api]" time="0.0278990268707"></testcase><testcase classname="supervisor.test_server.TestServerQuerying" file="supervisor/test_server.py" line="140" name="test_query_empty[zone-os_trusty-api]" time="0.0269641876221"></testcase><testcase classname="supervisor.test_server.TestServerQuerying" file="supervisor/test_server.py" line="140" name="test_query_empty[state-os_trusty-api]" time="2.07687091827"><skipped message="xfail-marked test passes unexpectedly">None</skipped></testcase><testcase classname="supervisor.test_stats" file="supervisor/test_stats.py" line="19" name="test_index_list[os_trusty-index_name0]" time="60.323854208"></testcase><testcase classname="supervisor.test_stats" file="supervisor/test_stats.py" line="19" name="test_index_list[os_trusty-index_name1]" time="0.00513005256653"></testcase><testcase classname="supervisor.test_stats" file="supervisor/test_stats.py" line="19" name="test_index_list[os_trusty-index_name2]" time="0.00402331352234"></testcase><testcase classname="supervisor.test_stats" file="supervisor/test_stats.py" line="19" name="test_index_list[os_trusty-index_name3]" time="0.00634098052979"></testcase><testcase classname="supervisor.test_stats" file="supervisor/test_stats.py" line="19" name="test_index_list[os_trusty-index_name4]" time="0.00417804718018"></testcase><testcase classname="supervisor.test_stats" file="supervisor/test_stats.py" line="19" name="test_index_list[os_trusty-index_name5]" time="0.00387811660767"></testcase><testcase classname="supervisor.test_stats" file="supervisor/test_stats.py" line="19" name="test_index_list[os_trusty-index_name6]" time="0.00377488136292"></testcase><testcase classname="supervisor.test_stats" file="supervisor/test_stats.py" line="19" name="test_index_list[os_trusty-index_name7]" time="0.00397229194641"></testcase><testcase classname="supervisor.test_stats" file="supervisor/test_stats.py" line="19" name="test_index_list[os_trusty-index_name8]" time="0.00388193130493"></testcase><testcase classname="supervisor.test_stats" file="supervisor/test_stats.py" line="19" name="test_index_list[os_trusty-index_name9]" time="0.00348281860352"></testcase><testcase classname="supervisor.test_stats" file="supervisor/test_stats.py" line="56" name="test_grafana[os_trusty-system-beat]" time="7.24282622337"></testcase><testcase classname="supervisor.test_stats" file="supervisor/test_stats.py" line="56" name="test_grafana[os_trusty-connectors-stats]" time="5.81912684441"><skipped message="expected test failure"></skipped></testcase><testcase classname="supervisor.test_stats" file="supervisor/test_stats.py" line="56" name="test_grafana[os_trusty-ring-keys]" time="6.26621818542"><skipped message="expected test failure"></skipped></testcase><testcase classname="supervisor.test_stats" file="supervisor/test_stats.py" line="56" name="test_grafana[os_trusty-disks-stats]" time="6.76443505287"><skipped message="expected test failure"></skipped></testcase><testcase classname="supervisor.test_stats" file="supervisor/test_stats.py" line="56" name="test_grafana[os_trusty-ring-operations]" time="6.02964496613"><skipped message="expected test failure"></skipped></testcase><testcase classname="supervisor.test_stats" file="supervisor/test_stats.py" line="56" name="test_grafana[os_trusty-rs2-operations]" time="2.48069810867"></testcase><testcase classname="supervisor.test_stats" file="supervisor/test_stats.py" line="56" name="test_grafana[os_trusty-s3]" time="5.90357017517"><skipped message="expected test failure"></skipped></testcase><testcase classname="supervisor.test_stats" file="supervisor/test_stats.py" line="56" name="test_grafana[os_trusty-s3-rest]" time="8.60435009003"><skipped message="expected test failure"></skipped></testcase><testcase classname="supervisor.test_stats_db.TestStatsDbCRUD" file="supervisor/base.py" line="130" name="test_retrieve[os_trusty-api]" time="0.0874729156494"></testcase><testcase classname="supervisor.test_stats_db.TestStatsDbCRUD" file="supervisor/base.py" line="141" name="test_retrieve_not_found[os_trusty-api]" time="0.0211791992188"></testcase><testcase classname="supervisor.test_stats_db.TestStatsDbCRUD" file="supervisor/base.py" line="156" name="test_create[os_trusty-api]" time="0.0497641563416"></testcase><testcase classname="supervisor.test_stats_db.TestStatsDbCRUD" file="supervisor/base.py" line="168" name="test_create_duplicate[unique_fields_name0-os_trusty-api]" time="0.0710391998291"></testcase><testcase classname="supervisor.test_stats_db.TestStatsDbCRUD" file="supervisor/base.py" line="184" name="test_delete[os_trusty-api]" time="0.065484046936"></testcase><testcase classname="supervisor.test_stats_db.TestStatsDbCRUD" file="supervisor/base.py" line="197" name="test_double_delete[os_trusty-api]" time="0.0760309696198"></testcase><testcase classname="supervisor.test_stats_db.TestStatsDbCRUD" file="supervisor/test_stats_db.py" line="31" name="test_patch_stats_db[api-os_trusty]" time="0.16602897644"></testcase><testcase classname="supervisor.test_stats_db.TestStatsDbCRUD" file="supervisor/test_stats_db.py" line="44" name="test_put_name_used_db[api-os_trusty]" time="0.113758802414"></testcase><testcase classname="supervisor.test_stats_db.TestStatsDbQuerying" file="supervisor/base.py" line="235" name="test_query_empty[name-os_trusty-api]" time="0.019602060318"></testcase><testcase classname="supervisor.test_stats_db.TestStatsDbQuerying" file="supervisor/base.py" line="235" name="test_query_empty[entrypoints-os_trusty-api]" time="0.0197908878326"></testcase><testcase classname="supervisor.test_stats_db.TestStatsDbQuerying" file="supervisor/base.py" line="258" name="test_query_matches[name-os_trusty-api]" time="0.317962884903"></testcase><testcase classname="supervisor.test_stats_db.TestStatsDbQuerying" file="supervisor/base.py" line="258" name="test_query_matches[entrypoints-os_trusty-api]" time="0.319843053818"></testcase><testcase classname="supervisor.test_stats_db.TestStatsDbQuerying" file="supervisor/base.py" line="292" name="test_query_db_wrong_param[os_trusty-api]" time="0.0143241882324"></testcase><testcase classname="supervisor.test_stats_db.TestStatsDbQuerying" file="supervisor/base.py" line="304" name="test_query_limit[entrypoints-os_trusty-api]" time="0.625885725021"></testcase><testcase classname="supervisor.test_volumes.TestVolumeCRUD" file="supervisor/base.py" line="130" name="test_retrieve[os_trusty-gui]" time="21.9933729172"></testcase><testcase classname="supervisor.test_volumes.TestVolumeCRUD" file="supervisor/base.py" line="141" name="test_retrieve_not_found[os_trusty-gui]" time="2.68194580078"></testcase><testcase classname="supervisor.test_volumes.TestVolumeCRUD" file="supervisor/base.py" line="156" name="test_create[os_trusty-gui]" time="11.4484059811"></testcase><testcase classname="supervisor.test_volumes.TestVolumeCRUD" file="supervisor/base.py" line="168" name="test_create_duplicate[unique_fields_name0-os_trusty-gui]" time="18.5700230598"></testcase><testcase classname="supervisor.test_volumes.TestVolumeCRUD" file="supervisor/base.py" line="168" name="test_create_duplicate[unique_fields_name1-os_trusty-gui]" time="18.2435450554"></testcase><testcase classname="supervisor.test_volumes.TestVolumeCRUD" file="supervisor/base.py" line="184" name="test_delete[os_trusty-gui]" time="16.8247480392"></testcase><testcase classname="supervisor.test_volumes.TestVolumeCRUD" file="supervisor/base.py" line="197" name="test_double_delete[os_trusty-gui]" time="17.9663488865"></testcase><testcase classname="supervisor.test_volumes.TestVolumeCRUD" file="supervisor/test_volumes.py" line="36" name="test_create_bad_named_volume[os_trusty-gui-volume_name0]" time="10.3912305832"></testcase><testcase classname="supervisor.test_volumes.TestVolumeCRUD" file="supervisor/test_volumes.py" line="36" name="test_create_bad_named_volume[os_trusty-gui-volume_name1]" time="9.97412228584"></testcase><testcase classname="supervisor.test_volumes.TestVolumeCRUD" file="supervisor/test_volumes.py" line="36" name="test_create_bad_named_volume[os_trusty-gui-volume_name2]" time="9.77391934395"></testcase><testcase classname="supervisor.test_volumes.TestVolumeCRUD" file="supervisor/test_volumes.py" line="54" name="test_device_id[gui-os_trusty]" time="16.3973610401"></testcase><testcase classname="supervisor.test_zone.TestZoneCRUD" file="supervisor/base.py" line="130" name="test_retrieve[os_trusty-gui]" time="3.58474469185"></testcase><testcase classname="supervisor.test_zone.TestZoneCRUD" file="supervisor/base.py" line="141" name="test_retrieve_not_found[os_trusty-gui]" time="2.94754910469"></testcase><testcase classname="supervisor.test_zone.TestZoneCRUD" file="supervisor/base.py" line="156" name="test_create[os_trusty-gui]" time="8.36860895157"></testcase><testcase classname="supervisor.test_zone.TestZoneCRUD" file="supervisor/base.py" line="184" name="test_delete[os_trusty-gui]" time="10.8455970287"></testcase><testcase classname="supervisor.test_zone.TestZoneCRUD" file="supervisor/test_zone.py" line="26" name="test_double_delete[gui-os_trusty]" time="0.415344953537"><skipped message="expected test failure">reason: bizstoresup accepts every deletion request</skipped></testcase><testcase classname="supervisor.test_zone.TestZoneCRUD" file="supervisor/test_zone.py" line="34" name="test_create_duplicate[unique_fields_name0-os_trusty-gui]" time="5.40738010406"><skipped message="expected test failure"></skipped></testcase><testcase classname="supervisor.test_zone.TestZoneCRUD" file="supervisor/base.py" line="130" name="test_retrieve[os_trusty-api]" time="0.503582954407"></testcase><testcase classname="supervisor.test_zone.TestZoneCRUD" file="supervisor/base.py" line="141" name="test_retrieve_not_found[os_trusty-api]" time="0.112144231796"></testcase><testcase classname="supervisor.test_zone.TestZoneCRUD" file="supervisor/base.py" line="156" name="test_create[os_trusty-api]" time="0.399561882019"></testcase><testcase classname="supervisor.test_zone.TestZoneCRUD" file="supervisor/base.py" line="184" name="test_delete[os_trusty-api]" time="0.490250110626"></testcase><testcase classname="supervisor.test_zone.TestZoneCRUD" file="supervisor/test_zone.py" line="26" name="test_double_delete[api-os_trusty]" time="0.337305307388"></testcase><testcase classname="supervisor.test_zone.TestZoneCRUD" file="supervisor/test_zone.py" line="34" name="test_create_duplicate[unique_fields_name0-os_trusty-api]" time="0.252748012543"><skipped message="expected test failure"></skipped></testcase><testcase classname="supervisor.tools.test_logwatcher" file="supervisor/tools/test_logwatcher.py" line="40" name="test_watch[os_trusty-True]" time="27.3293111324"></testcase><testcase classname="supervisor.tools.test_logwatcher" file="supervisor/tools/test_logwatcher.py" line="40" name="test_watch[os_trusty-False]" time="18.0479493141"></testcase></testsuite>
+<?xml version="1.0" encoding="utf-8"?>
+<testsuite errors="0" failures="0" name="pytest" skips="24" tests="120"
+           time="1532.762">
+    <testcase classname="supervisor.test_01_deployment.TestGenericDeployment"
+              file="supervisor/test_01_deployment.py" line="23"
+              name="test_denethor[os_trusty]" time="139.415722847"></testcase>
+    <testcase classname="supervisor.test_01_deployment.TestGenericDeployment"
+              file="supervisor/test_01_deployment.py" line="27"
+              name="test_supervisor_configuration[os_trusty]"
+              time="350.648134947"></testcase>
+    <testcase classname="supervisor.test_01_deployment.TestGenericDeployment"
+              file="supervisor/test_01_deployment.py" line="42"
+              name="test_supervisor_with_ring[gui-os_trusty]"
+              time="86.5909798145"></testcase>
+    <testcase classname="supervisor.test_01_deployment.TestGenericDeployment"
+              file="supervisor/test_01_deployment.py" line="59"
+              name="test_supervisor_bad_auth[supervisor-os_trusty-gui]"
+              time="28.1041693687"></testcase>
+    <testcase classname="supervisor.test_01_deployment.TestGenericDeployment"
+              file="supervisor/test_01_deployment.py" line="59"
+              name="test_supervisor_bad_auth[grafana-os_trusty-gui]"
+              time="8.78640294075"></testcase>
+    <testcase classname="supervisor.test_01_deployment.TestGenericDeployment"
+              file="supervisor/test_01_deployment.py" line="77"
+              name="test_supervisor_good_auth[supervisor-os_trusty-gui]"
+              time="22.5319859982"></testcase>
+    <testcase classname="supervisor.test_01_deployment.TestGenericDeployment"
+              file="supervisor/test_01_deployment.py" line="77"
+              name="test_supervisor_good_auth[grafana-os_trusty-gui]"
+              time="7.05154275894"></testcase>
+    <testcase classname="supervisor.test_01_deployment.TestGenericDeployment"
+              file="supervisor/test_01_deployment.py" line="42"
+              name="test_supervisor_with_ring[api-os_trusty]"
+              time="0.0484600067139">
+        <skipped message="Supervisor operation not implemented on the API"
+                 type="pytest.skip">
+            /home/eve/docker-prod-backend-4/build/tests/gollum/tests/supervisor/frameworks/supervisor.py:211:
+            &lt;py._xmlgen.raw object at 0x7fa872b9cdd0&gt;</skipped>
+    </testcase>
+    <testcase classname="supervisor.test_01_deployment.TestGenericDeployment"
+              file="supervisor/test_01_deployment.py" line="59"
+              name="test_supervisor_bad_auth[supervisor-os_trusty-api]"
+              time="0.0807800292969"></testcase>
+    <testcase classname="supervisor.test_01_deployment.TestGenericDeployment"
+              file="supervisor/test_01_deployment.py" line="59"
+              name="test_supervisor_bad_auth[grafana-os_trusty-api]"
+              time="0.000911712646484">
+        <skipped message="Not testing the grafana api" type="pytest.skip">
+            /home/eve/docker-prod-backend-4/build/tests/gollum/tests/supervisor/fixtures/supervisor.py:141:
+            &lt;py._xmlgen.raw object at 0x7fa872c63950&gt;</skipped>
+    </testcase>
+    <testcase classname="supervisor.test_01_deployment.TestGenericDeployment"
+              file="supervisor/test_01_deployment.py" line="77"
+              name="test_supervisor_good_auth[supervisor-os_trusty-api]"
+              time="0.0407299995422"></testcase>
+    <testcase classname="supervisor.test_01_deployment.TestGenericDeployment"
+              file="supervisor/test_01_deployment.py" line="77"
+              name="test_supervisor_good_auth[grafana-os_trusty-api]"
+              time="0.000735998153687">
+        <skipped message="Not testing the grafana api" type="pytest.skip">
+            /home/eve/docker-prod-backend-4/build/tests/gollum/tests/supervisor/fixtures/supervisor.py:141:
+            &lt;py._xmlgen.raw object at 0x7fa872b9ee50&gt;</skipped>
+    </testcase>
+    <testcase classname="supervisor.test_01_deployment.TestGenericDeployment"
+              file="supervisor/test_01_deployment.py" line="90"
+              name="test_supervisor_audit_log[file-os_trusty]"
+              time="39.5410401821"></testcase>
+    <testcase classname="supervisor.test_01_deployment.TestGenericDeployment"
+              file="supervisor/test_01_deployment.py" line="90"
+              name="test_supervisor_audit_log[syslog-os_trusty]"
+              time="45.2605071068"></testcase>
+    <testcase classname="supervisor.test_01_deployment.TestGenericDeployment"
+              file="supervisor/test_01_deployment.py" line="118"
+              name="test_storenode[os_trusty]" time="93.6642892361"></testcase>
+    <testcase classname="supervisor.test_connectors.TestConnectorCRUD"
+              file="supervisor/base.py" line="130"
+              name="test_retrieve[os_trusty-gui]"
+              time="9.14906477928"></testcase>
+    <testcase classname="supervisor.test_connectors.TestConnectorCRUD"
+              file="supervisor/base.py" line="141"
+              name="test_retrieve_not_found[os_trusty-gui]"
+              time="4.34794688225"></testcase>
+    <testcase classname="supervisor.test_connectors.TestConnectorCRUD"
+              file="supervisor/base.py" line="130"
+              name="test_retrieve[os_trusty-api]"
+              time="0.21022605896"></testcase>
+    <testcase classname="supervisor.test_connectors.TestConnectorCRUD"
+              file="supervisor/base.py" line="141"
+              name="test_retrieve_not_found[os_trusty-api]"
+              time="0.0339550971985"></testcase>
+    <testcase classname="supervisor.test_connectors.TestConnectorQuerying"
+              file="supervisor/base.py" line="235"
+              name="test_query_empty[name-os_trusty-api]"
+              time="0.0475332736969"></testcase>
+    <testcase classname="supervisor.test_connectors.TestConnectorQuerying"
+              file="supervisor/base.py" line="235"
+              name="test_query_empty[type-os_trusty-api]"
+              time="0.0726132392883"></testcase>
+    <testcase classname="supervisor.test_connectors.TestConnectorQuerying"
+              file="supervisor/base.py" line="235"
+              name="test_query_empty[server-os_trusty-api]"
+              time="0.0529911518097"></testcase>
+    <testcase classname="supervisor.test_connectors.TestConnectorQuerying"
+              file="supervisor/base.py" line="235"
+              name="test_query_empty[state-os_trusty-api]"
+              time="0.0436339378357"></testcase>
+    <testcase classname="supervisor.test_connectors.TestConnectorQuerying"
+              file="supervisor/base.py" line="235"
+              name="test_query_empty[ring-os_trusty-api]"
+              time="0.047611951828"></testcase>
+    <testcase classname="supervisor.test_connectors.TestConnectorQuerying"
+              file="supervisor/base.py" line="258"
+              name="test_query_matches[name-os_trusty-api]"
+              time="0.163570165634"></testcase>
+    <testcase classname="supervisor.test_connectors.TestConnectorQuerying"
+              file="supervisor/base.py" line="258"
+              name="test_query_matches[type-os_trusty-api]"
+              time="0.152004957199"></testcase>
+    <testcase classname="supervisor.test_connectors.TestConnectorQuerying"
+              file="supervisor/base.py" line="258"
+              name="test_query_matches[server-os_trusty-api]"
+              time="0.160793066025"></testcase>
+    <testcase classname="supervisor.test_connectors.TestConnectorQuerying"
+              file="supervisor/base.py" line="258"
+              name="test_query_matches[state-os_trusty-api]"
+              time="0.164515733719"></testcase>
+    <testcase classname="supervisor.test_connectors.TestConnectorQuerying"
+              file="supervisor/base.py" line="258"
+              name="test_query_matches[ring-os_trusty-api]"
+              time="0.153678894043"></testcase>
+    <testcase classname="supervisor.test_connectors.TestConnectorQuerying"
+              file="supervisor/base.py" line="292"
+              name="test_query_db_wrong_param[os_trusty-api]"
+              time="0.0206789970398"></testcase>
+    <testcase classname="supervisor.test_connectors.TestConnectorQuerying"
+              file="supervisor/base.py" line="304"
+              name="test_query_limit[no field-os_trusty-api]"
+              time="0.551695108414">
+        <skipped message="unconditional skip" type="pytest.skip">
+            supervisor/base.py:304: &lt;py._xmlgen.raw object at 0x7fa8730052d0&gt;</skipped>
+    </testcase>
+    <testcase classname="supervisor.test_restapi.TestStatsDbAPIMisUse"
+              file="supervisor/test_restapi.py" line="16"
+              name="test_patch_header_stats_dbs[api-os_trusty]"
+              time="0.0419180393219"></testcase>
+    <testcase classname="supervisor.test_restapi.TestStatsDbAPIMisUse"
+              file="supervisor/test_restapi.py" line="26"
+              name="test_wrong_fields_creation_stats_db[api-os_trusty]"
+              time="0.0239160060883"></testcase>
+    <testcase classname="supervisor.test_restapi.TestStatsDbAPIMisUse"
+              file="supervisor/test_restapi.py" line="38"
+              name="test_patch_wrong_action[api-os_trusty]"
+              time="0.0718252658844"></testcase>
+    <testcase classname="supervisor.test_restapi.TestStatsDbAPIMisUse"
+              file="supervisor/test_restapi.py" line="44"
+              name="test_patch_wrong_values[api-os_trusty]"
+              time="0.0592129230499"></testcase>
+    <testcase classname="supervisor.test_restapi.TestStatsDbAPIMisUse"
+              file="supervisor/test_restapi.py" line="53"
+              name="test_patch_wrong_db[api-os_trusty]"
+              time="0.0212569236755"></testcase>
+    <testcase classname="supervisor.test_restapi.TestStatsDbAPIMisUse"
+              file="supervisor/test_restapi.py" line="59"
+              name="test_put_name_stats_db[api-os_trusty]"
+              time="0.0944788455963"></testcase>
+    <testcase classname="supervisor.test_restapi.TestStatsDbAPIMisUse"
+              file="supervisor/test_restapi.py" line="80"
+              name="test_wrong_stats_db_methods[api-os_trusty-DELETE]"
+              time="0.0232028961182"></testcase>
+    <testcase classname="supervisor.test_restapi.TestStatsDbAPIMisUse"
+              file="supervisor/test_restapi.py" line="80"
+              name="test_wrong_stats_db_methods[api-os_trusty-PUT]"
+              time="0.0137996673584"></testcase>
+    <testcase classname="supervisor.test_restapi.TestTrailingSlash"
+              file="supervisor/test_restapi.py" line="111"
+              name="test_resource[api-os_trusty-True]"
+              time="0.130317211151"></testcase>
+    <testcase classname="supervisor.test_restapi.TestTrailingSlash"
+              file="supervisor/test_restapi.py" line="111"
+              name="test_resource[api-os_trusty-False]"
+              time="0.143559217453"></testcase>
+    <testcase classname="supervisor.test_restapi.TestTrailingSlash"
+              file="supervisor/test_restapi.py" line="89"
+              name="test_navigation_endpoints[os_trusty-/api]"
+              time="0.00838303565979"></testcase>
+    <testcase classname="supervisor.test_restapi.TestTrailingSlash"
+              file="supervisor/test_restapi.py" line="89"
+              name="test_navigation_endpoints[os_trusty-/api/v0.1]"
+              time="0.0104517936707"></testcase>
+    <testcase classname="supervisor.test_ring.TestRingGuiAlert"
+              file="supervisor/test_ring.py" line="78"
+              name="test_check_no_alert[os_trusty-gui-Auto purge]"
+              time="19.8966288567"></testcase>
+    <testcase classname="supervisor.test_ring.TestRingGuiAlert"
+              file="supervisor/test_ring.py" line="78"
+              name="test_check_no_alert[os_trusty-gui-Auto rebuild]"
+              time="2.96036171913"></testcase>
+    <testcase classname="supervisor.test_ring.TestRingGuiAlert"
+              file="supervisor/test_ring.py" line="85"
+              name="test_purge_alert[os_trusty-gui]"
+              time="27.7643098831"></testcase>
+    <testcase classname="supervisor.test_ring.TestRingGuiAlert"
+              file="supervisor/test_ring.py" line="91"
+              name="test_rebuild_alert[os_trusty-gui]"
+              time="27.8533017635"></testcase>
+    <testcase classname="supervisor.test_ring.TestRingCRUD"
+              file="supervisor/base.py" line="130"
+              name="test_retrieve[os_trusty-gui]"
+              time="16.525758028"></testcase>
+    <testcase classname="supervisor.test_ring.TestRingCRUD"
+              file="supervisor/base.py" line="156"
+              name="test_create[os_trusty-gui]" time="18.2318778038"></testcase>
+    <testcase classname="supervisor.test_ring.TestRingCRUD"
+              file="supervisor/base.py" line="184"
+              name="test_delete[os_trusty-gui]" time="22.1913759708"></testcase>
+    <testcase classname="supervisor.test_ring.TestRingCRUD"
+              file="supervisor/base.py" line="197"
+              name="test_double_delete[os_trusty-gui]"
+              time="28.2908937931"></testcase>
+    <testcase classname="supervisor.test_ring.TestRingCRUD"
+              file="supervisor/test_ring.py" line="101"
+              name="test_create_duplicate[unique_fields_name0-os_trusty-gui]"
+              time="24.9569563866">
+        <skipped message="expected test failure"></skipped>
+    </testcase>
+    <testcase classname="supervisor.test_ring.TestRingCRUD"
+              file="supervisor/test_ring.py" line="110"
+              name="test_retrieve_not_found[gui-os_trusty]"
+              time="4.16012001038"></testcase>
+    <testcase classname="supervisor.test_ring.TestRingCRUD"
+              file="supervisor/base.py" line="130"
+              name="test_retrieve[os_trusty-api]"
+              time="17.3349621296"></testcase>
+    <testcase classname="supervisor.test_ring.TestRingCRUD"
+              file="supervisor/base.py" line="156"
+              name="test_create[os_trusty-api]" time="1.97322773933">
+        <skipped message="ring is a read only. create action is unavailable"
+                 type="pytest.skip">
+            /home/eve/docker-prod-backend-4/build/tests/gollum/tests/supervisor/frameworks/base.py:438:
+            &lt;py._xmlgen.raw object at 0x7fa872a4c290&gt;</skipped>
+    </testcase>
+    <testcase classname="supervisor.test_ring.TestRingCRUD"
+              file="supervisor/base.py" line="184"
+              name="test_delete[os_trusty-api]" time="13.0363302231">
+        <skipped message="ring is a read only. delete action is unavailable"
+                 type="pytest.skip">
+            /home/eve/docker-prod-backend-4/build/tests/gollum/tests/supervisor/frameworks/base.py:433:
+            &lt;py._xmlgen.raw object at 0x7fa872a4cc50&gt;</skipped>
+    </testcase>
+    <testcase classname="supervisor.test_ring.TestRingCRUD"
+              file="supervisor/base.py" line="197"
+              name="test_double_delete[os_trusty-api]" time="12.91857934">
+        <skipped message="ring is a read only. delete action is unavailable"
+                 type="pytest.skip">
+            /home/eve/docker-prod-backend-4/build/tests/gollum/tests/supervisor/frameworks/base.py:433:
+            &lt;py._xmlgen.raw object at 0x7fa872a4c990&gt;</skipped>
+    </testcase>
+    <testcase classname="supervisor.test_ring.TestRingCRUD"
+              file="supervisor/test_ring.py" line="101"
+              name="test_create_duplicate[unique_fields_name0-os_trusty-api]"
+              time="19.0993347168">
+        <skipped message="ring is a read only. create action is unavailable"
+                 type="pytest.skip">
+            /home/eve/docker-prod-backend-4/build/tests/gollum/tests/supervisor/frameworks/base.py:438:
+            &lt;py._xmlgen.raw object at 0x7fa872a41e90&gt;</skipped>
+    </testcase>
+    <testcase classname="supervisor.test_ring.TestRingCRUD"
+              file="supervisor/test_ring.py" line="110"
+              name="test_retrieve_not_found[api-os_trusty]"
+              time="2.45410084724">
+        <skipped message="expected test failure">reason: bizstoresup does
+            respond with Bad Command
+        </skipped>
+    </testcase>
+    <testcase classname="supervisor.test_server.TestServerCRUD"
+              file="supervisor/base.py" line="130"
+              name="test_retrieve[os_trusty-gui]"
+              time="2.55441594124"></testcase>
+    <testcase classname="supervisor.test_server.TestServerCRUD"
+              file="supervisor/base.py" line="141"
+              name="test_retrieve_not_found[os_trusty-gui]"
+              time="2.60261631012"></testcase>
+    <testcase classname="supervisor.test_server.TestServerCRUD"
+              file="supervisor/base.py" line="156"
+              name="test_create[os_trusty-gui]" time="8.41548895836"></testcase>
+    <testcase classname="supervisor.test_server.TestServerCRUD"
+              file="supervisor/base.py" line="184"
+              name="test_delete[os_trusty-gui]" time="7.03992915154"></testcase>
+    <testcase classname="supervisor.test_server.TestServerCRUD"
+              file="supervisor/test_server.py" line="28"
+              name="test_double_delete[gui-os_trusty]" time="0.127729177475">
+        <skipped message="expected test failure">reason:</skipped>
+    </testcase>
+    <testcase classname="supervisor.test_server.TestServerCRUD"
+              file="supervisor/test_server.py" line="36"
+              name="test_create_duplicate[unique_fields_name0-gui-os_trusty]"
+              time="0.126738071442">
+        <skipped message="expected test failure"></skipped>
+    </testcase>
+    <testcase classname="supervisor.test_server.TestServerCRUD"
+              file="supervisor/test_server.py" line="44"
+              name="test_create_existing_server[gui-os_trusty]"
+              time="33.5701081753"></testcase>
+    <testcase classname="supervisor.test_server.TestServerCRUD"
+              file="supervisor/test_server.py" line="69"
+              name="test_update_server_zone[os_trusty-gui]"
+              time="8.19035220146"></testcase>
+    <testcase classname="supervisor.test_server.TestServerCRUD"
+              file="supervisor/test_server.py" line="88"
+              name="test_create_server_with_zone[os_trusty-gui]"
+              time="10.2423040867"></testcase>
+    <testcase classname="supervisor.test_server.TestServerCRUD"
+              file="supervisor/test_server.py" line="105"
+              name="test_create_server_with_ne_zone[os_trusty-gui]"
+              time="10.185090065"></testcase>
+    <testcase classname="supervisor.test_server.TestServerCRUD"
+              file="supervisor/base.py" line="130"
+              name="test_retrieve[os_trusty-api]"
+              time="0.151764154434"></testcase>
+    <testcase classname="supervisor.test_server.TestServerCRUD"
+              file="supervisor/base.py" line="141"
+              name="test_retrieve_not_found[os_trusty-api]"
+              time="0.0239691734314"></testcase>
+    <testcase classname="supervisor.test_server.TestServerCRUD"
+              file="supervisor/base.py" line="156"
+              name="test_create[os_trusty-api]"
+              time="0.115952968597"></testcase>
+    <testcase classname="supervisor.test_server.TestServerCRUD"
+              file="supervisor/base.py" line="184"
+              name="test_delete[os_trusty-api]"
+              time="0.153603792191"></testcase>
+    <testcase classname="supervisor.test_server.TestServerCRUD"
+              file="supervisor/test_server.py" line="28"
+              name="test_double_delete[api-os_trusty]"
+              time="0.151757001877"></testcase>
+    <testcase classname="supervisor.test_server.TestServerCRUD"
+              file="supervisor/test_server.py" line="36"
+              name="test_create_duplicate[unique_fields_name0-api-os_trusty]"
+              time="0.202139139175">
+        <skipped message="expected test failure"></skipped>
+    </testcase>
+    <testcase classname="supervisor.test_server.TestServerCRUD"
+              file="supervisor/test_server.py" line="44"
+              name="test_create_existing_server[api-os_trusty]"
+              time="0.385885715485"></testcase>
+    <testcase classname="supervisor.test_server.TestServerCRUD"
+              file="supervisor/test_server.py" line="69"
+              name="test_update_server_zone[os_trusty-api]"
+              time="0.329033136368"></testcase>
+    <testcase classname="supervisor.test_server.TestServerCRUD"
+              file="supervisor/test_server.py" line="88"
+              name="test_create_server_with_zone[os_trusty-api]"
+              time="0.229118347168"></testcase>
+    <testcase classname="supervisor.test_server.TestServerCRUD"
+              file="supervisor/test_server.py" line="105"
+              name="test_create_server_with_ne_zone[os_trusty-api]"
+              time="0.0466949939728"></testcase>
+    <testcase classname="supervisor.test_server.TestServerQuerying"
+              file="supervisor/base.py" line="258"
+              name="test_query_matches[name-os_trusty-api]"
+              time="0.578811168671"></testcase>
+    <testcase classname="supervisor.test_server.TestServerQuerying"
+              file="supervisor/base.py" line="258"
+              name="test_query_matches[zone-os_trusty-api]"
+              time="0.594351053238"></testcase>
+    <testcase classname="supervisor.test_server.TestServerQuerying"
+              file="supervisor/base.py" line="258"
+              name="test_query_matches[state-os_trusty-api]"
+              time="0.614847183228">
+        <skipped message="xfail-marked test passes unexpectedly">None</skipped>
+    </testcase>
+    <testcase classname="supervisor.test_server.TestServerQuerying"
+              file="supervisor/base.py" line="292"
+              name="test_query_db_wrong_param[os_trusty-api]"
+              time="0.0169208049774"></testcase>
+    <testcase classname="supervisor.test_server.TestServerQuerying"
+              file="supervisor/base.py" line="304"
+              name="test_query_limit[zone-os_trusty-api]"
+              time="0.909718036652"></testcase>
+    <testcase classname="supervisor.test_server.TestServerQuerying"
+              file="supervisor/test_server.py" line="140"
+              name="test_query_empty[name-os_trusty-api]"
+              time="0.0278990268707"></testcase>
+    <testcase classname="supervisor.test_server.TestServerQuerying"
+              file="supervisor/test_server.py" line="140"
+              name="test_query_empty[zone-os_trusty-api]"
+              time="0.0269641876221"></testcase>
+    <testcase classname="supervisor.test_server.TestServerQuerying"
+              file="supervisor/test_server.py" line="140"
+              name="test_query_empty[state-os_trusty-api]" time="2.07687091827">
+        <skipped message="xfail-marked test passes unexpectedly">None</skipped>
+    </testcase>
+    <testcase classname="supervisor.test_stats" file="supervisor/test_stats.py"
+              line="19" name="test_index_list[os_trusty-index_name0]"
+              time="60.323854208"></testcase>
+    <testcase classname="supervisor.test_stats" file="supervisor/test_stats.py"
+              line="19" name="test_index_list[os_trusty-index_name1]"
+              time="0.00513005256653"></testcase>
+    <testcase classname="supervisor.test_stats" file="supervisor/test_stats.py"
+              line="19" name="test_index_list[os_trusty-index_name2]"
+              time="0.00402331352234"></testcase>
+    <testcase classname="supervisor.test_stats" file="supervisor/test_stats.py"
+              line="19" name="test_index_list[os_trusty-index_name3]"
+              time="0.00634098052979"></testcase>
+    <testcase classname="supervisor.test_stats" file="supervisor/test_stats.py"
+              line="19" name="test_index_list[os_trusty-index_name4]"
+              time="0.00417804718018"></testcase>
+    <testcase classname="supervisor.test_stats" file="supervisor/test_stats.py"
+              line="19" name="test_index_list[os_trusty-index_name5]"
+              time="0.00387811660767"></testcase>
+    <testcase classname="supervisor.test_stats" file="supervisor/test_stats.py"
+              line="19" name="test_index_list[os_trusty-index_name6]"
+              time="0.00377488136292"></testcase>
+    <testcase classname="supervisor.test_stats" file="supervisor/test_stats.py"
+              line="19" name="test_index_list[os_trusty-index_name7]"
+              time="0.00397229194641"></testcase>
+    <testcase classname="supervisor.test_stats" file="supervisor/test_stats.py"
+              line="19" name="test_index_list[os_trusty-index_name8]"
+              time="0.00388193130493"></testcase>
+    <testcase classname="supervisor.test_stats" file="supervisor/test_stats.py"
+              line="19" name="test_index_list[os_trusty-index_name9]"
+              time="0.00348281860352"></testcase>
+    <testcase classname="supervisor.test_stats" file="supervisor/test_stats.py"
+              line="56" name="test_grafana[os_trusty-system-beat]"
+              time="7.24282622337"></testcase>
+    <testcase classname="supervisor.test_stats" file="supervisor/test_stats.py"
+              line="56" name="test_grafana[os_trusty-connectors-stats]"
+              time="5.81912684441">
+        <skipped message="expected test failure"></skipped>
+    </testcase>
+    <testcase classname="supervisor.test_stats" file="supervisor/test_stats.py"
+              line="56" name="test_grafana[os_trusty-ring-keys]"
+              time="6.26621818542">
+        <skipped message="expected test failure"></skipped>
+    </testcase>
+    <testcase classname="supervisor.test_stats" file="supervisor/test_stats.py"
+              line="56" name="test_grafana[os_trusty-disks-stats]"
+              time="6.76443505287">
+        <skipped message="expected test failure"></skipped>
+    </testcase>
+    <testcase classname="supervisor.test_stats" file="supervisor/test_stats.py"
+              line="56" name="test_grafana[os_trusty-ring-operations]"
+              time="6.02964496613">
+        <skipped message="expected test failure"></skipped>
+    </testcase>
+    <testcase classname="supervisor.test_stats" file="supervisor/test_stats.py"
+              line="56" name="test_grafana[os_trusty-rs2-operations]"
+              time="2.48069810867"></testcase>
+    <testcase classname="supervisor.test_stats" file="supervisor/test_stats.py"
+              line="56" name="test_grafana[os_trusty-s3]" time="5.90357017517">
+        <skipped message="expected test failure"></skipped>
+    </testcase>
+    <testcase classname="supervisor.test_stats" file="supervisor/test_stats.py"
+              line="56" name="test_grafana[os_trusty-s3-rest]"
+              time="8.60435009003">
+        <skipped message="expected test failure"></skipped>
+    </testcase>
+    <testcase classname="supervisor.test_stats_db.TestStatsDbCRUD"
+              file="supervisor/base.py" line="130"
+              name="test_retrieve[os_trusty-api]"
+              time="0.0874729156494"></testcase>
+    <testcase classname="supervisor.test_stats_db.TestStatsDbCRUD"
+              file="supervisor/base.py" line="141"
+              name="test_retrieve_not_found[os_trusty-api]"
+              time="0.0211791992188"></testcase>
+    <testcase classname="supervisor.test_stats_db.TestStatsDbCRUD"
+              file="supervisor/base.py" line="156"
+              name="test_create[os_trusty-api]"
+              time="0.0497641563416"></testcase>
+    <testcase classname="supervisor.test_stats_db.TestStatsDbCRUD"
+              file="supervisor/base.py" line="168"
+              name="test_create_duplicate[unique_fields_name0-os_trusty-api]"
+              time="0.0710391998291"></testcase>
+    <testcase classname="supervisor.test_stats_db.TestStatsDbCRUD"
+              file="supervisor/base.py" line="184"
+              name="test_delete[os_trusty-api]"
+              time="0.065484046936"></testcase>
+    <testcase classname="supervisor.test_stats_db.TestStatsDbCRUD"
+              file="supervisor/base.py" line="197"
+              name="test_double_delete[os_trusty-api]"
+              time="0.0760309696198"></testcase>
+    <testcase classname="supervisor.test_stats_db.TestStatsDbCRUD"
+              file="supervisor/test_stats_db.py" line="31"
+              name="test_patch_stats_db[api-os_trusty]"
+              time="0.16602897644"></testcase>
+    <testcase classname="supervisor.test_stats_db.TestStatsDbCRUD"
+              file="supervisor/test_stats_db.py" line="44"
+              name="test_put_name_used_db[api-os_trusty]"
+              time="0.113758802414"></testcase>
+    <testcase classname="supervisor.test_stats_db.TestStatsDbQuerying"
+              file="supervisor/base.py" line="235"
+              name="test_query_empty[name-os_trusty-api]"
+              time="0.019602060318"></testcase>
+    <testcase classname="supervisor.test_stats_db.TestStatsDbQuerying"
+              file="supervisor/base.py" line="235"
+              name="test_query_empty[entrypoints-os_trusty-api]"
+              time="0.0197908878326"></testcase>
+    <testcase classname="supervisor.test_stats_db.TestStatsDbQuerying"
+              file="supervisor/base.py" line="258"
+              name="test_query_matches[name-os_trusty-api]"
+              time="0.317962884903"></testcase>
+    <testcase classname="supervisor.test_stats_db.TestStatsDbQuerying"
+              file="supervisor/base.py" line="258"
+              name="test_query_matches[entrypoints-os_trusty-api]"
+              time="0.319843053818"></testcase>
+    <testcase classname="supervisor.test_stats_db.TestStatsDbQuerying"
+              file="supervisor/base.py" line="292"
+              name="test_query_db_wrong_param[os_trusty-api]"
+              time="0.0143241882324"></testcase>
+    <testcase classname="supervisor.test_stats_db.TestStatsDbQuerying"
+              file="supervisor/base.py" line="304"
+              name="test_query_limit[entrypoints-os_trusty-api]"
+              time="0.625885725021"></testcase>
+    <testcase classname="supervisor.test_volumes.TestVolumeCRUD"
+              file="supervisor/base.py" line="130"
+              name="test_retrieve[os_trusty-gui]"
+              time="21.9933729172"></testcase>
+    <testcase classname="supervisor.test_volumes.TestVolumeCRUD"
+              file="supervisor/base.py" line="141"
+              name="test_retrieve_not_found[os_trusty-gui]"
+              time="2.68194580078"></testcase>
+    <testcase classname="supervisor.test_volumes.TestVolumeCRUD"
+              file="supervisor/base.py" line="156"
+              name="test_create[os_trusty-gui]" time="11.4484059811"></testcase>
+    <testcase classname="supervisor.test_volumes.TestVolumeCRUD"
+              file="supervisor/base.py" line="168"
+              name="test_create_duplicate[unique_fields_name0-os_trusty-gui]"
+              time="18.5700230598"></testcase>
+    <testcase classname="supervisor.test_volumes.TestVolumeCRUD"
+              file="supervisor/base.py" line="168"
+              name="test_create_duplicate[unique_fields_name1-os_trusty-gui]"
+              time="18.2435450554"></testcase>
+    <testcase classname="supervisor.test_volumes.TestVolumeCRUD"
+              file="supervisor/base.py" line="184"
+              name="test_delete[os_trusty-gui]" time="16.8247480392"></testcase>
+    <testcase classname="supervisor.test_volumes.TestVolumeCRUD"
+              file="supervisor/base.py" line="197"
+              name="test_double_delete[os_trusty-gui]"
+              time="17.9663488865"></testcase>
+    <testcase classname="supervisor.test_volumes.TestVolumeCRUD"
+              file="supervisor/test_volumes.py" line="36"
+              name="test_create_bad_named_volume[os_trusty-gui-volume_name0]"
+              time="10.3912305832"></testcase>
+    <testcase classname="supervisor.test_volumes.TestVolumeCRUD"
+              file="supervisor/test_volumes.py" line="36"
+              name="test_create_bad_named_volume[os_trusty-gui-volume_name1]"
+              time="9.97412228584"></testcase>
+    <testcase classname="supervisor.test_volumes.TestVolumeCRUD"
+              file="supervisor/test_volumes.py" line="36"
+              name="test_create_bad_named_volume[os_trusty-gui-volume_name2]"
+              time="9.77391934395"></testcase>
+    <testcase classname="supervisor.test_volumes.TestVolumeCRUD"
+              file="supervisor/test_volumes.py" line="54"
+              name="test_device_id[gui-os_trusty]"
+              time="16.3973610401"></testcase>
+    <testcase classname="supervisor.test_zone.TestZoneCRUD"
+              file="supervisor/base.py" line="130"
+              name="test_retrieve[os_trusty-gui]"
+              time="3.58474469185"></testcase>
+    <testcase classname="supervisor.test_zone.TestZoneCRUD"
+              file="supervisor/base.py" line="141"
+              name="test_retrieve_not_found[os_trusty-gui]"
+              time="2.94754910469"></testcase>
+    <testcase classname="supervisor.test_zone.TestZoneCRUD"
+              file="supervisor/base.py" line="156"
+              name="test_create[os_trusty-gui]" time="8.36860895157"></testcase>
+    <testcase classname="supervisor.test_zone.TestZoneCRUD"
+              file="supervisor/base.py" line="184"
+              name="test_delete[os_trusty-gui]" time="10.8455970287"></testcase>
+    <testcase classname="supervisor.test_zone.TestZoneCRUD"
+              file="supervisor/test_zone.py" line="26"
+              name="test_double_delete[gui-os_trusty]" time="0.415344953537">
+        <skipped message="expected test failure">reason: bizstoresup accepts
+            every deletion request
+        </skipped>
+    </testcase>
+    <testcase classname="supervisor.test_zone.TestZoneCRUD"
+              file="supervisor/test_zone.py" line="34"
+              name="test_create_duplicate[unique_fields_name0-os_trusty-gui]"
+              time="5.40738010406">
+        <skipped message="expected test failure"></skipped>
+    </testcase>
+    <testcase classname="supervisor.test_zone.TestZoneCRUD"
+              file="supervisor/base.py" line="130"
+              name="test_retrieve[os_trusty-api]"
+              time="0.503582954407"></testcase>
+    <testcase classname="supervisor.test_zone.TestZoneCRUD"
+              file="supervisor/base.py" line="141"
+              name="test_retrieve_not_found[os_trusty-api]"
+              time="0.112144231796"></testcase>
+    <testcase classname="supervisor.test_zone.TestZoneCRUD"
+              file="supervisor/base.py" line="156"
+              name="test_create[os_trusty-api]"
+              time="0.399561882019"></testcase>
+    <testcase classname="supervisor.test_zone.TestZoneCRUD"
+              file="supervisor/base.py" line="184"
+              name="test_delete[os_trusty-api]"
+              time="0.490250110626"></testcase>
+    <testcase classname="supervisor.test_zone.TestZoneCRUD"
+              file="supervisor/test_zone.py" line="26"
+              name="test_double_delete[api-os_trusty]"
+              time="0.337305307388"></testcase>
+    <testcase classname="supervisor.test_zone.TestZoneCRUD"
+              file="supervisor/test_zone.py" line="34"
+              name="test_create_duplicate[unique_fields_name0-os_trusty-api]"
+              time="0.252748012543">
+        <skipped message="expected test failure"></skipped>
+    </testcase>
+    <testcase classname="supervisor.tools.test_logwatcher"
+              file="supervisor/tools/test_logwatcher.py" line="40"
+              name="test_watch[os_trusty-True]" time="27.3293111324"></testcase>
+    <testcase classname="supervisor.tools.test_logwatcher"
+              file="supervisor/tools/test_logwatcher.py" line="40"
+              name="test_watch[os_trusty-False]"
+              time="18.0479493141"></testcase>
+</testsuite>

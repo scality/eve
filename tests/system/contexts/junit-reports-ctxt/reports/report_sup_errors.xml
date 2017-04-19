@@ -1,811 +1,987 @@
-<?xml version="1.0" encoding="utf-8"?><testsuite errors="10" failures="0" name="pytest" skips="0" tests="1" time="612.227"><testcase classname="supervisor.test_01_deployment.TestGenericDeployment" file="supervisor/test_01_deployment.py" line="23" name="test_denethor[os_trusty]" time="202.286322832"></testcase><testcase classname="supervisor.test_01_deployment.TestGenericDeployment" file="supervisor/test_01_deployment.py" line="27" name="test_supervisor_configuration[os_trusty]" time="409.225574732"><error message="test setup failure">distribution = &apos;trusty&apos;
+<?xml version="1.0" encoding="utf-8"?>
+<testsuite errors="10" failures="0" name="pytest" skips="0" tests="1"
+           time="612.227">
+    <testcase classname="supervisor.test_01_deployment.TestGenericDeployment"
+              file="supervisor/test_01_deployment.py" line="23"
+              name="test_denethor[os_trusty]" time="202.286322832"></testcase>
+    <testcase classname="supervisor.test_01_deployment.TestGenericDeployment"
+              file="supervisor/test_01_deployment.py" line="27"
+              name="test_supervisor_configuration[os_trusty]"
+              time="409.225574732">
+        <error message="test setup failure">distribution = &apos;trusty&apos;
 
-    @pytest.yield_fixture(scope=&quot;session&quot;)
-    def supervisor(distribution):
-        &quot;&quot;&quot;Returns a supervisor object, representing a running supervisor host.&quot;&quot;&quot;
-        configuration = SUPERVISOR_CONF.copy()
-        configuration[&quot;distribution&quot;] = distribution
-    
-        init = HostInit()
-        init.cached_states = [
+            @pytest.yield_fixture(scope=&quot;session&quot;)
+            def supervisor(distribution):
+            &quot;&quot;&quot;Returns a supervisor object, representing a
+            running supervisor host.&quot;&quot;&quot;
+            configuration = SUPERVISOR_CONF.copy()
+            configuration[&quot;distribution&quot;] = distribution
+
+            init = HostInit()
+            init.cached_states = [
             (&quot;sls/supervisor_prerequisites.sls&quot;, None),
             (&quot;sls/scality_repo.sls&quot;, {
-                &quot;artifacts_url&quot;: format_settings(settings.ARTIFACTS_ROOT),
-                &quot;version&quot;: configuration[&quot;version&quot;],
+            &quot;artifacts_url&quot;: format_settings(settings.ARTIFACTS_ROOT),
+            &quot;version&quot;: configuration[&quot;version&quot;],
             }),
             (&quot;sls/supervisor_install.sls&quot;, None),
             (&quot;sls/supervisor_setup.sls&quot;, configuration)
-        ]
-        init.states = [(&quot;./sls/supervisor_start.sls&quot;, None)]
-    
-        image = Image.get(label=configuration[&quot;distribution&quot;])
-        host = Host.create(label=&apos;supervisor&apos;, hostname=&apos;supervisor&apos;,
-                           provider=settings.DEFAULT_RESOURCE_PROVIDER,
-                           image=image,
-                           init=init)
-    
-        _supervisor = Supervisor.create(protocol=&quot;http&quot;, host=host,
-                                        label=host.label, port=3080, api_port=4443,
-                                        api_user=configuration[&apos;gui_user&apos;],
-                                        api_password=configuration[&apos;gui_password&apos;])
-    
-        _supervisor.configuration = configuration.copy()
-        _supervisor.configuration.update({&apos;ip&apos;: host.ip})
-    
-        def wait_host_ready(_self):
-            _self.host.wait_ready({&quot;timeout&quot;: 60, &quot;retry_interval&quot;: 1,
-                                   &quot;url&quot;: &quot;/login&quot;, &quot;port&quot;: 3080,
-                                   &quot;reply&quot;: 200})
-            _self.host.wait_ready({&quot;timeout&quot;: 60, &quot;retry_interval&quot;: 1,
-                                   &quot;url&quot;: &quot;/apidoc&quot;, &quot;port&quot;: 4443,
-                                   &quot;reply&quot;: 200})
-    
-        _supervisor.wait_host_ready = MethodType(wait_host_ready, _supervisor)
-    
-&gt;       _supervisor.wait_host_ready()
+            ]
+            init.states = [(&quot;./sls/supervisor_start.sls&quot;, None)]
 
-tests/gollum/tests/fixtures/mocked_ring.py:210: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-tests/gollum/tests/fixtures/mocked_ring.py:206: in wait_host_ready
-    &quot;reply&quot;: 200})
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+            image = Image.get(label=configuration[&quot;distribution&quot;])
+            host = Host.create(label=&apos;supervisor&apos;, hostname=&apos;supervisor&apos;,
+            provider=settings.DEFAULT_RESOURCE_PROVIDER,
+            image=image,
+            init=init)
 
-self = Host u&apos;supervisor&apos;
-host_ready = {&apos;port&apos;: 4443, &apos;reply&apos;: 200, &apos;retry_interval&apos;: 1, &apos;timeout&apos;: 60, ...}
+            _supervisor = Supervisor.create(protocol=&quot;http&quot;,
+            host=host,
+            label=host.label, port=3080, api_port=4443,
+            api_user=configuration[&apos;gui_user&apos;],
+            api_password=configuration[&apos;gui_password&apos;])
 
-    def wait_ready(self, host_ready):
-        &quot;&quot;&quot;Wait for host to be ready as per criteria provided by caller.&quot;&quot;&quot;
-        if not host_ready:
+            _supervisor.configuration = configuration.copy()
+            _supervisor.configuration.update({&apos;ip&apos;: host.ip})
+
+            def wait_host_ready(_self):
+            _self.host.wait_ready({&quot;timeout&quot;: 60, &quot;retry_interval&quot;:
+            1,
+            &quot;url&quot;: &quot;/login&quot;, &quot;port&quot;: 3080,
+            &quot;reply&quot;: 200})
+            _self.host.wait_ready({&quot;timeout&quot;: 60, &quot;retry_interval&quot;:
+            1,
+            &quot;url&quot;: &quot;/apidoc&quot;, &quot;port&quot;: 4443,
+            &quot;reply&quot;: 200})
+
+            _supervisor.wait_host_ready = MethodType(wait_host_ready,
+            _supervisor)
+
+            &gt; _supervisor.wait_host_ready()
+
+            tests/gollum/tests/fixtures/mocked_ring.py:210:
+            _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+            _ _ _ _ _ _
+            tests/gollum/tests/fixtures/mocked_ring.py:206: in wait_host_ready
+            &quot;reply&quot;: 200})
+            _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+            _ _ _ _ _ _
+
+            self = Host u&apos;supervisor&apos;
+            host_ready = {&apos;port&apos;: 4443, &apos;reply&apos;: 200, &apos;retry_interval&apos;:
+            1, &apos;timeout&apos;: 60, ...}
+
+            def wait_ready(self, host_ready):
+            &quot;&quot;&quot;Wait for host to be ready as per criteria provided
+            by caller.&quot;&quot;&quot;
+            if not host_ready:
             return
-        protocol = host_ready.get(&quot;protocol&quot;, &apos;http&apos;)
-        timeout = host_ready.get(&quot;timeout&quot;, 60)
-        retry = host_ready.get(&quot;retry&quot;, 1)
-        url = host_ready.get(&quot;url&quot;, &apos;/&apos;)
-        port = host_ready.get(&quot;port&quot;, 80)
-        reply = host_ready.get(&quot;reply&quot;, 200)
-    
-        fqdn = &apos;{protocol}://{ip}:{port}{url}&apos;.format(protocol=protocol,
-                                                      ip=self.ip,
-                                                      port=port,
-                                                      url=url)
-    
-        for _ in range(timeout):
+            protocol = host_ready.get(&quot;protocol&quot;, &apos;http&apos;)
+            timeout = host_ready.get(&quot;timeout&quot;, 60)
+            retry = host_ready.get(&quot;retry&quot;, 1)
+            url = host_ready.get(&quot;url&quot;, &apos;/&apos;)
+            port = host_ready.get(&quot;port&quot;, 80)
+            reply = host_ready.get(&quot;reply&quot;, 200)
+
+            fqdn = &apos;{protocol}://{ip}:{port}{url}&apos;.format(protocol=protocol,
+            ip=self.ip,
+            port=port,
+            url=url)
+
+            for _ in range(timeout):
             try:
-                if urllib.urlopen(fqdn).getcode() == reply:
-                    return
+            if urllib.urlopen(fqdn).getcode() == reply:
+            return
             except Exception:
-                pass
+            pass
             time.sleep(retry)
-&gt;       raise TimeoutError(&quot;%s does not reply&quot; % self)
-E       TimeoutError: Host u&apos;supervisor&apos; does not reply
+            &gt; raise TimeoutError(&quot;%s does not reply&quot; % self)
+            E TimeoutError: Host u&apos;supervisor&apos; does not reply
 
-../../gollum_venv/local/lib/python2.7/site-packages/gollum-1.1b0-py2.7.egg/gollum/models/host.py:179: TimeoutError</error></testcase><testcase classname="supervisor.test_01_deployment.TestGenericDeployment" file="supervisor/test_01_deployment.py" line="42" name="test_supervisor_with_ring[gui-os_trusty]" time="0.000833034515381"><error message="test setup failure">distribution = &apos;trusty&apos;
+            ../../gollum_venv/local/lib/python2.7/site-packages/gollum-1.1b0-py2.7.egg/gollum/models/host.py:179:
+            TimeoutError
+        </error>
+    </testcase>
+    <testcase classname="supervisor.test_01_deployment.TestGenericDeployment"
+              file="supervisor/test_01_deployment.py" line="42"
+              name="test_supervisor_with_ring[gui-os_trusty]"
+              time="0.000833034515381">
+        <error message="test setup failure">distribution = &apos;trusty&apos;
 
-    @pytest.yield_fixture(scope=&quot;session&quot;)
-    def supervisor(distribution):
-        &quot;&quot;&quot;Returns a supervisor object, representing a running supervisor host.&quot;&quot;&quot;
-        configuration = SUPERVISOR_CONF.copy()
-        configuration[&quot;distribution&quot;] = distribution
-    
-        init = HostInit()
-        init.cached_states = [
+            @pytest.yield_fixture(scope=&quot;session&quot;)
+            def supervisor(distribution):
+            &quot;&quot;&quot;Returns a supervisor object, representing a
+            running supervisor host.&quot;&quot;&quot;
+            configuration = SUPERVISOR_CONF.copy()
+            configuration[&quot;distribution&quot;] = distribution
+
+            init = HostInit()
+            init.cached_states = [
             (&quot;sls/supervisor_prerequisites.sls&quot;, None),
             (&quot;sls/scality_repo.sls&quot;, {
-                &quot;artifacts_url&quot;: format_settings(settings.ARTIFACTS_ROOT),
-                &quot;version&quot;: configuration[&quot;version&quot;],
+            &quot;artifacts_url&quot;: format_settings(settings.ARTIFACTS_ROOT),
+            &quot;version&quot;: configuration[&quot;version&quot;],
             }),
             (&quot;sls/supervisor_install.sls&quot;, None),
             (&quot;sls/supervisor_setup.sls&quot;, configuration)
-        ]
-        init.states = [(&quot;./sls/supervisor_start.sls&quot;, None)]
-    
-        image = Image.get(label=configuration[&quot;distribution&quot;])
-        host = Host.create(label=&apos;supervisor&apos;, hostname=&apos;supervisor&apos;,
-                           provider=settings.DEFAULT_RESOURCE_PROVIDER,
-                           image=image,
-                           init=init)
-    
-        _supervisor = Supervisor.create(protocol=&quot;http&quot;, host=host,
-                                        label=host.label, port=3080, api_port=4443,
-                                        api_user=configuration[&apos;gui_user&apos;],
-                                        api_password=configuration[&apos;gui_password&apos;])
-    
-        _supervisor.configuration = configuration.copy()
-        _supervisor.configuration.update({&apos;ip&apos;: host.ip})
-    
-        def wait_host_ready(_self):
-            _self.host.wait_ready({&quot;timeout&quot;: 60, &quot;retry_interval&quot;: 1,
-                                   &quot;url&quot;: &quot;/login&quot;, &quot;port&quot;: 3080,
-                                   &quot;reply&quot;: 200})
-            _self.host.wait_ready({&quot;timeout&quot;: 60, &quot;retry_interval&quot;: 1,
-                                   &quot;url&quot;: &quot;/apidoc&quot;, &quot;port&quot;: 4443,
-                                   &quot;reply&quot;: 200})
-    
-        _supervisor.wait_host_ready = MethodType(wait_host_ready, _supervisor)
-    
-&gt;       _supervisor.wait_host_ready()
+            ]
+            init.states = [(&quot;./sls/supervisor_start.sls&quot;, None)]
 
-tests/gollum/tests/fixtures/mocked_ring.py:210: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-tests/gollum/tests/fixtures/mocked_ring.py:206: in wait_host_ready
-    &quot;reply&quot;: 200})
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+            image = Image.get(label=configuration[&quot;distribution&quot;])
+            host = Host.create(label=&apos;supervisor&apos;, hostname=&apos;supervisor&apos;,
+            provider=settings.DEFAULT_RESOURCE_PROVIDER,
+            image=image,
+            init=init)
 
-self = Host u&apos;supervisor&apos;
-host_ready = {&apos;port&apos;: 4443, &apos;reply&apos;: 200, &apos;retry_interval&apos;: 1, &apos;timeout&apos;: 60, ...}
+            _supervisor = Supervisor.create(protocol=&quot;http&quot;,
+            host=host,
+            label=host.label, port=3080, api_port=4443,
+            api_user=configuration[&apos;gui_user&apos;],
+            api_password=configuration[&apos;gui_password&apos;])
 
-    def wait_ready(self, host_ready):
-        &quot;&quot;&quot;Wait for host to be ready as per criteria provided by caller.&quot;&quot;&quot;
-        if not host_ready:
+            _supervisor.configuration = configuration.copy()
+            _supervisor.configuration.update({&apos;ip&apos;: host.ip})
+
+            def wait_host_ready(_self):
+            _self.host.wait_ready({&quot;timeout&quot;: 60, &quot;retry_interval&quot;:
+            1,
+            &quot;url&quot;: &quot;/login&quot;, &quot;port&quot;: 3080,
+            &quot;reply&quot;: 200})
+            _self.host.wait_ready({&quot;timeout&quot;: 60, &quot;retry_interval&quot;:
+            1,
+            &quot;url&quot;: &quot;/apidoc&quot;, &quot;port&quot;: 4443,
+            &quot;reply&quot;: 200})
+
+            _supervisor.wait_host_ready = MethodType(wait_host_ready,
+            _supervisor)
+
+            &gt; _supervisor.wait_host_ready()
+
+            tests/gollum/tests/fixtures/mocked_ring.py:210:
+            _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+            _ _ _ _ _ _
+            tests/gollum/tests/fixtures/mocked_ring.py:206: in wait_host_ready
+            &quot;reply&quot;: 200})
+            _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+            _ _ _ _ _ _
+
+            self = Host u&apos;supervisor&apos;
+            host_ready = {&apos;port&apos;: 4443, &apos;reply&apos;: 200, &apos;retry_interval&apos;:
+            1, &apos;timeout&apos;: 60, ...}
+
+            def wait_ready(self, host_ready):
+            &quot;&quot;&quot;Wait for host to be ready as per criteria provided
+            by caller.&quot;&quot;&quot;
+            if not host_ready:
             return
-        protocol = host_ready.get(&quot;protocol&quot;, &apos;http&apos;)
-        timeout = host_ready.get(&quot;timeout&quot;, 60)
-        retry = host_ready.get(&quot;retry&quot;, 1)
-        url = host_ready.get(&quot;url&quot;, &apos;/&apos;)
-        port = host_ready.get(&quot;port&quot;, 80)
-        reply = host_ready.get(&quot;reply&quot;, 200)
-    
-        fqdn = &apos;{protocol}://{ip}:{port}{url}&apos;.format(protocol=protocol,
-                                                      ip=self.ip,
-                                                      port=port,
-                                                      url=url)
-    
-        for _ in range(timeout):
+            protocol = host_ready.get(&quot;protocol&quot;, &apos;http&apos;)
+            timeout = host_ready.get(&quot;timeout&quot;, 60)
+            retry = host_ready.get(&quot;retry&quot;, 1)
+            url = host_ready.get(&quot;url&quot;, &apos;/&apos;)
+            port = host_ready.get(&quot;port&quot;, 80)
+            reply = host_ready.get(&quot;reply&quot;, 200)
+
+            fqdn = &apos;{protocol}://{ip}:{port}{url}&apos;.format(protocol=protocol,
+            ip=self.ip,
+            port=port,
+            url=url)
+
+            for _ in range(timeout):
             try:
-                if urllib.urlopen(fqdn).getcode() == reply:
-                    return
+            if urllib.urlopen(fqdn).getcode() == reply:
+            return
             except Exception:
-                pass
+            pass
             time.sleep(retry)
-&gt;       raise TimeoutError(&quot;%s does not reply&quot; % self)
-E       TimeoutError: Host u&apos;supervisor&apos; does not reply
+            &gt; raise TimeoutError(&quot;%s does not reply&quot; % self)
+            E TimeoutError: Host u&apos;supervisor&apos; does not reply
 
-../../gollum_venv/local/lib/python2.7/site-packages/gollum-1.1b0-py2.7.egg/gollum/models/host.py:179: TimeoutError</error></testcase><testcase classname="supervisor.test_01_deployment.TestGenericDeployment" file="supervisor/test_01_deployment.py" line="59" name="test_supervisor_bad_auth[supervisor-os_trusty-gui]" time="0.000448703765869"><error message="test setup failure">distribution = &apos;trusty&apos;
+            ../../gollum_venv/local/lib/python2.7/site-packages/gollum-1.1b0-py2.7.egg/gollum/models/host.py:179:
+            TimeoutError
+        </error>
+    </testcase>
+    <testcase classname="supervisor.test_01_deployment.TestGenericDeployment"
+              file="supervisor/test_01_deployment.py" line="59"
+              name="test_supervisor_bad_auth[supervisor-os_trusty-gui]"
+              time="0.000448703765869">
+        <error message="test setup failure">distribution = &apos;trusty&apos;
 
-    @pytest.yield_fixture(scope=&quot;session&quot;)
-    def supervisor(distribution):
-        &quot;&quot;&quot;Returns a supervisor object, representing a running supervisor host.&quot;&quot;&quot;
-        configuration = SUPERVISOR_CONF.copy()
-        configuration[&quot;distribution&quot;] = distribution
-    
-        init = HostInit()
-        init.cached_states = [
+            @pytest.yield_fixture(scope=&quot;session&quot;)
+            def supervisor(distribution):
+            &quot;&quot;&quot;Returns a supervisor object, representing a
+            running supervisor host.&quot;&quot;&quot;
+            configuration = SUPERVISOR_CONF.copy()
+            configuration[&quot;distribution&quot;] = distribution
+
+            init = HostInit()
+            init.cached_states = [
             (&quot;sls/supervisor_prerequisites.sls&quot;, None),
             (&quot;sls/scality_repo.sls&quot;, {
-                &quot;artifacts_url&quot;: format_settings(settings.ARTIFACTS_ROOT),
-                &quot;version&quot;: configuration[&quot;version&quot;],
+            &quot;artifacts_url&quot;: format_settings(settings.ARTIFACTS_ROOT),
+            &quot;version&quot;: configuration[&quot;version&quot;],
             }),
             (&quot;sls/supervisor_install.sls&quot;, None),
             (&quot;sls/supervisor_setup.sls&quot;, configuration)
-        ]
-        init.states = [(&quot;./sls/supervisor_start.sls&quot;, None)]
-    
-        image = Image.get(label=configuration[&quot;distribution&quot;])
-        host = Host.create(label=&apos;supervisor&apos;, hostname=&apos;supervisor&apos;,
-                           provider=settings.DEFAULT_RESOURCE_PROVIDER,
-                           image=image,
-                           init=init)
-    
-        _supervisor = Supervisor.create(protocol=&quot;http&quot;, host=host,
-                                        label=host.label, port=3080, api_port=4443,
-                                        api_user=configuration[&apos;gui_user&apos;],
-                                        api_password=configuration[&apos;gui_password&apos;])
-    
-        _supervisor.configuration = configuration.copy()
-        _supervisor.configuration.update({&apos;ip&apos;: host.ip})
-    
-        def wait_host_ready(_self):
-            _self.host.wait_ready({&quot;timeout&quot;: 60, &quot;retry_interval&quot;: 1,
-                                   &quot;url&quot;: &quot;/login&quot;, &quot;port&quot;: 3080,
-                                   &quot;reply&quot;: 200})
-            _self.host.wait_ready({&quot;timeout&quot;: 60, &quot;retry_interval&quot;: 1,
-                                   &quot;url&quot;: &quot;/apidoc&quot;, &quot;port&quot;: 4443,
-                                   &quot;reply&quot;: 200})
-    
-        _supervisor.wait_host_ready = MethodType(wait_host_ready, _supervisor)
-    
-&gt;       _supervisor.wait_host_ready()
+            ]
+            init.states = [(&quot;./sls/supervisor_start.sls&quot;, None)]
 
-tests/gollum/tests/fixtures/mocked_ring.py:210: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-tests/gollum/tests/fixtures/mocked_ring.py:206: in wait_host_ready
-    &quot;reply&quot;: 200})
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+            image = Image.get(label=configuration[&quot;distribution&quot;])
+            host = Host.create(label=&apos;supervisor&apos;, hostname=&apos;supervisor&apos;,
+            provider=settings.DEFAULT_RESOURCE_PROVIDER,
+            image=image,
+            init=init)
 
-self = Host u&apos;supervisor&apos;
-host_ready = {&apos;port&apos;: 4443, &apos;reply&apos;: 200, &apos;retry_interval&apos;: 1, &apos;timeout&apos;: 60, ...}
+            _supervisor = Supervisor.create(protocol=&quot;http&quot;,
+            host=host,
+            label=host.label, port=3080, api_port=4443,
+            api_user=configuration[&apos;gui_user&apos;],
+            api_password=configuration[&apos;gui_password&apos;])
 
-    def wait_ready(self, host_ready):
-        &quot;&quot;&quot;Wait for host to be ready as per criteria provided by caller.&quot;&quot;&quot;
-        if not host_ready:
+            _supervisor.configuration = configuration.copy()
+            _supervisor.configuration.update({&apos;ip&apos;: host.ip})
+
+            def wait_host_ready(_self):
+            _self.host.wait_ready({&quot;timeout&quot;: 60, &quot;retry_interval&quot;:
+            1,
+            &quot;url&quot;: &quot;/login&quot;, &quot;port&quot;: 3080,
+            &quot;reply&quot;: 200})
+            _self.host.wait_ready({&quot;timeout&quot;: 60, &quot;retry_interval&quot;:
+            1,
+            &quot;url&quot;: &quot;/apidoc&quot;, &quot;port&quot;: 4443,
+            &quot;reply&quot;: 200})
+
+            _supervisor.wait_host_ready = MethodType(wait_host_ready,
+            _supervisor)
+
+            &gt; _supervisor.wait_host_ready()
+
+            tests/gollum/tests/fixtures/mocked_ring.py:210:
+            _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+            _ _ _ _ _ _
+            tests/gollum/tests/fixtures/mocked_ring.py:206: in wait_host_ready
+            &quot;reply&quot;: 200})
+            _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+            _ _ _ _ _ _
+
+            self = Host u&apos;supervisor&apos;
+            host_ready = {&apos;port&apos;: 4443, &apos;reply&apos;: 200, &apos;retry_interval&apos;:
+            1, &apos;timeout&apos;: 60, ...}
+
+            def wait_ready(self, host_ready):
+            &quot;&quot;&quot;Wait for host to be ready as per criteria provided
+            by caller.&quot;&quot;&quot;
+            if not host_ready:
             return
-        protocol = host_ready.get(&quot;protocol&quot;, &apos;http&apos;)
-        timeout = host_ready.get(&quot;timeout&quot;, 60)
-        retry = host_ready.get(&quot;retry&quot;, 1)
-        url = host_ready.get(&quot;url&quot;, &apos;/&apos;)
-        port = host_ready.get(&quot;port&quot;, 80)
-        reply = host_ready.get(&quot;reply&quot;, 200)
-    
-        fqdn = &apos;{protocol}://{ip}:{port}{url}&apos;.format(protocol=protocol,
-                                                      ip=self.ip,
-                                                      port=port,
-                                                      url=url)
-    
-        for _ in range(timeout):
+            protocol = host_ready.get(&quot;protocol&quot;, &apos;http&apos;)
+            timeout = host_ready.get(&quot;timeout&quot;, 60)
+            retry = host_ready.get(&quot;retry&quot;, 1)
+            url = host_ready.get(&quot;url&quot;, &apos;/&apos;)
+            port = host_ready.get(&quot;port&quot;, 80)
+            reply = host_ready.get(&quot;reply&quot;, 200)
+
+            fqdn = &apos;{protocol}://{ip}:{port}{url}&apos;.format(protocol=protocol,
+            ip=self.ip,
+            port=port,
+            url=url)
+
+            for _ in range(timeout):
             try:
-                if urllib.urlopen(fqdn).getcode() == reply:
-                    return
+            if urllib.urlopen(fqdn).getcode() == reply:
+            return
             except Exception:
-                pass
+            pass
             time.sleep(retry)
-&gt;       raise TimeoutError(&quot;%s does not reply&quot; % self)
-E       TimeoutError: Host u&apos;supervisor&apos; does not reply
+            &gt; raise TimeoutError(&quot;%s does not reply&quot; % self)
+            E TimeoutError: Host u&apos;supervisor&apos; does not reply
 
-../../gollum_venv/local/lib/python2.7/site-packages/gollum-1.1b0-py2.7.egg/gollum/models/host.py:179: TimeoutError</error></testcase><testcase classname="supervisor.test_01_deployment.TestGenericDeployment" file="supervisor/test_01_deployment.py" line="59" name="test_supervisor_bad_auth[grafana-os_trusty-gui]" time="0.000423908233643"><error message="test setup failure">distribution = &apos;trusty&apos;
+            ../../gollum_venv/local/lib/python2.7/site-packages/gollum-1.1b0-py2.7.egg/gollum/models/host.py:179:
+            TimeoutError
+        </error>
+    </testcase>
+    <testcase classname="supervisor.test_01_deployment.TestGenericDeployment"
+              file="supervisor/test_01_deployment.py" line="59"
+              name="test_supervisor_bad_auth[grafana-os_trusty-gui]"
+              time="0.000423908233643">
+        <error message="test setup failure">distribution = &apos;trusty&apos;
 
-    @pytest.yield_fixture(scope=&quot;session&quot;)
-    def supervisor(distribution):
-        &quot;&quot;&quot;Returns a supervisor object, representing a running supervisor host.&quot;&quot;&quot;
-        configuration = SUPERVISOR_CONF.copy()
-        configuration[&quot;distribution&quot;] = distribution
-    
-        init = HostInit()
-        init.cached_states = [
+            @pytest.yield_fixture(scope=&quot;session&quot;)
+            def supervisor(distribution):
+            &quot;&quot;&quot;Returns a supervisor object, representing a
+            running supervisor host.&quot;&quot;&quot;
+            configuration = SUPERVISOR_CONF.copy()
+            configuration[&quot;distribution&quot;] = distribution
+
+            init = HostInit()
+            init.cached_states = [
             (&quot;sls/supervisor_prerequisites.sls&quot;, None),
             (&quot;sls/scality_repo.sls&quot;, {
-                &quot;artifacts_url&quot;: format_settings(settings.ARTIFACTS_ROOT),
-                &quot;version&quot;: configuration[&quot;version&quot;],
+            &quot;artifacts_url&quot;: format_settings(settings.ARTIFACTS_ROOT),
+            &quot;version&quot;: configuration[&quot;version&quot;],
             }),
             (&quot;sls/supervisor_install.sls&quot;, None),
             (&quot;sls/supervisor_setup.sls&quot;, configuration)
-        ]
-        init.states = [(&quot;./sls/supervisor_start.sls&quot;, None)]
-    
-        image = Image.get(label=configuration[&quot;distribution&quot;])
-        host = Host.create(label=&apos;supervisor&apos;, hostname=&apos;supervisor&apos;,
-                           provider=settings.DEFAULT_RESOURCE_PROVIDER,
-                           image=image,
-                           init=init)
-    
-        _supervisor = Supervisor.create(protocol=&quot;http&quot;, host=host,
-                                        label=host.label, port=3080, api_port=4443,
-                                        api_user=configuration[&apos;gui_user&apos;],
-                                        api_password=configuration[&apos;gui_password&apos;])
-    
-        _supervisor.configuration = configuration.copy()
-        _supervisor.configuration.update({&apos;ip&apos;: host.ip})
-    
-        def wait_host_ready(_self):
-            _self.host.wait_ready({&quot;timeout&quot;: 60, &quot;retry_interval&quot;: 1,
-                                   &quot;url&quot;: &quot;/login&quot;, &quot;port&quot;: 3080,
-                                   &quot;reply&quot;: 200})
-            _self.host.wait_ready({&quot;timeout&quot;: 60, &quot;retry_interval&quot;: 1,
-                                   &quot;url&quot;: &quot;/apidoc&quot;, &quot;port&quot;: 4443,
-                                   &quot;reply&quot;: 200})
-    
-        _supervisor.wait_host_ready = MethodType(wait_host_ready, _supervisor)
-    
-&gt;       _supervisor.wait_host_ready()
+            ]
+            init.states = [(&quot;./sls/supervisor_start.sls&quot;, None)]
 
-tests/gollum/tests/fixtures/mocked_ring.py:210: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-tests/gollum/tests/fixtures/mocked_ring.py:206: in wait_host_ready
-    &quot;reply&quot;: 200})
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+            image = Image.get(label=configuration[&quot;distribution&quot;])
+            host = Host.create(label=&apos;supervisor&apos;, hostname=&apos;supervisor&apos;,
+            provider=settings.DEFAULT_RESOURCE_PROVIDER,
+            image=image,
+            init=init)
 
-self = Host u&apos;supervisor&apos;
-host_ready = {&apos;port&apos;: 4443, &apos;reply&apos;: 200, &apos;retry_interval&apos;: 1, &apos;timeout&apos;: 60, ...}
+            _supervisor = Supervisor.create(protocol=&quot;http&quot;,
+            host=host,
+            label=host.label, port=3080, api_port=4443,
+            api_user=configuration[&apos;gui_user&apos;],
+            api_password=configuration[&apos;gui_password&apos;])
 
-    def wait_ready(self, host_ready):
-        &quot;&quot;&quot;Wait for host to be ready as per criteria provided by caller.&quot;&quot;&quot;
-        if not host_ready:
+            _supervisor.configuration = configuration.copy()
+            _supervisor.configuration.update({&apos;ip&apos;: host.ip})
+
+            def wait_host_ready(_self):
+            _self.host.wait_ready({&quot;timeout&quot;: 60, &quot;retry_interval&quot;:
+            1,
+            &quot;url&quot;: &quot;/login&quot;, &quot;port&quot;: 3080,
+            &quot;reply&quot;: 200})
+            _self.host.wait_ready({&quot;timeout&quot;: 60, &quot;retry_interval&quot;:
+            1,
+            &quot;url&quot;: &quot;/apidoc&quot;, &quot;port&quot;: 4443,
+            &quot;reply&quot;: 200})
+
+            _supervisor.wait_host_ready = MethodType(wait_host_ready,
+            _supervisor)
+
+            &gt; _supervisor.wait_host_ready()
+
+            tests/gollum/tests/fixtures/mocked_ring.py:210:
+            _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+            _ _ _ _ _ _
+            tests/gollum/tests/fixtures/mocked_ring.py:206: in wait_host_ready
+            &quot;reply&quot;: 200})
+            _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+            _ _ _ _ _ _
+
+            self = Host u&apos;supervisor&apos;
+            host_ready = {&apos;port&apos;: 4443, &apos;reply&apos;: 200, &apos;retry_interval&apos;:
+            1, &apos;timeout&apos;: 60, ...}
+
+            def wait_ready(self, host_ready):
+            &quot;&quot;&quot;Wait for host to be ready as per criteria provided
+            by caller.&quot;&quot;&quot;
+            if not host_ready:
             return
-        protocol = host_ready.get(&quot;protocol&quot;, &apos;http&apos;)
-        timeout = host_ready.get(&quot;timeout&quot;, 60)
-        retry = host_ready.get(&quot;retry&quot;, 1)
-        url = host_ready.get(&quot;url&quot;, &apos;/&apos;)
-        port = host_ready.get(&quot;port&quot;, 80)
-        reply = host_ready.get(&quot;reply&quot;, 200)
-    
-        fqdn = &apos;{protocol}://{ip}:{port}{url}&apos;.format(protocol=protocol,
-                                                      ip=self.ip,
-                                                      port=port,
-                                                      url=url)
-    
-        for _ in range(timeout):
+            protocol = host_ready.get(&quot;protocol&quot;, &apos;http&apos;)
+            timeout = host_ready.get(&quot;timeout&quot;, 60)
+            retry = host_ready.get(&quot;retry&quot;, 1)
+            url = host_ready.get(&quot;url&quot;, &apos;/&apos;)
+            port = host_ready.get(&quot;port&quot;, 80)
+            reply = host_ready.get(&quot;reply&quot;, 200)
+
+            fqdn = &apos;{protocol}://{ip}:{port}{url}&apos;.format(protocol=protocol,
+            ip=self.ip,
+            port=port,
+            url=url)
+
+            for _ in range(timeout):
             try:
-                if urllib.urlopen(fqdn).getcode() == reply:
-                    return
+            if urllib.urlopen(fqdn).getcode() == reply:
+            return
             except Exception:
-                pass
+            pass
             time.sleep(retry)
-&gt;       raise TimeoutError(&quot;%s does not reply&quot; % self)
-E       TimeoutError: Host u&apos;supervisor&apos; does not reply
+            &gt; raise TimeoutError(&quot;%s does not reply&quot; % self)
+            E TimeoutError: Host u&apos;supervisor&apos; does not reply
 
-../../gollum_venv/local/lib/python2.7/site-packages/gollum-1.1b0-py2.7.egg/gollum/models/host.py:179: TimeoutError</error></testcase><testcase classname="supervisor.test_01_deployment.TestGenericDeployment" file="supervisor/test_01_deployment.py" line="77" name="test_supervisor_good_auth[supervisor-os_trusty-gui]" time="0.000420808792114"><error message="test setup failure">distribution = &apos;trusty&apos;
+            ../../gollum_venv/local/lib/python2.7/site-packages/gollum-1.1b0-py2.7.egg/gollum/models/host.py:179:
+            TimeoutError
+        </error>
+    </testcase>
+    <testcase classname="supervisor.test_01_deployment.TestGenericDeployment"
+              file="supervisor/test_01_deployment.py" line="77"
+              name="test_supervisor_good_auth[supervisor-os_trusty-gui]"
+              time="0.000420808792114">
+        <error message="test setup failure">distribution = &apos;trusty&apos;
 
-    @pytest.yield_fixture(scope=&quot;session&quot;)
-    def supervisor(distribution):
-        &quot;&quot;&quot;Returns a supervisor object, representing a running supervisor host.&quot;&quot;&quot;
-        configuration = SUPERVISOR_CONF.copy()
-        configuration[&quot;distribution&quot;] = distribution
-    
-        init = HostInit()
-        init.cached_states = [
+            @pytest.yield_fixture(scope=&quot;session&quot;)
+            def supervisor(distribution):
+            &quot;&quot;&quot;Returns a supervisor object, representing a
+            running supervisor host.&quot;&quot;&quot;
+            configuration = SUPERVISOR_CONF.copy()
+            configuration[&quot;distribution&quot;] = distribution
+
+            init = HostInit()
+            init.cached_states = [
             (&quot;sls/supervisor_prerequisites.sls&quot;, None),
             (&quot;sls/scality_repo.sls&quot;, {
-                &quot;artifacts_url&quot;: format_settings(settings.ARTIFACTS_ROOT),
-                &quot;version&quot;: configuration[&quot;version&quot;],
+            &quot;artifacts_url&quot;: format_settings(settings.ARTIFACTS_ROOT),
+            &quot;version&quot;: configuration[&quot;version&quot;],
             }),
             (&quot;sls/supervisor_install.sls&quot;, None),
             (&quot;sls/supervisor_setup.sls&quot;, configuration)
-        ]
-        init.states = [(&quot;./sls/supervisor_start.sls&quot;, None)]
-    
-        image = Image.get(label=configuration[&quot;distribution&quot;])
-        host = Host.create(label=&apos;supervisor&apos;, hostname=&apos;supervisor&apos;,
-                           provider=settings.DEFAULT_RESOURCE_PROVIDER,
-                           image=image,
-                           init=init)
-    
-        _supervisor = Supervisor.create(protocol=&quot;http&quot;, host=host,
-                                        label=host.label, port=3080, api_port=4443,
-                                        api_user=configuration[&apos;gui_user&apos;],
-                                        api_password=configuration[&apos;gui_password&apos;])
-    
-        _supervisor.configuration = configuration.copy()
-        _supervisor.configuration.update({&apos;ip&apos;: host.ip})
-    
-        def wait_host_ready(_self):
-            _self.host.wait_ready({&quot;timeout&quot;: 60, &quot;retry_interval&quot;: 1,
-                                   &quot;url&quot;: &quot;/login&quot;, &quot;port&quot;: 3080,
-                                   &quot;reply&quot;: 200})
-            _self.host.wait_ready({&quot;timeout&quot;: 60, &quot;retry_interval&quot;: 1,
-                                   &quot;url&quot;: &quot;/apidoc&quot;, &quot;port&quot;: 4443,
-                                   &quot;reply&quot;: 200})
-    
-        _supervisor.wait_host_ready = MethodType(wait_host_ready, _supervisor)
-    
-&gt;       _supervisor.wait_host_ready()
+            ]
+            init.states = [(&quot;./sls/supervisor_start.sls&quot;, None)]
 
-tests/gollum/tests/fixtures/mocked_ring.py:210: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-tests/gollum/tests/fixtures/mocked_ring.py:206: in wait_host_ready
-    &quot;reply&quot;: 200})
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+            image = Image.get(label=configuration[&quot;distribution&quot;])
+            host = Host.create(label=&apos;supervisor&apos;, hostname=&apos;supervisor&apos;,
+            provider=settings.DEFAULT_RESOURCE_PROVIDER,
+            image=image,
+            init=init)
 
-self = Host u&apos;supervisor&apos;
-host_ready = {&apos;port&apos;: 4443, &apos;reply&apos;: 200, &apos;retry_interval&apos;: 1, &apos;timeout&apos;: 60, ...}
+            _supervisor = Supervisor.create(protocol=&quot;http&quot;,
+            host=host,
+            label=host.label, port=3080, api_port=4443,
+            api_user=configuration[&apos;gui_user&apos;],
+            api_password=configuration[&apos;gui_password&apos;])
 
-    def wait_ready(self, host_ready):
-        &quot;&quot;&quot;Wait for host to be ready as per criteria provided by caller.&quot;&quot;&quot;
-        if not host_ready:
+            _supervisor.configuration = configuration.copy()
+            _supervisor.configuration.update({&apos;ip&apos;: host.ip})
+
+            def wait_host_ready(_self):
+            _self.host.wait_ready({&quot;timeout&quot;: 60, &quot;retry_interval&quot;:
+            1,
+            &quot;url&quot;: &quot;/login&quot;, &quot;port&quot;: 3080,
+            &quot;reply&quot;: 200})
+            _self.host.wait_ready({&quot;timeout&quot;: 60, &quot;retry_interval&quot;:
+            1,
+            &quot;url&quot;: &quot;/apidoc&quot;, &quot;port&quot;: 4443,
+            &quot;reply&quot;: 200})
+
+            _supervisor.wait_host_ready = MethodType(wait_host_ready,
+            _supervisor)
+
+            &gt; _supervisor.wait_host_ready()
+
+            tests/gollum/tests/fixtures/mocked_ring.py:210:
+            _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+            _ _ _ _ _ _
+            tests/gollum/tests/fixtures/mocked_ring.py:206: in wait_host_ready
+            &quot;reply&quot;: 200})
+            _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+            _ _ _ _ _ _
+
+            self = Host u&apos;supervisor&apos;
+            host_ready = {&apos;port&apos;: 4443, &apos;reply&apos;: 200, &apos;retry_interval&apos;:
+            1, &apos;timeout&apos;: 60, ...}
+
+            def wait_ready(self, host_ready):
+            &quot;&quot;&quot;Wait for host to be ready as per criteria provided
+            by caller.&quot;&quot;&quot;
+            if not host_ready:
             return
-        protocol = host_ready.get(&quot;protocol&quot;, &apos;http&apos;)
-        timeout = host_ready.get(&quot;timeout&quot;, 60)
-        retry = host_ready.get(&quot;retry&quot;, 1)
-        url = host_ready.get(&quot;url&quot;, &apos;/&apos;)
-        port = host_ready.get(&quot;port&quot;, 80)
-        reply = host_ready.get(&quot;reply&quot;, 200)
-    
-        fqdn = &apos;{protocol}://{ip}:{port}{url}&apos;.format(protocol=protocol,
-                                                      ip=self.ip,
-                                                      port=port,
-                                                      url=url)
-    
-        for _ in range(timeout):
+            protocol = host_ready.get(&quot;protocol&quot;, &apos;http&apos;)
+            timeout = host_ready.get(&quot;timeout&quot;, 60)
+            retry = host_ready.get(&quot;retry&quot;, 1)
+            url = host_ready.get(&quot;url&quot;, &apos;/&apos;)
+            port = host_ready.get(&quot;port&quot;, 80)
+            reply = host_ready.get(&quot;reply&quot;, 200)
+
+            fqdn = &apos;{protocol}://{ip}:{port}{url}&apos;.format(protocol=protocol,
+            ip=self.ip,
+            port=port,
+            url=url)
+
+            for _ in range(timeout):
             try:
-                if urllib.urlopen(fqdn).getcode() == reply:
-                    return
+            if urllib.urlopen(fqdn).getcode() == reply:
+            return
             except Exception:
-                pass
+            pass
             time.sleep(retry)
-&gt;       raise TimeoutError(&quot;%s does not reply&quot; % self)
-E       TimeoutError: Host u&apos;supervisor&apos; does not reply
+            &gt; raise TimeoutError(&quot;%s does not reply&quot; % self)
+            E TimeoutError: Host u&apos;supervisor&apos; does not reply
 
-../../gollum_venv/local/lib/python2.7/site-packages/gollum-1.1b0-py2.7.egg/gollum/models/host.py:179: TimeoutError</error></testcase><testcase classname="supervisor.test_01_deployment.TestGenericDeployment" file="supervisor/test_01_deployment.py" line="77" name="test_supervisor_good_auth[grafana-os_trusty-gui]" time="0.000443935394287"><error message="test setup failure">distribution = &apos;trusty&apos;
+            ../../gollum_venv/local/lib/python2.7/site-packages/gollum-1.1b0-py2.7.egg/gollum/models/host.py:179:
+            TimeoutError
+        </error>
+    </testcase>
+    <testcase classname="supervisor.test_01_deployment.TestGenericDeployment"
+              file="supervisor/test_01_deployment.py" line="77"
+              name="test_supervisor_good_auth[grafana-os_trusty-gui]"
+              time="0.000443935394287">
+        <error message="test setup failure">distribution = &apos;trusty&apos;
 
-    @pytest.yield_fixture(scope=&quot;session&quot;)
-    def supervisor(distribution):
-        &quot;&quot;&quot;Returns a supervisor object, representing a running supervisor host.&quot;&quot;&quot;
-        configuration = SUPERVISOR_CONF.copy()
-        configuration[&quot;distribution&quot;] = distribution
-    
-        init = HostInit()
-        init.cached_states = [
+            @pytest.yield_fixture(scope=&quot;session&quot;)
+            def supervisor(distribution):
+            &quot;&quot;&quot;Returns a supervisor object, representing a
+            running supervisor host.&quot;&quot;&quot;
+            configuration = SUPERVISOR_CONF.copy()
+            configuration[&quot;distribution&quot;] = distribution
+
+            init = HostInit()
+            init.cached_states = [
             (&quot;sls/supervisor_prerequisites.sls&quot;, None),
             (&quot;sls/scality_repo.sls&quot;, {
-                &quot;artifacts_url&quot;: format_settings(settings.ARTIFACTS_ROOT),
-                &quot;version&quot;: configuration[&quot;version&quot;],
+            &quot;artifacts_url&quot;: format_settings(settings.ARTIFACTS_ROOT),
+            &quot;version&quot;: configuration[&quot;version&quot;],
             }),
             (&quot;sls/supervisor_install.sls&quot;, None),
             (&quot;sls/supervisor_setup.sls&quot;, configuration)
-        ]
-        init.states = [(&quot;./sls/supervisor_start.sls&quot;, None)]
-    
-        image = Image.get(label=configuration[&quot;distribution&quot;])
-        host = Host.create(label=&apos;supervisor&apos;, hostname=&apos;supervisor&apos;,
-                           provider=settings.DEFAULT_RESOURCE_PROVIDER,
-                           image=image,
-                           init=init)
-    
-        _supervisor = Supervisor.create(protocol=&quot;http&quot;, host=host,
-                                        label=host.label, port=3080, api_port=4443,
-                                        api_user=configuration[&apos;gui_user&apos;],
-                                        api_password=configuration[&apos;gui_password&apos;])
-    
-        _supervisor.configuration = configuration.copy()
-        _supervisor.configuration.update({&apos;ip&apos;: host.ip})
-    
-        def wait_host_ready(_self):
-            _self.host.wait_ready({&quot;timeout&quot;: 60, &quot;retry_interval&quot;: 1,
-                                   &quot;url&quot;: &quot;/login&quot;, &quot;port&quot;: 3080,
-                                   &quot;reply&quot;: 200})
-            _self.host.wait_ready({&quot;timeout&quot;: 60, &quot;retry_interval&quot;: 1,
-                                   &quot;url&quot;: &quot;/apidoc&quot;, &quot;port&quot;: 4443,
-                                   &quot;reply&quot;: 200})
-    
-        _supervisor.wait_host_ready = MethodType(wait_host_ready, _supervisor)
-    
-&gt;       _supervisor.wait_host_ready()
+            ]
+            init.states = [(&quot;./sls/supervisor_start.sls&quot;, None)]
 
-tests/gollum/tests/fixtures/mocked_ring.py:210: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-tests/gollum/tests/fixtures/mocked_ring.py:206: in wait_host_ready
-    &quot;reply&quot;: 200})
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+            image = Image.get(label=configuration[&quot;distribution&quot;])
+            host = Host.create(label=&apos;supervisor&apos;, hostname=&apos;supervisor&apos;,
+            provider=settings.DEFAULT_RESOURCE_PROVIDER,
+            image=image,
+            init=init)
 
-self = Host u&apos;supervisor&apos;
-host_ready = {&apos;port&apos;: 4443, &apos;reply&apos;: 200, &apos;retry_interval&apos;: 1, &apos;timeout&apos;: 60, ...}
+            _supervisor = Supervisor.create(protocol=&quot;http&quot;,
+            host=host,
+            label=host.label, port=3080, api_port=4443,
+            api_user=configuration[&apos;gui_user&apos;],
+            api_password=configuration[&apos;gui_password&apos;])
 
-    def wait_ready(self, host_ready):
-        &quot;&quot;&quot;Wait for host to be ready as per criteria provided by caller.&quot;&quot;&quot;
-        if not host_ready:
+            _supervisor.configuration = configuration.copy()
+            _supervisor.configuration.update({&apos;ip&apos;: host.ip})
+
+            def wait_host_ready(_self):
+            _self.host.wait_ready({&quot;timeout&quot;: 60, &quot;retry_interval&quot;:
+            1,
+            &quot;url&quot;: &quot;/login&quot;, &quot;port&quot;: 3080,
+            &quot;reply&quot;: 200})
+            _self.host.wait_ready({&quot;timeout&quot;: 60, &quot;retry_interval&quot;:
+            1,
+            &quot;url&quot;: &quot;/apidoc&quot;, &quot;port&quot;: 4443,
+            &quot;reply&quot;: 200})
+
+            _supervisor.wait_host_ready = MethodType(wait_host_ready,
+            _supervisor)
+
+            &gt; _supervisor.wait_host_ready()
+
+            tests/gollum/tests/fixtures/mocked_ring.py:210:
+            _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+            _ _ _ _ _ _
+            tests/gollum/tests/fixtures/mocked_ring.py:206: in wait_host_ready
+            &quot;reply&quot;: 200})
+            _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+            _ _ _ _ _ _
+
+            self = Host u&apos;supervisor&apos;
+            host_ready = {&apos;port&apos;: 4443, &apos;reply&apos;: 200, &apos;retry_interval&apos;:
+            1, &apos;timeout&apos;: 60, ...}
+
+            def wait_ready(self, host_ready):
+            &quot;&quot;&quot;Wait for host to be ready as per criteria provided
+            by caller.&quot;&quot;&quot;
+            if not host_ready:
             return
-        protocol = host_ready.get(&quot;protocol&quot;, &apos;http&apos;)
-        timeout = host_ready.get(&quot;timeout&quot;, 60)
-        retry = host_ready.get(&quot;retry&quot;, 1)
-        url = host_ready.get(&quot;url&quot;, &apos;/&apos;)
-        port = host_ready.get(&quot;port&quot;, 80)
-        reply = host_ready.get(&quot;reply&quot;, 200)
-    
-        fqdn = &apos;{protocol}://{ip}:{port}{url}&apos;.format(protocol=protocol,
-                                                      ip=self.ip,
-                                                      port=port,
-                                                      url=url)
-    
-        for _ in range(timeout):
+            protocol = host_ready.get(&quot;protocol&quot;, &apos;http&apos;)
+            timeout = host_ready.get(&quot;timeout&quot;, 60)
+            retry = host_ready.get(&quot;retry&quot;, 1)
+            url = host_ready.get(&quot;url&quot;, &apos;/&apos;)
+            port = host_ready.get(&quot;port&quot;, 80)
+            reply = host_ready.get(&quot;reply&quot;, 200)
+
+            fqdn = &apos;{protocol}://{ip}:{port}{url}&apos;.format(protocol=protocol,
+            ip=self.ip,
+            port=port,
+            url=url)
+
+            for _ in range(timeout):
             try:
-                if urllib.urlopen(fqdn).getcode() == reply:
-                    return
+            if urllib.urlopen(fqdn).getcode() == reply:
+            return
             except Exception:
-                pass
+            pass
             time.sleep(retry)
-&gt;       raise TimeoutError(&quot;%s does not reply&quot; % self)
-E       TimeoutError: Host u&apos;supervisor&apos; does not reply
+            &gt; raise TimeoutError(&quot;%s does not reply&quot; % self)
+            E TimeoutError: Host u&apos;supervisor&apos; does not reply
 
-../../gollum_venv/local/lib/python2.7/site-packages/gollum-1.1b0-py2.7.egg/gollum/models/host.py:179: TimeoutError</error></testcase><testcase classname="supervisor.test_01_deployment.TestGenericDeployment" file="supervisor/test_01_deployment.py" line="42" name="test_supervisor_with_ring[api-os_trusty]" time="0.000533819198608"><error message="test setup failure">distribution = &apos;trusty&apos;
+            ../../gollum_venv/local/lib/python2.7/site-packages/gollum-1.1b0-py2.7.egg/gollum/models/host.py:179:
+            TimeoutError
+        </error>
+    </testcase>
+    <testcase classname="supervisor.test_01_deployment.TestGenericDeployment"
+              file="supervisor/test_01_deployment.py" line="42"
+              name="test_supervisor_with_ring[api-os_trusty]"
+              time="0.000533819198608">
+        <error message="test setup failure">distribution = &apos;trusty&apos;
 
-    @pytest.yield_fixture(scope=&quot;session&quot;)
-    def supervisor(distribution):
-        &quot;&quot;&quot;Returns a supervisor object, representing a running supervisor host.&quot;&quot;&quot;
-        configuration = SUPERVISOR_CONF.copy()
-        configuration[&quot;distribution&quot;] = distribution
-    
-        init = HostInit()
-        init.cached_states = [
+            @pytest.yield_fixture(scope=&quot;session&quot;)
+            def supervisor(distribution):
+            &quot;&quot;&quot;Returns a supervisor object, representing a
+            running supervisor host.&quot;&quot;&quot;
+            configuration = SUPERVISOR_CONF.copy()
+            configuration[&quot;distribution&quot;] = distribution
+
+            init = HostInit()
+            init.cached_states = [
             (&quot;sls/supervisor_prerequisites.sls&quot;, None),
             (&quot;sls/scality_repo.sls&quot;, {
-                &quot;artifacts_url&quot;: format_settings(settings.ARTIFACTS_ROOT),
-                &quot;version&quot;: configuration[&quot;version&quot;],
+            &quot;artifacts_url&quot;: format_settings(settings.ARTIFACTS_ROOT),
+            &quot;version&quot;: configuration[&quot;version&quot;],
             }),
             (&quot;sls/supervisor_install.sls&quot;, None),
             (&quot;sls/supervisor_setup.sls&quot;, configuration)
-        ]
-        init.states = [(&quot;./sls/supervisor_start.sls&quot;, None)]
-    
-        image = Image.get(label=configuration[&quot;distribution&quot;])
-        host = Host.create(label=&apos;supervisor&apos;, hostname=&apos;supervisor&apos;,
-                           provider=settings.DEFAULT_RESOURCE_PROVIDER,
-                           image=image,
-                           init=init)
-    
-        _supervisor = Supervisor.create(protocol=&quot;http&quot;, host=host,
-                                        label=host.label, port=3080, api_port=4443,
-                                        api_user=configuration[&apos;gui_user&apos;],
-                                        api_password=configuration[&apos;gui_password&apos;])
-    
-        _supervisor.configuration = configuration.copy()
-        _supervisor.configuration.update({&apos;ip&apos;: host.ip})
-    
-        def wait_host_ready(_self):
-            _self.host.wait_ready({&quot;timeout&quot;: 60, &quot;retry_interval&quot;: 1,
-                                   &quot;url&quot;: &quot;/login&quot;, &quot;port&quot;: 3080,
-                                   &quot;reply&quot;: 200})
-            _self.host.wait_ready({&quot;timeout&quot;: 60, &quot;retry_interval&quot;: 1,
-                                   &quot;url&quot;: &quot;/apidoc&quot;, &quot;port&quot;: 4443,
-                                   &quot;reply&quot;: 200})
-    
-        _supervisor.wait_host_ready = MethodType(wait_host_ready, _supervisor)
-    
-&gt;       _supervisor.wait_host_ready()
+            ]
+            init.states = [(&quot;./sls/supervisor_start.sls&quot;, None)]
 
-tests/gollum/tests/fixtures/mocked_ring.py:210: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-tests/gollum/tests/fixtures/mocked_ring.py:206: in wait_host_ready
-    &quot;reply&quot;: 200})
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+            image = Image.get(label=configuration[&quot;distribution&quot;])
+            host = Host.create(label=&apos;supervisor&apos;, hostname=&apos;supervisor&apos;,
+            provider=settings.DEFAULT_RESOURCE_PROVIDER,
+            image=image,
+            init=init)
 
-self = Host u&apos;supervisor&apos;
-host_ready = {&apos;port&apos;: 4443, &apos;reply&apos;: 200, &apos;retry_interval&apos;: 1, &apos;timeout&apos;: 60, ...}
+            _supervisor = Supervisor.create(protocol=&quot;http&quot;,
+            host=host,
+            label=host.label, port=3080, api_port=4443,
+            api_user=configuration[&apos;gui_user&apos;],
+            api_password=configuration[&apos;gui_password&apos;])
 
-    def wait_ready(self, host_ready):
-        &quot;&quot;&quot;Wait for host to be ready as per criteria provided by caller.&quot;&quot;&quot;
-        if not host_ready:
+            _supervisor.configuration = configuration.copy()
+            _supervisor.configuration.update({&apos;ip&apos;: host.ip})
+
+            def wait_host_ready(_self):
+            _self.host.wait_ready({&quot;timeout&quot;: 60, &quot;retry_interval&quot;:
+            1,
+            &quot;url&quot;: &quot;/login&quot;, &quot;port&quot;: 3080,
+            &quot;reply&quot;: 200})
+            _self.host.wait_ready({&quot;timeout&quot;: 60, &quot;retry_interval&quot;:
+            1,
+            &quot;url&quot;: &quot;/apidoc&quot;, &quot;port&quot;: 4443,
+            &quot;reply&quot;: 200})
+
+            _supervisor.wait_host_ready = MethodType(wait_host_ready,
+            _supervisor)
+
+            &gt; _supervisor.wait_host_ready()
+
+            tests/gollum/tests/fixtures/mocked_ring.py:210:
+            _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+            _ _ _ _ _ _
+            tests/gollum/tests/fixtures/mocked_ring.py:206: in wait_host_ready
+            &quot;reply&quot;: 200})
+            _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+            _ _ _ _ _ _
+
+            self = Host u&apos;supervisor&apos;
+            host_ready = {&apos;port&apos;: 4443, &apos;reply&apos;: 200, &apos;retry_interval&apos;:
+            1, &apos;timeout&apos;: 60, ...}
+
+            def wait_ready(self, host_ready):
+            &quot;&quot;&quot;Wait for host to be ready as per criteria provided
+            by caller.&quot;&quot;&quot;
+            if not host_ready:
             return
-        protocol = host_ready.get(&quot;protocol&quot;, &apos;http&apos;)
-        timeout = host_ready.get(&quot;timeout&quot;, 60)
-        retry = host_ready.get(&quot;retry&quot;, 1)
-        url = host_ready.get(&quot;url&quot;, &apos;/&apos;)
-        port = host_ready.get(&quot;port&quot;, 80)
-        reply = host_ready.get(&quot;reply&quot;, 200)
-    
-        fqdn = &apos;{protocol}://{ip}:{port}{url}&apos;.format(protocol=protocol,
-                                                      ip=self.ip,
-                                                      port=port,
-                                                      url=url)
-    
-        for _ in range(timeout):
+            protocol = host_ready.get(&quot;protocol&quot;, &apos;http&apos;)
+            timeout = host_ready.get(&quot;timeout&quot;, 60)
+            retry = host_ready.get(&quot;retry&quot;, 1)
+            url = host_ready.get(&quot;url&quot;, &apos;/&apos;)
+            port = host_ready.get(&quot;port&quot;, 80)
+            reply = host_ready.get(&quot;reply&quot;, 200)
+
+            fqdn = &apos;{protocol}://{ip}:{port}{url}&apos;.format(protocol=protocol,
+            ip=self.ip,
+            port=port,
+            url=url)
+
+            for _ in range(timeout):
             try:
-                if urllib.urlopen(fqdn).getcode() == reply:
-                    return
+            if urllib.urlopen(fqdn).getcode() == reply:
+            return
             except Exception:
-                pass
+            pass
             time.sleep(retry)
-&gt;       raise TimeoutError(&quot;%s does not reply&quot; % self)
-E       TimeoutError: Host u&apos;supervisor&apos; does not reply
+            &gt; raise TimeoutError(&quot;%s does not reply&quot; % self)
+            E TimeoutError: Host u&apos;supervisor&apos; does not reply
 
-../../gollum_venv/local/lib/python2.7/site-packages/gollum-1.1b0-py2.7.egg/gollum/models/host.py:179: TimeoutError</error></testcase><testcase classname="supervisor.test_01_deployment.TestGenericDeployment" file="supervisor/test_01_deployment.py" line="59" name="test_supervisor_bad_auth[supervisor-os_trusty-api]" time="0.000428915023804"><error message="test setup failure">distribution = &apos;trusty&apos;
+            ../../gollum_venv/local/lib/python2.7/site-packages/gollum-1.1b0-py2.7.egg/gollum/models/host.py:179:
+            TimeoutError
+        </error>
+    </testcase>
+    <testcase classname="supervisor.test_01_deployment.TestGenericDeployment"
+              file="supervisor/test_01_deployment.py" line="59"
+              name="test_supervisor_bad_auth[supervisor-os_trusty-api]"
+              time="0.000428915023804">
+        <error message="test setup failure">distribution = &apos;trusty&apos;
 
-    @pytest.yield_fixture(scope=&quot;session&quot;)
-    def supervisor(distribution):
-        &quot;&quot;&quot;Returns a supervisor object, representing a running supervisor host.&quot;&quot;&quot;
-        configuration = SUPERVISOR_CONF.copy()
-        configuration[&quot;distribution&quot;] = distribution
-    
-        init = HostInit()
-        init.cached_states = [
+            @pytest.yield_fixture(scope=&quot;session&quot;)
+            def supervisor(distribution):
+            &quot;&quot;&quot;Returns a supervisor object, representing a
+            running supervisor host.&quot;&quot;&quot;
+            configuration = SUPERVISOR_CONF.copy()
+            configuration[&quot;distribution&quot;] = distribution
+
+            init = HostInit()
+            init.cached_states = [
             (&quot;sls/supervisor_prerequisites.sls&quot;, None),
             (&quot;sls/scality_repo.sls&quot;, {
-                &quot;artifacts_url&quot;: format_settings(settings.ARTIFACTS_ROOT),
-                &quot;version&quot;: configuration[&quot;version&quot;],
+            &quot;artifacts_url&quot;: format_settings(settings.ARTIFACTS_ROOT),
+            &quot;version&quot;: configuration[&quot;version&quot;],
             }),
             (&quot;sls/supervisor_install.sls&quot;, None),
             (&quot;sls/supervisor_setup.sls&quot;, configuration)
-        ]
-        init.states = [(&quot;./sls/supervisor_start.sls&quot;, None)]
-    
-        image = Image.get(label=configuration[&quot;distribution&quot;])
-        host = Host.create(label=&apos;supervisor&apos;, hostname=&apos;supervisor&apos;,
-                           provider=settings.DEFAULT_RESOURCE_PROVIDER,
-                           image=image,
-                           init=init)
-    
-        _supervisor = Supervisor.create(protocol=&quot;http&quot;, host=host,
-                                        label=host.label, port=3080, api_port=4443,
-                                        api_user=configuration[&apos;gui_user&apos;],
-                                        api_password=configuration[&apos;gui_password&apos;])
-    
-        _supervisor.configuration = configuration.copy()
-        _supervisor.configuration.update({&apos;ip&apos;: host.ip})
-    
-        def wait_host_ready(_self):
-            _self.host.wait_ready({&quot;timeout&quot;: 60, &quot;retry_interval&quot;: 1,
-                                   &quot;url&quot;: &quot;/login&quot;, &quot;port&quot;: 3080,
-                                   &quot;reply&quot;: 200})
-            _self.host.wait_ready({&quot;timeout&quot;: 60, &quot;retry_interval&quot;: 1,
-                                   &quot;url&quot;: &quot;/apidoc&quot;, &quot;port&quot;: 4443,
-                                   &quot;reply&quot;: 200})
-    
-        _supervisor.wait_host_ready = MethodType(wait_host_ready, _supervisor)
-    
-&gt;       _supervisor.wait_host_ready()
+            ]
+            init.states = [(&quot;./sls/supervisor_start.sls&quot;, None)]
 
-tests/gollum/tests/fixtures/mocked_ring.py:210: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-tests/gollum/tests/fixtures/mocked_ring.py:206: in wait_host_ready
-    &quot;reply&quot;: 200})
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+            image = Image.get(label=configuration[&quot;distribution&quot;])
+            host = Host.create(label=&apos;supervisor&apos;, hostname=&apos;supervisor&apos;,
+            provider=settings.DEFAULT_RESOURCE_PROVIDER,
+            image=image,
+            init=init)
 
-self = Host u&apos;supervisor&apos;
-host_ready = {&apos;port&apos;: 4443, &apos;reply&apos;: 200, &apos;retry_interval&apos;: 1, &apos;timeout&apos;: 60, ...}
+            _supervisor = Supervisor.create(protocol=&quot;http&quot;,
+            host=host,
+            label=host.label, port=3080, api_port=4443,
+            api_user=configuration[&apos;gui_user&apos;],
+            api_password=configuration[&apos;gui_password&apos;])
 
-    def wait_ready(self, host_ready):
-        &quot;&quot;&quot;Wait for host to be ready as per criteria provided by caller.&quot;&quot;&quot;
-        if not host_ready:
+            _supervisor.configuration = configuration.copy()
+            _supervisor.configuration.update({&apos;ip&apos;: host.ip})
+
+            def wait_host_ready(_self):
+            _self.host.wait_ready({&quot;timeout&quot;: 60, &quot;retry_interval&quot;:
+            1,
+            &quot;url&quot;: &quot;/login&quot;, &quot;port&quot;: 3080,
+            &quot;reply&quot;: 200})
+            _self.host.wait_ready({&quot;timeout&quot;: 60, &quot;retry_interval&quot;:
+            1,
+            &quot;url&quot;: &quot;/apidoc&quot;, &quot;port&quot;: 4443,
+            &quot;reply&quot;: 200})
+
+            _supervisor.wait_host_ready = MethodType(wait_host_ready,
+            _supervisor)
+
+            &gt; _supervisor.wait_host_ready()
+
+            tests/gollum/tests/fixtures/mocked_ring.py:210:
+            _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+            _ _ _ _ _ _
+            tests/gollum/tests/fixtures/mocked_ring.py:206: in wait_host_ready
+            &quot;reply&quot;: 200})
+            _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+            _ _ _ _ _ _
+
+            self = Host u&apos;supervisor&apos;
+            host_ready = {&apos;port&apos;: 4443, &apos;reply&apos;: 200, &apos;retry_interval&apos;:
+            1, &apos;timeout&apos;: 60, ...}
+
+            def wait_ready(self, host_ready):
+            &quot;&quot;&quot;Wait for host to be ready as per criteria provided
+            by caller.&quot;&quot;&quot;
+            if not host_ready:
             return
-        protocol = host_ready.get(&quot;protocol&quot;, &apos;http&apos;)
-        timeout = host_ready.get(&quot;timeout&quot;, 60)
-        retry = host_ready.get(&quot;retry&quot;, 1)
-        url = host_ready.get(&quot;url&quot;, &apos;/&apos;)
-        port = host_ready.get(&quot;port&quot;, 80)
-        reply = host_ready.get(&quot;reply&quot;, 200)
-    
-        fqdn = &apos;{protocol}://{ip}:{port}{url}&apos;.format(protocol=protocol,
-                                                      ip=self.ip,
-                                                      port=port,
-                                                      url=url)
-    
-        for _ in range(timeout):
+            protocol = host_ready.get(&quot;protocol&quot;, &apos;http&apos;)
+            timeout = host_ready.get(&quot;timeout&quot;, 60)
+            retry = host_ready.get(&quot;retry&quot;, 1)
+            url = host_ready.get(&quot;url&quot;, &apos;/&apos;)
+            port = host_ready.get(&quot;port&quot;, 80)
+            reply = host_ready.get(&quot;reply&quot;, 200)
+
+            fqdn = &apos;{protocol}://{ip}:{port}{url}&apos;.format(protocol=protocol,
+            ip=self.ip,
+            port=port,
+            url=url)
+
+            for _ in range(timeout):
             try:
-                if urllib.urlopen(fqdn).getcode() == reply:
-                    return
+            if urllib.urlopen(fqdn).getcode() == reply:
+            return
             except Exception:
-                pass
+            pass
             time.sleep(retry)
-&gt;       raise TimeoutError(&quot;%s does not reply&quot; % self)
-E       TimeoutError: Host u&apos;supervisor&apos; does not reply
+            &gt; raise TimeoutError(&quot;%s does not reply&quot; % self)
+            E TimeoutError: Host u&apos;supervisor&apos; does not reply
 
-../../gollum_venv/local/lib/python2.7/site-packages/gollum-1.1b0-py2.7.egg/gollum/models/host.py:179: TimeoutError</error></testcase><testcase classname="supervisor.test_01_deployment.TestGenericDeployment" file="supervisor/test_01_deployment.py" line="59" name="test_supervisor_bad_auth[grafana-os_trusty-api]" time="0.000798225402832"><error message="test setup failure">distribution = &apos;trusty&apos;
+            ../../gollum_venv/local/lib/python2.7/site-packages/gollum-1.1b0-py2.7.egg/gollum/models/host.py:179:
+            TimeoutError
+        </error>
+    </testcase>
+    <testcase classname="supervisor.test_01_deployment.TestGenericDeployment"
+              file="supervisor/test_01_deployment.py" line="59"
+              name="test_supervisor_bad_auth[grafana-os_trusty-api]"
+              time="0.000798225402832">
+        <error message="test setup failure">distribution = &apos;trusty&apos;
 
-    @pytest.yield_fixture(scope=&quot;session&quot;)
-    def supervisor(distribution):
-        &quot;&quot;&quot;Returns a supervisor object, representing a running supervisor host.&quot;&quot;&quot;
-        configuration = SUPERVISOR_CONF.copy()
-        configuration[&quot;distribution&quot;] = distribution
-    
-        init = HostInit()
-        init.cached_states = [
+            @pytest.yield_fixture(scope=&quot;session&quot;)
+            def supervisor(distribution):
+            &quot;&quot;&quot;Returns a supervisor object, representing a
+            running supervisor host.&quot;&quot;&quot;
+            configuration = SUPERVISOR_CONF.copy()
+            configuration[&quot;distribution&quot;] = distribution
+
+            init = HostInit()
+            init.cached_states = [
             (&quot;sls/supervisor_prerequisites.sls&quot;, None),
             (&quot;sls/scality_repo.sls&quot;, {
-                &quot;artifacts_url&quot;: format_settings(settings.ARTIFACTS_ROOT),
-                &quot;version&quot;: configuration[&quot;version&quot;],
+            &quot;artifacts_url&quot;: format_settings(settings.ARTIFACTS_ROOT),
+            &quot;version&quot;: configuration[&quot;version&quot;],
             }),
             (&quot;sls/supervisor_install.sls&quot;, None),
             (&quot;sls/supervisor_setup.sls&quot;, configuration)
-        ]
-        init.states = [(&quot;./sls/supervisor_start.sls&quot;, None)]
-    
-        image = Image.get(label=configuration[&quot;distribution&quot;])
-        host = Host.create(label=&apos;supervisor&apos;, hostname=&apos;supervisor&apos;,
-                           provider=settings.DEFAULT_RESOURCE_PROVIDER,
-                           image=image,
-                           init=init)
-    
-        _supervisor = Supervisor.create(protocol=&quot;http&quot;, host=host,
-                                        label=host.label, port=3080, api_port=4443,
-                                        api_user=configuration[&apos;gui_user&apos;],
-                                        api_password=configuration[&apos;gui_password&apos;])
-    
-        _supervisor.configuration = configuration.copy()
-        _supervisor.configuration.update({&apos;ip&apos;: host.ip})
-    
-        def wait_host_ready(_self):
-            _self.host.wait_ready({&quot;timeout&quot;: 60, &quot;retry_interval&quot;: 1,
-                                   &quot;url&quot;: &quot;/login&quot;, &quot;port&quot;: 3080,
-                                   &quot;reply&quot;: 200})
-            _self.host.wait_ready({&quot;timeout&quot;: 60, &quot;retry_interval&quot;: 1,
-                                   &quot;url&quot;: &quot;/apidoc&quot;, &quot;port&quot;: 4443,
-                                   &quot;reply&quot;: 200})
-    
-        _supervisor.wait_host_ready = MethodType(wait_host_ready, _supervisor)
-    
-&gt;       _supervisor.wait_host_ready()
+            ]
+            init.states = [(&quot;./sls/supervisor_start.sls&quot;, None)]
 
-tests/gollum/tests/fixtures/mocked_ring.py:210: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-tests/gollum/tests/fixtures/mocked_ring.py:206: in wait_host_ready
-    &quot;reply&quot;: 200})
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+            image = Image.get(label=configuration[&quot;distribution&quot;])
+            host = Host.create(label=&apos;supervisor&apos;, hostname=&apos;supervisor&apos;,
+            provider=settings.DEFAULT_RESOURCE_PROVIDER,
+            image=image,
+            init=init)
 
-self = Host u&apos;supervisor&apos;
-host_ready = {&apos;port&apos;: 4443, &apos;reply&apos;: 200, &apos;retry_interval&apos;: 1, &apos;timeout&apos;: 60, ...}
+            _supervisor = Supervisor.create(protocol=&quot;http&quot;,
+            host=host,
+            label=host.label, port=3080, api_port=4443,
+            api_user=configuration[&apos;gui_user&apos;],
+            api_password=configuration[&apos;gui_password&apos;])
 
-    def wait_ready(self, host_ready):
-        &quot;&quot;&quot;Wait for host to be ready as per criteria provided by caller.&quot;&quot;&quot;
-        if not host_ready:
+            _supervisor.configuration = configuration.copy()
+            _supervisor.configuration.update({&apos;ip&apos;: host.ip})
+
+            def wait_host_ready(_self):
+            _self.host.wait_ready({&quot;timeout&quot;: 60, &quot;retry_interval&quot;:
+            1,
+            &quot;url&quot;: &quot;/login&quot;, &quot;port&quot;: 3080,
+            &quot;reply&quot;: 200})
+            _self.host.wait_ready({&quot;timeout&quot;: 60, &quot;retry_interval&quot;:
+            1,
+            &quot;url&quot;: &quot;/apidoc&quot;, &quot;port&quot;: 4443,
+            &quot;reply&quot;: 200})
+
+            _supervisor.wait_host_ready = MethodType(wait_host_ready,
+            _supervisor)
+
+            &gt; _supervisor.wait_host_ready()
+
+            tests/gollum/tests/fixtures/mocked_ring.py:210:
+            _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+            _ _ _ _ _ _
+            tests/gollum/tests/fixtures/mocked_ring.py:206: in wait_host_ready
+            &quot;reply&quot;: 200})
+            _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+            _ _ _ _ _ _
+
+            self = Host u&apos;supervisor&apos;
+            host_ready = {&apos;port&apos;: 4443, &apos;reply&apos;: 200, &apos;retry_interval&apos;:
+            1, &apos;timeout&apos;: 60, ...}
+
+            def wait_ready(self, host_ready):
+            &quot;&quot;&quot;Wait for host to be ready as per criteria provided
+            by caller.&quot;&quot;&quot;
+            if not host_ready:
             return
-        protocol = host_ready.get(&quot;protocol&quot;, &apos;http&apos;)
-        timeout = host_ready.get(&quot;timeout&quot;, 60)
-        retry = host_ready.get(&quot;retry&quot;, 1)
-        url = host_ready.get(&quot;url&quot;, &apos;/&apos;)
-        port = host_ready.get(&quot;port&quot;, 80)
-        reply = host_ready.get(&quot;reply&quot;, 200)
-    
-        fqdn = &apos;{protocol}://{ip}:{port}{url}&apos;.format(protocol=protocol,
-                                                      ip=self.ip,
-                                                      port=port,
-                                                      url=url)
-    
-        for _ in range(timeout):
+            protocol = host_ready.get(&quot;protocol&quot;, &apos;http&apos;)
+            timeout = host_ready.get(&quot;timeout&quot;, 60)
+            retry = host_ready.get(&quot;retry&quot;, 1)
+            url = host_ready.get(&quot;url&quot;, &apos;/&apos;)
+            port = host_ready.get(&quot;port&quot;, 80)
+            reply = host_ready.get(&quot;reply&quot;, 200)
+
+            fqdn = &apos;{protocol}://{ip}:{port}{url}&apos;.format(protocol=protocol,
+            ip=self.ip,
+            port=port,
+            url=url)
+
+            for _ in range(timeout):
             try:
-                if urllib.urlopen(fqdn).getcode() == reply:
-                    return
+            if urllib.urlopen(fqdn).getcode() == reply:
+            return
             except Exception:
-                pass
+            pass
             time.sleep(retry)
-&gt;       raise TimeoutError(&quot;%s does not reply&quot; % self)
-E       TimeoutError: Host u&apos;supervisor&apos; does not reply
+            &gt; raise TimeoutError(&quot;%s does not reply&quot; % self)
+            E TimeoutError: Host u&apos;supervisor&apos; does not reply
 
-../../gollum_venv/local/lib/python2.7/site-packages/gollum-1.1b0-py2.7.egg/gollum/models/host.py:179: TimeoutError</error></testcase><testcase classname="supervisor.test_01_deployment.TestGenericDeployment" file="supervisor/test_01_deployment.py" line="77" name="test_supervisor_good_auth[supervisor-os_trusty-api]" time="0.00053596496582"><error message="test setup failure">distribution = &apos;trusty&apos;
+            ../../gollum_venv/local/lib/python2.7/site-packages/gollum-1.1b0-py2.7.egg/gollum/models/host.py:179:
+            TimeoutError
+        </error>
+    </testcase>
+    <testcase classname="supervisor.test_01_deployment.TestGenericDeployment"
+              file="supervisor/test_01_deployment.py" line="77"
+              name="test_supervisor_good_auth[supervisor-os_trusty-api]"
+              time="0.00053596496582">
+        <error message="test setup failure">distribution = &apos;trusty&apos;
 
-    @pytest.yield_fixture(scope=&quot;session&quot;)
-    def supervisor(distribution):
-        &quot;&quot;&quot;Returns a supervisor object, representing a running supervisor host.&quot;&quot;&quot;
-        configuration = SUPERVISOR_CONF.copy()
-        configuration[&quot;distribution&quot;] = distribution
-    
-        init = HostInit()
-        init.cached_states = [
+            @pytest.yield_fixture(scope=&quot;session&quot;)
+            def supervisor(distribution):
+            &quot;&quot;&quot;Returns a supervisor object, representing a
+            running supervisor host.&quot;&quot;&quot;
+            configuration = SUPERVISOR_CONF.copy()
+            configuration[&quot;distribution&quot;] = distribution
+
+            init = HostInit()
+            init.cached_states = [
             (&quot;sls/supervisor_prerequisites.sls&quot;, None),
             (&quot;sls/scality_repo.sls&quot;, {
-                &quot;artifacts_url&quot;: format_settings(settings.ARTIFACTS_ROOT),
-                &quot;version&quot;: configuration[&quot;version&quot;],
+            &quot;artifacts_url&quot;: format_settings(settings.ARTIFACTS_ROOT),
+            &quot;version&quot;: configuration[&quot;version&quot;],
             }),
             (&quot;sls/supervisor_install.sls&quot;, None),
             (&quot;sls/supervisor_setup.sls&quot;, configuration)
-        ]
-        init.states = [(&quot;./sls/supervisor_start.sls&quot;, None)]
-    
-        image = Image.get(label=configuration[&quot;distribution&quot;])
-        host = Host.create(label=&apos;supervisor&apos;, hostname=&apos;supervisor&apos;,
-                           provider=settings.DEFAULT_RESOURCE_PROVIDER,
-                           image=image,
-                           init=init)
-    
-        _supervisor = Supervisor.create(protocol=&quot;http&quot;, host=host,
-                                        label=host.label, port=3080, api_port=4443,
-                                        api_user=configuration[&apos;gui_user&apos;],
-                                        api_password=configuration[&apos;gui_password&apos;])
-    
-        _supervisor.configuration = configuration.copy()
-        _supervisor.configuration.update({&apos;ip&apos;: host.ip})
-    
-        def wait_host_ready(_self):
-            _self.host.wait_ready({&quot;timeout&quot;: 60, &quot;retry_interval&quot;: 1,
-                                   &quot;url&quot;: &quot;/login&quot;, &quot;port&quot;: 3080,
-                                   &quot;reply&quot;: 200})
-            _self.host.wait_ready({&quot;timeout&quot;: 60, &quot;retry_interval&quot;: 1,
-                                   &quot;url&quot;: &quot;/apidoc&quot;, &quot;port&quot;: 4443,
-                                   &quot;reply&quot;: 200})
-    
-        _supervisor.wait_host_ready = MethodType(wait_host_ready, _supervisor)
-    
-&gt;       _supervisor.wait_host_ready()
+            ]
+            init.states = [(&quot;./sls/supervisor_start.sls&quot;, None)]
 
-tests/gollum/tests/fixtures/mocked_ring.py:210: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-tests/gollum/tests/fixtures/mocked_ring.py:206: in wait_host_ready
-    &quot;reply&quot;: 200})
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+            image = Image.get(label=configuration[&quot;distribution&quot;])
+            host = Host.create(label=&apos;supervisor&apos;, hostname=&apos;supervisor&apos;,
+            provider=settings.DEFAULT_RESOURCE_PROVIDER,
+            image=image,
+            init=init)
 
-self = Host u&apos;supervisor&apos;
-host_ready = {&apos;port&apos;: 4443, &apos;reply&apos;: 200, &apos;retry_interval&apos;: 1, &apos;timeout&apos;: 60, ...}
+            _supervisor = Supervisor.create(protocol=&quot;http&quot;,
+            host=host,
+            label=host.label, port=3080, api_port=4443,
+            api_user=configuration[&apos;gui_user&apos;],
+            api_password=configuration[&apos;gui_password&apos;])
 
-    def wait_ready(self, host_ready):
-        &quot;&quot;&quot;Wait for host to be ready as per criteria provided by caller.&quot;&quot;&quot;
-        if not host_ready:
+            _supervisor.configuration = configuration.copy()
+            _supervisor.configuration.update({&apos;ip&apos;: host.ip})
+
+            def wait_host_ready(_self):
+            _self.host.wait_ready({&quot;timeout&quot;: 60, &quot;retry_interval&quot;:
+            1,
+            &quot;url&quot;: &quot;/login&quot;, &quot;port&quot;: 3080,
+            &quot;reply&quot;: 200})
+            _self.host.wait_ready({&quot;timeout&quot;: 60, &quot;retry_interval&quot;:
+            1,
+            &quot;url&quot;: &quot;/apidoc&quot;, &quot;port&quot;: 4443,
+            &quot;reply&quot;: 200})
+
+            _supervisor.wait_host_ready = MethodType(wait_host_ready,
+            _supervisor)
+
+            &gt; _supervisor.wait_host_ready()
+
+            tests/gollum/tests/fixtures/mocked_ring.py:210:
+            _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+            _ _ _ _ _ _
+            tests/gollum/tests/fixtures/mocked_ring.py:206: in wait_host_ready
+            &quot;reply&quot;: 200})
+            _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+            _ _ _ _ _ _
+
+            self = Host u&apos;supervisor&apos;
+            host_ready = {&apos;port&apos;: 4443, &apos;reply&apos;: 200, &apos;retry_interval&apos;:
+            1, &apos;timeout&apos;: 60, ...}
+
+            def wait_ready(self, host_ready):
+            &quot;&quot;&quot;Wait for host to be ready as per criteria provided
+            by caller.&quot;&quot;&quot;
+            if not host_ready:
             return
-        protocol = host_ready.get(&quot;protocol&quot;, &apos;http&apos;)
-        timeout = host_ready.get(&quot;timeout&quot;, 60)
-        retry = host_ready.get(&quot;retry&quot;, 1)
-        url = host_ready.get(&quot;url&quot;, &apos;/&apos;)
-        port = host_ready.get(&quot;port&quot;, 80)
-        reply = host_ready.get(&quot;reply&quot;, 200)
-    
-        fqdn = &apos;{protocol}://{ip}:{port}{url}&apos;.format(protocol=protocol,
-                                                      ip=self.ip,
-                                                      port=port,
-                                                      url=url)
-    
-        for _ in range(timeout):
-            try:
-                if urllib.urlopen(fqdn).getcode() == reply:
-                    return
-            except Exception:
-                pass
-            time.sleep(retry)
-&gt;       raise TimeoutError(&quot;%s does not reply&quot; % self)
-E       TimeoutError: Host u&apos;supervisor&apos; does not reply
+            protocol = host_ready.get(&quot;protocol&quot;, &apos;http&apos;)
+            timeout = host_ready.get(&quot;timeout&quot;, 60)
+            retry = host_ready.get(&quot;retry&quot;, 1)
+            url = host_ready.get(&quot;url&quot;, &apos;/&apos;)
+            port = host_ready.get(&quot;port&quot;, 80)
+            reply = host_ready.get(&quot;reply&quot;, 200)
 
-../../gollum_venv/local/lib/python2.7/site-packages/gollum-1.1b0-py2.7.egg/gollum/models/host.py:179: TimeoutError</error></testcase></testsuite>
+            fqdn = &apos;{protocol}://{ip}:{port}{url}&apos;.format(protocol=protocol,
+            ip=self.ip,
+            port=port,
+            url=url)
+
+            for _ in range(timeout):
+            try:
+            if urllib.urlopen(fqdn).getcode() == reply:
+            return
+            except Exception:
+            pass
+            time.sleep(retry)
+            &gt; raise TimeoutError(&quot;%s does not reply&quot; % self)
+            E TimeoutError: Host u&apos;supervisor&apos; does not reply
+
+            ../../gollum_venv/local/lib/python2.7/site-packages/gollum-1.1b0-py2.7.egg/gollum/models/host.py:179:
+            TimeoutError
+        </error>
+    </testcase>
+</testsuite>

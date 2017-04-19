@@ -6,7 +6,6 @@ from twisted.trial import unittest
 
 class TestUpload(testutil.BuildStepMixin, unittest.TestCase,
                  configmixin.ConfigErrorsMixin):
-
     def setUp(self):
         return self.setUpBuildStep()
 
@@ -17,8 +16,7 @@ class TestUpload(testutil.BuildStepMixin, unittest.TestCase,
         # this checks that an exception is raised for invalid arguments
         self.assertRaisesConfigError(
             "Invalid argument(s) passed to RemoteShellCommand: ",
-            lambda: Upload(source='ok', url=[],
-                           wrongArg1=1, wrongArg2='two'))
+            lambda: Upload(source='ok', url=[], wrongArg1=1, wrongArg2='two'))
 
     def test_constructor_args(self):
         upload_step = Upload('tmp', ['link1', 'link2'])
