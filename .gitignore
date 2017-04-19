@@ -6,3 +6,5 @@
 .eggs
 eve.egg-info
 env
+.coverage
+.htmlcov
