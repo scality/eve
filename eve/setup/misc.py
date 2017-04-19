@@ -1,4 +1,3 @@
-import socket
 import time
 from os import path
 
@@ -24,9 +23,7 @@ def wamp():
 def protocols():
     return {
         'pb': {
-            'port': 'tcp:%s:interface=%s' % (
-                util.env.PB_PORT,
-                socket.gethostbyname(util.env.MASTER_FQDN))
+            'port': 'tcp:%s:interface=%s' % (util.env.PB_PORT, '0.0.0.0')
         }
     }
 
