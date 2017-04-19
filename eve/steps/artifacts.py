@@ -258,7 +258,8 @@ class Upload(ShellCommand):
                 else:
                     links.update([
                         ('{prefix}{name}'.format(
-                            prefix=prefix, name=match.split('/')[-1]),
+                            prefix=prefix,
+                            name=match.split('/')[-1]),
                          match)
                         for match in matches
                     ])

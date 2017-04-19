@@ -486,9 +486,10 @@ class PublishCoverageReport(_UploadCoverageReportsMixin, BuildStep):
         except (OSError, IOError) as exc:
             self.addCompleteLog(
                 'error', 'Unable to create a temporary directory '
-                'to retrieve coverage report files from worker: {0}'.format(
-                    exc.strerror or exc
-                )
+                         'to retrieve coverage report files '
+                         'from worker: {0}'.format(
+                             exc.strerror or exc
+                         )
             )
             return FAILURE
         else:
@@ -530,8 +531,8 @@ class PublishCoverageReport(_UploadCoverageReportsMixin, BuildStep):
                 )
 
                 if result == SUCCESS and \
-                   self.publication.url_name and \
-                   self.publication.url:
+                        self.publication.url_name and \
+                        self.publication.url:
                     self.addURL(
                         self.publication.url_name,
                         self.publication.url
@@ -551,10 +552,12 @@ class PublishCoverageReport(_UploadCoverageReportsMixin, BuildStep):
                 log.msg('Warning: Unable to remove "{0}": {1}'.format(
                     path, excinfo
                 ))
+
             shutil.rmtree(tmpdir, onerror=warnOnError)
             return result
 
-        finished.addBoth(removeTmpdir, self.tmpdir)  # noqa: E501, pylint: disable=no-member
+        # noqa: E501, pylint: disable=no-member
+        finished.addBoth(removeTmpdir, self.tmpdir)
 
         finished.addCallback(self.finished)  # pylint: disable=no-member
         finished.addErrback(self.failed)  # pylint: disable=no-member

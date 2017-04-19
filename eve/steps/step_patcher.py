@@ -1,12 +1,8 @@
 """Step patching feature."""
 
 import yaml
-
 from buildbot.process.buildstep import BuildStep
-from buildbot.process.results import (
-    FAILURE, SUCCESS, SKIPPED, WARNINGS
-)
-
+from buildbot.process.results import FAILURE, SKIPPED, SUCCESS, WARNINGS
 from twisted.internet import defer
 from twisted.logger import Logger
 

@@ -13,12 +13,10 @@ from subprocess import PIPE, Popen
 
 class NgrokNotAvailableError(Exception):
     """ngrok binary could not be found."""
-    pass
 
 
 class NgrokTimeoutError(Exception):
     """ngrok took too much time to create the tunnel."""
-    pass
 
 
 class Ngrok(object):

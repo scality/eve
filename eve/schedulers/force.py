@@ -5,7 +5,6 @@ from twisted.internet import defer, threads
 
 
 class EveForceScheduler(ForceScheduler):
-
     @defer.inlineCallbacks
     def gatherPropertiesAndChanges(self, collector, **kwargs):
         properties, changeids, sourcestamps = \
