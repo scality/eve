@@ -20,17 +20,11 @@ setup(
     description='Scality\'s automated build system',
     url='https://bitbucket.org/scality/eve',
     include_package_data=True,
-    packages=find_packages(where='src'),
-    package_dir={
-        '': 'src'
-    },
+    packages=find_packages(where='.'),
     install_requires=requires(),
     use_scm_version={
         'local_scheme': 'dirty-tag'
     },
-    setup_requires=[
-        'setuptools_scm'
-    ],
     entry_points={
         'console_scripts': [
             'eve=eve.scripts.runner:main'
