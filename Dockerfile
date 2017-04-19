@@ -18,22 +18,24 @@ RUN         apt-get update && \
 # Install required python packages, and twisted
 RUN pip install --upgrade pip setuptools
 
+# Freezing requirements
 COPY requirements/base.txt requirements.txt
 RUN pip install -r requirements.txt
 
+RUN curl -sSL https://get.docker.com/ | sh
 RUN mkdir /root/eve
 WORKDIR /root/eve
 
 COPY . /opt/eve
 RUN pip install /opt/eve
 
-RUN cp /opt/eve/src/eve/etc/master.cfg .
+RUN cp /opt/eve/eve/etc/master.cfg .
 
-RUN git config --global url."http://git_cache/bitbucket.org/".insteadOf git@bitbucket.org:
-RUN git config --global url."http://git_cache/github.com/".insteadOf git@github.com:
-RUN git config --global url."http://git_cache/mock/".insteadOf git@mock:
+RUN git config --global url."http://git_cache/https/bitbucket.org/".insteadOf git@bitbucket.org:
+RUN git config --global url."http://git_cache/https/github.com/".insteadOf git@github.com:
+RUN git config --global url."http://git_cache/git/mock/".insteadOf git@mock:
 
-COPY docker_cmd.sh .
-RUN chmod +x docker_cmd.sh
+COPY docker_cmd.py .
+RUN chmod +x docker_cmd.py
 
-CMD exec ./docker_cmd.sh
+ENTRYPOINT ./docker_cmd.py $DB_URL $WAMP_ROUTER_URL
