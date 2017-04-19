@@ -2,5 +2,6 @@
 # check instruction on how to reproduce in base.in
 -c constraints.txt
 
-autopep8
+yapf
+autoflake
 isort

@@ -4,6 +4,8 @@
 
 crossbar
 pytest
+pytest-cov
+pytest-xdist
 python-dotenv
 PyYAML
 requests

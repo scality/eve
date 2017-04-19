@@ -3,3 +3,5 @@
 -c constraints.txt
 
 mock
+pytest
+pytest-cov

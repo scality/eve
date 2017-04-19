@@ -1,9 +1,17 @@
 # This file has been automatically generated, DO NOT EDIT!
 
-# Frozen requirements for "unit.in"
+# Frozen requirements for "requirements/unit.in"
 
+appdirs==1.4.3
+coverage==4.3.4
 funcsigs==1.0.2
 mock==2.0.0
-pbr==2.0.0
+packaging==16.8
+pbr==2.1.0
+py==1.4.33
+pyparsing==2.2.0
+pytest==3.0.7
+pytest-cov==2.4.0
+setuptools==35.0.0
 six==1.10.0
 

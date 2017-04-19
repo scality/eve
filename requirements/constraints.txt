@@ -23,3 +23,9 @@ pycodestyle==2.0.0
 # and, with requests 2.13.0, buildbot plugins trigger:
 #  (requests 2.13.0, Requirement.parse('requests!=2.12.2,!=2.13.0,>=2.10.0'), set(['keystoneauth1']))
 requests==2.11.1
+
+# prospector==0.12.4 not compatible with pylint > 1.6.5
+pylint==1.6.5
+
+# pylint==1.6.5 not compatible with astroid > 1.4.9
+astroid==1.4.9

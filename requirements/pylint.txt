@@ -1,6 +1,6 @@
 # This file has been automatically generated, DO NOT EDIT!
 
-# Frozen requirements for "pylint.in"
+# Frozen requirements for "requirements/pylint.in"
 
 astroid==1.4.9
 backports.functools-lru-cache==1.3
