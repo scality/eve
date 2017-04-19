@@ -56,6 +56,23 @@ class EveDockerLatentWorker(AbstractLatentWorker):
             except KeyError:
                 pass
 
+        cmd = ['inspect', 'git_cache']
+        try:
+            self.logger.debug('Inspecting git_cache...')
+            self.docker_invoke(*cmd)
+            self.logger.debug('git_cache is already there...')
+        except RuntimeError:
+            self.logger.debug('git_cache does not exist. building...')
+            cmd = ['build', '-t', 'git_cache_img',
+                   '/opt/eve/eve/services/git_cache/']
+            self.logger.debug('running git_cache...')
+            self.docker_invoke(*cmd)
+            cmd = ['run',
+                   '--detach',
+                   '--name', 'git_cache',
+                   'git_cache_img']
+            self.docker_invoke(*cmd)
+
         cmd = [
             'run',
             '--privileged',
@@ -65,12 +82,13 @@ class EveDockerLatentWorker(AbstractLatentWorker):
             '--env', 'BUILDMASTER_PORT=%s' % self.pb_port,
             '--env', 'DOCKER_HOST_IP=%s' % docker_host_ip,
             '--env', 'ARTIFACTS_PREFIX=%s' % self.artifacts_prefix,
+            '--env', 'GIT_CACHE_HOST=git_cache',
+            '--env', 'GIT_CACHE_PORT=80',
+            '--link', util.env.GIT_CACHE_NAME,
             '--detach',
             '--memory=%s' % self.max_memory,
             '--cpus=%s' % self.max_cpus
         ]
-
-        cmd.extend(['--link', util.env.GIT_CACHE_NAME])
 
         for volume in volumes:
             if isinstance(volume, dict):
@@ -111,7 +129,7 @@ class EveDockerLatentWorker(AbstractLatentWorker):
         except (TypeError, ValueError) as exc:
             log.msg('Output: %r' % mounts_content)
             log.err(exc, 'Error: Unable to parse JSON content'
-                    ' from docker inspect command')
+                         ' from docker inspect command')
             mounts = None
 
         self.docker_invoke('kill', instance)
@@ -132,11 +150,14 @@ class EveDockerLatentWorker(AbstractLatentWorker):
          """
         cmd = ['docker']
         cmd.extend(args)
+        cmd_shell = ' '.join(cmd)
         try:
+            self.logger.debug('::RUNNING::{}'.format(cmd_shell))
             res = check_output(cmd, stderr=STDOUT).strip()
             return res
         except CalledProcessError as exception:
             time.sleep(5)  # avoid a fast loop in case of failure
-            self.logger.debug('Error: command %s failed: %s' %
-                              (cmd, exception.output))
-            raise
+            raise RuntimeError('CalledProcessError: {} *** OUTPUT: {}'.format(
+                cmd_shell,
+                exception.output
+            ))
