@@ -3,6 +3,7 @@ import time
 from fnmatch import fnmatch
 from tempfile import mktemp
 
+import netifaces
 import yaml
 from buildbot.plugins import steps, util
 from buildbot.process.buildstep import BuildStep
@@ -97,49 +98,27 @@ class ReadConfFromYaml(FileUpload):
         self.setProperty('stage_name', stage_name, 'ReadConfFromYaml Step')
 
         self.build.addStepsAfterCurrentStep([
-            SetProperty(
-                name='get the API version',
-                property='eve_api_version',
-                hideStepIf=lambda results, s: results == SUCCESS,
-                value=eve_api_version),
+            GetApiVersion(eve_api_version=eve_api_version),
             steps.TriggerStages([
                 stage_name
             ], waitForFinish=True, haltOnFailure=True)
         ])
 
+        docker_host_ip = get_docker_host_ip()
+
         # compute artifact_name property starting from Eve API 0.2
         if version.parse(eve_api_version) >= version.parse('0.2'):
             buildnumber = str(self.getProperty('buildnumber'))
             self.build.addStepsAfterCurrentStep([
-                SetPropertyFromCommand(
-                    name='get the commit short_revision',
-                    command=Interpolate(
-                        'git -C %(prop:master_builddir)s/build' +
-                        ' rev-parse --verify --short ' +
-                        branch
-                    ),
-                    hideStepIf=lambda results, s: results == SUCCESS,
-                    property='commit_short_revision'),
-                SetPropertyFromCommand(
-                    name='get the commit timestamp',
-                    command=Interpolate(
-                        'date -u --date=@' +
-                        '`git -C %(prop:master_builddir)s/build' +
-                        ' show -s --format=%%ct ' + branch +
-                        '` +%%y%%m%%d%%H%%M%%S'
-                    ),
-                    hideStepIf=lambda results, s: results == SUCCESS,
-                    property='commit_timestamp'),
-                SetProperty(
-                    name='get the pipeline name',
-                    property='pipeline',
-                    hideStepIf=lambda results, s: results == SUCCESS,
-                    value=stage_name),
-                SetProperty(
-                    name='get the b4nb',
-                    property='b4nb',
-                    hideStepIf=lambda results, s: results == SUCCESS,
-                    value=buildnumber.zfill(8)),
+                GetCommitShortVersion(branch=branch),
+                GetCommitTimestamp(),
+                GetPipelineName(stage_name=stage_name),
+                GetB4NB(buildnumber=buildnumber),
+                SetArtifactsBaseName(),
+                SetArtifactsName(),
+                SetArtifactsLocalReverseProxy(docker_host_ip=docker_host_ip),
+                SetArtifactsPrivateURL(docker_host_ip=docker_host_ip),
+                SetArtifactsPublicURL(),
             ])
 
         defer.returnValue(SUCCESS)
@@ -212,3 +191,124 @@ class StepExtractor(BuildStep):
             self.logger.debug('Add {step} with params : {params}',
                               step=step_type, params=params)
         return defer.succeed(SUCCESS)
+
+
+class GetCommitShortVersion(SetPropertyFromCommand):
+    def __init__(self, branch):
+        super(GetCommitShortVersion, self).__init__(
+            name='get the commit short_revision',
+            command=Interpolate(
+                'git rev-parse --verify --short ' + branch),
+            hideStepIf=lambda results, s: results == SUCCESS,
+            property='commit_short_revision',
+            haltOnFailure=True)
+
+
+class GetCommitTimestamp(SetPropertyFromCommand):
+    def __init__(self):
+        super(GetCommitTimestamp, self).__init__(
+            name='get the commit timestamp',
+            command='git log -1 --format=%cd '
+                    '--date="format-local:%y%m%d%H%M%S"',
+            hideStepIf=lambda results, s: results == SUCCESS,
+            haltOnFailure=True,
+            property='commit_timestamp')
+
+
+class GetPipelineName(SetProperty):
+    def __init__(self, stage_name):
+        super(GetPipelineName, self).__init__(
+            name='get the pipeline name',
+            property='pipeline',
+            hideStepIf=lambda results, s: results == SUCCESS,
+            haltOnFailure=True,
+            value=stage_name)
+
+
+class GetB4NB(SetProperty):
+    def __init__(self, buildnumber):
+        super(GetB4NB, self).__init__(
+            name='get the b4nb',
+            property='b4nb',
+            hideStepIf=lambda results, s: results == SUCCESS,
+            haltOnFailure=True,
+            value=buildnumber.zfill(8))
+
+
+class SetArtifactsBaseName(SetPropertyFromCommand):
+    def __init__(self):
+        super(SetArtifactsBaseName, self).__init__(
+            name='set the artifacts base name',
+            command=Interpolate('echo %(prop:git_host)s'
+                                ':%(prop:git_owner)s:' +
+                                util.env.GIT_SLUG +
+                                ':%(prop:artifacts_prefix)s'
+                                '%(prop:product_version)s'
+                                '.r%(prop:commit_timestamp)s'
+                                '.%(prop:commit_short_revision)s'),
+            hideStepIf=lambda results, s: results == SUCCESS,
+            property='artifacts_base_name')
+
+
+class SetArtifactsName(SetPropertyFromCommand):
+    def __init__(self):
+        super(SetArtifactsName, self).__init__(
+            name='set the artifacts name',
+            command=Interpolate('echo %(prop:artifacts_base_name)s'
+                                '.%(prop:pipeline)s'
+                                '.%(prop:b4nb)s'),
+            hideStepIf=lambda results, s: results == SUCCESS,
+            property='artifacts_name')
+
+
+class SetArtifactsLocalReverseProxy(SetProperty):
+    def __init__(self, docker_host_ip):
+        super(SetArtifactsLocalReverseProxy, self).__init__(
+            name='set the artifacts local reverse proxy',
+            property='artifacts_local_reverse_proxy',
+            hideStepIf=lambda results, s: results == SUCCESS,
+            value='http://' + docker_host_ip + ':1080/')
+
+
+class SetArtifactsPrivateURL(SetPropertyFromCommand):
+    def __init__(self, docker_host_ip):
+        super(SetArtifactsPrivateURL, self).__init__(
+            name='set the artifacts private url',
+            command=Interpolate('echo http://' + docker_host_ip +
+                                ':1080/builds/'
+                                '%(prop:artifacts_name)s'),
+            hideStepIf=lambda results, s: results == SUCCESS,
+            property='artifacts_private_url')
+
+
+class SetArtifactsPublicURL(SetPropertyFromCommand):
+    def __init__(self):
+        super(SetArtifactsPublicURL, self).__init__(
+            name='set the artifacts public url',
+            command=Interpolate('echo ' + util.env.ARTIFACTS_URL +
+                                '/%(prop:artifacts_name)s'),
+            hideStepIf=lambda results, s: results == SUCCESS,
+            property='artifacts_public_url')
+
+
+class GetApiVersion(SetProperty):
+    def __init__(self, eve_api_version):
+        super(GetApiVersion, self).__init__(
+            name='get the API version',
+            property='eve_api_version',
+            hideStepIf=lambda results, s: results == SUCCESS,
+            value=eve_api_version)
+
+
+def get_docker_host_ip():
+    docker_host_ip = '127.0.0.1'  # Dummy default value
+    try:
+        docker_addresses = netifaces.ifaddresses('docker0')
+    except ValueError:
+        pass
+    else:
+        try:
+            docker_host_ip = (docker_addresses[netifaces.AF_INET][0]['addr'])
+        except KeyError:
+            pass
+    return docker_host_ip
