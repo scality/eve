@@ -15,106 +15,22 @@ spec:
         image: gcr.io/eve-prod/eve_master
         imagePullPolicy: Always
         command:
-#        - '/bin/sleep'
         - /root/eve/docker_cmd.py
         args:
-#        - 'infinity'
         - $(DB_URL)
         - $(WAMP_ROUTER_URL)
         env:
-        - name: DB_URL
-          valueFrom:
-            secretKeyRef:
-              name: eve
-              key: db_url
-        - name: WAMP_ROUTER_URL
-          value: 'ws://crossbar:8080/ws'
-        - name: WAMP_REALM
-          value: realm1
         - name: MASTER_MODE
           value: backend
-        - name: ARTIFACTS_PREFIX
-          value: test_artifacts_prefix
-        - name: ARTIFACTS_URL
-          value: test_artifacts_url
-        - name: BOOTSTRAP_BUILDER_NAME
-          value: test_bootstrap
-        - name: BOOTSTRAP_SCHEDULER_NAME
-          value: test_bootstrap_scheduler
-        - name: CLOUDFILES_URL
-          value: test_cloudfiles_url
-        - name: CODECOV_IO_BASE_URL
-          value: https://codecov.io
-        - name: DOCKER_API_VERSION
-          value: '1.25'
-        - name: DOCKER_BUILDER_PREFIX
-          value: test_docker_builder
-        - name: DOCKER_CONTAINER_MAX_CPU
-          value: '1'
-        - name: DOCKER_CONTAINER_MAX_MEMORY
-          value: 4G
-        - name: DOCKER_SCHEDULER_PREFIX
-          value: test_docker_scheduler
-        - name: EVE_GITHOST_LOGIN
-          value: test_githost_login
-        - name: EVE_GITHOST_PWD
-          value: test_githost_pwd
-        - name: EXTERNAL_URL
-          value: 'http://localhost:8010/'
-        - name: FORCE_SCHEDULER_NAME
-          value: test_force_scheduler_name
-        - name: GIT_CACHE_NAME
-          value: git_cache
-        - name: GIT_HOST
-          value: mock
-        - name: GIT_OWNER
-          value: test_owner
-        - name: GIT_POLLING
-          value: '0'
-        - name: GIT_REPO
-          value: git@mock:test_owner/mock.git
-        - name: GIT_SLUG
-          value: mock
-        - name: HTTP_PORT
-          value: '8010'
-        - name: IS_PRODUCTION
-          value: '0'
-        - name: LOCAL_BUILDER_PREFIX
-          value: test_local_builder
-        - name: LOCAL_SCHEDULER_PREFIX
-          value: test_local_scheduler
-        - name: MASTER_FQDN
-          value: 172.17.0.1
-        - name: MASTER_MODE
-          value: standalone
-        - name: MAX_DOCKER_WORKERS
-          value: '2'
-        - name: MAX_LOCAL_WORKERS
-          value: '2'
-        - name: MAX_OPENSTACK_WORKERS
-          value: '2'
-        - name: OPENSTACK_BUILDER_PREFIX
-          value: test_openstack_builder
-        - name: OPENSTACK_SCHEDULER_PREFIX
-          value: test_openstack_scheduler
-        - name: PB_PORT
-          value: '2345'
-        - name: PROJECT_URL
-          value: test_project_url
-        - name: SECRET_ARTIFACT_CREDS
-          value: test_artifacts_creds
-        - name: SUFFIX
-          value: test_suffix
-        - name: TRY_PORT
-          value: '3456'
-        - name: TRY_PWD
-          value: test_try_pwd
-        - name: TRY_SCHEDULER_NAME
-          value: test_try_scheduler_name
-#        volumeMounts:
-#        - name: eve-start
-#          mountPath: /root/eve
-
+        envFrom:
+        - configMapRef:
+            name: env-envvars
+        - secretRef:
+            name: env-secret-envvars
+#        ports:
+#        - containerPort: 8010
+#          name: buildbot-ui
+#          protocol: TCP
 #        livenessProbe:
 #          httpGet:
 #            path: /
@@ -128,11 +44,3 @@ spec:
           requests:
             cpu: 25m
             memory: 100Mi
-        ports:
-        - containerPort: 8010
-          name: buildbot-ui
-          protocol: TCP
-#      volumes:
-#      - name: eve-start
-#        configMap:
-#          name: evestart
