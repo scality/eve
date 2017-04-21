@@ -12,7 +12,7 @@ from tests.util.daemon import Daemon
 
 
 class BuildbotMaster(Daemon):
-    _start_wait = 30
+    _start_wait = 120
     _log = 'twistd.log'
     _start_cmd = ['buildbot', 'start', '--nodaemon', '.']
     _stop_cmd = 'buildbot stop --no-wait .'
