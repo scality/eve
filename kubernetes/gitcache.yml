@@ -1,0 +1,40 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: gitcache
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        k8s-app: gitcache
+    spec:
+      containers:
+      - name: gitcache
+        image: gcr.io/eve-prod/git_cache
+        imagePullPolicy: Always
+        volumeMounts:
+        - name: git-credential
+          mountPath: /git/
+#        livenessProbe:
+#          httpGet:
+#            path: /
+#            port: buildbot-ui
+#          initialDelaySeconds: 120
+#          periodSeconds: 20
+        resources:
+          limits:
+            cpu: 50m
+            memory: 200Mi
+          requests:
+            cpu: 25m
+            memory: 100Mi
+        ports:
+        - containerPort: 80
+          name: gitcache
+          protocol: TCP
+      volumes:
+      - name: git-credential
+        secret:
+          secretName: gitcache-credential

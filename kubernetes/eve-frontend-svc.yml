@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    k8s-app: buildbot-ui
+  name: eve-frontend
+spec:
+  type: NodePort
+  ports:
+  - name: eve-frontend
+    port: 8010
+    targetPort: 8010
+    protocol: TCP
+  selector:
+    k8s-app: eve-frontend

@@ -1,0 +1,13 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: eve-frontend
+spec:
+  rules:
+#  - host: eve-kube.devsca.com
+  - http:
+      paths:
+      - path: /*
+        backend:
+          serviceName: eve-frontend
+          servicePort: 8010

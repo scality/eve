@@ -21,6 +21,13 @@ spec:
         volumeMounts:
         - name: crossbar-config
           mountPath: /node/.crossbar/
+        resources:
+          limits:
+            cpu: 50m
+            memory: 200Mi
+          requests:
+            cpu: 25m
+            memory: 100Mi
       volumes:
       - name: crossbar-config
         configMap:

@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    k8s-app: gitcache
+  name: gitcache
+spec:
+  ports:
+  - name: gitcache
+    port: 80
+    protocol: TCP
+  selector:
+    k8s-app: gitcache
