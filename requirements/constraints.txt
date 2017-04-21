@@ -29,3 +29,6 @@ pylint==1.6.5
 
 # pylint==1.6.5 not compatible with astroid > 1.4.9
 astroid==1.4.9
+
+# python-novaclient 8.0.0 not compatible with current Eve code
+python-novaclient==7.1.0

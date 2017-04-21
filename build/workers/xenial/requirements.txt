@@ -1,6 +1,6 @@
 # This file has been automatically generated, DO NOT EDIT!
 
-# Frozen requirements for "build/workers/trusty/requirements.in"
+# Frozen requirements for "build/workers/xenial/requirements.in"
 
 apipkg==1.4
 appdirs==1.4.3
@@ -9,7 +9,7 @@ asn1crypto==0.22.0
 astroid==1.4.9
 attrs==16.3.0
 autobahn==0.17.2
-autoflake==0.6.6
+autoflake==0.7
 babel==2.4.0
 backports.functools-lru-cache==1.3
 buildbot==0.9.5
@@ -57,7 +57,7 @@ oslo.serialization==2.18.0
 oslo.utils==3.25.0
 packaging==16.8
 pathtools==0.1.2
-pbr==2.1.0
+pbr==3.0.0
 pep8-naming==0.4.1
 pluggy==0.4.0
 positional==1.1.1
@@ -73,7 +73,7 @@ pycparser==2.17
 pydocstyle==1.0.0
 pyflakes==1.5.0
 pygments==2.2.0
-pyjwt==1.4.2
+pyjwt==1.5.0
 pylint==1.6.5
 pylint-celery==0.3
 pylint-common==0.2.5
@@ -81,14 +81,14 @@ pylint-django==0.7.2
 pylint-flask==0.5
 pylint-plugin-utils==0.2.6
 pynacl==1.1.2
-pyopenssl==16.2.0
+pyopenssl==17.0.0
 pyparsing==2.2.0
 pytest==3.0.7
 pytest-cov==2.4.0
 pytest-xdist==1.15.0
 python-dateutil==2.6.0
 python-dotenv==0.6.4
-python-novaclient==8.0.0
+python-novaclient==7.1.0
 pytrie==0.3
 pytz==2017.2
 pyyaml==3.12
@@ -100,7 +100,7 @@ sdnotify==0.3.1
 service-identity==16.0.0
 setoptconf==0.2.0
 setproctitle==1.1.10
-setuptools==35.0.0
+setuptools==35.0.1
 shutilwhich==1.1.0
 simplejson==3.10.0
 six==1.10.0
@@ -114,7 +114,7 @@ tox==2.7.0
 treq==17.3.1
 twisted==16.6.0
 txaio==2.7.0
-u-msgpack-python==2.3.0
+u-msgpack-python==2.4.0
 virtualenv==15.1.0
 watchdog==0.8.3
 wrapt==1.10.10
