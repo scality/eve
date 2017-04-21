@@ -21,14 +21,14 @@ services:
     depends_on:
       - db
       - crossbar
-      - git_cache
+      - gitcache
     env_file: "${ENV_FILE-env}"
     environment:
       MASTER_MODE: backend
       DB_URL: "mysql://eve:4m4zing@db:3306/buildbot_db?max_idle=300"
       WAMP_ROUTER_URL: 'ws://crossbar:10990/ws'
       GIT_CACHE_PORT: 80
-      GIT_CACHE_HOST: git_cache
+      GIT_CACHE_HOST: gitcache
       EXTERNAL_PB_PORT: ${EXTERNAL_PB_PORT-9999}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
@@ -44,8 +44,8 @@ services:
     volumes:
       - ./tests/system/factories/crossbar.json:/node/.crossbar/config.json
 
-  git_cache:
-    build: src/eve/services/git_cache
+  gitcache:
+    build: eve/services/gitcache
     ports:
       - "${EXTERNAL_GIT_CACHE_PORT-8888}:80"
     env_file: "${ENV_FILE-env}"

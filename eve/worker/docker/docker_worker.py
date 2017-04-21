@@ -56,21 +56,21 @@ class EveDockerLatentWorker(AbstractLatentWorker):
             except KeyError:
                 pass
 
-        cmd = ['inspect', 'git_cache']
+        cmd = ['inspect', 'gitcache']
         try:
-            self.logger.debug('Inspecting git_cache...')
+            self.logger.debug('Inspecting gitcache...')
             self.docker_invoke(*cmd)
-            self.logger.debug('git_cache is already there...')
+            self.logger.debug('gitcache is already there...')
         except RuntimeError:
-            self.logger.debug('git_cache does not exist. building...')
-            cmd = ['build', '-t', 'git_cache_img',
-                   '/opt/eve/eve/services/git_cache/']
-            self.logger.debug('running git_cache...')
+            self.logger.debug('gitcache does not exist. building...')
+            cmd = ['build', '-t', 'gitcache_img',
+                   '/opt/eve/eve/services/gitcache/']
+            self.logger.debug('running gitcache...')
             self.docker_invoke(*cmd)
             cmd = ['run',
                    '--detach',
-                   '--name', 'git_cache',
-                   'git_cache_img']
+                   '--name', 'gitcache',
+                   'gitcache_img']
             self.docker_invoke(*cmd)
 
         cmd = [
@@ -82,7 +82,7 @@ class EveDockerLatentWorker(AbstractLatentWorker):
             '--env', 'BUILDMASTER_PORT=%s' % self.pb_port,
             '--env', 'DOCKER_HOST_IP=%s' % docker_host_ip,
             '--env', 'ARTIFACTS_PREFIX=%s' % self.artifacts_prefix,
-            '--env', 'GIT_CACHE_HOST=git_cache',
+            '--env', 'GIT_CACHE_HOST=gitcache',
             '--env', 'GIT_CACHE_PORT=80',
             '--link', util.env.GIT_CACHE_NAME,
             '--detach',
