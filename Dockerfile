@@ -35,6 +35,7 @@ RUN git config --global url."http://gitcache/https/bitbucket.org/".insteadOf git
 RUN git config --global url."http://gitcache/https/github.com/".insteadOf git@github.com:
 RUN git config --global url."http://gitcache/git/mock/".insteadOf git@mock:
 
+COPY buildbot.tac .
 COPY docker_cmd.py .
 RUN chmod +x docker_cmd.py
 

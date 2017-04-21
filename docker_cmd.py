@@ -41,17 +41,5 @@ if os.environ['MASTER_MODE'] == 'frontend':
     # until the next sync.
     time.sleep(10)
 
-
-print "Creating master..."
-subprocess.check_call('buildbot create-master .', shell=True)
-
-print "Upgrading master..."
-subprocess.check_call('buildbot upgrade-master .', shell=True)
-
 print "Starting master..."
-try:
-    subprocess.check_call('buildbot start .', shell=True)
-except Exception:
-    subprocess.check_call('tail -n 1000 twistd.log', shell=True)
-    raise
-subprocess.check_call('tail -fn 1000 twistd.log', shell=True)
+subprocess.check_call('twistd -ny ./buildbot.tac', shell=True)
