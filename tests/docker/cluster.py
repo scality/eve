@@ -29,5 +29,5 @@ class DockerizedCluster(Cluster):
             assert self._ext_ip, 'Not connected to the internet ?'
             return self._ext_ip
         else:
-            self._ext_ip = '172.17.42.1'  # Should work on Linux systems
+            self._ext_ip = '172.17.0.1'  # Should work on Linux systems
         return self._ext_ip
