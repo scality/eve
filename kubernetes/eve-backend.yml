@@ -12,7 +12,7 @@ spec:
     spec:
       containers:
       - name: eve-backend
-        image: gcr.io/eve-prod/eve_master
+        image: gcr.io/eve-rayene/eve_master
         imagePullPolicy: Always
         command:
         - /root/eve/docker_cmd.py
@@ -24,9 +24,9 @@ spec:
           value: backend
         envFrom:
         - configMapRef:
-            name: env-envvars
+            name: eve-envvars
         - secretRef:
-            name: env-secret-envvars
+            name: eve-secret-envvars
 #        ports:
 #        - containerPort: 8010
 #          name: buildbot-ui

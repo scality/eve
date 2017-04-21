@@ -12,7 +12,7 @@ spec:
     spec:
       containers:
       - name: gitcache
-        image: gcr.io/eve-prod/git_cache
+        image: gcr.io/eve-rayene/git_cache
         imagePullPolicy: Always
         volumeMounts:
         - name: git-credential
