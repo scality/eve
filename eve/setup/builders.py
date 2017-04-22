@@ -17,13 +17,13 @@ def triggerable_builder(builder_name, workers):
             haltOnFailure=True,
 
             command='git config --global '
-                    'url.http://git_cache/https/bitbucket.org/.insteadOf '
+                    'url.http://gitcache/https/bitbucket.org/.insteadOf '
                     'git@bitbucket.org: && '
                     'git config --global '
-                    'url.http://git_cache/https/github.com/.insteadOf '
+                    'url.http://gitcache/https/github.com/.insteadOf '
                     'git@github.com: && '
                     'git config --global '
-                    'url.http://git_cache/git/mock/.insteadOf git@mock:'
+                    'url.http://gitcache/git/mock/.insteadOf git@mock:'
         ))
 
     # Extract steps from conf

@@ -31,10 +31,11 @@ RUN pip install /opt/eve
 
 RUN cp /opt/eve/eve/etc/master.cfg .
 
-RUN git config --global url."http://git_cache/https/bitbucket.org/".insteadOf git@bitbucket.org:
-RUN git config --global url."http://git_cache/https/github.com/".insteadOf git@github.com:
-RUN git config --global url."http://git_cache/git/mock/".insteadOf git@mock:
+RUN git config --global url."http://gitcache/https/bitbucket.org/".insteadOf git@bitbucket.org:
+RUN git config --global url."http://gitcache/https/github.com/".insteadOf git@github.com:
+RUN git config --global url."http://gitcache/git/mock/".insteadOf git@mock:
 
+COPY buildbot.tac .
 COPY docker_cmd.py .
 RUN chmod +x docker_cmd.py
 
