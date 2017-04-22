@@ -9,6 +9,8 @@ import subprocess
 db_url = sys.argv[1]
 wamp_router_url = sys.argv[2]
 
+print 'pinging crossbar...{} ...'.format(wamp_router_url)
+
 for i in xrange(120):
     try:
         requests.get(wamp_router_url.replace('ws://', 'http://'))
@@ -20,11 +22,12 @@ for i in xrange(120):
 else:
     raise Exception('The wamp server never responded')
 
+print 'pinging database...'
 sa = sqlalchemy.create_engine(db_url.split('?')[0])
 
 for i in xrange(120):
     try:
-        sa.execute('show databases;')
+        sa.execute('select 1;')
         break
     except sqlalchemy.exc.OperationalError:
         print('Waiting for the database to wake up {} ...'.format(db_url))
