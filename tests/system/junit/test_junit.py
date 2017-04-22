@@ -1,4 +1,3 @@
-# coding: utf-8
 """This test suite checks end-to-end operation of EVE."""
 import unittest
 from os import pardir
@@ -16,7 +15,7 @@ class Test(unittest.TestCase):
         * Have various commands create JUnit reports and parse them
         """
         cluster = Cluster().start()
-        print 'API URL:', cluster.api.api_uri
+        print 'API URL:', cluster.api.api_url
         cluster.sanity_check()
 
         local_repo = cluster.clone()

@@ -1,5 +1,5 @@
 # coding: utf-8
-"""A set of utilities used by EVE deployment tools."""
+"""A simple command launcher."""
 import logging
 import os
 import subprocess
@@ -9,7 +9,17 @@ logging.basicConfig(format='[%(levelname)s] %(message)s', level=logging.INFO)
 
 
 def cmd(command, ignore_exception=False, cwd=None, wait=True, env=None):
-    """Execute a shell command and display output in a readable manner."""
+    """Execute a shell command and display output in a readable manner.
+
+    Args:
+        command (string): The command to execute
+        ignore_exception (bool): Do not raise a CalledProcessError if return
+                                 code is <> 0
+        cwd (string): the directory that the command will be run from.
+        wait (bool): wait for finish. default==True.
+        env (dict): environement variables to add to os.environ before running
+                    the command
+    """
     output = ''
     logger.info('COMMAND : %s', command)
     if env is not None:

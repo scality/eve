@@ -30,7 +30,7 @@ class TestCluster(unittest.TestCase):
         buildrequestid = cluster.api.getw(
             '/buildrequests', {'buildsetid': buildset.bsid})['buildrequestid']
 
-        print cluster.api.uri
+        print cluster.api.url
         bootstrap = cluster.api.getw('/builders', {
             'name': 'bootstrap',
         })['builderid']

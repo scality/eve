@@ -11,7 +11,7 @@ class TestDockerCluster(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.cluster = DockerizedCluster().start()
-        print 'API URL:', cls.cluster.api.api_uri
+        print 'API URL:', cls.cluster.api.api_url
         cls.cluster.sanity_check()
 
     @classmethod

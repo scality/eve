@@ -1,4 +1,3 @@
-# coding: utf-8
 """Buildbot REST API client.
 
 for more info on the API, see `buildbot REST API documentation`_
@@ -27,21 +26,21 @@ requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 class BuildbotDataAPI(object):
     """Class to interact with a Buildbot master through its REST API."""
 
-    def __init__(self, uri):
-        self.uri = uri
-        assert uri.endswith('/')
-        self.api_uri = "{0}api/v2".format(self.uri)
+    def __init__(self, url):
+        self.url = url
+        assert url.endswith('/')
+        self.api_url = "{0}api/v2".format(self.url)
 
         self.session = requests.Session()
 
     def login(self, user, password):
         """Retreive the authenticated cookie in the session."""
-        res = self.session.get(self.uri + "auth/login", auth=(user, password))
+        res = self.session.get(self.url + "auth/login", auth=(user, password))
         res.raise_for_status()
 
     def logout(self):
         """Remove the authenticated cookie from the session."""
-        res = self.session.get(self.uri + "auth/logout")
+        res = self.session.get(self.url + "auth/logout")
         res.raise_for_status()
 
     def post(self, route, method, params=None):
@@ -54,15 +53,15 @@ class BuildbotDataAPI(object):
             'params': params
         }
 
-        res = self.session.post(self.api_uri + route, json=data)
+        res = self.session.post(self.api_url + route, json=data)
         res.raise_for_status()
         return res.json()['result']
 
     def get(self, route, get_params=None):
         """Get data from the REST API."""
-        print(self.api_uri + route, get_params)
+        print(self.api_url + route, get_params)
         res = self.session.get(
-            self.api_uri + route,
+            self.api_url + route,
             headers={"Accept": "application/json"},
             params=get_params)
         res.raise_for_status()
@@ -85,7 +84,7 @@ class BuildbotDataAPI(object):
             except ConnectionError:
                 if i == retry - 1:
                     raise
-                print('waiting for', self.api_uri + route,
+                print('waiting for', self.api_url + route,
                       'to be available...', get_params)
                 time.sleep(1)
                 continue
@@ -107,7 +106,7 @@ class BuildbotDataAPI(object):
             time.sleep(1)
 
         raise Exception('The route {} exists but never reached the expected '
-                        'count'.format(self.api_uri + route))
+                        'count'.format(self.api_url + route))
 
     def get_element_id_from_name(self, route, name, id_key, name_key='name'):
         """Get the ID of an entity using its name."""
@@ -143,7 +142,7 @@ class BuildbotDataAPI(object):
                     build['results'] is not None:
                 break
             time.sleep(1)
-            print('waiting for build to finish on {}'.format(self.uri))
+            print('waiting for build to finish on {}'.format(self.url))
         else:
             raise Exception('Build took too long')
         result_codes = [
@@ -185,7 +184,7 @@ class BuildbotDataAPI(object):
                     break
             else:
                 time.sleep(1)
-                print('waiting for build to start on {}'.format(self.uri))
+                print('waiting for build to start on {}'.format(self.url))
 
         else:
             raise Exception('unable to find build, '
@@ -256,10 +255,20 @@ class BuildbotDataAPI(object):
             'commits': commits,
         }
         res = requests.post(
-            self.uri + 'change_hook/bitbucket', data=json.dumps(payload))
+            self.url + 'change_hook/bitbucket', data=json.dumps(payload))
         res.raise_for_status()
 
     def force(self, branch, reason='testing'):
+        """
+        Force a build
+
+        Args:
+            branch (str): the branch name
+            reason (str): the buils reason (default=testing)
+
+        Returns: the Buildset that has been added
+
+        """
         force_sched_name = self.getw('/forceschedulers')['name']
         res = self.post(
             '/forceschedulers/{}'.format(force_sched_name),
@@ -280,6 +289,15 @@ class ApiResource(object):
     default_get_params = None
 
     def __init__(self, api, id_, url_params=None):
+        """
+        Base class to represent a Resource from the API
+        Args:
+            api: the API instance
+            id_: The ID of the resource
+            url_params: some objects need to specify additional parameters on
+                        the url to be retrieved (e.g., to retrieve a step,
+                        you need to specify a buildid).
+        """
         self._api = api
         self._id = id_
         self._dict = None
@@ -287,10 +305,24 @@ class ApiResource(object):
             url_params = {}
         url = self.__class__.base_path.format(**url_params)
         self._url = '{}/{}'.format(url, self._id)
-        self._full_url = '{}{}'.format(api.api_uri, self._url)
+        self._full_url = '{}{}'.format(api.api_url, self._url)
 
     @classmethod
     def find(cls, api, url_params=None, get_params=None, expected_count=1):
+        """
+        Find one or more resources from the API.
+
+        Args:
+            api: the API object
+            url_params: see __init__ docstring
+            get_params: the get parameters to add to the URL
+            expected_count: the number of resources that are expected.
+             default==1.
+
+        Returns: If expected_count == 1, returns a single resource. Otherwise,
+                 returns a list of resources.
+        Raises: Exception if the expected_count is not matched.
+        """
         if url_params is None:
             url_params = {}
         if get_params is None:
@@ -317,6 +349,12 @@ class ApiResource(object):
         return self._dict[item]
 
     def wait_for_finish(self, timeout=180):
+        """
+        waits for a resource until it has results.
+
+        Args:
+            timeout: the number of seconds to wait for it
+        """
         if self.results_field is None:
             return self
         for _ in range(timeout):
@@ -331,6 +369,9 @@ class ApiResource(object):
 
     @property
     def result(self):
+        """
+        Returns: Waits for and returns the result of the resource
+        """
         assert self.results_field is not None
         self.wait_for_finish()
         result_code = self._dict[self.results_field]
@@ -338,6 +379,9 @@ class ApiResource(object):
 
 
 class BuildSet(ApiResource):
+    """
+    A BuildSet API object
+    """
     base_path = '/buildsets'
     results_field = 'results'
     id_field = 'bsid'
@@ -349,6 +393,9 @@ class BuildSet(ApiResource):
 
 
 class BuildRequest(ApiResource):
+    """
+    A BuildRequest API object
+    """
     base_path = '/buildrequests'
     results_field = 'results'
     id_field = 'buildrequestid'
@@ -364,6 +411,9 @@ class BuildRequest(ApiResource):
 
 
 class Build(ApiResource):
+    """
+    A Build API object
+    """
     base_path = '/builds'
     results_field = 'results'
     id_field = 'buildid'
@@ -371,6 +421,10 @@ class Build(ApiResource):
 
     @property
     def children(self):
+        """
+        Returns: The builds which the parent_buildid is this instance
+
+        """
         return BuildSet.find(
             self._api,
             get_params={'parent_buildid': self.buildid},
@@ -378,6 +432,10 @@ class Build(ApiResource):
 
     @property
     def steps(self):
+        """
+        Returns: The steps of this build
+
+        """
         return Steps.find(
             self._api,
             url_params={'buildid': self.buildid},
@@ -385,6 +443,10 @@ class Build(ApiResource):
 
     @property
     def first_failing_step(self):
+        """
+        Returns: the first step that failed, or raises an exception
+
+        """
         for step in self.steps:
             if step.results not in (0, 1, 3):  # success, warning, skipped
                 return step
@@ -392,6 +454,9 @@ class Build(ApiResource):
 
 
 class Steps(ApiResource):
+    """
+    A Steps API object
+    """
     base_path = '/builds/{buildid}/steps'
     results_field = 'results'
     id_field = 'number'

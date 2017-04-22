@@ -1,4 +1,3 @@
-# coding: utf-8
 """This test suite checks end-to-end operation of EVE."""
 import os
 import unittest

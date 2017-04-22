@@ -1,5 +1,6 @@
-# coding: utf-8
-
+"""
+Test the GitHostMock daemon
+"""
 import tempfile
 from unittest import TestCase
 
@@ -9,6 +10,14 @@ from tests.util.githost_mock import GitHostMock
 
 class TestGitHostMock(TestCase):
     def test_start_and_stop(self):
+        """
+        Steps:
+            - start a GitHostMock
+            - clone it to a temp directory
+            - create a branch and push it
+            - check that the branch has been pushed successfully
+            - stop the GitHostMock
+        """
         ghm = GitHostMock().start()
         clone_dir = tempfile.mkdtemp()
         cmd(

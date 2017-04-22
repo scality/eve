@@ -1,6 +1,3 @@
-# coding: utf-8
-"""This test suite checks end-to-end operation of EVE."""
-
 from __future__ import print_function
 
 import os
@@ -18,11 +15,14 @@ class Crossbar(Daemon):
     _start_wait = 20
 
     def __init__(self):
+        """
+        Crossbar Daemon
+        """
         self.port = self.get_free_port()
         super(Crossbar, self).__init__(name='crossbar_{}'.format(self.port))
 
     def pre_start_hook(self):
-        """Spawns a local crossbar.
+        """Generates the conf file before the crossbar daemon is spawned
         """
         conf = CrossbarConfFactory(port=self.port)
         conf.dump(os.path.join(self._base_path, 'config.json'))

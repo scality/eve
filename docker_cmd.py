@@ -44,5 +44,8 @@ if os.environ['MASTER_MODE'] == 'frontend':
     # until the next sync.
     time.sleep(10)
 
+print "Upgrading master..."
+subprocess.check_call('buildbot upgrade-master .', shell=True)
+
 print "Starting master..."
 subprocess.check_call('twistd -ny ./buildbot.tac', shell=True)

@@ -1,2 +1,2 @@
-from .git_repo import GitRepo
-__all__ = ['GitRepo']
+from .git_repo import LocalGitRepo
+__all__ = ['LocalGitRepo']

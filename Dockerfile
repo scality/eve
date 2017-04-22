@@ -39,4 +39,4 @@ COPY buildbot.tac .
 COPY docker_cmd.py .
 RUN chmod +x docker_cmd.py
 
-ENTRYPOINT ./docker_cmd.py $DB_URL $WAMP_ROUTER_URL
+CMD ./docker_cmd.py $DB_URL $WAMP_ROUTER_URL

@@ -1,6 +1,3 @@
-# coding: utf-8
-"""This test suite checks end-to-end operation of EVE."""
-
 from __future__ import print_function
 
 import atexit
@@ -10,6 +7,8 @@ import time
 from os import environ
 from os.path import join
 from subprocess import Popen
+
+from tests.util.cmd import cmd
 
 
 class Daemon(object):
@@ -23,15 +22,29 @@ class Daemon(object):
     start_success_msg = None
 
     def __init__(self, name):
+        """
+        A Base class to specify, and interact with daemons.
+
+        Args:
+            name: the name of the daemons (displayed in logs)
+        """
         self._name = name
         self._base_path = tempfile.mkdtemp(
             prefix=str(time.time()), suffix='_eve_{}'.format(self._name))
         self._process = None
 
     def pre_start_hook(self):
-        pass
+        """
+        actions to make before starting the daemon
+        """
 
     def start(self):
+        """
+        Start the daemon and wait for it if self._start_wait is not None
+
+        Returns: self
+
+        """
         self.pre_start_hook()
         print(' '.join(self._start_cmd))
         self._process = Popen(
@@ -45,6 +58,12 @@ class Daemon(object):
         return self
 
     def kill(self):
+        """
+        SIGKILL the daemon violently.
+
+        This should be avoided. Try to kill the daemons cleanly in
+        teardown methods with stop().
+        """
         if self._process.returncode is not None:
             return  # The child exited properly
         print('WARNING: {} PID: {} has not been shutdown properly in tests. '
@@ -52,9 +71,11 @@ class Daemon(object):
         self._process.kill()
 
     def stop(self):
+        """
+        Send a SIGTERM to the daemon and wait until it finishes.
+        """
         print(
             'terminating {} PID: {}...'.format(self._name, self._process.pid))
-        from tests.util.cmd import cmd
         if self._stop_cmd is not None:
             cmd(self._stop_cmd.format(name=self._name), cwd=self._base_path)
             # self.wait_for_it()
@@ -64,6 +85,10 @@ class Daemon(object):
 
     @property
     def loglines(self):
+        """
+        Returns: a list of the daemon's log lines
+
+        """
         if self._log is None:
             return []
         if callable(self._log):
@@ -73,10 +98,20 @@ class Daemon(object):
         return open(join(self._base_path, self._log)).readlines()
 
     def print_loglines(self):
+        """
+        prints the log of the daemon
+        """
         for logline in self.loglines:
             print('{}: {}'.format(self._name, logline), end='')
 
     def wait_for_it(self, delay=10):
+        """
+        Wait for the daemon to start / stop
+
+        Args:
+            delay (int): number of seconds after which an exception is raised
+
+        """
         for _ in xrange(delay):
             if self._status == 'stopping':
                 if self._process.returncode is None:
@@ -98,6 +133,10 @@ class Daemon(object):
 
     @staticmethod
     def get_free_port():
+        """
+        Returns: a free system port that can be used by the daemon
+
+        """
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.bind(('', 0))
         port = sock.getsockname()[1]
@@ -105,4 +144,6 @@ class Daemon(object):
         return port
 
     def sanity_check(self):
-        pass
+        """
+        Check that the daemon has no unexpected error messages in logs.
+        """

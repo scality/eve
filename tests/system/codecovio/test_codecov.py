@@ -183,7 +183,7 @@ class TestPublishCodeCoverage(unittest.TestCase):
                 'build':
                 build.number,
                 'build_url':
-                '{0}#builders/{1}/builds/{2}'.format(self.cluster.api.uri,
+                '{0}#builders/{1}/builds/{2}'.format(self.cluster.api.url,
                                                      child_build.builderid,
                                                      child_build.number),
                 'service':

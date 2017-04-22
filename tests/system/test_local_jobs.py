@@ -1,4 +1,3 @@
-# coding: utf-8
 """This test suite checks end-to-end operation of EVE."""
 
 import os
@@ -83,7 +82,7 @@ class Test(unittest.TestCase):
             path = os.path.join(master._base_path, 'local2/sub/periodic.yml')
             assert os.path.isfile(path)
 
-        print 'API URL:', cluster.api.api_uri
+        print 'API URL:', cluster.api.api_url
         cluster.start()
         cluster.sanity_check()
         scheduler = cluster.api.getw(

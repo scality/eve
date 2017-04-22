@@ -1,16 +1,15 @@
-# coding: utf-8
 """This test suite checks end-to-end operation of EVE."""
 import unittest
 
 from tests.util.cluster import Cluster
-from tests.util.yaml_factory import EmptyYaml, SingleCommandYaml, ZeroStageYaml
+from tests.util.yaml_factory import RawYaml, SingleCommandYaml, YamlFactory
 
 
 class TestYamlSyntax(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.cluster = Cluster().start()
-        print cls.cluster.api.uri
+        print cls.cluster.api.url
 
     @classmethod
     def tearDownClass(cls):
@@ -28,7 +27,7 @@ class TestYamlSyntax(unittest.TestCase):
 
         Spawns EVE, sends a YAML that will fail and check that it fails.
         """
-        self.local_repo.push(yaml=EmptyYaml())
+        self.local_repo.push(yaml=RawYaml(''))
         buildset = self.cluster.force(self.local_repo.branch)
         assert buildset.result == 'failure'
 
@@ -37,7 +36,7 @@ class TestYamlSyntax(unittest.TestCase):
          by the eve/main.yml file
         """
 
-        self.local_repo.push(yaml=ZeroStageYaml())
+        self.local_repo.push(yaml=YamlFactory(branches={}, stages={}))
         buildset = self.cluster.force(self.local_repo.branch)
         assert buildset.result == 'cancelled'
 

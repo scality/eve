@@ -1,5 +1,6 @@
-# coding: utf-8
-"""This test suite checks end-to-end operation of EVE."""
+"""
+Create and interact with a local git repository
+"""
 
 from __future__ import print_function
 
@@ -9,33 +10,10 @@ from os.path import join
 from uuid import uuid4
 
 from tests.util.cmd import cmd
-from tests.util.yaml_factory import SingleCommandYaml, YamlFactory
+from tests.util.yaml_factory import RawYaml, SingleCommandYaml
 
 
-class GitRepo(object):
-    pass
-
-
-class RemoteGitRepo(GitRepo):
-    def __init__(self, url=None):
-        if url is None:
-            self._dir = tempfile.mkdtemp(prefix='eve_remote_')
-            cmd('git init --bare', cwd=self._dir)
-        else:
-            self._dir = url
-
-    def clone(self):
-        return LocalGitRepo(remote=self._dir)
-
-    @property
-    def url(self):
-        return self._dir
-
-    def __delete__(self, instance):
-        pass
-
-
-class LocalGitRepo(GitRepo):
+class LocalGitRepo(object):
     def __init__(self, remote):
         self.remote = remote
         self._dir = tempfile.mkdtemp(prefix='eve_local_')
@@ -61,7 +39,7 @@ class LocalGitRepo(GitRepo):
         src_ctxt = join('tests', 'system', 'contexts')
         shutil.copytree(src_ctxt, join(self._dir, 'eve'))
 
-        if isinstance(yaml, YamlFactory):
+        if isinstance(yaml, RawYaml):
             yaml.filedump(join(self._dir, 'eve', 'main.yml'))
         else:
             shutil.copyfile(yaml, join(self._dir, 'eve', 'main.yml'))
@@ -72,14 +50,20 @@ class LocalGitRepo(GitRepo):
 
     @property
     def loglines(self):
+        """
+        Returns (list): the lines resulting from git log command
+
+        git log --pretty=format:"%an %ae|%s|%H|%cd" --date=iso
+
+        """
         res = cmd(
             'git log --pretty=format:"%an %ae|%s|%H|%cd" --date=iso',
             cwd=self._dir)
         return reversed(res.splitlines())
 
     def cmd(self, *args, **kwargs):
+        """
+        Runs a command in the git repo directory
+        """
         kwargs['cwd'] = self._dir
         return cmd(*args, **kwargs)
-
-    def __delete__(self, instance):
-        pass
