@@ -2,4 +2,4 @@
 
 set -e
 
-python /usr/lib/git-core/git-proxy-cache.py && /usr/lib/git-core/git-http-backend $@
+python /usr/lib/git-core/git_proxy_cache.py && /usr/lib/git-core/git-http-backend $@
