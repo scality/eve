@@ -15,11 +15,13 @@ class Test(unittest.TestCase):
         * Have various commands create JUnit reports and parse them
         """
         cluster = Cluster().start()
-        print 'API URL:', cluster.api.api_url
         cluster.sanity_check()
 
         local_repo = cluster.clone()
-        local_repo.push(yaml=abspath(join(__file__, pardir, 'main.yml')))
+        parent = abspath(join(__file__, pardir))
+        yaml = join(parent, 'main.yml')
+        reports_dir = join(parent, 'reports')
+        local_repo.push(yaml=yaml, dirs=(reports_dir, ))
         cluster.sanity_check()
         buildset = cluster.force(local_repo.branch)
         assert buildset.result == 'failure'

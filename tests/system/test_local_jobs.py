@@ -5,41 +5,6 @@ import unittest
 
 from tests.util.cluster import Cluster
 
-
-def use_environ(**environ):
-    """Decorator to specify extra Eve environment variables."""
-
-    def decorate(func):
-        """Set extra Eve environment variables to the given function."""
-        func.__eve_environ__ = environ
-        func.__old_eve_environ__ = {}
-        return func
-
-    return decorate
-
-
-def frontend_local_job(jobnames):
-    """Decorator to add local job(s) to eve config."""
-
-    def decorate(func):
-        """Set extra Eve job to the setup of this test."""
-        func.__frontend_jobs__ = jobnames
-        return func
-
-    return decorate
-
-
-def backend_local_job(jobnames):
-    """Decorator to add local job(s) to eve config."""
-
-    def decorate(func):
-        """Set extra Eve job to the setup of this test."""
-        func.__backend_jobs__ = jobnames
-        return func
-
-    return decorate
-
-
 PERIODIC_LOCAL_JOB = {
     'scheduler': {
         'type': 'Periodic',
@@ -58,9 +23,28 @@ PERIODIC_LOCAL_JOB = {
     }]
 }
 
+NIGHTLY_LOCAL_JOB = {
+    'scheduler': {
+        'type': 'Nightly',
+        'name': 'my-nightly-scheduler',
+        'hour': 1,
+        'minute': 10,
+    },
+    'builder': {
+        'name': 'my-nightly-builder',
+        'description': 'I sleep',
+    },
+    'steps': [{
+        'ShellCommand': {
+            'name': 'sleep for 1 second',
+            'command': "sleep 1"
+        }
+    }]
+}
+
 
 class Test(unittest.TestCase):
-    def test_local_job_frontend(self, master_ids=(0, )):
+    def configure_local_jobs(self, master_ids=(0, )):
         """Test a local job on the frontend.
 
         The local directory is customized with a subdirectory.
@@ -82,7 +66,6 @@ class Test(unittest.TestCase):
             path = os.path.join(master._base_path, 'local2/sub/periodic.yml')
             assert os.path.isfile(path)
 
-        print 'API URL:', cluster.api.api_url
         cluster.start()
         cluster.sanity_check()
         scheduler = cluster.api.getw(
@@ -107,57 +90,6 @@ class Test(unittest.TestCase):
                                      "triggered this build"
         cluster.stop()
 
-    def test_local_job_backend(self):
-        """Test a local job on the backend.
-
-        The local directory is kept at default value.
-
-        Steps:
-        * Configure local job in decorator
-        * Check Eve can start (no error in setup)
-        * Verify directories and files (test setup validation)
-        * Check schedulers and builders are correct
-        * Check periodic job is running
-        """
-
-        return self.test_local_job_frontend(master_ids=(1, ))
-
-    @unittest.skip('Test not refactored yet')
-    @frontend_local_job(["periodic", "nightly"])
-    @backend_local_job("nightly")
-    def test_local_job_mixed(self):
-        """Test a local job on the frontend and backend simultaneously.
-
-        Steps:
-        * Configure local jobs in decorators
-        * Check Eve can start (no error in setup)
-        * Verify directories and files (test setup validation)
-        * Check schedulers and builders are correct
-        """
-        # try:
-        #     path = os.path.join(self.test_dir, 'master0/local')
-        #     assert os.path.isdir(path)
-        #     path = os.path.join(self.test_dir, 'master0/local/periodic.yml')
-        #     assert os.path.isfile(path)
-        #     path = os.path.join(self.test_dir, 'master0/local/nightly.yml')
-        #     assert os.path.isfile(path)
-        #     path = os.path.join(self.test_dir, 'master1/local')
-        #     assert os.path.isdir(path)
-        #     path = os.path.join(self.test_dir, 'master1/local/nightly.yml')
-        #     assert os.path.isfile(path)
-        #
-        #     self.get_builder('my-periodic-builder')
-        #     scheduler = self.get_scheduler('my-periodic-scheduler')
-        #     assert 'master0' in scheduler['master']['name']
-        #     scheduler = self.get_scheduler('nightly-scheduler-test-eve0')
-        #     assert 'master0' in scheduler['master']['name']
-        #     scheduler = self.get_scheduler('nightly-scheduler-test-eve1')
-        #     assert 'master1' in scheduler['master']['name']
-        # finally:
-        #     # stop eve manually to prevent periodic job from running
-        #     self.shutdown_eve()
-
-    @use_environ()
     def test_local_job_empty(self):  # pylint: disable=no-self-use
         """Test local jobs with no job defined and absolute path.
 
@@ -173,4 +105,67 @@ class Test(unittest.TestCase):
         master.conf['LOCAL_JOBS_DIRPATH'] = '/dev/null'
         cluster.start()
         cluster.sanity_check()
+        cluster.stop()
+
+    def test_local_job_frontend(self):
+        """Test a local job on the frontend.
+
+        The local directory is customized with a subdirectory.
+
+        Steps:
+        * Configure local job in decorator
+        * Check Eve can start (no error in setup)
+        * Verify directories and files (test setup validation)
+        * Check schedulers and builders are correct
+        """
+        self.configure_local_jobs(master_ids=(0, ))
+
+    def test_local_job_backend(self):
+        """Test a local job on the backend.
+
+        The local directory is kept at default value.
+
+        Steps:
+        * Configure local job in decorator
+        * Check Eve can start (no error in setup)
+        * Verify directories and files (test setup validation)
+        * Check schedulers and builders are correct
+        * Check periodic job is running
+        """
+        self.configure_local_jobs(master_ids=(1, ))
+
+    def test_local_job_mixed(self):
+        """Test a local job on the frontend and backend simultaneously.
+
+        Steps:
+        * Configure local jobs in decorators
+        * Check Eve can start (no error in setup)
+        * Verify directories and files (test setup validation)
+        * Check schedulers and builders are correct
+        """
+        self.configure_local_jobs(master_ids=(0, 1))
+
+    def test_nightly_build(self):
+        """Tests that a nightly build is well registred. does not launch it.
+        """
+
+        cluster = Cluster()
+        master = cluster._masters.values()[0]
+        master.add_conf_file(
+            yaml_data=NIGHTLY_LOCAL_JOB, filename='local2/sub/nightly.yml')
+        master.conf['LOCAL_JOBS_DIRPATH'] = 'local2/sub'
+        path = os.path.join(master._base_path, 'local2/sub/nightly.yml')
+        assert os.path.isfile(path)
+
+        cluster.start()
+        cluster.sanity_check()
+        scheduler = cluster.api.getw(
+            '/schedulers',
+            get_params={'name': NIGHTLY_LOCAL_JOB['scheduler']['name']})
+        assert scheduler['enabled']
+        builder = cluster.api.getw(
+            '/builders',
+            get_params={'name': NIGHTLY_LOCAL_JOB['builder']['name']})
+        assert builder['description'] == NIGHTLY_LOCAL_JOB['builder'][
+            'description']
         cluster.stop()

@@ -23,17 +23,15 @@ class TestYamlSyntax(unittest.TestCase):
         del self.local_repo
 
     def test_empty_yaml(self):
-        """Tests builds triggered by git polling.
-
-        Spawns EVE, sends a YAML that will fail and check that it fails.
+        """Tests that the build fails when the YAML file is empty
         """
         self.local_repo.push(yaml=RawYaml(''))
         buildset = self.cluster.force(self.local_repo.branch)
         assert buildset.result == 'failure'
 
     def test_skip_if_no_branch_in_yml(self):
-        """Tests that the build is cancelled when the branch is not covered
-         by the eve/main.yml file
+        """Tests that the build is cancelled when the branch is not covered by
+        the eve/main.yml file.
         """
 
         self.local_repo.push(yaml=YamlFactory(branches={}, stages={}))
@@ -41,9 +39,8 @@ class TestYamlSyntax(unittest.TestCase):
         assert buildset.result == 'cancelled'
 
     def test_simple_failure(self):
-        """Tests builds triggered by git polling.
-
-        Spawns EVE, sends a YAML that will fail and check that it fails.
+        """
+        Tests that the build fails if there is an 'exit 1' command in a step
         """
         self.local_repo.push(yaml=SingleCommandYaml('exit 1'))
         buildset = self.cluster.force(self.local_repo.branch)
@@ -59,9 +56,8 @@ class TestYamlSyntax(unittest.TestCase):
         assert failing_step.state_string == "'exit 1' (failure)"
 
     def test_simple_success(self):
-        """Tests builds triggered by git polling.
-
-        Spawns EVE, sends a YAML that will fail and check that it fails.
+        """
+        Tests that the build succeeds when it is expected to succeed.
         """
         self.local_repo.push(yaml=SingleCommandYaml('exit 0'))
         buildset = self.cluster.force(self.local_repo.branch)

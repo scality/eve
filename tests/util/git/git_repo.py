@@ -6,7 +6,8 @@ from __future__ import print_function
 
 import shutil
 import tempfile
-from os.path import join
+from os import mkdir
+from os.path import basename, join
 from uuid import uuid4
 
 from tests.util.cmd import cmd
@@ -22,11 +23,13 @@ class LocalGitRepo(object):
         cmd('git config user.name "John Doe"', cwd=self._dir)
         self.branch = None
 
-    def push(self, yaml=None, branch=None):
+    def push(self, yaml=None, dirs=(), branch=None):
         """Create a new commit to trigger a test build.
 
         Args:
-            eve_dir (str): directory of the yaml test file.
+            yaml (YamlFactory or str): The yaml file to be pushed
+            dirs (list): Additional folders to be pushed to the git repo root
+            branch (str): the branch name to push to
         """
         if branch is None:
             branch = 'bugfix/heal_the_world_{}'.format(uuid4())
@@ -36,13 +39,15 @@ class LocalGitRepo(object):
         self.branch = branch
         cmd('git checkout -b %s' % branch, cwd=self._dir)
 
-        src_ctxt = join('tests', 'system', 'contexts')
-        shutil.copytree(src_ctxt, join(self._dir, 'eve'))
-
+        mkdir(join(self._dir, 'eve'))
         if isinstance(yaml, RawYaml):
             yaml.filedump(join(self._dir, 'eve', 'main.yml'))
         else:
             shutil.copyfile(yaml, join(self._dir, 'eve', 'main.yml'))
+
+        for src in dirs:
+            shutil.copytree(src, join(self._dir, basename(src)))
+
         cmd('git add -A', cwd=self._dir)
         cmd('git commit -m "add yaml file"', cwd=self._dir)
         cmd('git push -u origin HEAD:%s' % branch, cwd=self._dir)

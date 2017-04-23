@@ -59,13 +59,3 @@ class Test(unittest.TestCase):
         # TODO: pass a fake env variable and test
         expected = 'None/' + expected
         assert child_build.properties['artifacts_public_url'][0] == expected
-
-    @need_rackspace_credentials()
-    @need_artifacts_credentials()
-    def test_worker_uploads_artifacts(self):
-        """Tests artifact uploading to cloudfiles
-        """
-        # TODO: We need to mock cloudfiles instead of using the real one
-        # self.commit_git('worker_uploads_artifacts')
-        # self.notify_webhook()
-        # self.get_build_result(expected_result='success')

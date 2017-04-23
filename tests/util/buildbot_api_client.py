@@ -108,50 +108,6 @@ class BuildbotDataAPI(object):
         raise Exception('The route {} exists but never reached the expected '
                         'count'.format(self.api_url + route))
 
-    def get_element_id_from_name(self, route, name, id_key, name_key='name'):
-        """Get the ID of an entity using its name."""
-        # The top level of every response is an object whose keys are the
-        # plural name of the resource types (hence the get(route)[route]).
-        # e.g. GET api/v2/schedulers
-        # {
-        #     "meta": {
-        #         "total": 2
-        #     },
-        #     "schedulers": [
-        #         {...},
-        #         {...}
-        #     ]
-        # }
-        elements = self.get(route)[route]
-        for elem in elements:
-            if elem[name_key] == name:
-                _id = elem[id_key]
-                break
-        else:
-            raise Exception('element not found')
-        return _id
-
-    def get_build_result(self,
-                         builder='bootstrap',
-                         branch=None,
-                         expected_result='success'):
-        """Get the result of the build `build_number`."""
-        for _ in range(900):
-            build = self.get_build(builder=builder, branch=branch)
-            if build['state_string'] == 'finished' and \
-                    build['results'] is not None:
-                break
-            time.sleep(1)
-            print('waiting for build to finish on {}'.format(self.url))
-        else:
-            raise Exception('Build took too long')
-        result_codes = [
-            'success', 'warnings', 'failure', 'skipped', 'exception', 'retry',
-            'cancelled'
-        ]
-        assert result_codes[build['results']] == expected_result
-        return build
-
     def get_builder(self, name):
         """Get builder named name from the Buildbot's API."""
         return self.get('/builders?name=%s' % name)['builders'][0]

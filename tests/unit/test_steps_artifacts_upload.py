@@ -13,12 +13,13 @@ class TestUpload(testutil.BuildStepMixin, unittest.TestCase,
         return self.tearDownBuildStep()
 
     def test_constructor_args_validity(self):
-        # this checks that an exception is raised for invalid arguments
+        """Tests that an exception is raised for invalid arguments"""
         self.assertRaisesConfigError(
             "Invalid argument(s) passed to RemoteShellCommand: ",
             lambda: Upload(source='ok', url=[], wrongArg1=1, wrongArg2='two'))
 
     def test_constructor_args(self):
+        """Tests that the constructor args are stored in the class"""
         upload_step = Upload('tmp', ['link1', 'link2'])
         self.assertEqual(upload_step._retry, (0, 1))
         self.assertEqual(upload_step._source, 'tmp')
@@ -26,5 +27,6 @@ class TestUpload(testutil.BuildStepMixin, unittest.TestCase,
         self.assertEqual(upload_step.workdir, 'build/tmp')
 
     def test_retry_arg(self):
+        """Tests that the retry constructor arg is stored in the class"""
         upload_step = Upload('/tmp', ['link1', 'link2'], retry=(1, 2))
         self.assertEqual(upload_step._retry, (1, 2))

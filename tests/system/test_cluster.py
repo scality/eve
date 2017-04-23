@@ -9,19 +9,50 @@ SUCCESS = 0
 
 class TestCluster(unittest.TestCase):
     def test1_cluster_start_stop(self):
+        """
+        Test cluster start and stop
+
+        Steps:
+            - start a cluster with 01 frontend and 01 backend
+            - check that there are no errors in logs
+            - stop it
+        """
         cluster = Cluster().start()
+        cluster.sanity_check()
         cluster.stop()
 
+
     def test2_bigger_cluster_start_stop(self):
+        """
+        Test addition of extra masters to a cluster
+
+        Steps:
+            - start a cluster with 01 frontend and 01 backend
+            - add a frontend
+            - add a backend
+            - check that there are no errors in logs
+            - stop it
+        """
         cluster = Cluster()
         cluster.start()
         master = cluster.add_master('frontend')
         master.start()
         master = cluster.add_master('backend')
         master.start()
+        cluster.sanity_check()
         cluster.stop()
 
+
     def test3_simple_success(self):
+        """
+        Test a simple build success on a cluster
+
+        Steps:
+            - start a cluster with 01 frontend and 01 backend
+            - force a job
+            - check that all the expected steps are there
+            - stop it
+        """
         cluster = Cluster().start()
         local_repo = cluster.clone()
 
@@ -126,16 +157,3 @@ class TestCluster(unittest.TestCase):
         assert child_build.first_failing_step.state_string == \
             "'test -z ...' (failure)"
         cluster.stop()
-
-    @unittest.skip('Test flaky on developers machine which need to be '
-                   'investigated and fixed.')
-    def test_lost_slave_recovery(self):
-        """Ensures test can recover when slave is lost.
-
-        Steps :
-         * Launch the first job, that kills buildbot/container
-         * The build shouldn't be retried and should fail
-        """
-        # self.commit_git('lost_slave_recovery')
-        # self.notify_webhook()
-        # self.get_build_result(expected_result='failure')
