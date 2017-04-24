@@ -2,7 +2,7 @@
 
 import yaml
 from buildbot.process.buildstep import BuildStep
-from buildbot.process.results import FAILURE, SKIPPED, SUCCESS, WARNINGS
+from buildbot.process.results import SKIPPED, SUCCESS, WARNINGS
 from twisted.internet import defer
 from twisted.logger import Logger
 
