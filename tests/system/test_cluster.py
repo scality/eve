@@ -21,7 +21,6 @@ class TestCluster(unittest.TestCase):
         cluster.sanity_check()
         cluster.stop()
 
-
     def test2_bigger_cluster_start_stop(self):
         """
         Test addition of extra masters to a cluster
@@ -41,7 +40,6 @@ class TestCluster(unittest.TestCase):
         master.start()
         cluster.sanity_check()
         cluster.stop()
-
 
     def test3_simple_success(self):
         """

@@ -1,28 +1,11 @@
 """This test suite checks end-to-end operation of EVE."""
-import os
 import unittest
 
 from tests.util.cluster import Cluster
 from tests.util.yaml_factory import SingleCommandYaml
 
 
-def need_env_vars(varnames, reason):
-    """Decorator to skip test if environment variables are not passsed."""
-    return unittest.skipIf(
-        any([varname not in os.environ for varname in varnames]), reason)
-
-
-def need_rackspace_credentials(reason='needs rackspace credentials'):
-    """Decorator to skip test if rackspace credentials are not passed."""
-    return need_env_vars(['RAX_LOGIN', 'RAX_PWD'], reason)
-
-
-def need_artifacts_credentials(reason='needs artifacts credentials'):
-    """Decorator to skip test if artifacts credentials are not passed."""
-    return need_env_vars(['ARTIFACTS_URL', 'SECRET_ARTIFACT_CREDS'], reason)
-
-
-class Test(unittest.TestCase):
+class TestArtifacts(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.cluster = Cluster().start()

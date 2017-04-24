@@ -19,16 +19,24 @@ class TestDockerCluster(unittest.TestCase):
         cls.cluster.stop()
 
     def test1_bad_dockerfile(self):
+        """
+        Tests the build fails when the Dockerfile is malformed
+
+        Steps:
+            - forces a build with a bad Dockefile
+            - checks that the build fails
+            - checks that the failing step is the docker build step
+        """
         local_repo = self.cluster.clone()
         local_repo.push(
             yaml=SingleCommandYaml(
-                'exit 5',
+                'exit 0',
                 worker={'type': 'docker',
                         'path': 'bad-ubuntu-xenial-ctxt'}),
             dirs=[
                 abspath(
                     join(__file__, pardir, 'contexts',
-                         'ubuntu-xenial-with-docker-ctxt'))
+                         'bad-ubuntu-xenial-ctxt'))
             ])
         self.cluster.sanity_check()
         buildset = self.cluster.force(local_repo.branch)
@@ -39,6 +47,14 @@ class TestDockerCluster(unittest.TestCase):
                              'bad-ubuntu-xenial-ctxt'
 
     def test2_simple_failure_in_docker(self):
+        """
+        Test that a command failure fails the whole build
+
+        Steps:
+            - forces a build with a docker worker and a failing command
+            - checks that the build fails
+            - checks that the failing step is the failing command execution
+        """
         local_repo = self.cluster.clone()
         local_repo.push(
             yaml=SingleCommandYaml(
@@ -59,6 +75,13 @@ class TestDockerCluster(unittest.TestCase):
             "'exit 1' (failure)"
 
     def test3_simple_success_in_docker(self):
+        """
+        Test a successful build success with a docker worker
+
+        Steps:
+            - forces a build with a docker worker and an 'exit 0' command
+            - checks that the build succeeds
+        """
         local_repo = self.cluster.clone()
         local_repo.push(
             yaml=SingleCommandYaml(
@@ -143,6 +166,10 @@ class TestDockerCluster(unittest.TestCase):
         assert child_build.result == 'success'
 
     def test_git_clone_in_docker_worker(self):
+        """
+        Tests that a passwordless git clone works from within a docker worker
+
+        """
         local_repo = self.cluster.clone()
         local_repo.push(
             yaml=PreMerge(

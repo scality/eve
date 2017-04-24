@@ -10,7 +10,9 @@ class DockerizedCrossbar(Crossbar):
     _stop_cmd = 'docker rm -f {name}'
 
     def pre_start_hook(self):
-        """Spawns a dockerized crossbar.
+        """
+        Creates a crossbar configuration, pulls the crossbar docker image and
+         prepares the command to run it
         """
 
         conf = join(__file__, pardir, pardir, 'util', 'crossbar',
@@ -25,4 +27,7 @@ class DockerizedCrossbar(Crossbar):
         ]  # yapf: disable
 
     def _log(self):
+        """
+        Returns: the logs of the Crossbar docker container
+        """
         return cmd('docker logs {}'.format(self._name))

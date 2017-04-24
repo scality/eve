@@ -43,7 +43,7 @@ NIGHTLY_LOCAL_JOB = {
 }
 
 
-class Test(unittest.TestCase):
+class TestLocalJobs(unittest.TestCase):
     def configure_local_jobs(self, master_ids=(0, )):
         """Test a local job on the frontend.
 

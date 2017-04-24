@@ -6,7 +6,7 @@ from os.path import abspath, join
 from tests.util.cluster import Cluster
 
 
-class Test(unittest.TestCase):
+class TestJunit(unittest.TestCase):
     def test_junit_step(self):  # pylint: disable=too-many-statements
         """Test customized JUnitShellCommand step with OK tests.
 

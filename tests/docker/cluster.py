@@ -17,6 +17,14 @@ class DockerizedCluster(Cluster):
 
     @property
     def external_ip(self):
+        """
+        Returns: The external IP address of the cluster.
+
+        On Linux, it returns '172.17.0.1'
+        On Mac OS, it tries to find the address that connects your computer to
+        the Internet.
+
+        """
         if self._ext_ip:
             return self._ext_ip
         if platform.system() == 'Darwin':
