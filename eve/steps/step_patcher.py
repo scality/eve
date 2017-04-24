@@ -34,7 +34,7 @@ class StepPatcherConfig(BuildStep):
                 'An error occured while loading the patcher config file at '
                 '{path}: {err}', path=self.conf_path, err=err)
             self.setProperty(prop, {}, 'StepPatcherConfig')
-            return defer.succeed(FAILURE)
+            return defer.succeed(WARNINGS)
 
         self.setProperty('step_patcher_config', config, 'StepPatcherConfig')
         if not config:
