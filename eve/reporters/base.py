@@ -68,8 +68,8 @@ class BaseBuildStatusPush(HttpStatusPushBase):
         """
         key = build['properties']['stage_name'][0]
         src = build['buildset']['sourcestamps'][0]
-        self.repo = src['repository'].strip('/').split('/')[-1]. \
-            replace('.git', '')
+        self.repo = src['repository'].strip('/').split('/')[-1].replace(
+            '.git', '')
         branch = src['branch']
         title = 'build #%s' % build['buildid']
         summary = '(%s) build #%s on %s:%s ' % (
