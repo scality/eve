@@ -304,7 +304,7 @@ class ApiResource(object):
             self._refresh()
         return self._dict[item]
 
-    def wait_for_finish(self, timeout=180):
+    def wait_for_finish(self, timeout=360):
         """
         waits for a resource until it has results.
 
