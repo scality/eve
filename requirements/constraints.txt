@@ -32,3 +32,8 @@ astroid==1.4.9
 
 # python-novaclient 8.0.0 not compatible with current Eve code
 python-novaclient==7.1.0
+
+
+# pydocstyle==2.0.0 raises an AttributeError: 'module' object has no attribute 'PEP257Checker'
+pydocstyle==1.0.0
+
