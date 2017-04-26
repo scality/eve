@@ -1,0 +1,7 @@
+# ADDITIONAL Requirements for requirements freezer
+# check instruction on how to reproduce in base.in
+-c constraints.txt
+
+buildbot-pkg
+freeze-requirements
+mock
