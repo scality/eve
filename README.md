@@ -76,9 +76,24 @@ listed in tox.ini, `passenv` section. The other variables are hardcoded
 for the tests.
 
 Run tests with:
-    
+
     $ tox -e unit
     $ tox -e testutil
     $ tox -e system
     $ tox -e docker
     $ tox -e autoformatcheck
+
+To investigate a failure for a specific test case:
+
+    $ tox -e system -- -k test_name --pdb
+
+    # at debugger prompt, find out eve url with:
+    (pdb) print cluster.api.url
+    http://localhost:52909/
+
+    # find the name of the buildbot instances:
+    (pdb) print cluster._masters.keys
+    ['frontend52909', 'backend44190']
+
+    # logs are stored in /tmp:
+    cat /tmp/1493216925.55RDRKM__eve_frontend52909/twistd.log
