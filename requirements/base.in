@@ -1,23 +1,18 @@
 # requirements for successful installation of eve
 #
-# to reproduce frozen requirements:
-#    first install packages needed to be able to compile buildbot-www wheel:
-#    $ pip install -U -r base.txt
-#    $ pip install -U -r unit.txt
+# to recreate frozen requirements:
 #
-#    then:
-#    $ pip install freeze-requirements
-#    $ freeze-requirements freeze --separate-requirements base.in
-#    $ mv base-frozen.in base.txt
+#    $ tox -e freeze-requirements
+#
 -c constraints.txt
 
-buildbot[tls]       # core technology
+MySQL-python        # used in production with a mysql database
+PyYAML              # used by yaml_parser
 buildbot-worker     # used in workers setup
 buildbot-www        # used in www setup
-MySQL-python        # used in production with a mysql database
+buildbot[tls]       # core technology
 netifaces           # used by bootstrap job
 python-novaclient   # used by EveOpenStackLatentWorker
-PyYAML              # used by yaml_parser
 raven               # used by sentry
 requests[security]  # used by step_factory
 retrying            # used by EveOpenStackLatentWorker

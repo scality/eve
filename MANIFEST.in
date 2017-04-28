@@ -1,4 +1,2 @@
-include src/etc/master.cfg
 include requirements.txt
-recursive-include requirements *.txt
-recursive-include src/services *
+recursive-include requirements *.in *.txt

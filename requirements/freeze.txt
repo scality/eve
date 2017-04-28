@@ -1,0 +1,17 @@
+# This file has been automatically generated, DO NOT EDIT!
+
+# Frozen requirements for "requirements/freeze.in"
+
+appdirs==1.4.3
+buildbot-pkg==0.9.5
+click==6.7
+freeze-requirements==0.5.1
+funcsigs==1.0.2
+mock==2.0.0
+packaging==16.8
+pbr==3.0.0
+pyparsing==2.2.0
+setuptools==35.0.1
+sh==1.12.13
+six==1.10.0
+

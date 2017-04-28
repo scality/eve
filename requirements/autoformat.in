@@ -2,6 +2,7 @@
 # check instruction on how to reproduce in base.in
 -c constraints.txt
 
-yapf
 autoflake
+autopep8
 isort
+yapf
