@@ -75,14 +75,17 @@ class BuildbotDataAPI(object):
         res.raise_for_status()
         return res.json()['result']
 
-    def get(self, route, get_params=None):
+    def get(self, route, get_params=None, raw=False):
         """Get data from the REST API."""
-        print(self.api_url + route, get_params)
+        print('requesting {} get params {}', self.api_url + route, get_params)
         res = self.session.get(
             self.api_url + route,
             headers={"Accept": "application/json"},
             params=get_params)
         res.raise_for_status()
+
+        if raw:
+            return res.text
 
         object_name = route.split('/')[-1]
 
@@ -231,27 +234,22 @@ class BuildbotDataAPI(object):
             self.url + 'change_hook/bitbucket', data=json.dumps(payload))
         res.raise_for_status()
 
-    def force(self, branch, reason='testing'):
+    def force(self, **kwargs):
         """Force a build.
 
         Args:
-            branch (str): The branch name.
-            reason (str): The buils reason (default=testing).
+            arguments accepted by the force API
+            http://docs.buildbot.net/latest/developer/rest.html#forcescheduler
 
         Returns:
             The Buildset that has been added.
 
         """
         force_sched_name = self.getw('/forceschedulers')['name']
-        res = self.post(
-            '/forceschedulers/{}'.format(force_sched_name),
-            'force', {
-                'branch': branch,
-                'owner': 'John Doe <john@doe.net>',
-                'reason': reason
-            })  # yapf: disable
+        res = self.post('/forceschedulers/{}'.format(force_sched_name),
+                        'force', kwargs)
 
-        buildset = BuildSet(self, res[0])
+        buildset = BuildSet(api=self, id_=res[0])
         return buildset
 
 
@@ -323,7 +321,10 @@ class ApiResource(object):
     def __getattr__(self, item):
         if self._dict is None:
             self._refresh()
-        return self._dict[item]
+        try:
+            return self._dict[item]
+        except KeyError:
+            raise AttributeError('{} does not exist'.format(item))
 
     def wait_for_finish(self, timeout=360):
         """Wait for a resource until it has results.
@@ -402,7 +403,7 @@ class Build(ApiResource):
     @property
     def steps(self):
         """Return the steps of this build."""
-        return Steps.find(
+        return Step.find(
             self._api,
             url_params={'buildid': self.buildid},
             expected_count=None)
@@ -416,9 +417,20 @@ class Build(ApiResource):
         raise Exception('There is no failing steps under this build')
 
 
-class Steps(ApiResource):
-    """Represent a Steps API object."""
+class Step(ApiResource):
+    """Represent a Step API object."""
 
     base_path = '/builds/{buildid}/steps'
     results_field = 'results'
     id_field = 'number'
+
+    def rawlog(self, log_slug):
+        """Returns the step log contents as text
+
+        Args:
+          log_slug (str): The name of the log. e.g., 'stdio'
+
+        """
+        route = (self.base_path + '/{step_number}/logs/{log_slug}/raw').format(
+            buildid=self.buildid, step_number=self.number, log_slug=log_slug)
+        return self._api.get(route=route, raw=True)

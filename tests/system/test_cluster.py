@@ -73,7 +73,7 @@ class TestCluster(unittest.TestCase):
         local_repo = cluster.clone()
 
         local_repo.push()
-        buildset = cluster.force(local_repo.branch)
+        buildset = cluster.api.force(branch=local_repo.branch)
         buildrequestid = cluster.api.getw(
             '/buildrequests', {'buildsetid': buildset.bsid})['buildrequestid']
 
@@ -166,11 +166,39 @@ class TestCluster(unittest.TestCase):
         local_repo = cluster.clone()
 
         local_repo.push(yaml=SingleCommandYaml('test -z "$FOO"'))
-        buildset = cluster.force(local_repo.branch)
+        buildset = cluster.api.force(branch=local_repo.branch)
         assert buildset.result == 'failure'
         child_build = \
             buildset.buildrequest.build.children[0].buildrequest.build
         assert child_build.first_failing_step.name == 'shell'
         assert child_build.first_failing_step.state_string == \
             "'test -z ...' (failure)"
+        cluster.stop()
+
+    def test_force_parametrized_build(self):
+        """Test forced build with parameters.
+
+        Steps:
+        * Spawn cluster with a parametrized force build scheduler
+        * Force a build with 2 parameters out of 5
+        * Check that the parameters are taken into account by reading the step
+          stdio log.
+        """
+        os.environ['FORCE_BUILD_PARAM_COUNT'] = '5'
+        cluster = Cluster().start()
+        local_repo = cluster.clone()
+        local_repo.push(yaml=SingleCommandYaml(
+            'echo The %(prop:color)s %(prop:vehicule)s'))
+        buildset = cluster.api.force(
+            branch=local_repo.branch,
+            prop00_name='vehicule',
+            prop00_value='submarine',
+            prop01_name='color',
+            prop01_value='yellow')
+
+        assert buildset.result == 'success'
+        child_build = buildset.buildrequest.build.children[
+            0].buildrequest.build
+        step = child_build.steps[-1]
+        assert 'The yellow submarine' in step.rawlog('stdio')
         cluster.stop()

@@ -57,7 +57,7 @@ class TestDockerCluster(unittest.TestCase):
                          'bad-ubuntu-xenial-ctxt'))
             ])
         self.cluster.sanity_check()
-        buildset = self.cluster.force(local_repo.branch)
+        buildset = self.cluster.api.force(branch=local_repo.branch)
         assert buildset.result == 'failure'
         # Check that the failing build step is The good one
         fstep = buildset.buildrequest.build.first_failing_step
@@ -84,7 +84,7 @@ class TestDockerCluster(unittest.TestCase):
                     join(__file__, pardir, 'contexts', 'ubuntu-xenial-ctxt'))
             ])
         self.cluster.sanity_check()
-        buildset = self.cluster.force(local_repo.branch)
+        buildset = self.cluster.api.force(branch=local_repo.branch)
         assert buildset.result == 'failure'
         child_build = \
             buildset.buildrequest.build.children[0].buildrequest.build
@@ -111,7 +111,7 @@ class TestDockerCluster(unittest.TestCase):
                     join(__file__, pardir, 'contexts', 'ubuntu-xenial-ctxt'))
             ])
         self.cluster.sanity_check()
-        buildset = self.cluster.force(local_repo.branch)
+        buildset = self.cluster.api.force(branch=local_repo.branch)
         assert buildset.result == 'success'
         child_build = \
             buildset.buildrequest.build.children[0].buildrequest.build
@@ -144,7 +144,7 @@ class TestDockerCluster(unittest.TestCase):
             ])
 
         self.cluster.sanity_check()
-        buildset = self.cluster.force(local_repo.branch)
+        buildset = self.cluster.api.force(branch=local_repo.branch)
         assert buildset.result == 'success'
         child_build = \
             buildset.buildrequest.build.children[0].buildrequest.build
@@ -178,7 +178,7 @@ class TestDockerCluster(unittest.TestCase):
                          'use-different-dockerfile'))
             ])
         self.cluster.sanity_check()
-        buildset = self.cluster.force(local_repo.branch)
+        buildset = self.cluster.api.force(branch=local_repo.branch)
         assert buildset.result == 'success'
         child_build = \
             buildset.buildrequest.build.children[0].buildrequest.build
@@ -209,7 +209,7 @@ class TestDockerCluster(unittest.TestCase):
                          'use-different-dockerfile'))
             ])
         self.cluster.sanity_check()
-        buildset = self.cluster.force(local_repo.branch)
+        buildset = self.cluster.api.force(branch=local_repo.branch)
         assert buildset.result == 'success'
         child_build = \
             buildset.buildrequest.build.children[0].buildrequest.build
@@ -239,7 +239,7 @@ class TestDockerCluster(unittest.TestCase):
                          'ubuntu-xenial-with-docker-ctxt'))
             ])
         self.cluster.sanity_check()
-        buildset = self.cluster.force(local_repo.branch)
+        buildset = self.cluster.api.force(branch=local_repo.branch)
         assert buildset.result == 'success'
         child_build = \
             buildset.buildrequest.build.children[0].buildrequest.build
@@ -269,7 +269,7 @@ class TestDockerCluster(unittest.TestCase):
             ])
 
         self.cluster.sanity_check()
-        buildset = self.cluster.force(local_repo.branch)
+        buildset = self.cluster.api.force(branch=local_repo.branch)
         assert buildset.result == 'success'
         child_build = \
             buildset.buildrequest.build.children[0].buildrequest.build
@@ -291,7 +291,7 @@ class TestDockerCluster(unittest.TestCase):
                     join(__file__, pardir, 'contexts', 'ubuntu-xenial-ctxt'))
             ])
         self.cluster.sanity_check()
-        buildset = self.cluster.force(local_repo.branch)
+        buildset = self.cluster.api.force(branch=local_repo.branch)
         assert buildset.result == 'success'
         child_build = \
             buildset.buildrequest.build.children[0].buildrequest.build
@@ -315,5 +315,5 @@ class TestDockerCluster(unittest.TestCase):
                     join(__file__, pardir, 'contexts', 'ubuntu-xenial-ctxt'))
             ])
         # self.cluster.sanity_check()
-        buildset = self.cluster.force(local_repo.branch)
+        buildset = self.cluster.api.force(branch=local_repo.branch)
         assert buildset.result == 'success'

@@ -43,20 +43,20 @@ class TestYamlSyntax(unittest.TestCase):
     def test_empty_yaml(self):
         """Test that the build fails when the YAML file is empty."""
         self.local_repo.push(yaml=RawYaml(''))
-        buildset = self.cluster.force(self.local_repo.branch)
+        buildset = self.cluster.api.force(branch=self.local_repo.branch)
         assert buildset.result == 'failure'
 
     def test_skip_if_no_branch_in_yml(self):
         """Test build cancelled when branch not covered by eve.yml."""
 
         self.local_repo.push(yaml=YamlFactory(branches={}, stages={}))
-        buildset = self.cluster.force(self.local_repo.branch)
+        buildset = self.cluster.api.force(branch=self.local_repo.branch)
         assert buildset.result == 'cancelled'
 
     def test_simple_failure(self):
         """Test that build fails if there is an 'exit 1' command in a step."""
         self.local_repo.push(yaml=SingleCommandYaml('exit 1'))
-        buildset = self.cluster.force(self.local_repo.branch)
+        buildset = self.cluster.api.force(branch=self.local_repo.branch)
         assert buildset.result == 'failure'
 
         build = buildset.buildrequest.build
@@ -71,7 +71,7 @@ class TestYamlSyntax(unittest.TestCase):
     def test_simple_success(self):
         """Test that the build succeeds when it is expected to succeed."""
         self.local_repo.push(yaml=SingleCommandYaml('exit 0'))
-        buildset = self.cluster.force(self.local_repo.branch)
+        buildset = self.cluster.api.force(branch=self.local_repo.branch)
         assert buildset.result == 'success'
         build = buildset.buildrequest.build
         child_buildsets = build.children

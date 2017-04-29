@@ -42,7 +42,7 @@ class TestJunit(unittest.TestCase):
         reports_dir = join(parent, 'reports')
         local_repo.push(yaml=yaml, dirs=(reports_dir, ))
         cluster.sanity_check()
-        buildset = cluster.force(local_repo.branch)
+        buildset = cluster.api.force(branch=local_repo.branch)
         assert buildset.result == 'failure'
         child_build = \
             buildset.buildrequest.build.children[0].buildrequest.build

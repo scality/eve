@@ -191,7 +191,7 @@ class TestPublishCodeCoverage(unittest.TestCase):
             }
         }]))
 
-        buildset = self.cluster.force(self.local_repo.branch)
+        buildset = self.cluster.api.force(branch=self.local_repo.branch)
         assert buildset.result == 'success'
 
         build = buildset.buildrequest.build

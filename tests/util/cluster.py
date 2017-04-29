@@ -64,6 +64,9 @@ class Cluster(object):
 
         self.add_master('backend')
 
+    def __repr__(self):
+        return 'Cluster {}'.format(self.api.url)
+
     @property
     def githost_url(self):
         """Generate the url that points to the git repo."""
@@ -153,18 +156,6 @@ class Cluster(object):
 
     def webhook(self, git_repo):
         return self.api.webhook(git_repo)
-
-    def force(self, branch):
-        """Force a build from the API.
-
-        Args:
-            branch (str): The remote branch to be built.
-
-        Returns:
-            An API BuildSet object.
-
-        """
-        return self.api.force(branch)
 
     def sanity_check(self):
         """Check that the cluster has no unexpected error messages in logs."""

@@ -41,6 +41,8 @@ def force_scheduler():
                                     label='Reason:',
                                     default='force build',
                                     size=20),
+        properties=[util.AnyPropertyParameter(name='prop%02d' % i)
+                    for i in range(util.env.FORCE_BUILD_PARAM_COUNT)],
         codebases=[
             util.CodebaseParameter(
                 '',
