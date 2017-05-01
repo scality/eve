@@ -7,6 +7,7 @@ def hipchat_reporter():
 
     builders = [
         util.env.DOCKER_BUILDER_NAME,
+        util.env.EC2_BUILDER_NAME,
         util.env.OPENSTACK_BUILDER_NAME
     ]
 
@@ -22,6 +23,7 @@ def github_reporter():
 
     builders = [
         util.env.DOCKER_BUILDER_NAME,
+        util.env.EC2_BUILDER_NAME,
         util.env.OPENSTACK_BUILDER_NAME
     ]
 
@@ -37,6 +39,7 @@ def bitbucket_reporter():
 
     builders = [
         util.env.DOCKER_BUILDER_NAME,
+        util.env.EC2_BUILDER_NAME,
         util.env.OPENSTACK_BUILDER_NAME
     ]
 

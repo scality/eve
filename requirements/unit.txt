@@ -12,6 +12,6 @@ py==1.4.33
 pyparsing==2.2.0
 pytest==3.0.7
 pytest-cov==2.4.0
-setuptools==35.0.1
+setuptools==35.0.2
 six==1.10.0
 

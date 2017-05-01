@@ -4,6 +4,32 @@ from buildbot.worker.local import LocalWorker
 from twisted.python.reflect import namedModule
 
 
+# Script allowing to install a buildbot worker at VM startup (cloud-init)
+
+# FIXME: the cloud-init script is run as root for now.
+
+CLOUD_INIT_SCRIPT = """#!/bin/bash
+OS="$(lsb_release -is)"
+if [ -f /etc/redhat-release ]
+then
+    sudo yum -y install git gcc python-devel python-setuptools
+    sudo easy_install pip
+elif [ -f /etc/lsb-release ]
+then
+    echo "Debian/Ubuntu";
+    sudo apt-get install --no-install-recommends --yes git python-pip python-twisted python-setuptools
+else
+    echo "Unsupported Operating System";
+    exit 1;
+fi
+
+sudo pip install buildbot-worker
+buildbot-worker create-worker ~/eveworker {master_fqdn}:{master_pb_port} {workername} {workerpassword}
+buildbot-worker start ~/eveworker
+"""
+
+
+
 def local_workers():
     workers = []
     for i in range(util.env.MAX_LOCAL_WORKERS):
@@ -33,6 +59,33 @@ def docker_workers():
             ))
     return workers
 
+
+def ec2_workers():
+    workers = []
+    for i in range(util.env.MAX_EC2_WORKERS):
+        wrkname = 'ew%03d-%s-%s' % (i, util.env.GIT_SLUG, util.env.SUFFIX)
+        wrkpasswd = util.password_generator()
+        workers.append(
+            worker.EveEC2LatentWorker(
+                name=wrkname,
+                password=wrkpasswd,
+                instance_type=Property('ec2_instance_type'),
+                ami=Property('ec2_ami'),
+                identifier=util.env.AWS_ACCESS_KEY_ID,
+                secret_identifier=util.env.AWS_SECRET_ACCESS_KEY,
+                keypair_name=util.env.AWS_SSH_KEY,
+                security_name=False,  # this is a workaround, buggy buildbot
+                region=util.env.AWS_REGION_NAME,
+                build_wait_timeout=0,  # do not reuse the instance
+                keepalive_interval=300,
+                user_data=CLOUD_INIT_SCRIPT.format(
+                    master_fqdn=util.env.MASTER_FQDN,
+                    master_pb_port=util.env.EXTERNAL_PB_PORT,
+                    workername=wrkname,
+                    workerpassword=wrkpasswd
+                )
+            ))
+    return workers
 
 def openstack_workers():
     workers = []

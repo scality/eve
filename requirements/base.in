@@ -6,6 +6,7 @@
 #
 -c constraints.txt
 
+boto3               # used by EC2LatentWorker
 MySQL-python        # used in production with a mysql database
 PyYAML              # used by yaml_parser
 buildbot-worker     # used in workers setup
