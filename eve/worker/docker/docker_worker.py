@@ -56,7 +56,8 @@ class EveDockerLatentWorker(AbstractLatentWorker):
             except KeyError:
                 pass
 
-        cmd = ['inspect', 'gitcache']
+        gitcache_name = util.env.GIT_CACHE_NAME
+        cmd = ['inspect', gitcache_name]
         try:
             self.logger.debug('Inspecting gitcache...')
             self.docker_invoke(*cmd)
@@ -69,7 +70,8 @@ class EveDockerLatentWorker(AbstractLatentWorker):
             self.docker_invoke(*cmd)
             cmd = ['run',
                    '--detach',
-                   '--name', 'gitcache',
+                   '--name',
+                   gitcache_name,
                    'gitcache_img']
             self.docker_invoke(*cmd)
 
@@ -82,9 +84,9 @@ class EveDockerLatentWorker(AbstractLatentWorker):
             '--env', 'BUILDMASTER_PORT=%s' % self.pb_port,
             '--env', 'DOCKER_HOST_IP=%s' % docker_host_ip,
             '--env', 'ARTIFACTS_PREFIX=%s' % self.artifacts_prefix,
-            '--env', 'GIT_CACHE_HOST=gitcache',
+            '--env', 'GIT_CACHE_HOST=%s' % gitcache_name,
             '--env', 'GIT_CACHE_PORT=80',
-            '--link', util.env.GIT_CACHE_NAME,
+            '--link', gitcache_name,
             '--detach',
             '--memory=%s' % self.max_memory,
             '--cpus=%s' % self.max_cpus
