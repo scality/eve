@@ -314,4 +314,4 @@ class GithubBuildStatusPush(GitHubStatusPush, BuildStatusPushMixin):
     def send(self, build):
         key = build['properties']['stage_name'][0]
         self.context = key  # pylint: disable=attribute-defined-outside-init
-        return super(GithubBuildStatusPush, self).send(build)
+        yield super(GithubBuildStatusPush, self).send(build)
