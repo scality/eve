@@ -26,8 +26,9 @@ from tests.util.yaml_factory import SingleCommandYaml
 
 class TestGitRepo(TestCase):
     def test_git_repo(self):
-        """
-        Steps:
+        """Test that a fake git repo works correctly.
+
+           Steps:
             - create a fake remote git repo
             - clone it with the LocalGitRepo class
             - push a specified yaml file on a specified branch

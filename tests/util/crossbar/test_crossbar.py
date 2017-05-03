@@ -23,8 +23,9 @@ from tests.util.crossbar.crossbar import Crossbar
 
 class TestCrossbar(TestCase):
     def test_start_and_stop(self):
-        """
-        Steps:
+        """Test start and stop a crossbar daemon
+
+           Steps:
             - start crossbar
             - look for a line in the code to check if it completed its start
             - stop it

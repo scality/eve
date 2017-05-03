@@ -36,8 +36,7 @@ class TestArtifacts(unittest.TestCase):
         self.local_repo = self.cluster.clone()
 
     def test_artifacts_properties(self):
-        """Tests that artifacts properties are well set.
-        """
+        """Test that artifacts properties are well set."""
         self.local_repo.push(yaml=SingleCommandYaml('exit 0'))
         buildset = self.cluster.force(self.local_repo.branch)
         assert buildset.result == 'success'

@@ -37,13 +37,13 @@ class TestDockerCluster(unittest.TestCase):
         cls.cluster.stop()
 
     def test1_bad_dockerfile(self):
-        """
-        Tests the build fails when the Dockerfile is malformed
+        """Test the build fails when the Dockerfile is malformed.
 
         Steps:
             - forces a build with a bad Dockefile
             - checks that the build fails
             - checks that the failing step is the docker build step
+
         """
         local_repo = self.cluster.clone()
         local_repo.push(
@@ -65,13 +65,13 @@ class TestDockerCluster(unittest.TestCase):
                              'bad-ubuntu-xenial-ctxt'
 
     def test2_simple_failure_in_docker(self):
-        """
-        Test that a command failure fails the whole build
+        """Test that a command failure fails the whole build.
 
         Steps:
             - forces a build with a docker worker and a failing command
             - checks that the build fails
             - checks that the failing step is the failing command execution
+
         """
         local_repo = self.cluster.clone()
         local_repo.push(
@@ -93,12 +93,12 @@ class TestDockerCluster(unittest.TestCase):
             "'exit 1' (failure)"
 
     def test3_simple_success_in_docker(self):
-        """
-        Test a successful build success with a docker worker
+        """Test a successful build success with a docker worker.
 
         Steps:
             - forces a build with a docker worker and an 'exit 0' command
             - checks that the build succeeds
+
         """
         local_repo = self.cluster.clone()
         local_repo.push(
@@ -184,10 +184,7 @@ class TestDockerCluster(unittest.TestCase):
         assert child_build.result == 'success'
 
     def test_git_clone_in_docker_worker(self):
-        """
-        Tests that a passwordless git clone works from within a docker worker
-
-        """
+        """Test passwordless git clone works from within docker workers."""
         local_repo = self.cluster.clone()
         local_repo.push(
             yaml=PreMerge(
@@ -218,12 +215,13 @@ class TestDockerCluster(unittest.TestCase):
         assert child_build.result == 'success'
 
     def test_docker_in_docker(self):
-        """Tests that we can launch a docker command inside a docker worker
+        """Test that we can launch a docker command inside a docker worker.
 
         Steps:
          * Substantiate a docker worker containing docker installation
          * Launch a `docker ps` command
          * Check that it succeeds
+
         """
 
         local_repo = self.cluster.clone()
@@ -247,14 +245,14 @@ class TestDockerCluster(unittest.TestCase):
         assert child_build.result == 'success'
 
     def test_use_premade_docker_img(self):
-        """Tests that we can build docker images on our own and give them to
-        buildbot
+        """Test that we can build docker images on our own.
 
         Steps:
          * Substantiate a docker worker containing docker installation
          * Launch a `docker build` command
          * Launch a stage with the newly built image
          * Check that it succeeds
+
         """
         local_repo = self.cluster.clone()
         local_repo.push(
@@ -277,8 +275,7 @@ class TestDockerCluster(unittest.TestCase):
         assert child_build.result == 'success'
 
     def test_use_premade_docker_img_p(self):
-        """Same test than test_use_premade_docker_image but use
-        property to store the image id."""
+        """Test use of premade image but use property to store the image id."""
 
         local_repo = self.cluster.clone()
         local_repo.push(
@@ -300,10 +297,11 @@ class TestDockerCluster(unittest.TestCase):
         assert child_build.result == 'success'
 
     def test_write_read_from_cache(self):
-        """Tests docker cache volumes
+        """Test docker cache volumes.
 
         Step1 creates a docker named volume and creates a file into it.
         Step2 starts another container and reads a file from the same volume.
+
         """
         local_repo = self.cluster.clone()
         local_repo.push(

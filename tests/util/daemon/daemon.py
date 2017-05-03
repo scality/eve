@@ -40,8 +40,7 @@ class Daemon(object):
     start_success_msg = None
 
     def __init__(self, name):
-        """
-        A Base class to specify, and interact with daemons.
+        """Specify a daemon that can be interacted with.
 
         Args:
             name: the name of the daemons (displayed in logs)
@@ -52,15 +51,13 @@ class Daemon(object):
         self._process = None
 
     def pre_start_hook(self):
-        """
-        actions to make before starting the daemon
-        """
+        """Prepare for daemon startup."""
 
     def start(self):
-        """
-        Start the daemon and wait for it if self._start_wait is not None
+        """Start the daemon and eventually wait for it.
 
-        Returns: self
+        Returns:
+            self
 
         """
         self.pre_start_hook()
@@ -76,8 +73,7 @@ class Daemon(object):
         return self
 
     def kill(self):
-        """
-        SIGKILL the daemon violently.
+        """SIGKILL the daemon violently.
 
         This should be avoided. Try to kill the daemons cleanly in
         teardown methods with stop().
@@ -89,9 +85,7 @@ class Daemon(object):
         self._process.kill()
 
     def stop(self):
-        """
-        Send a SIGTERM to the daemon and wait until it finishes.
-        """
+        """Send a SIGTERM to the daemon and wait until it finishes."""
         print(
             'terminating {} PID: {}...'.format(self._name, self._process.pid))
         if self._stop_cmd is not None:
@@ -103,10 +97,7 @@ class Daemon(object):
 
     @property
     def loglines(self):
-        """
-        Returns: a list of the daemon's log lines
-
-        """
+        """Return a list of the daemon's log lines."""
         if self._log is None:
             return []
         if callable(self._log):
@@ -116,15 +107,12 @@ class Daemon(object):
         return open(join(self._base_path, self._log)).readlines()
 
     def print_loglines(self):
-        """
-        prints the log of the daemon
-        """
+        """Print the log of the daemon."""
         for logline in self.loglines:
             print('{}: {}'.format(self._name, logline), end='')
 
     def wait_for_it(self, delay=10):
-        """
-        Wait for the daemon to start / stop
+        """Wait for the daemon to start / stop.
 
         Args:
             delay (int): number of seconds after which an exception is raised
@@ -151,10 +139,7 @@ class Daemon(object):
 
     @staticmethod
     def get_free_port():
-        """
-        Returns: a free system port that can be used by the daemon
-
-        """
+        """Return a free system port that can be used by the daemon."""
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.bind(('', 0))
         port = sock.getsockname()[1]
@@ -162,6 +147,4 @@ class Daemon(object):
         return port
 
     def sanity_check(self):
-        """
-        Check that the daemon has no unexpected error messages in logs.
-        """
+        """Check that the daemon has no unexpected error messages in logs."""

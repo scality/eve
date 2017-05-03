@@ -102,7 +102,9 @@ class Ngrok(object):
 
     @property
     def running(self):
-        """Returns: boolean: True if ngrok is running."""
+        """Check if ngrok is running.
+
+        Returns: boolean: True if ngrok is running"""
         return self._state is not None
 
     def stop(self):

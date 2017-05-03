@@ -27,21 +27,20 @@ SUCCESS = 0
 
 class TestCluster(unittest.TestCase):
     def test1_cluster_start_stop(self):
-        """
-        Test cluster start and stop
+        """Test cluster start and stop.
 
         Steps:
             - start a cluster with 01 frontend and 01 backend
             - check that there are no errors in logs
             - stop it
+
         """
         cluster = Cluster().start()
         cluster.sanity_check()
         cluster.stop()
 
     def test2_bigger_cluster_start_stop(self):
-        """
-        Test addition of extra masters to a cluster
+        """Test addition of extra masters to a cluster.
 
         Steps:
             - start a cluster with 01 frontend and 01 backend
@@ -49,6 +48,7 @@ class TestCluster(unittest.TestCase):
             - add a backend
             - check that there are no errors in logs
             - stop it
+
         """
         cluster = Cluster()
         cluster.start()
@@ -60,14 +60,14 @@ class TestCluster(unittest.TestCase):
         cluster.stop()
 
     def test3_simple_success(self):
-        """
-        Test a simple build success on a cluster
+        """Test a simple build success on a cluster.
 
         Steps:
             - start a cluster with 01 frontend and 01 backend
             - force a job
             - check that all the expected steps are there
             - stop it
+
         """
         cluster = Cluster().start()
         local_repo = cluster.clone()
@@ -157,8 +157,9 @@ class TestCluster(unittest.TestCase):
         """Test worker environment.
 
         Steps:
-        * Spawn worker
-        * Check Eve environment variables are not setted in the worker
+            - Spawn worker
+            - Check Eve environment variables are not setted in the worker
+
         """
         os.environ['FOO'] = 'bar'
         cluster = Cluster().start()

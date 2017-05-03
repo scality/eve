@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor,
 # Boston, MA  02110-1301, USA.
-"""Class to generate an SQLite database path and sqlalchemy URL"""
+"""Class to generate an SQLite database path and sqlalchemy URL."""
 
 from __future__ import print_function
 
@@ -26,8 +26,8 @@ from tests.util.daemon import Daemon
 
 class Sqlite(Daemon):
     def __init__(self, **_):
-        """
-        Class to generate an SQLite database path and sqlalchemy URL
+        """Class to generate an SQLite database path and sqlalchemy URL.
+
         Args:
             **_: ignored
         """
@@ -36,7 +36,4 @@ class Sqlite(Daemon):
             'sqlite:///' + os.path.join(self._base_path, 'state.sqlite')
 
     def start(self):
-        """
-        Fake method to make this class have the same interfaces as other
-        daemons (e.g., MySQL)
-        """
+        """Fake method to have the same interface as other DB daemons."""

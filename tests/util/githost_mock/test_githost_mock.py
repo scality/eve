@@ -15,9 +15,8 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor,
 # Boston, MA  02110-1301, USA.
-"""
-Test the GitHostMock daemon
-"""
+"""Test the GitHostMock daemon."""
+
 import tempfile
 from unittest import TestCase
 
@@ -27,8 +26,9 @@ from tests.util.githost_mock import GitHostMock
 
 class TestGitHostMock(TestCase):
     def test_start_and_stop(self):
-        """
-        Steps:
+        """Test start and stop a githost mock daemon.
+
+          Steps:
             - start a GitHostMock
             - clone it to a temp directory
             - create a branch and push it

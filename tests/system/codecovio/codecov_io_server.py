@@ -117,7 +117,7 @@ class _CodecovIORequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
     """HTTP handler of `CodecovIOMockServer`."""
 
     def do_POST(self):
-        """Called on each POST request received.
+        """Handle POST requests.
 
         If */upload/v4* path wanted, we compute and return a fake
         ``codecov.io`` response.
@@ -150,10 +150,11 @@ class _CodecovIORequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             self.end_headers()
 
     def do_PUT(self):
-        """Called on each POST request received.
+        """Handle PUT requests.
 
-        Return *200* HTTP status if the path wanted is */s3*, *404*
-        otherwise.
+        Returns:
+            *200* HTTP status if the path wanted is */s3*, *404* otherwise.
+
         """
         url_parts = urlparse.urlparse(self.path)
 
@@ -164,7 +165,7 @@ class _CodecovIORequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         self.end_headers()
 
     def parse_request(self):
-        """Called on each request received.
+        """Parse all requests.
 
         Store the request received to verify the ``coecov.io`` handshake.
         """
@@ -180,6 +181,7 @@ class CodecovIOMockServer(BaseHTTPServer.HTTPServer):
     The goal of this HTTP server is to react like a real
     ``codecov.io`` server (see
     https://docs.codecov.io/v4.3.0/reference#upload).
+
     """
 
     def __init__(self, bind_address='localhost'):
@@ -233,7 +235,7 @@ class CodecovIOMockServer(BaseHTTPServer.HTTPServer):
         return 'http://localhost:{0}'.format(self.server_port)
 
     def start(self):
-        """Start the HTTP server
+        """Start the HTTP server.
 
         Create a thread to listen the HTTP server in background.
         """

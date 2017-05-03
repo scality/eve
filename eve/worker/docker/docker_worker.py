@@ -149,7 +149,7 @@ class EveDockerLatentWorker(AbstractLatentWorker):
         self.logger.debug('Container %s stopped successfully.' % instance)
 
     def docker_invoke(self, *args):
-        """calls the docker client binary with the arguments given as a
+        """Calls the docker client binary with the arguments given as a
          parameter and logs exceptions if any.
          Returns the output of the commmand (stderr + stdout)
 

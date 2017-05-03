@@ -23,7 +23,8 @@ from tests.util.buildbot_master.buildbot_master import BuildbotMaster
 
 class TestMaster(TestCase):
     def test_start_and_stop_master(self):
-        """
+        """Test start and stop a buildbot master.
+
         Steps:
             - start a standalon buildmaster
             - look for a line in the code to check if it completed its start

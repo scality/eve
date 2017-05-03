@@ -15,9 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor,
 # Boston, MA  02110-1301, USA.
-"""
-Create and interact with a local git repository
-"""
+"""Create and interact with a local git repository."""
 
 from __future__ import print_function
 
@@ -72,10 +70,11 @@ class LocalGitRepo(object):
 
     @property
     def loglines(self):
-        """
-        Returns (list): the lines resulting from git log command
+        """Return a list of loglines from the git log command.
 
-        git log --pretty=format:"%an %ae|%s|%H|%cd" --date=iso
+        Returns:
+            list: the lines resulting from git log command
+                  `git log --pretty=format:"%an %ae|%s|%H|%cd" --date=iso`
 
         """
         res = cmd(
@@ -84,8 +83,6 @@ class LocalGitRepo(object):
         return reversed(res.splitlines())
 
     def cmd(self, *args, **kwargs):
-        """
-        Runs a command in the git repo directory
-        """
+        """Run a command in the git repo directory."""
         kwargs['cwd'] = self._dir
         return cmd(*args, **kwargs)
