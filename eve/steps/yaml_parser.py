@@ -16,10 +16,6 @@ from packaging import version
 from twisted.internet import defer
 from twisted.logger import Logger
 
-EVE_FOLDER = 'eve'
-EVE_MAIN_YAML = 'main.yml'
-EVE_MAIN_YAML_FULL_PATH = '%s/%s' % (EVE_FOLDER, EVE_MAIN_YAML)
-
 
 class ReadConfFromYaml(FileUpload):
     """Load the YAML file to `conf` property.
@@ -30,11 +26,12 @@ class ReadConfFromYaml(FileUpload):
     logger = Logger('eve.steps.ReadConfFromYaml')
 
     def __init__(self, **kwargs):
+        self.yaml = util.env.PROJECT_YAML
         self.masterdest = mktemp()
         FileUpload.__init__(
             self,
-            name='read %s' % EVE_MAIN_YAML_FULL_PATH,
-            workersrc=EVE_MAIN_YAML_FULL_PATH,
+            name='read %s' % self.yaml,
+            workersrc=self.yaml,
             masterdest=self.masterdest,
             haltOnFailure=True,
             hideStepIf=lambda results, s: results == SUCCESS,
@@ -45,11 +42,11 @@ class ReadConfFromYaml(FileUpload):
         result = yield FileUpload.run(self)
         if result != SUCCESS:
             self.addCompleteLog('stderr', 'Could not find %s' %
-                                EVE_MAIN_YAML_FULL_PATH)
+                                self.yaml)
             defer.returnValue(result)
 
         raw_conf = open(self.masterdest).read()
-        self.addCompleteLog(EVE_MAIN_YAML_FULL_PATH, raw_conf)
+        self.addCompleteLog(self.yaml, raw_conf)
         conf = yaml.load(raw_conf)
 
         # Extract Eve API version (call str() to support buggy yaml files)
@@ -63,7 +60,7 @@ class ReadConfFromYaml(FileUpload):
             branches = conf['branches']
         except (TypeError, KeyError):
             self.addCompleteLog('stderr', 'Could not find the branches field'
-                                          'in %s' % EVE_MAIN_YAML_FULL_PATH)
+                                          'in %s' % self.yaml)
             defer.returnValue(FAILURE)
 
         new_branches = {}

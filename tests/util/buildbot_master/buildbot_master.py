@@ -67,6 +67,7 @@ class BuildbotMaster(Daemon):
             GIT_REPO=git_repo,
             # GIT_REPO='git@mock:repo_owner/test.git',
             PROJECT_URL='www.example.com',
+            PROJECT_YAML='eve/main.yml',
             SECRET_ARTIFACT_CREDS='None',
             SUFFIX='test_suffix',
             DB_URL=self.db_url, )

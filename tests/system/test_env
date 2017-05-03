@@ -33,6 +33,7 @@ OPENSTACK_BUILDER_PREFIX=test_openstack_builder
 OPENSTACK_SCHEDULER_PREFIX=test_openstack_scheduler
 PB_PORT=2345
 PROJECT_URL=test_project_url
+PROJECT_YAML=eve/main.yml
 SECRET_ARTIFACT_CREDS=test_artifacts_creds
 SUFFIX=test_suffix
 TRY_PORT=3456
