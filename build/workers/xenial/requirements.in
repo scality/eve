@@ -13,6 +13,7 @@
 -r ../../../requirements/autoformat.in
 -r ../../../requirements/base.in
 -r ../../../requirements/flake8.in
+-r ../../../requirements/pydocstyle.in
 -r ../../../requirements/pylint.in
 -r ../../../requirements/system_tests.in
 -r ../../../requirements/unit.in

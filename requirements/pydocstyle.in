@@ -1,0 +1,5 @@
+# ADDITIONAL Requirements for pydocstyle testing
+# check instruction on how to reproduce in base.in
+-c constraints.txt
+
+pydocstyle
