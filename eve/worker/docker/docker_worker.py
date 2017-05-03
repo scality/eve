@@ -56,25 +56,6 @@ class EveDockerLatentWorker(AbstractLatentWorker):
             except KeyError:
                 pass
 
-        gitcache_name = util.env.GIT_CACHE_NAME
-        cmd = ['inspect', gitcache_name]
-        try:
-            self.logger.debug('Inspecting gitcache...')
-            self.docker_invoke(*cmd)
-            self.logger.debug('gitcache is already there...')
-        except RuntimeError:
-            self.logger.debug('gitcache does not exist. building...')
-            cmd = ['build', '-t', 'gitcache_img',
-                   '/opt/eve/eve/services/gitcache/']
-            self.logger.debug('running gitcache...')
-            self.docker_invoke(*cmd)
-            cmd = ['run',
-                   '--detach',
-                   '--name',
-                   gitcache_name,
-                   'gitcache_img']
-            self.docker_invoke(*cmd)
-
         cmd = [
             'run',
             '--privileged',
@@ -84,13 +65,37 @@ class EveDockerLatentWorker(AbstractLatentWorker):
             '--env', 'BUILDMASTER_PORT=%s' % self.pb_port,
             '--env', 'DOCKER_HOST_IP=%s' % docker_host_ip,
             '--env', 'ARTIFACTS_PREFIX=%s' % self.artifacts_prefix,
-            '--env', 'GIT_CACHE_HOST=%s' % gitcache_name,
-            '--env', 'GIT_CACHE_PORT=80',
-            '--link', gitcache_name,
             '--detach',
             '--memory=%s' % self.max_memory,
             '--cpus=%s' % self.max_cpus
         ]
+
+        if util.env.GITCACHE_IN_USE:
+            gitcache_hostname = util.env.GITCACHE_HOSTNAME
+            gitcache_port = util.env.GITCACHE_PORT
+            cmd2 = ['inspect', gitcache_hostname]
+            try:
+                self.logger.debug('Inspecting gitcache...')
+                self.docker_invoke(*cmd2)
+                self.logger.debug('gitcache is already there...')
+            except RuntimeError:
+                self.logger.debug('gitcache does not exist. building...')
+                cmd2 = ['build', '-t', 'gitcache_img',
+                        '/opt/eve/eve/services/gitcache/']
+                self.logger.debug('running gitcache...')
+                self.docker_invoke(*cmd2)
+                cmd2 = ['run',
+                        '--detach',
+                        '--name',
+                        gitcache_hostname,
+                        '--publish %s:80' % gitcache_port,
+                        'gitcache_img']
+                self.docker_invoke(*cmd2)
+
+            cmd.append([
+                '--env', 'GITCACHE_HOSTNAME=%s' % gitcache_hostname,
+                '--env', 'GITCACHE_PORT=%s' % gitcache_port,
+                '--link', gitcache_hostname])
 
         for volume in volumes:
             if isinstance(volume, dict):
