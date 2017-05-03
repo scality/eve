@@ -18,15 +18,15 @@ def bootstrap_builder(workers):
                 rax_pwd=util.env.RAX_PWD))
 
     git_config = None
-    if util.env.GIT_CACHE_HOST and util.env.GIT_CACHE_PORT:
-        git_cache = '{}:{}'.format(util.env.GIT_CACHE_HOST,
-                                   util.env.GIT_CACHE_PORT)
+    if util.env.GITCACHE_IN_USE:
+        gitcache = '{}:{}'.format(util.env.GITCACHE_HOSTNAME,
+                                  util.env.GITCACHE_PORT)
         git_config = {
-            'url.http://{}/https/bitbucket.org/.insteadOf'.format(git_cache):
+            'url.http://{}/https/bitbucket.org/.insteadOf'.format(gitcache):
                 'git@bitbucket.org:',
-            'url.http://{}/https/github.com/.insteadOf'.format(git_cache):
+            'url.http://{}/https/github.com/.insteadOf'.format(gitcache):
                 'git@github.com:',
-            'url.http://{}/git/.insteadOf'.format(git_cache):
+            'url.http://{}/git/.insteadOf'.format(gitcache):
                 'git://'
         }
 

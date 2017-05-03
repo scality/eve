@@ -10,7 +10,8 @@ def triggerable_builder(builder_name, workers):
     factory.addStep(steps.CancelOldBuild())
 
     # customize global Git conf to hit on docker cache
-    if builder_name == util.env.DOCKER_BUILDER_NAME:
+    if (util.env.GITCACHE_IN_USE and
+            builder_name == util.env.DOCKER_BUILDER_NAME):
         factory.addStep(ShellCommand(
             name='customize git settings to hit on cache',
             hideStepIf=lambda results, s: results == SUCCESS,
@@ -24,7 +25,7 @@ def triggerable_builder(builder_name, workers):
                     'git@github.com: && '
                     'git config --global '
                     'url.http://%(gitcache)s/git/mock/.insteadOf git@mock:' % {
-                        'gitcache': util.env.GIT_CACHE_NAME
+                        'gitcache': util.env.GITCACHE_HOSTNAME
                     },
         ))
 
