@@ -74,7 +74,7 @@ class PublicationBase(object):
     """Name of the URL given to buildbot."""
 
     def __init__(self, repository, revision,
-                 branch=None, name=None, flags=None):
+                 branch=None, name=None, flags=None, config_file=None):
         """`PublicationBase` constructor.
 
         :args repository: Repository identifier (name or slug).
@@ -82,12 +82,15 @@ class PublicationBase(object):
         :args branch: Branch name.
         :args name: Name of the code coverage report.
         :args flags: Code coverage report tags.
+        :args config_file: Relative path of the configuration file
+                             (codecov.yml).
         """
         self.repository = repository
         self.revision = revision
         self.branch = branch
         self.name = name
         self.flags = flags
+        self.config_file = config_file
 
         self.url = None
 
@@ -190,6 +193,9 @@ class CodecovIOPublication(PublicationBase):
             'build_url': build_url,
             'service': 'buildbot',
         }
+
+        if self.config_file:
+            params['yaml'] = self.config_file
 
         if self.branch:
             params['branch'] = self.branch
@@ -474,6 +480,7 @@ class PublishCoverageReport(_UploadCoverageReportsMixin, BuildStep):
         'branch',
         'uploadName',
         'flags',
+        'configFile',
         'skipMissingFile',
         'maxSize',
         'blockSize',
@@ -497,6 +504,9 @@ class PublishCoverageReport(_UploadCoverageReportsMixin, BuildStep):
     flags = None
     """Code coverage report tags."""
 
+    configFile = None
+    """Relative path of the configuration file (codecov.yml)."""
+
     def __init__(self, **kwargs):
         super(PublishCoverageReport, self).__init__(**kwargs)
 
@@ -505,7 +515,8 @@ class PublishCoverageReport(_UploadCoverageReportsMixin, BuildStep):
             self.repository, self.revision,
             branch=self.branch,
             name=self.uploadName,
-            flags=self.flags
+            flags=self.flags,
+            config_file=self.configFile,
         )
 
     def prepare_publication(self):

@@ -1006,6 +1006,7 @@ class TestPublishCodeCoverage(BaseTest):
                 'branch': publish_args['branch'],
                 'name': publish_args['uploadName'],
                 'slug': publish_args['repository'],
+                'yaml': publish_args['configFile'],
             }, {
                 'Accept': 'text/plain',
             }
