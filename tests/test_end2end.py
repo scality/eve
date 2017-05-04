@@ -988,7 +988,8 @@ class TestPublishCodeCoverage(BaseTest):
 
         try:
             steps = yaml_content['stages']['coverage_tests']['steps']
-            publish_args = steps[1]['PublishCoverageReport']
+            set_property_args = steps[1]['SetProperty']
+            publish_args = steps[2]['PublishCoverageReport']
         except (TypeError, KeyError):
             raise AssertionError(
                 'Unable to get parameters of the PublishCoverageReport step'
@@ -996,7 +997,7 @@ class TestPublishCodeCoverage(BaseTest):
 
         self.codecov_io_server.assert_request_received_with((
             'POST', '/upload/v4', {
-                'commit': publish_args['revision'],
+                'commit': set_property_args['value'],
                 'token': 'FAKE_TOKEN',
                 'build': 1,
                 'build_url': '{0}#builders/{1}/builds/{2}'.format(
