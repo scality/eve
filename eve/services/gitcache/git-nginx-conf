@@ -21,6 +21,10 @@ server {
     send_timeout                600;
     proxy_max_temp_file_size      0;
 
+    # disable keep-alive to avoid upsteam timeouts
+    proxy_http_version 1.1;
+    proxy_set_header Connection "";
+
     location ~ ^.*\.git/(HEAD|info/refs|objects/info/.*|git-(upload|receive)-pack)$ {
         fastcgi_read_timeout 300;
 
