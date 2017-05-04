@@ -1,15 +1,9 @@
 # Eve
-
-Pipeline as code in Buildbot
+Pipeline as code in Buildbot.
+Current stable branch is: development/1.0
 
 ## Support
-
 Please open an issue on JIRA RELENG project for support.
-
-## Contributing
-
-Please contribute using the ticketing process. Create a branch, add commits,
-and open a pull request.
 
 ## Developper environment
 Install the libraries required for mysql on your machine:
