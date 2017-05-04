@@ -18,16 +18,21 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor,
 # Boston, MA  02110-1301, USA.
 
+from __future__ import print_function
+
+import os
+import subprocess
 import sys
 import time
+
 import requests
 import sqlalchemy
-import subprocess
+
 
 db_url = sys.argv[1]
 wamp_router_url = sys.argv[2]
 
-print 'pinging crossbar...{} ...'.format(wamp_router_url)
+print('pinging crossbar...{} ...'.format(wamp_router_url))
 
 for i in xrange(120):
     try:
@@ -40,7 +45,7 @@ for i in xrange(120):
 else:
     raise Exception('The wamp server never responded')
 
-print 'pinging database...'
+print('pinging database...')
 sa = sqlalchemy.create_engine(db_url.split('?')[0])
 
 for i in xrange(120):
@@ -53,8 +58,6 @@ for i in xrange(120):
 else:
     raise Exception('The database never responded')
 
-import os
-
 if os.environ['MASTER_MODE'] == 'frontend':
     # Backends must start before frontends because builders need to be
     # available before launching the first build.
@@ -62,8 +65,8 @@ if os.environ['MASTER_MODE'] == 'frontend':
     # until the next sync.
     time.sleep(10)
 
-print "Upgrading master..."
+print('Upgrading master...')
 subprocess.check_call('buildbot upgrade-master .', shell=True)
 
-print "Starting master..."
+print('Starting master...')
 subprocess.check_call('twistd -ny ./buildbot.tac', shell=True)
