@@ -11,6 +11,7 @@ PyYAML              # used by yaml_parser
 buildbot-worker     # used in workers setup
 buildbot-www        # used in www setup
 buildbot[tls]       # core technology
+lz4                 # used by buildbot to compress logs
 netifaces           # used by bootstrap job
 python-novaclient   # used by EveOpenStackLatentWorker
 raven               # used by sentry
