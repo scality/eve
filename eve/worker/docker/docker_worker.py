@@ -89,31 +89,12 @@ class EveDockerLatentWorker(AbstractLatentWorker):
         ]
 
         if util.env.GITCACHE_IN_USE:
-            gitcache_hostname = util.env.GITCACHE_HOSTNAME
-            gitcache_port = util.env.GITCACHE_PORT
-            cmd2 = ['inspect', gitcache_hostname]
-            try:
-                self.logger.debug('Inspecting gitcache...')
-                self.docker_invoke(*cmd2)
-                self.logger.debug('gitcache is already there...')
-            except RuntimeError:
-                self.logger.debug('gitcache does not exist. building...')
-                cmd2 = ['build', '-t', 'gitcache_img',
-                        '/opt/eve/eve/services/gitcache/']
-                self.logger.debug('running gitcache...')
-                self.docker_invoke(*cmd2)
-                cmd2 = ['run',
-                        '--detach',
-                        '--name',
-                        gitcache_hostname,
-                        '--publish %s:80' % gitcache_port,
-                        'gitcache_img']
-                self.docker_invoke(*cmd2)
-
-            cmd.append([
-                '--env', 'GITCACHE_HOSTNAME=%s' % gitcache_hostname,
-                '--env', 'GITCACHE_PORT=%s' % gitcache_port,
-                '--link', gitcache_hostname])
+            hostname = util.env.GITCACHE_HOSTNAME
+            port = util.env.GITCACHE_PORT
+            cmd += [
+                '--env', 'GITCACHE_HOSTNAME=%s' % hostname,
+                '--env', 'GITCACHE_PORT=%s' % port,
+                '--link', hostname]
 
         for volume in volumes:
             if isinstance(volume, dict):

@@ -36,17 +36,26 @@ def bootstrap_builder(workers):
                 rax_pwd=util.env.RAX_PWD))
 
     git_config = None
+
     if util.env.GITCACHE_IN_USE:
-        gitcache = '{}:{}'.format(util.env.GITCACHE_HOSTNAME,
-                                  util.env.GITCACHE_PORT)
-        git_config = {
-            'url.http://{}/https/bitbucket.org/.insteadOf'.format(gitcache):
-                'git@bitbucket.org:',
-            'url.http://{}/https/github.com/.insteadOf'.format(gitcache):
-                'git@github.com:',
-            'url.http://{}/git/.insteadOf'.format(gitcache):
-                'git://'
-        }
+        bootstrap_factory.addStep(
+            steps.CheckGitCachePresence())
+
+    #   gitcache = util.env.GITCACHE_HOSTNAME
+    #   git_config = {
+    #       'url.http://{}/https/bitbucket.org/.insteadOf'.format(gitcache):
+    #           'git@bitbucket.org:',
+    #       'url.http://{}/https/github.com/.insteadOf'.format(gitcache):
+    #           'git@github.com:',
+    #       'url.http://{}/git/.insteadOf'.format(gitcache):
+    #           'git://'
+    #   }
+
+    # The code commented above will only work when we have full dockerization,
+    # and bootstrap runs in a docker linked to gitcache. In the meantime, we
+    # live without a cache on 'backend' machines (acceptable for the small
+    # repos # only; already deployed without cache on current production eve
+    # 1.2b1)
 
     bootstrap_factory.addStep(
         Git(name='checkout git branch',
