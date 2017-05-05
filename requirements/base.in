@@ -4,6 +4,7 @@ autobahn
 buildbot-worker
 buildbot-www
 buildbot[tls]
+lz4
 MySQL-python # Used in production with a mysql database
 netifaces
 python-dateutil
