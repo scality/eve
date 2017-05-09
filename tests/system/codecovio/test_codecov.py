@@ -177,6 +177,7 @@ class TestPublishCodeCoverage(unittest.TestCase):
                 'filepaths': [report_file],
                 'branch': 'master',
                 'uploadName': 'ucheck',
+                'configFile': '.codecov.yml',
             }
         }]))
 
@@ -212,6 +213,8 @@ class TestPublishCodeCoverage(unittest.TestCase):
                 'ucheck',
                 'slug':
                 'scality/test_codecov_io',
+                'yaml':
+                '.codecov.yml',
             }, {
                 'Accept': 'text/plain',
             }), ('PUT', '/s3/fake_report.txt', {
