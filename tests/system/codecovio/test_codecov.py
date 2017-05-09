@@ -193,26 +193,31 @@ class TestPublishCodeCoverage(unittest.TestCase):
         if self.codecov_io_server is None:
             return
 
-        self.codecov_io_server.assert_request_received_with((
-            'POST', '/upload/v4', {
-                'commit': '98f9379054719da6e7b5fd537b5a8e0ede096968',
-                'token': 'FAKETOKEN',
-                'build': build.number,
-                'build_url': '{0}#builders/{1}/builds/{2}'.format(
-                    self.cluster.api.url,
-                    child_build.builderid,
-                    child_build.number
-                ),
-                'service': 'buildbot',
-                'branch': 'master',
-                'name': 'ucheck',
-                'slug': 'scality/test_codecov_io',
-                'yaml': '.codecov.yml',
+        self.codecov_io_server.assert_request_received_with(
+            ('POST', '/upload/v4', {
+                'commit':
+                '98f9379054719da6e7b5fd537b5a8e0ede096968',
+                'token':
+                'FAKETOKEN',
+                'build':
+                build.number,
+                'build_url':
+                '{0}#builders/{1}/builds/{2}'.format(self.cluster.api.url,
+                                                     child_build.builderid,
+                                                     child_build.number),
+                'service':
+                'buildbot',
+                'branch':
+                'master',
+                'name':
+                'ucheck',
+                'slug':
+                'scality/test_codecov_io',
+                'yaml':
+                '.codecov.yml',
             }, {
                 'Accept': 'text/plain',
-            }
-        ), (
-            'PUT', '/s3/fake_report.txt', {
+            }), ('PUT', '/s3/fake_report.txt', {
                 'AWSAccessKeyId': 'FAKEAWSACCESSKID',
                 'Expires': str(self.codecov_io_server.expires),
                 'Signature': 'FAKESIGNATURE',
@@ -221,5 +226,4 @@ class TestPublishCodeCoverage(unittest.TestCase):
                 'Content-Type': 'text/plain',
                 'x-amz-acl': 'public-read',
                 'x-amz-storage-class': 'REDUCED_REDUNDANCY',
-            }
-        ))
+            }))
