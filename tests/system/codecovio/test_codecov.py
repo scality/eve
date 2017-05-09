@@ -171,9 +171,15 @@ class TestPublishCodeCoverage(unittest.TestCase):
         tree.write(report_file, encoding='utf-8', xml_declaration=True)
 
         self.local_repo.push(yaml=PreMerge(steps=[{
+            'SetProperty': {
+                'name': 'set property my_revision',
+                'property': 'my_revision',
+                'value': '98f9379054719da6e7b5fd537b5a8e0ede096968',
+            }
+        }, {
             'PublishCoverageReport': {
                 'repository': 'scality/test_codecov_io',
-                'revision': '98f9379054719da6e7b5fd537b5a8e0ede096968',
+                'revision': '%(prop:my_revision)s',
                 'filepaths': [report_file],
                 'branch': 'master',
                 'uploadName': 'ucheck',
