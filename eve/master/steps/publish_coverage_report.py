@@ -486,6 +486,16 @@ class PublishCoverageReport(_UploadCoverageReportsMixin, BuildStep):
         'blockSize',
     ]
 
+    renderables = [
+        'repository',
+        'revision',
+        'filepaths',
+        'branch',
+        'uploadName',
+        'flags',
+        'configFile',
+    ]
+
     repository = None
     """Repository identifier (name or slug)."""
 
@@ -511,13 +521,6 @@ class PublishCoverageReport(_UploadCoverageReportsMixin, BuildStep):
         super(PublishCoverageReport, self).__init__(**kwargs)
 
         self.tmpdir = None
-        self.publication = self.publication_cls(
-            self.repository, self.revision,
-            branch=self.branch,
-            name=self.uploadName,
-            flags=self.flags,
-            config_file=self.configFile,
-        )
 
     def prepare_publication(self):
         """Prepare the upload of all code coverage report files.
@@ -567,20 +570,28 @@ class PublishCoverageReport(_UploadCoverageReportsMixin, BuildStep):
             nsrcs, 'report' if nsrcs == 1 else 'reports'
         )
 
+        publication = self.publication_cls(
+            self.repository, self.revision,
+            branch=self.branch,
+            name=self.uploadName,
+            flags=self.flags,
+            config_file=self.configFile,
+        )
+
         @defer.inlineCallbacks
         def startUploadAndPublishReports(tmpdir):
             (result, reports) = yield self.uploadCoverageReports(tmpdir)
             if result in [SUCCESS, WARNINGS]:
-                (result, name, text) = yield self.publication.publish(
+                (result, name, text) = yield publication.publish(
                     self.build, reports
                 )
 
                 if result == SUCCESS and \
-                   self.publication.url_name and \
-                   self.publication.url:
+                   publication.url_name and \
+                   publication.url:
                     self.addURL(
-                        self.publication.url_name,
-                        self.publication.url
+                        publication.url_name,
+                        publication.url
                     )
 
                 if name and text:
