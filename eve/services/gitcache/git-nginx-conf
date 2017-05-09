@@ -21,7 +21,7 @@ server {
     send_timeout                600;
     proxy_max_temp_file_size      0;
 
-    # disable keep-alive to avoid upsteam timeouts
+    # disable keep-alive to avoid upstream timeouts
     proxy_http_version 1.1;
     proxy_set_header Connection "";
 
