@@ -30,6 +30,7 @@ def triggerable_builder(builder_name, workers):
     # customize global Git conf to hit on docker cache
     if (util.env.GITCACHE_IN_USE and
             builder_name == util.env.DOCKER_BUILDER_NAME):
+        git_repo = util.env.GIT_REPO
         factory.addStep(ShellCommand(
             name='customize git settings to hit on cache',
             hideStepIf=lambda results, s: results == SUCCESS,
@@ -42,8 +43,15 @@ def triggerable_builder(builder_name, workers):
                     'url.http://%(gitcache)s/https/github.com/.insteadOf '
                     'git@github.com: && '
                     'git config --global '
-                    'url.http://%(gitcache)s/git/mock/.insteadOf git@mock:' % {
-                        'gitcache': util.env.GITCACHE_HOSTNAME
+                    'url.http://%(gitcache)s/git/mock/.insteadOf git@mock: && '
+                    'git config --global '
+                    'lfs.url '
+                    '"http://%(gitcache)s:81/%(githost)s/%(gitowner)s/'
+                    '%(gitrepo)s/info/lfs"' % {
+                        'gitcache': util.env.GITCACHE_HOSTNAME,
+                        'githost': git_repo.split('@')[1].split(':')[0],
+                        'gitowner': git_repo.split(':')[1].split('/')[0],
+                        'gitrepo': git_repo.rsplit('/', 1)[1]
                     },
         ))
 

@@ -22,6 +22,7 @@ COPY git-proxy-cache-and-http-backend /usr/lib/git-core/git-proxy-cache-and-http
 COPY git-nginx-conf /etc/nginx/sites-enabled/default
 
 RUN \
+  mkdir -p /data/nginx && \
   chmod 777 /usr/lib/git-core/git-proxy-cache-and-http-backend && \
   git config --system credential.helper 'store --file=/var/lib/git/.git-credentials'
 
