@@ -15,8 +15,8 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor,
 # Boston, MA  02110-1301, USA.
+"""Hack to not restart a worker substantiating on failure."""
 
-"""HACK to not restart a worker substantiating on failure."""
 import buildbot.process.build
 from buildbot.process.results import FAILURE
 

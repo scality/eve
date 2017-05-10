@@ -15,7 +15,6 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor,
 # Boston, MA  02110-1301, USA.
-
 """Step patching feature."""
 
 import yaml
@@ -26,13 +25,14 @@ from twisted.logger import Logger
 
 
 class StepPatcherConfig(BuildStep):
-    """Parses the patch config file and sets the corresponding property.
+    """Parse the patch config file and sets the corresponding property.
 
     The config file path should be set in the conf_path argument.
     If this variable is not set, the step patching feature is
     disabled.
 
     """
+
     name = 'step patcher config'
     logger = Logger('eve.steps.StepPatcherReader')
 
@@ -58,6 +58,5 @@ class StepPatcherConfig(BuildStep):
         if not config:
             return defer.succeed(SUCCESS)
         else:
-            self.logger.info("Setting patching config: {conf}",
-                             conf=config)
+            self.logger.info("Setting patching config: {conf}", conf=config)
             return defer.succeed(WARNINGS)

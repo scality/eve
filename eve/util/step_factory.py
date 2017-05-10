@@ -71,6 +71,7 @@ def replace_with_interpolate(obj):
     Read step arguments from the yaml file and replaces them with
     interpolate objects when relevant so they can be replaced with
     properties when run.
+
     """
 
     if isinstance(obj, dict):

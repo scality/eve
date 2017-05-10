@@ -41,12 +41,15 @@ class DenyRebuildIntermediateBuild(EndpointMatcherBase):
 
     Here we need to deny the endpoint for all roles if the build is an
     intermediate build of the given builder.
+
     """
 
     def __init__(self, root_builder_name, **kwargs):
         """`DenyRebuildBuildEndpointMatcher` constructor.
 
-        :args root_builder_name: Name of the root builder.
+        Args:
+            root_builder_name (str): Name of the root builder.
+
         """
         self.root_builder_name = root_builder_name
 
@@ -54,10 +57,12 @@ class DenyRebuildIntermediateBuild(EndpointMatcherBase):
 
     @defer.inlineCallbacks
     def match_BuildEndpoint_rebuild(self, epobject, epdict, _):
-        """Called by `~.EndpointMatcherBase.match` for rebuild endpoint.
+        """Disallow rebuild of anything else than the root builder.
 
-        :raises Forbidden: If the builder name is an intermediate
-                             build of the given root builder.
+        Raises:
+            Forbidden: If the builder name is an intermediate build of the
+                given root builder.
+
         """
         build = yield epobject.get({}, epdict)
         buildrequest = yield self.master.data.get(

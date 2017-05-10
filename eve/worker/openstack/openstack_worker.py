@@ -15,7 +15,6 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor,
 # Boston, MA  02110-1301, USA.
-
 """Allow eve to use openstack workers."""
 
 import re
@@ -36,10 +35,14 @@ from ..ngrok import Ngrok
 
 
 class EveOpenStackLatentWorker(OpenStackLatentWorker):
-    """Improved version of OpenStackLatentWorker that adds:
-    - Support for regions (Required for Rackspace)
-    - Automatically installs a buildbot worker after spawn using ssh
+    """Eve version of OpenStackLatenteWorker.
+
+    Improved version of OpenStackLatentWorker that adds:
+        - Support for regions (Required for Rackspace).
+        - Automatically installs a buildbot worker after spawn using ssh.
+
     """
+
     logger = Logger('eve.EveOpenStackLatentWorker')
 
     # (address, port) tuple used to configure buildbot-worker on VM
@@ -74,9 +77,14 @@ class EveOpenStackLatentWorker(OpenStackLatentWorker):
         self._starting_instance = False
 
     def ssh(self, cmd):
-        """ Execute an ssh command on the instance.
-        :param cmd: The command to launch
-        :return: the output of the command
+        """Execute an ssh command on the instance.
+
+        Args:
+            cmd: The command to launch.
+
+        Returns:
+            str: The output of the command.
+
         """
         self.logger.debug('Executing "%s" on %s %s' %
                           (cmd, self.workername, self.ip_address))
@@ -88,11 +96,12 @@ class EveOpenStackLatentWorker(OpenStackLatentWorker):
         return res
 
     def scp(self, src, dst):
-        """
-        Send files to instance using scp
-        :param src: the source file
-        :param dst: the destination file
-        :return:
+        """Send files to instance using scp.
+
+        Args:
+            src (str): The source file.
+            dst (str): The destination file.
+
         """
         self.logger.debug('Copying %s to on %s %s:%s ' %
                           (src, self.ip_address, dst, self.workername))
@@ -104,7 +113,7 @@ class EveOpenStackLatentWorker(OpenStackLatentWorker):
         return res
 
     def ssh_ping(self):
-        """Dummy command to test ssh connexion."""
+        """Test ssh connexion with a dummy command."""
         self.ssh('ls')
 
     @defer.inlineCallbacks
@@ -185,11 +194,11 @@ class EveOpenStackLatentWorker(OpenStackLatentWorker):
     def start_worker(self, init_script):
         """Execute init scripts remotely and launches buildbot worker.
 
-        - run the init script provided by project (installs buildbot,
-          creates user `eve` for target system)
-        - run cloud init script, common to all workers (typically: adds
-          ssh keys)
-        - instanciate buildbot worker
+        - Run the init script provided by project (installs buildbot,
+          creates user `eve` for target system).
+        - Run cloud init script, common to all workers (typically: adds
+          ssh keys).
+        - Instanciate buildbot worker.
 
         """
         self.scp(init_script, '/tmp/worker_init.sh')
@@ -299,10 +308,13 @@ class EveOpenStackLatentWorker(OpenStackLatentWorker):
 def get_active_servers_by_name(server_name, nova_client):
     """Get all active servers having a given name.
 
-        :param server_name: the server name we are looking for
-        :param nova_client: a nova client
+    Args:
+        server_name (str): The server name we are looking for.
+        nova_client: A nova client.
 
-        :return: a list of servers having given name.
+    Returns:
+        A list of servers having given name.
+
     """
     return nova_client.servers.list(search_opts={'name': server_name})
 
@@ -310,10 +322,14 @@ def get_active_servers_by_name(server_name, nova_client):
 def get_openstack_image_by_name(image_name, nova_client):
     """Identification of an OpenStack image based on its name.
 
-        :param image_name: a list of nova image objects
-        :param nova_client: a nova client
-        :return: the image that matches the name
-        """
+    Args:
+        image_name: A list of nova image objects.
+        nova_client: A nova client.
+
+    Returns:
+        The image that matches the name.
+
+    """
 
     images = nova_client.images.list()
     for image in images:

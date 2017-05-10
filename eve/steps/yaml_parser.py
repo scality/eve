@@ -40,7 +40,9 @@ class ReadConfFromYaml(FileUpload):
 
     This step Reads the YAML file and converts it to a `conf` property which
     is made available to the following steps.
+
     """
+
     logger = Logger('eve.steps.ReadConfFromYaml')
 
     def __init__(self, **kwargs):
@@ -59,8 +61,7 @@ class ReadConfFromYaml(FileUpload):
     def run(self):
         result = yield FileUpload.run(self)
         if result != SUCCESS:
-            self.addCompleteLog('stderr', 'Could not find %s' %
-                                self.yaml)
+            self.addCompleteLog('stderr', 'Could not find %s' % self.yaml)
             defer.returnValue(result)
 
         raw_conf = open(self.masterdest).read()
@@ -184,11 +185,13 @@ class StepPatcher(object):
 
 
 class StepExtractor(BuildStep):
-    """Extracts and adds the build steps to the current builder.
+    """Extract and add the build steps to the current builder.
 
     This step extracts the build steps from the `conf` property and adds them
     to the current builder. It also adds a step to build an image.
+
     """
+
     name = 'step extractor'
     logger = Logger('eve.steps.StepExtractor')
 

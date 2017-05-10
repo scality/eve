@@ -15,8 +15,8 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor,
 # Boston, MA  02110-1301, USA.
-
 """Allow eve to send reports."""
+
 import re
 
 from buildbot.process.results import (CANCELLED, EXCEPTION, FAILURE, RETRY,
@@ -38,9 +38,8 @@ CLOCK_ICON = 'https://image.freepik.com/free-icon/clock-of-circular-shape-at' \
 
 
 class BaseBuildStatusPush(HttpStatusPushBase):
-    """
-    Base class for pushing build status
-    """
+    """Base class for pushing build status."""
+
     repo = None
     neededDetails = dict(wantProperties=True, wantSteps=True)
     RESULT_COLOR_CORRESP = {
@@ -50,11 +49,12 @@ class BaseBuildStatusPush(HttpStatusPushBase):
         SKIPPED: 'white',
         EXCEPTION: 'purple',
         RETRY: 'purple',
-        CANCELLED: 'pink'}
+        CANCELLED: 'pink',
+    }
 
     @defer.inlineCallbacks
     def getDetailsForTriggeredBuilds(self, build):  # noqa
-        """get details for triggered builds."""
+        """Get details for triggered builds."""
         for step in build['steps']:
             step.setdefault('triggered_builds', [])
             for url in step['urls']:
@@ -79,10 +79,14 @@ class BaseBuildStatusPush(HttpStatusPushBase):
             yield self.send(build)
 
     def gather_data(self, build):
-        """
-        Gathers data to be used in build status
-        :param build: The build dictionary
-        :return: (key, result, title, summary, description)
+        """Gathers data to be used in build status.
+
+        Args:
+            build (dict): The build dictionary.
+
+        Returns:
+            dict: (key, result, title, summary, description).
+
         """
         key = build['properties']['stage_name'][0]
         src = build['buildset']['sourcestamps'][0]
@@ -114,7 +118,7 @@ class BaseBuildStatusPush(HttpStatusPushBase):
         return key, result, title, summary, description
 
     def getStepsWithResult(self, build):  # noqa
-        """get steps with result."""
+        """Get steps with result."""
         res = []
         for step in build['steps']:
             if step['results'] != build['results']:
@@ -125,20 +129,20 @@ class BaseBuildStatusPush(HttpStatusPushBase):
                         continue
                     for step_chain in self.getStepsWithResult(trig_build):
                         stage_name = trig_build['properties']['stage_name'][0]
-                        res.append('%s -> %s' % (stage_name,
-                                                 step_chain))
+                        res.append('%s -> %s' % (stage_name, step_chain))
             else:
                 res.append(step['name'])
         return res
 
     def add_tag(self, name, value, icon, color=None):
-        """
-        Add a tag (name+value) to the status
-        :param name: The name of the tag
-        :param value: The value of the tag
-        :param icon: a square image url (can be None) (HipChat Only)
-        :param color: The color of the tag (HipChat Only)
-        :return: None
+        """Add a tag (name, value) to the status.
+
+        Args:
+            name (str): The name of the tag.
+            value (str): The value of the tag.
+            icon (str): A square image url (can be None) (HipChat Only).
+            color (str): The color of the tag (HipChat Only).
+
         """
         raise NotImplementedError()
 
@@ -158,6 +162,7 @@ class BuildStatusPushMixin(object):
 
 class HipChatBuildStatusPush(BaseBuildStatusPush, BuildStatusPushMixin):
     """Send build result to HipChat build status API."""
+
     name = 'HipChatBuildStatusPush'
     logger = Logger('eve.steps.HipChatBuildStatusPush')
     attributes = []
@@ -170,7 +175,8 @@ class HipChatBuildStatusPush(BaseBuildStatusPush, BuildStatusPushMixin):
         'pink': 'lozenge-error',
         'brown': 'lozenge-moved',
         'blue': 'lozenge-complete',
-        'gray': 'lozenge'}
+        'gray': 'lozenge',
+    }
     HIPCHAT_COLOR_CORRESP = {
         SUCCESS: 'green',
         WARNINGS: 'yellow',
@@ -179,7 +185,8 @@ class HipChatBuildStatusPush(BaseBuildStatusPush, BuildStatusPushMixin):
         EXCEPTION: 'purple',
         RETRY: 'purple',
         CANCELLED: 'gray',
-        None: 'gray'}
+        None: 'gray',
+    }
 
     def __init__(self, room_id, token, **kwargs):
         self.room_id = room_id
@@ -196,17 +203,14 @@ class HipChatBuildStatusPush(BaseBuildStatusPush, BuildStatusPushMixin):
 
     def filterBuilds(self, build):
         return self._filterBuilds(
-            super(HipChatBuildStatusPush, self).filterBuilds,
-            build)
+            super(HipChatBuildStatusPush, self).filterBuilds, build)
 
     @defer.inlineCallbacks
     def send(self, build):
         """Send build status to HipChat."""
         if not self.room_id or not self.token:
-            self.logger.info(
-                'Hipchat status not sent'
-                ' (HIPCHAT_* variables not defined))'
-            )
+            self.logger.info('Hipchat status not sent'
+                             ' (HIPCHAT_* variables not defined))')
             return
 
         self.attributes = []
@@ -248,6 +252,7 @@ class HipChatBuildStatusPush(BaseBuildStatusPush, BuildStatusPushMixin):
 
 class BitbucketBuildStatusPush(BaseBuildStatusPush, BuildStatusPushMixin):
     """Send build result to bitbucket build status API."""
+
     name = 'BitbucketBuildStatusPush'
     description_suffix = ''
     logger = Logger('eve.steps.BitbucketBuildStatusPush')
@@ -275,7 +280,7 @@ class BitbucketBuildStatusPush(BaseBuildStatusPush, BuildStatusPushMixin):
                % {
                    'repo_owner': 'scality',
                    'repo_name': self.repo,
-                   'sha1': sha1
+                   'sha1': sha1,
                }
 
     def add_tag(self, name, value, icon, color=None):
@@ -284,8 +289,7 @@ class BitbucketBuildStatusPush(BaseBuildStatusPush, BuildStatusPushMixin):
 
     def filterBuilds(self, build):
         return self._filterBuilds(
-            super(BitbucketBuildStatusPush, self).filterBuilds,
-            build)
+            super(BitbucketBuildStatusPush, self).filterBuilds, build)
 
     @defer.inlineCallbacks
     def send(self, build):
@@ -299,7 +303,7 @@ class BitbucketBuildStatusPush(BaseBuildStatusPush, BuildStatusPushMixin):
             'key': key,
             'name': summary,
             'url': build['url'],
-            'description': description + self.description_suffix
+            'description': description + self.description_suffix,
         }
         url = self.forge_url(build)
 
@@ -321,12 +325,12 @@ class BitbucketBuildStatusPush(BaseBuildStatusPush, BuildStatusPushMixin):
 
 class GithubBuildStatusPush(GitHubStatusPush, BuildStatusPushMixin):
     """Send build result to github build status API."""
+
     logger = Logger('eve.steps.GithubBuildStatusPush')
 
     def filterBuilds(self, build):
         return self._filterBuilds(
-            super(GithubBuildStatusPush, self).filterBuilds,
-            build)
+            super(GithubBuildStatusPush, self).filterBuilds, build)
 
     @defer.inlineCallbacks
     def send(self, build):

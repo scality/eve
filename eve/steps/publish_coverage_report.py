@@ -15,7 +15,6 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor,
 # Boston, MA  02110-1301, USA.
-
 """Code coverage report publication buildbot step.
 
 This file provide the `PublishCoverageReport` which is a buildbot step
@@ -23,14 +22,10 @@ class.
 It's used to publish a generic code coverage report.
 
 Content:
+    - `PublicationBase`: Base class for all publication classes.
+    - `CodecovIOPublication`: Codecov IO publication class.
+    - `PublishCoverageReport`: Buildbot step to publish a code coverate report.
 
-* `PublicationBase`: Base class for all publication classes.
-* `CodecovIOPublication`: Codecov IO publication class.
-
-Used to publish code coverage report to codecov.io.
-
-* `PublishCoverageReport`: Buildbot step to publish a code coverate
-  report.
 """
 
 import abc
@@ -66,13 +61,14 @@ class PublicationBase(object):
                  branch=None, name=None, flags=None, config_file=None):
         """`PublicationBase` constructor.
 
-        :args repository: Repository identifier (name or slug).
-        :args revision: Version control revision ID (E.g. git changeset).
-        :args branch: Branch name.
-        :args name: Name of the code coverage report.
-        :args flags: Code coverage report tags.
-        :args config_file: Relative path of the configuration file
-                             (codecov.yml).
+        Args:
+            repository: Repository identifier (name or slug).
+            revision: Version control revision ID (E.g. git changeset).
+            branch: Branch name.
+            name: Name of the code coverage report.
+            flags: Code coverage report tags.
+            config_file: Relative path of the configuration file (codecov.yml).
+
         """
         self.repository = repository
         self.revision = revision
@@ -98,35 +94,38 @@ class CodecovIOPublication(PublicationBase):
     def publish(self, build, reports):
         """Publish all given code coverage report files.
 
-        :args build: Buildbot build which execute the
-                       `PublishCoverageReport` step.
-        :args reports: List of code coverage report files to publish.
+        To publish a code coverage report to *codecov* service, we first need
+        to make a request to notify codecov we want upload a new code coverage
+        report.
+        After that, ``codecov`` return us a temporary URL to S3 server where we
+        can upload the code coverage report.
 
-        :returns: (result, name, text).
+        For more details, see `codecov documentation`_.
 
-          - *result*: Publish step result (*SUCCESS*, *FAILURE* or *SKIPPED*).
-          - *name* and *text* are respectively the title and the
-             content of the buildbot complete log of the step.
-             It's used to return additionnal information for the
-             occured error or to give the skip reason.
+        Args:
+            build: Buildbot build which execute the PublishCoverageReport step.
+            reports: List of code coverage report files to publish.
 
-        To publish a code coverage report to *codecov* service, we
-        first need to make a request to notify codecov we want upload
-        a new code coverage report.
-        After that, ``codecov`` return us a temporary URL to S3 server
-        where we can upload the code coverage report.
-        For more details, see https://docs.codecov.io/v4.3.0/reference#upload.
+        Returns:
+            (result, name, text).
+
+            - *result*: Publish step result (*SUCCESS*, *FAILURE* or
+                        *SKIPPED*).
+            - *name* and *text* are respectively the title and the content of
+              the buildbot complete log of the step.
+              It's used to return additionnal information for the occured error
+              or to give the skip reason.
+
+        .. _codecov documentation:
+           https://docs.codecov.io/v4.3.0/reference#upload
+
         """
         if not self.revision:
-            defer.returnValue(
-                (FAILURE, 'error', 'Missing revision')
-            )
+            defer.returnValue((FAILURE, 'error', 'Missing revision'))
 
         if not util.env.CODECOV_IO_UPLOAD_TOKEN:
-            defer.returnValue(
-                (SKIPPED, 'reason',
-                 'Codecov.io upload token not given to Eve')
-            )
+            defer.returnValue((SKIPPED, 'reason',
+                               'Codecov.io upload token not given to Eve'))
 
         (result, arg1, arg2) = yield self._send_to_codecov(build)
         if result != SUCCESS:
@@ -142,25 +141,27 @@ class CodecovIOPublication(PublicationBase):
     def _send_to_codecov(self, build):
         """Notify ``codecov`` we want upload a new code coverage report file.
 
-        :arg build: Buildbot build which execute the
-                      `PublishCoverageReport` step.
-
         ``codecov`` need multiple query parameters:
-          - *commit*: The destination commit sha for the report (mandatory)
-          - *token*: A UUID token used to identify the project (mandatory).
+            - *commit*: The destination commit sha for the report (mandatory)
+            - *token*: A UUID token used to identify the project (mandatory).
 
-          - *branch*: The target branch for the report. This value may
-             be overridden during the Codecov discovery process.
-          - *build*: The build number provided by your CI service.
-          - *job*: The job number provided by your CI service.
-          - *build_url*: The http url to link back to your CI provider.
-          - *name*: A custom name for this specific upload.
-          - *slug*: The owner/repo slug name of the project.
-          - *yaml*: The relative path to the codecov.yml in this project.
-          - *service*: The CI service name (buildbot in our case).
-          - *flags*: Used for Flags. Can be one or more flags. E.g.,
-             flags=unit or flags=unit,java
-          - *pr*: The pull request number this commit is currently found in.
+            - *branch*: The target branch for the report. This value may
+                        be overridden during the Codecov discovery process.
+            - *build*: The build number provided by your CI service.
+            - *job*: The job number provided by your CI service.
+            - *build_url*: The http url to link back to your CI provider.
+            - *name*: A custom name for this specific upload.
+            - *slug*: The owner/repo slug name of the project.
+            - *yaml*: The relative path to the codecov.yml in this project.
+            - *service*: The CI service name (buildbot in our case).
+            - *flags*: Used for Flags. Can be one or more flags. E.g.,
+                       flags=unit or flags=unit,java
+            - *pr*: The pull request number this commit is currently found in.
+
+        Args:
+            build: Buildbot build which execute the `PublishCoverageReport`
+                step.
+
         """
         http = yield httpclientservice.HTTPClientService.getService(
             build.master, util.env.CODECOV_IO_BASE_URL, headers={
@@ -226,11 +227,13 @@ class CodecovIOPublication(PublicationBase):
     def _send_to_s3(self, build, s3_url, reports):
         """Store the code coverage report file in S3.
 
-        :args build: Buildbot build which execute the
-                      `PublishCoverageReport` step.
-        :args s3_url: URL returned by ``codecov`` where we can upload
-                        the report.
-        :args reports: List of code coverage report files.
+        Args:
+            build: Buildbot build which execute the `PublishCoverageReport`
+                step.
+            s3_url (str): URL returned by ``codecov`` where we can upload
+                the report.
+            reports: List of code coverage report files.
+
         """
         s3_url_parts = urlparse.urlparse(s3_url)
         s3_url_endpoint = '{0}://{1}'.format(
@@ -304,12 +307,13 @@ class CodecovIOPublication(PublicationBase):
 class _UploadCoverageReportsMixin(object):
     """Mixin class to upload code coverage report files from worker to master.
 
-    We could have used `~buildbot.steps.transfer.MultipleFileUpload`
+    We could have used `~buildbot.steps.transfer.MultipleFileUpload`.
     to do the job but:
-    - This class allow to upload directory, what we don't want.
-    - This class call directly the ``finished`` function after all
-      upload. It's very difficult and dirty to override this behaviour.
-    - This class can't ignore missing files.
+        - This class allow to upload directory, what we don't want.
+        - This class call directly the ``finished`` function after all upload.
+          It's very difficult and dirty to override this behaviour.
+        - This class can't ignore missing files.
+
     """
 
     maxSize = None
@@ -333,6 +337,7 @@ class _UploadCoverageReportsMixin(object):
 
         - Check availability of worker features.
         - Skip the upload if no given report files.
+
         """
         if not self.filepaths:
             self.addCompleteLog('reason', 'No given report')
@@ -347,7 +352,10 @@ class _UploadCoverageReportsMixin(object):
     def _statOnRemoteReport(self, filepath):
         """Execute 'stat' command on remote file.
 
-        :returns None: If the given file doesn't exists on the worker.
+        Returns:
+            The output of `stat` or None if the given file doesn't exists on
+            the worker.
+
         """
         args = {
             'file': filepath,
@@ -372,8 +380,10 @@ class _UploadCoverageReportsMixin(object):
     def _uploadRemoteReport(self, workersrc, masterdest):
         """Upload the remote file into the master.
 
-        :args workersrc: Path of the file to upload in the worker.
-        :args masterdest: Path of the file to write in the master.
+        Args:
+            workersrc (str): Path of the file to upload in the worker.
+            masterdest (str): Path of the file to write in the master.
+
         """
         file_writer = remotetransfer.FileWriter(masterdest, self.maxSize, None)
 
@@ -406,8 +416,9 @@ class _UploadCoverageReportsMixin(object):
     def uploadCoverageReports(self, destdir):
         """Upload all code coverage report files from worker.
 
-        :args destdir: Path of the directory in the master to store
-                         all reports.
+        Args:
+            destdir (str): Path of the dir on the master to store reports.
+
         """
         workersrcs = []
         for workersrc in set(self.filepaths):
@@ -508,8 +519,9 @@ class PublishCoverageReport(_UploadCoverageReportsMixin, BuildStep):
     def prepare_publication(self):
         """Prepare the upload of all code coverage report files.
 
-        - Create a temporary directory in the master to store all
-          reports from the buildbot worker.
+        Create a temporary directory in the master to store all reports from
+        the buildbot worker.
+
         """
         try:
             self.tmpdir = tempfile.mkdtemp(
@@ -528,22 +540,21 @@ class PublishCoverageReport(_UploadCoverageReportsMixin, BuildStep):
             return SUCCESS
 
     def start(self):
-        """Main funcion of the buildbot step.
+        """Start the publish step.
 
         Mandatory arguments:
-
-        * **repository**: Name of the git repository.
-        * **revision**:  The destination commit sha for the report.
-        * **filepaths**: List of code coverage report file path.
+            - **repository**: Name of the git repository.
+            - **revision**:  The destination commit sha for the report.
+            - **filepaths**: List of code coverage report file path.
 
         Optional arguments:
+            - **branch**: Name of the branch.
+            - **uploadName**: Upload identifier.
+            - **flags**: List of report flag.
+            - **skipMissingFile**: Skip or not missing report file.
+            - **maxSize**: Upload max size.
+            - **blockSize**: Upload block size.
 
-        * **branch**: Name of the branch.
-        * **uploadName**: Upload identifier.
-        * **flags**: List of report flag.
-        * **skipMissingFile**: Skip or not missing report file.
-        * **maxSize**: Upload max size.
-        * **blockSize**: Upload block size.
         """
         result = self.prepare_publication()
         if result != SUCCESS:

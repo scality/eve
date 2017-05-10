@@ -67,6 +67,4 @@ def try_scheduler():
 
 
 def triggerable_scheduler(scheduler_name, builder_name):
-    return Triggerable(
-        name=scheduler_name,
-        builderNames=[builder_name])
+    return Triggerable(name=scheduler_name, builderNames=[builder_name])

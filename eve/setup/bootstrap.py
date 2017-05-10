@@ -38,8 +38,7 @@ def bootstrap_builder(workers):
     git_config = None
 
     if util.env.GITCACHE_IN_USE:
-        bootstrap_factory.addStep(
-            steps.CheckGitCachePresence())
+        bootstrap_factory.addStep(steps.CheckGitCachePresence())
 
     #   gitcache = util.env.GITCACHE_HOSTNAME
     #   git_config = {
@@ -68,8 +67,7 @@ def bootstrap_builder(workers):
             haltOnFailure=True,
             config=git_config))
 
-    bootstrap_factory.addStep(
-        steps.CancelNonTipBuild())
+    bootstrap_factory.addStep(steps.CancelNonTipBuild())
 
     bootstrap_factory.addStep(
         SetProperty(

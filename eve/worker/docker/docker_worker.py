@@ -15,7 +15,6 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor,
 # Boston, MA  02110-1301, USA.
-
 """Allow eve to use docker workers."""
 
 import time
@@ -32,9 +31,13 @@ from twisted.python import log
 
 
 class EveDockerLatentWorker(AbstractLatentWorker):
-    """Improved version of DockerLatentWorker using the docker command line
-     client instead of docker-py which was the cause of multiple dead locks
+    """Eve version on the DockerLetentWorker.
+
+    Improved version of DockerLatentWorker using the docker command line client
+    instead of docker-py which was the cause of multiple dead locks.
+
     """
+
     logger = Logger('eve.workers.EveDockerLatentWorker')
     instance = None
 
@@ -149,11 +152,18 @@ class EveDockerLatentWorker(AbstractLatentWorker):
         self.logger.debug('Container %s stopped successfully.' % instance)
 
     def docker_invoke(self, *args):
-        """Calls the docker client binary with the arguments given as a
-         parameter and logs exceptions if any.
-         Returns the output of the commmand (stderr + stdout)
+        """Call the docker client binary.
 
-         """
+        It calls the `docker` command with the arguments given as a parameter
+        and logs exceptions if any.
+
+        Args:
+            *args: Arguments to pass to `docker`.
+
+        Returns:
+            str: The output of the commmand (stderr + stdout).
+
+        """
         cmd = ['docker']
         cmd.extend(args)
         cmd_shell = ' '.join(cmd)

@@ -15,9 +15,8 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor,
 # Boston, MA  02110-1301, USA.
+"""Hack to fix a bug where the git diff is sent as str instead of unicode."""
 
-"""HACK to fix a bug where the git diff is sent as an str instead of
-unicode and triggers an exception."""
 from buildbot.process import buildrequest
 
 

@@ -23,13 +23,14 @@ from twisted.python import log
 
 
 def getChanges(request, _options=None):
-    """Catch a POST request from BitBucket and start a build process
+    """Catch a POST request from BitBucket and start a build process.
 
     Check the URL below if you require more information about payload
     https://confluence.atlassian.com/display/BITBUCKET/POST+Service+Management
 
-    :param request: the http request Twisted object
-    :param _options: additional options
+    Args:
+        request: The http request Twisted object.
+        _options: Additional options.
 
     """
     log.msg('Processing changes from bitbucket')
