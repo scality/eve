@@ -43,7 +43,8 @@ class Daemon(object):
         """Specify a daemon that can be interacted with.
 
         Args:
-            name: the name of the daemons (displayed in logs)
+            name (str): The name of the daemons (displayed in logs).
+
         """
         self._name = name
         self._base_path = tempfile.mkdtemp(
@@ -77,6 +78,7 @@ class Daemon(object):
 
         This should be avoided. Try to kill the daemons cleanly in
         teardown methods with stop().
+
         """
         if self._process.returncode is not None:
             return  # The child exited properly
@@ -115,7 +117,7 @@ class Daemon(object):
         """Wait for the daemon to start / stop.
 
         Args:
-            delay (int): number of seconds after which an exception is raised
+            delay (int): Number of seconds after which an exception is raised.
 
         """
         for _ in xrange(delay):

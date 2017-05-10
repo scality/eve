@@ -42,9 +42,10 @@ class LocalGitRepo(object):
         """Create a new commit to trigger a test build.
 
         Args:
-            yaml (YamlFactory or str): The yaml file to be pushed
-            dirs (list): Additional folders to be pushed to the git repo root
-            branch (str): the branch name to push to
+            yaml (YamlFactory or str): The yaml file to be pushed.
+            dirs (list): Additional folders to be pushed to the git repo root.
+            branch (str): The branch name to push to.
+
         """
         if branch is None:
             branch = 'bugfix/heal_the_world_{}'.format(uuid4())
@@ -73,8 +74,8 @@ class LocalGitRepo(object):
         """Return a list of loglines from the git log command.
 
         Returns:
-            list: the lines resulting from git log command
-                  `git log --pretty=format:"%an %ae|%s|%H|%cd" --date=iso`
+            list: The lines resulting from git log command
+                `git log --pretty=format:"%an %ae|%s|%H|%cd" --date=iso`.
 
         """
         res = cmd(

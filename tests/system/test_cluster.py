@@ -30,9 +30,9 @@ class TestCluster(unittest.TestCase):
         """Test cluster start and stop.
 
         Steps:
-            - start a cluster with 01 frontend and 01 backend
-            - check that there are no errors in logs
-            - stop it
+            - Start a cluster with 01 frontend and 01 backend.
+            - Check that there are no errors in logs.
+            - Stop it.
 
         """
         cluster = Cluster().start()
@@ -43,11 +43,11 @@ class TestCluster(unittest.TestCase):
         """Test addition of extra masters to a cluster.
 
         Steps:
-            - start a cluster with 01 frontend and 01 backend
-            - add a frontend
-            - add a backend
-            - check that there are no errors in logs
-            - stop it
+            - Start a cluster with 01 frontend and 01 backend.
+            - Add a frontend.
+            - Add a backend.
+            - Check that there are no errors in logs.
+            - Stop it.
 
         """
         cluster = Cluster()
@@ -63,10 +63,10 @@ class TestCluster(unittest.TestCase):
         """Test a simple build success on a cluster.
 
         Steps:
-            - start a cluster with 01 frontend and 01 backend
-            - force a job
-            - check that all the expected steps are there
-            - stop it
+            - Start a cluster with 01 frontend and 01 backend.
+            - Force a job.
+            - Check that all the expected steps are there.
+            - Stop it.
 
         """
         cluster = Cluster().start()
@@ -157,8 +157,8 @@ class TestCluster(unittest.TestCase):
         """Test worker environment.
 
         Steps:
-            - Spawn worker
-            - Check Eve environment variables are not setted in the worker
+            - Spawn worker.
+            - Check Eve environment variables are not setted in the worker.
 
         """
         os.environ['FOO'] = 'bar'

@@ -30,8 +30,8 @@ class DockerizedBuildbotMaster(BuildbotMaster):
         """Dockerized buildbot master daemon.
 
         Args:
-            *args: Same as the BuildbotMaster class
-            **kwargs: Same as the BuildbotMaster class
+            *args: Same as the BuildbotMaster class.
+            **kwargs: Same as the BuildbotMaster class.
 
         """
         super(DockerizedBuildbotMaster, self).__init__(*args, **kwargs)

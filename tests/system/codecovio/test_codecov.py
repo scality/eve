@@ -32,9 +32,8 @@ class TestPublishCodeCoverage(unittest.TestCase):
     At this moment, only ``codecov.io`` service is supported.
 
     These tests are two operating modes:
-
-    - The first is to use an internal mock ``codecov.io`` server.
-    - The second use the real ``codecov.io`` service.
+        - The first is to use an internal mock ``codecov.io`` server.
+        - The second use the real ``codecov.io`` service.
 
     By default, in the automatic tests, we use the mock ``codecov.io``
     server to avoid being dependent external services that could not
@@ -44,6 +43,7 @@ class TestPublishCodeCoverage(unittest.TestCase):
     environment variable **CODECOV_IO_UPLOAD_TOKEN** which is the
     ``codecov.io`` upload token of the repository given in
     *yaml/generate_coverage_report/main.yml* YAML file.
+
     """
 
     def __init__(self, *args, **kwargs):
@@ -62,6 +62,7 @@ class TestPublishCodeCoverage(unittest.TestCase):
         We define the **CODECOV_IO_UPLOAD_TOKEN** environment variable
         to avoid to skip the step.  It's the default behaviour if we
         don't give this variable to Eve.
+
         """
 
         if not os.environ.get('CODECOV_IO_UPLOAD_TOKEN'):
@@ -85,6 +86,7 @@ class TestPublishCodeCoverage(unittest.TestCase):
         """Stop the ``codecov.io`` mock HTTP server if needed.
 
         And restore old environment variables.
+
         """
         super(TestPublishCodeCoverage, self).tearDown()
 
@@ -101,8 +103,12 @@ class TestPublishCodeCoverage(unittest.TestCase):
     def _get_publish_codecov_build(self, builder_name='test_docker_builder'):
         """Search the build of the code coverage report publication step.
 
-        :args builder_name: Root builder name rather than bootstrap.
-        :returns None: If we don't find the potential build.
+        Args:
+            builder_name: Root builder name rather than bootstrap.
+
+        Returns:
+            None if no potential build else the build found.
+
         """
         builders = self.cluster.api.get(
             'builders?name__contains={0}'.format(builder_name))
@@ -120,13 +126,11 @@ class TestPublishCodeCoverage(unittest.TestCase):
     def test_codecovio_success(self):
         """Test PublishCoverageReport success.
 
-        :args name: Name of the directory which contains the
-                      ``main.yml`` to commit.
-
         If we use the mock HTTP server, we ensure that we execute the
         requests with the correct query parameters and headers, in
         accordance with the ``codecov.io`` API (see
         https://docs.codecov.io/v4.3.0/reference#upload).
+
         """
 
         import xml.etree.cElementTree as ET

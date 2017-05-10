@@ -29,7 +29,8 @@ class Sqlite(Daemon):
         """Class to generate an SQLite database path and sqlalchemy URL.
 
         Args:
-            **_: ignored
+            **_: Ignored.
+
         """
         super(Sqlite, self).__init__(name='sqlite')
         self.url = \

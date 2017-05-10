@@ -40,9 +40,9 @@ class TestDockerCluster(unittest.TestCase):
         """Test the build fails when the Dockerfile is malformed.
 
         Steps:
-            - forces a build with a bad Dockefile
-            - checks that the build fails
-            - checks that the failing step is the docker build step
+            - Force a build with a bad Dockefile.
+            - Check that the build fails.
+            - Check that the failing step is the docker build step.
 
         """
         local_repo = self.cluster.clone()
@@ -68,9 +68,9 @@ class TestDockerCluster(unittest.TestCase):
         """Test that a command failure fails the whole build.
 
         Steps:
-            - forces a build with a docker worker and a failing command
-            - checks that the build fails
-            - checks that the failing step is the failing command execution
+            - Force a build with a docker worker and a failing command.
+            - Check that the build fails.
+            - Check that the failing step is the failing command execution.
 
         """
         local_repo = self.cluster.clone()
@@ -96,8 +96,8 @@ class TestDockerCluster(unittest.TestCase):
         """Test a successful build success with a docker worker.
 
         Steps:
-            - forces a build with a docker worker and an 'exit 0' command
-            - checks that the build succeeds
+            - Force a build with a docker worker and an 'exit 0' command.
+            - Check that the build succeeds.
 
         """
         local_repo = self.cluster.clone()
@@ -160,6 +160,7 @@ class TestDockerCluster(unittest.TestCase):
         **/Dockerfile** inside the Docker context.
         We can use a different Dockerfile (see ``-f`` option of
         ``docker build`` command).
+
         """
 
         local_repo = self.cluster.clone()
@@ -218,9 +219,9 @@ class TestDockerCluster(unittest.TestCase):
         """Test that we can launch a docker command inside a docker worker.
 
         Steps:
-         * Substantiate a docker worker containing docker installation
-         * Launch a `docker ps` command
-         * Check that it succeeds
+            - Substantiate a docker worker containing docker installation.
+            - Launch a `docker ps` command.
+            - Check that it succeeds.
 
         """
 
@@ -248,10 +249,10 @@ class TestDockerCluster(unittest.TestCase):
         """Test that we can build docker images on our own.
 
         Steps:
-         * Substantiate a docker worker containing docker installation
-         * Launch a `docker build` command
-         * Launch a stage with the newly built image
-         * Check that it succeeds
+            - Substantiate a docker worker containing docker installation.
+            - Launch a `docker build` command.
+            - Launch a stage with the newly built image.
+            - Check that it succeeds.
 
         """
         local_repo = self.cluster.clone()
@@ -299,8 +300,9 @@ class TestDockerCluster(unittest.TestCase):
     def test_write_read_from_cache(self):
         """Test docker cache volumes.
 
-        Step1 creates a docker named volume and creates a file into it.
-        Step2 starts another container and reads a file from the same volume.
+        Steps:
+            - Create a docker named volume and create a file into it.
+            - Start another container and read a file from the same volume.
 
         """
         local_repo = self.cluster.clone()

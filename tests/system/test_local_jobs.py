@@ -67,10 +67,10 @@ class TestLocalJobs(unittest.TestCase):
         The local directory is customized with a subdirectory.
 
         Steps:
-            - Configure local job in decorator
-            - Check Eve can start (no error in setup)
-            - Verify directories and files (test setup validation)
-            - Check schedulers and builders are correct
+            - Configure local job in decorator.
+            - Check Eve can start (no error in setup).
+            - Verify directories and files (test setup validation).
+            - Check schedulers and builders are correct.
 
         """
 
@@ -114,9 +114,9 @@ class TestLocalJobs(unittest.TestCase):
         (useful for people who want to store job files in /etc)
 
         Steps:
-            - Configure local jobs in decorator
-            - Check Eve can start (no error in setup)
-            - Verify directory (test setup validation)
+            - Configure local jobs in decorator.
+            - Check Eve can start (no error in setup).
+            - Verify directory (test setup validation).
 
         """
         cluster = Cluster()
@@ -132,10 +132,10 @@ class TestLocalJobs(unittest.TestCase):
         The local directory is customized with a subdirectory.
 
         Steps:
-            - Configure local job in decorator
-            - Check Eve can start (no error in setup)
-            - Verify directories and files (test setup validation)
-            - Check schedulers and builders are correct
+            - Configure local job in decorator.
+            - Check Eve can start (no error in setup).
+            - Verify directories and files (test setup validation).
+            - Check schedulers and builders are correct.
 
         """
         self.configure_local_jobs(master_ids=(0, ))
@@ -146,11 +146,11 @@ class TestLocalJobs(unittest.TestCase):
         The local directory is kept at default value.
 
         Steps:
-            - Configure local job in decorator
-            - Check Eve can start (no error in setup)
-            - Verify directories and files (test setup validation)
-            - Check schedulers and builders are correct
-            - Check periodic job is running
+            - Configure local job in decorator.
+            - Check Eve can start (no error in setup).
+            - Verify directories and files (test setup validation).
+            - Check schedulers and builders are correct.
+            - Check periodic job is running.
 
         """
         self.configure_local_jobs(master_ids=(1, ))
@@ -159,10 +159,10 @@ class TestLocalJobs(unittest.TestCase):
         """Test a local job on the frontend and backend simultaneously.
 
         Steps:
-            - Configure local jobs in decorators
-            - Check Eve can start (no error in setup)
-            - Verify directories and files (test setup validation)
-            - Check schedulers and builders are correct
+            - Configure local jobs in decorators.
+            - Check Eve can start (no error in setup).
+            - Verify directories and files (test setup validation).
+            - Check schedulers and builders are correct.
 
         """
         self.configure_local_jobs(master_ids=(0, 1))

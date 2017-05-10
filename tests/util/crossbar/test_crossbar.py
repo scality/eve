@@ -26,10 +26,11 @@ class TestCrossbar(TestCase):
         """Test start and stop a crossbar daemon
 
            Steps:
-            - start crossbar
-            - look for a line in the code to check if it completed its start
-            - stop it
-            - look for a line in the code to check if it completed its stop
+            - Start crossbar.
+            - Look for a line in the code to check if it completed its start.
+            - Stop it.
+            - Look for a line in the code to check if it completed its stop.
+
         """
         crossbar = Crossbar().start()
         assert "Router 'worker-001': transport 'transport-001' started" in \

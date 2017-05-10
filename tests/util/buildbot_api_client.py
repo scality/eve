@@ -21,6 +21,7 @@ for more info on the API, see `buildbot REST API documentation`_
 
 .. _buildbot REST API documentation:
   http://docs.buildbot.net/latest/developer/rest.html
+
 """
 
 from __future__ import print_function
@@ -51,7 +52,7 @@ class BuildbotDataAPI(object):
         self.session = requests.Session()
 
     def login(self, user, password):
-        """Retreive the authenticated cookie in the session."""
+        """Retrieve the authenticated cookie in the session."""
         res = self.session.get(self.url + "auth/login", auth=(user, password))
         res.raise_for_status()
 
@@ -234,11 +235,11 @@ class BuildbotDataAPI(object):
         """Force a build.
 
         Args:
-            branch (str): the branch name
-            reason (str): the buils reason (default=testing)
+            branch (str): The branch name.
+            reason (str): The buils reason (default=testing).
 
         Returns:
-            the Buildset that has been added
+            The Buildset that has been added.
 
         """
         force_sched_name = self.getw('/forceschedulers')['name']
@@ -264,11 +265,11 @@ class ApiResource(object):
         """Represent a Resource from the API.
 
         Args:
-            api: the API instance
-            id_: The ID of the resource
-            url_params: some objects need to specify additional parameters on
-                        the url to be retrieved (e.g., to retrieve a step,
-                        you need to specify a buildid).
+            api: The API instance.
+            id_: The ID of the resource.
+            url_params (dict): Some objects needed to specify additional
+                parameters on the url to be retrieved (e.g. to retrieve a step,
+                you need to specify a buildid).
 
         """
         self._api = api
@@ -285,18 +286,18 @@ class ApiResource(object):
         """Find one or more resources from the API.
 
         Args:
-            api: the API object
-            url_params: see __init__ docstring
-            get_params: the get parameters to add to the URL
-            expected_count: the number of resources that are expected.
-             default==1.
+            api: The API object.
+            url_params (dict): See __init__ docstring.
+            get_params (dict): The get parameters to add to the URL.
+            expected_count (int): The number of resources that are expected
+                (default to 1).
 
         Returns:
             If expected_count == 1, returns a single resource. Otherwise,
             returns a list of resources.
 
         Raises:
-            Exception if the expected_count is not matched.
+            Exception: If the expected_count is not matched.
 
         """
         if url_params is None:
@@ -328,7 +329,8 @@ class ApiResource(object):
         """Wait for a resource until it has results.
 
         Args:
-            timeout: the number of seconds to wait for it
+            timeout (int): The number of seconds to wait for it.
+
         """
         if self.results_field is None:
             return self

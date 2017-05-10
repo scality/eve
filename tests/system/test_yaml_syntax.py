@@ -16,6 +16,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor,
 # Boston, MA  02110-1301, USA.
 """This test suite checks end-to-end operation of EVE."""
+
 import unittest
 
 from tests.util.cluster import Cluster

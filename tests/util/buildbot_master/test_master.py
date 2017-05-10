@@ -26,10 +26,11 @@ class TestMaster(TestCase):
         """Test start and stop a buildbot master.
 
         Steps:
-            - start a standalon buildmaster
-            - look for a line in the code to check if it completed its start
-            - stop it
-            - look for a line in the code to check if it completed its stop
+            - Start a standalon buildmaster.
+            - Look for a line in the code to check if it completed its start.
+            - Stop it.
+            - Look for a line in the code to check if it completed its stop.
+
         """
         master = BuildbotMaster(mode='standalone', git_repo='something')
         master.start()

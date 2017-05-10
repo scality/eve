@@ -16,6 +16,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor,
 # Boston, MA  02110-1301, USA.
 """Tools to configure and interact with a testing eve cluster."""
+
 from collections import OrderedDict
 
 from tests.util.buildbot_master import BuildbotMaster
@@ -37,10 +38,10 @@ class Cluster(object):
         """Configure and interact with a testing eve cluster.
 
         Args:
-            githost (GitHostMock): optional parameter to specify the git host
-                                   that will be used to fake bitbucket or
-                                   github. The default is specified by
-                                   self.githost_class.
+            githost (GitHostMock): Optional parameter to specify the git host
+                that will be used to fake bitbucket or github. The default is
+                specified by self.githost_class.
+
         """
         self.githost = githost if githost is not None else self.githost_class()
 
@@ -73,7 +74,7 @@ class Cluster(object):
         """Clone the git repo from the githost to a local directory.
 
         Returns:
-            LocalGitRepo object
+            LocalGitRepo: The.repository's local clone.
 
         """
         return LocalGitRepo(remote=self.githost_url)
@@ -97,10 +98,10 @@ class Cluster(object):
         """Add a master to the cluster.
 
         Args:
-            mode (string): frontend/backend/standalone/symmetric
+            mode (string): Any of frontend/backend/standalone/symmetric.
 
         Returns:
-            a freshly created self.master_class object
+            A freshly created self.master_class object.
 
         """
         master = self.buildbot_master_class(
@@ -117,7 +118,7 @@ class Cluster(object):
         """Start the cluster (blocking).
 
         Returns:
-            the cluster instance
+            The cluster instance.
 
         """
         self.githost.start()
@@ -131,7 +132,7 @@ class Cluster(object):
         """Stop the cluster (blocking).
 
         Returns:
-            the cluster instance
+            The cluster instance.
 
         """
         self.githost.stop()
@@ -157,10 +158,10 @@ class Cluster(object):
         """Force a build from the API.
 
         Args:
-            branch (str): The remote branch to be built
+            branch (str): The remote branch to be built.
 
         Returns:
-            An API BuildSet object
+            An API BuildSet object.
 
         """
         return self.api.force(branch)
@@ -174,7 +175,8 @@ class Cluster(object):
         """Delete the cluster.
 
         Args:
-            _: ignored
+            _: Ignored.
+
         """
         self.stop()
         del self._crossbar

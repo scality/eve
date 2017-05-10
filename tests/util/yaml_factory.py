@@ -29,7 +29,7 @@ class RawYaml(object):
             Therfore, you can use this class to generate broken YAML files.
 
         Args:
-            yaml_text (str): The text to store in the YAML file
+            yaml_text (str): The text to store in the YAML file.
 
         """
         self.yaml_text = yaml_text
@@ -38,7 +38,7 @@ class RawYaml(object):
         """Dump the YAML structrure to a file.
 
         Args:
-            filename: the path to the file where the YAML will be dumped
+            filename: The path to the file where the YAML will be dumped.
 
         """
         with open(filename, 'w') as fhandle:
@@ -50,14 +50,14 @@ class YamlFactory(RawYaml):
         """Generate a syntaxically correct eve yaml file.
 
         Args:
-            version (str): the eve file version number (e.g 0.1 or 0.2)
-            branches (dict): the branch patterns covered by the YAML file as
-                             well as their corresponding stages.
-                             {
-                                'feature/*': {'stage': 'pre-merge'}
-                                'default': {'stage': 'post-merge'}
-                             }
-            stages (dict): the stage specifications (see eve's user doc).
+            version (str): The eve file version number (e.g 0.1 or 0.2).
+            branches (dict): The branch patterns covered by the YAML file as
+                well as their corresponding stages.
+                {
+                    'feature/*': {'stage': 'pre-merge'}
+                    'default': {'stage': 'post-merge'}
+                }
+            stages (dict): The stage specifications (see eve's user doc).
 
         """
         data = dict(version=version, branches=branches, stages=stages)
@@ -70,9 +70,8 @@ class PreMerge(YamlFactory):
         """Generate a YAML file with a single stage called 'pre-merge'.
 
         Args:
-            steps (list): the steps of the pre-merge stage
-            worker (dict): the worker definition. e.g. default :
-                           {'type': 'local'}
+            steps (list): The steps of the pre-merge stage.
+            worker (dict): The worker definition (default: {'type': 'local'}).
 
         """
         branches = {'default': {'stage': 'pre-merge'}}
@@ -88,9 +87,8 @@ class SingleCommandYaml(PreMerge):
         """Generate a YAML file with a single stage that runs a single command.
 
         Args:
-            command (str): the command to run
-            worker (dict): the worker definition. e.g. default :
-                           {'type': 'local'}
+            command (str): The command to run.
+            worker (dict): The worker definition (default: {'type': 'local'}).
 
         """
         shell_command_step = {'ShellCommand': {'command': command}}

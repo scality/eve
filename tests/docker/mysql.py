@@ -35,7 +35,7 @@ class DockerizedMySQL(Daemon):
         """Represent a dockerized MySQL daemon.
 
         Args:
-            external_ip (str): The IP address that will allow external access
+            external_ip (str): The IP address that will allow external access.
 
         """
         self.port = self.get_free_port()

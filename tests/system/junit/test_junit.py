@@ -28,8 +28,9 @@ class TestJunit(unittest.TestCase):
         """Test customized JUnitShellCommand step with OK tests.
 
         Steps:
-        * Spawn worker
-        * Have various commands create JUnit reports and parse them
+            - Spawn worker.
+            - Have various commands create JUnit reports and parse them.
+
         """
         cluster = Cluster().start()
         cluster.sanity_check()

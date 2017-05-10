@@ -45,12 +45,13 @@ class BuildbotMaster(Daemon):
         """Class representing a Buildbot Daemon.
 
         Args:
-            mode (str): frontend/backend/standalone/symmetric
-            git_repo (GitHostMock): The remote git repo to use
-            external_url: The external web url
-            db_url: The sqlalchemy url to connect to
-            master_fqdn: the FQDN of the master so the workers can connect to.
-            wamp_url: The url to the wamp router
+            mode (str): A value from frontend/backend/standalone/symmetric.
+            git_repo (GitHostMock): The remote git repo to use.
+            external_url: The external web url.
+            db_url: The sqlalchemy url to connect to.
+            master_fqdn: The FQDN of the master so the workers can connect to.
+            wamp_url: The url to the wamp router.
+
         """
         self.http_port = self.get_free_port()
         name = '{}{}'.format(mode, self.http_port)
@@ -129,8 +130,9 @@ class BuildbotMaster(Daemon):
         """Add configuration files to the master's directory.
 
         Args:
-            yaml_data (dict): the contents of the conf file
-            filename: the path to the conf file
+            yaml_data (dict): The contents of the conf file.
+            filename (str): The path to the conf file.
+
         """
         abspath = os.path.join(self._base_path, filename)
         pardir = os.path.abspath(os.path.join(abspath, os.pardir))
@@ -151,7 +153,8 @@ class BuildbotMaster(Daemon):
         """Dump the buildmaster's conf.
 
         Args:
-            filename: the path to the conf file
+            filename: The path to the conf file.
+
         """
         with open(filename, 'w') as fhandle:
             lines = [

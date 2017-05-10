@@ -28,12 +28,13 @@ class TestGitRepo(TestCase):
     def test_git_repo(self):
         """Test that a fake git repo works correctly.
 
-           Steps:
-            - create a fake remote git repo
-            - clone it with the LocalGitRepo class
-            - push a specified yaml file on a specified branch
-            - check that the file is on that branch
-            - check the branch has been pushed to the remote
+        Steps:
+            - Create a fake remote git repo.
+            - Clone it with the LocalGitRepo class.
+            - Push a specified yaml file on a specified branch.
+            - Check that the file is on that branch.
+            - Check the branch has been pushed to the remote.
+
         """
         remote = tempfile.mkdtemp(prefix='eve_remote_')
         cmd('git init --bare', cwd=remote)

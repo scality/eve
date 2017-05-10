@@ -20,7 +20,9 @@
 Content:
 
 * `CodecovIOMockServer`: HTTP server to mock ``codecov.io`` upload service.
+
 """
+
 try:
     from http.server import BaseHTTPServer
 except ImportError:
@@ -44,9 +46,11 @@ class _RequestRec(object):
     def __init__(self, command, path, headers):
         """`_RequestRec` constructor.
 
-        :args command: HTTP verb (POST, PUT, DELETE, ...)
-        :args path: URL path used.
-        :args headers: HTTP headers.
+        Args:
+            command (str): HTTP verb (POST, PUT, DELETE, ...).
+            path (str): URL path used.
+            headers (dict): HTTP headers.
+
         """
         self.command = command.upper() if command else None
         path_parts = urlparse.urlparse(path)
@@ -73,9 +77,13 @@ class _RequestRec(object):
     def __eq__(self, obj):
         """Compare with another `_RequestRec` instance.
 
-        :return True: If the given `_RequestRec` instance has the same
-                        properties.
-        :return False: Otherwise.
+        Args:
+            obj (_RequestRec): other instance to compare to.
+
+        Returns:
+            bool: True if the given `_RequestRec` instance has the same
+                properties, False otherwise.
+
         """
         return all([
             self.command == obj.command, self.path == obj.path,
@@ -89,8 +97,10 @@ class _RequestRec(object):
     def __repr_dict(values, indent=''):
         """Pretty display a given dict.
 
-        :args values: Dict to display.
-        :args indent: Prefix to print on each line.
+        Args:
+            values (dict): Dict to display.
+            indent (str): Prefix to print on each line.
+
         """
         result = ''
         for key in sorted(values.keys()):
@@ -121,6 +131,7 @@ class _CodecovIORequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
         If */upload/v4* path wanted, we compute and return a fake
         ``codecov.io`` response.
+
         """
         url_parts = urlparse.urlparse(self.path)
 
@@ -168,6 +179,7 @@ class _CodecovIORequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         """Parse all requests.
 
         Store the request received to verify the ``coecov.io`` handshake.
+
         """
         ret = BaseHTTPServer.BaseHTTPRequestHandler.parse_request(self)
         if ret:
@@ -187,7 +199,9 @@ class CodecovIOMockServer(BaseHTTPServer.HTTPServer):
     def __init__(self, bind_address='localhost'):
         """`CodecovIOMockServer` constructor.
 
-        :args bind_address: Bind address of the TCP socket to use.
+        Args:
+            bind_address (str): Bind address of the TCP socket to use.
+
         """
         BaseHTTPServer.HTTPServer.__init__(self, (bind_address, 0),
                                            _CodecovIORequestHandler)
@@ -203,7 +217,9 @@ class CodecovIOMockServer(BaseHTTPServer.HTTPServer):
         Check if all request received is in accordance with the list
         of expected requests given.
 
-        :raises AssertionError: If a request differ.
+        Raises:
+            AssertionError: If a request differ.
+
         """
         for idx, expected_request_received_args in enumerate(args):
             expected_request_received = _RequestRec.from_args(
@@ -224,7 +240,9 @@ class CodecovIOMockServer(BaseHTTPServer.HTTPServer):
     def register_request_rec(self, request):
         """Register the given request on the stack.
 
-        :args request: Request to add in the stack.
+        Args:
+            request: Request to add in the stack.
+
         """
         request_rec = _RequestRec.from_request(request)
         self.request_received_list.append(request_rec)
@@ -238,6 +256,7 @@ class CodecovIOMockServer(BaseHTTPServer.HTTPServer):
         """Start the HTTP server.
 
         Create a thread to listen the HTTP server in background.
+
         """
         assert self._th is None, 'Thread already started'
 
