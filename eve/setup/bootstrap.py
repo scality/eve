@@ -16,6 +16,8 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor,
 # Boston, MA  02110-1301, USA.
 
+from os.path import dirname
+
 from buildbot.config import BuilderConfig
 from buildbot.plugins import steps, util
 from buildbot.process.factory import BuildFactory
@@ -102,10 +104,11 @@ def bootstrap_builder(workers):
         hideStepIf=lambda results, s: results == SUCCESS,
         value=util.env.GIT_SLUG))
 
+    yaml_dirpath = dirname(util.env.PROJECT_YAML)
     bootstrap_factory.addStep(SetPropertyFromCommand(
         name='get the product version',
-        command=('./eve/get_product_version.sh 2> /dev/null'
-                 ' || echo 0.0.0'),
+        command=('./{}/get_product_version.sh 2> /dev/null'
+                 ' || echo 0.0.0'.format(yaml_dirpath)),
         hideStepIf=lambda results, s: results == SUCCESS,
         property='product_version'))
 
