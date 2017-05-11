@@ -1,5 +1,0 @@
-# ADDITIONAL Requirements for prospector testing
-# check instruction on how to reproduce in base.in
--c constraints.txt
-
-prospector
