@@ -179,10 +179,11 @@ class TestCluster(unittest.TestCase):
         """Test forced build with parameters.
 
         Steps:
-        * Spawn cluster with a parametrized force build scheduler
-        * Force a build with 2 parameters out of 5
-        * Check that the parameters are taken into account by reading the step
-          stdio log.
+            - Spawn cluster with a parametrized force build scheduler.
+            - Force a build with 2 parameters out of 5.
+            - Check that the parameters are taken into account by reading
+              the step's stdio log.
+
         """
         os.environ['FORCE_BUILD_PARAM_COUNT'] = '5'
         cluster = Cluster().start()

@@ -238,11 +238,14 @@ class BuildbotDataAPI(object):
         """Force a build.
 
         Args:
-            arguments accepted by the force API
-            http://docs.buildbot.net/latest/developer/rest.html#forcescheduler
+            arguments accepted by the force API (see `buildbot forcescheduler's
+            documentation`_).
 
         Returns:
             The Buildset that has been added.
+
+        .. _buildbot forcescheduler's documentation:
+            http://docs.buildbot.net/latest/developer/rest.html#forcescheduler
 
         """
         force_sched_name = self.getw('/forceschedulers')['name']
@@ -425,10 +428,10 @@ class Step(ApiResource):
     id_field = 'number'
 
     def rawlog(self, log_slug):
-        """Returns the step log contents as text
+        """Return the step log contents as text.
 
         Args:
-          log_slug (str): The name of the log. e.g., 'stdio'
+            log_slug (str): The name of the log. e.g., 'stdio'.
 
         """
         route = (self.base_path + '/{step_number}/logs/{log_slug}/raw').format(
