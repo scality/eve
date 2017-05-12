@@ -38,7 +38,7 @@ pynacl==1.1.2
 pyopenssl==17.0.0
 pyparsing==2.2.0
 pytest==3.0.7
-pytest-cov==2.5.0
+pytest-cov==2.5.1
 pytest-xdist==1.16.0
 python-dotenv==0.6.4
 pytrie==0.3

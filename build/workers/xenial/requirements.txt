@@ -73,12 +73,12 @@ pydocstyle==2.0.0
 pyflakes==1.5.0
 pygments==2.2.0
 pyjwt==1.5.0
-pylint==1.7.1
+pylint==1.6.5
 pynacl==1.1.2
 pyopenssl==17.0.0
 pyparsing==2.2.0
 pytest==3.0.7
-pytest-cov==2.5.0
+pytest-cov==2.5.1
 pytest-xdist==1.16.0
 python-dateutil==2.6.0
 python-dotenv==0.6.4
@@ -95,7 +95,6 @@ setproctitle==1.1.10
 setuptools==35.0.2
 shutilwhich==1.1.0
 simplejson==3.10.0
-singledispatch==3.4.0.3
 six==1.10.0
 snowballstemmer==1.2.1
 sortedcontainers==1.5.7
