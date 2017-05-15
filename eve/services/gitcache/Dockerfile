@@ -16,8 +16,6 @@ RUN \
 
 VOLUME ["/var/lib/git", "/data/nginx"]
 
-EXPOSE 80 81 82
-
 COPY git_proxy_cache.py /usr/lib/git-core/git_proxy_cache.py
 COPY git-proxy-cache-and-http-backend /usr/lib/git-core/git-proxy-cache-and-http-backend
 COPY git-nginx-conf /etc/nginx/sites-enabled/default

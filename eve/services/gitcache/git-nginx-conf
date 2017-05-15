@@ -47,8 +47,8 @@ server {
     listen [::]:81 default_server;
     server_name _;
 
-    location /bitbucket.org {
-            rewrite /bitbucket.org/(.*) /$1 break;
+    location /bitbucket {
+            rewrite /bitbucket/(.*) /$1 break;
 
             # define reverse proxy
             proxy_pass             https://bitbucket.org/;
@@ -56,7 +56,7 @@ server {
             proxy_set_header       Authorization "Basic ROBOT_BASE64";
 
             # filter to make links point to the second reverse proxy
-            sub_filter 'https://media-api.atlassian.io/' 'http://gitcache:82/bitbucket.org/';
+            sub_filter 'https://media-api.atlassian.io/' 'http://gitcache:82/bitbucket/';
             sub_filter_types application/vnd.git-lfs+json;
             sub_filter_once off;
 
@@ -78,8 +78,8 @@ server {
     listen [::]:82 default_server;
     server_name _;
 
-    location /bitbucket.org {
-            rewrite /bitbucket.org/(.*) /$1 break;
+    location /bitbucket {
+            rewrite /bitbucket/(.*) /$1 break;
 
             # define reverse proxy
             proxy_pass             https://media-api.atlassian.io/;

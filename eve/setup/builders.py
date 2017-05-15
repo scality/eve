@@ -45,8 +45,8 @@ def triggerable_builder(builder_name, workers):
                     'url.http://%(gitcache)s/git/mock/.insteadOf git@mock: && '
                     'git config --global '
                     'lfs.url '
-                    '"http://%(gitcache)s:81/%(githost)s/%(gitowner)s/'
-                    '%(gitslug)s.git/info/lfs"' % {
+                    '"http://%(gitcache)s:81/'
+                    '%(githost)s/%(gitowner)s/%(gitslug)s.git/info/lfs"' % {
                         'gitcache': util.env.GITCACHE_HOSTNAME,
                         'githost': util.env.GIT_HOST,
                         'gitowner': util.env.GIT_OWNER,
