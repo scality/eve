@@ -20,8 +20,10 @@ from buildbot.plugins import util
 
 
 class OpenStackBuildOrder(util.BaseBuildOrder):
-    """Base class representing a build to trigger on an OpenStack instance
-    (Scheduler, properties and OpenStack config)
+    """Base class representing a build to trigger on an OpenStack instance.
+
+    Scheduler, properties and OpenStack config.
+
     """
 
     DEFAULT_IMAGE = 'Ubuntu 14.04 LTS (Trusty Tahr) (PVHVM)'

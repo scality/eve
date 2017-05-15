@@ -32,11 +32,11 @@ class DockerizedMySQL(Daemon):
     _stop_cmd = 'docker rm -f {name}'
 
     def __init__(self, external_ip='localhost'):
-        """
-        A class to represent a dockerized MySQL daemon
+        """Represent a dockerized MySQL daemon.
 
         Args:
-            external_ip (str): The IP address that will allow external access
+            external_ip (str): The IP address that will allow external access.
+
         """
         self.port = self.get_free_port()
         super(DockerizedMySQL,
@@ -46,9 +46,7 @@ class DockerizedMySQL(Daemon):
         self._start_cmd = None
 
     def pre_start_hook(self):
-        """
-        Pull a mysql docker image and prepare the command to run it
-        """
+        """Pull a mysql docker image and prepare the command to run it."""
         cmd('docker pull mysql/mysql-server:5.7')
         self._start_cmd = [
             'docker', 'run', '--name', self._name,
@@ -61,7 +59,5 @@ class DockerizedMySQL(Daemon):
         ]  # yapf: disable
 
     def _log(self):
-        """
-        Returns: the logs of the MySQL docker container
-        """
+        """Return the logs of the MySQL docker container."""
         return cmd('docker logs {}'.format(self._name))

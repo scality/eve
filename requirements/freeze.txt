@@ -11,7 +11,7 @@ mock==2.0.0
 packaging==16.8
 pbr==3.0.0
 pyparsing==2.2.0
-setuptools==35.0.1
+setuptools==35.0.2
 sh==1.12.13
 six==1.10.0
 

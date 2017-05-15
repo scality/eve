@@ -21,6 +21,7 @@ for more info on the API, see `buildbot REST API documentation`_
 
 .. _buildbot REST API documentation:
   http://docs.buildbot.net/latest/developer/rest.html
+
 """
 
 from __future__ import print_function
@@ -51,7 +52,7 @@ class BuildbotDataAPI(object):
         self.session = requests.Session()
 
     def login(self, user, password):
-        """Retreive the authenticated cookie in the session."""
+        """Retrieve the authenticated cookie in the session."""
         res = self.session.get(self.url + "auth/login", auth=(user, password))
         res.raise_for_status()
 
@@ -74,14 +75,17 @@ class BuildbotDataAPI(object):
         res.raise_for_status()
         return res.json()['result']
 
-    def get(self, route, get_params=None):
+    def get(self, route, get_params=None, raw=False):
         """Get data from the REST API."""
-        print(self.api_url + route, get_params)
+        print('requesting {} get params {}', self.api_url + route, get_params)
         res = self.session.get(
             self.api_url + route,
             headers={"Accept": "application/json"},
             params=get_params)
         res.raise_for_status()
+
+        if raw:
+            return res.text
 
         object_name = route.split('/')[-1]
 
@@ -141,7 +145,6 @@ class BuildbotDataAPI(object):
 
     def get_build(self, builder='boostrap', branch=None):
         """Wait for build to start and return its infos."""
-
         the_build = None
         for _ in range(60):
             if the_build:
@@ -165,7 +168,7 @@ class BuildbotDataAPI(object):
         return the_build
 
     def get_build_steps(self, builder='bootstrap', build_number=1):
-        """Returns steps from specified builder and build."""
+        """Return steps from specified builder and build."""
         builder = self.get_builder(builder)
         try:
             return self.get('builders/%d/builds/%d/steps' %
@@ -176,7 +179,7 @@ class BuildbotDataAPI(object):
                             (builder['builderid'], build_number))
 
     def get_step(self, name, builder='bootstrap', build_number=1):
-        """Returns matching step from specified builder and build number."""
+        """Return matching step from specified builder and build number."""
         steps = self.get_build_steps(
             builder=builder, build_number=build_number)
         step = [s for s in steps if s["name"] == name]
@@ -231,27 +234,25 @@ class BuildbotDataAPI(object):
             self.url + 'change_hook/bitbucket', data=json.dumps(payload))
         res.raise_for_status()
 
-    def force(self, branch, reason='testing'):
-        """
-        Force a build
+    def force(self, **kwargs):
+        """Force a build.
 
         Args:
-            branch (str): the branch name
-            reason (str): the buils reason (default=testing)
+            arguments accepted by the force API (see `buildbot forcescheduler's
+            documentation`_).
 
-        Returns: the Buildset that has been added
+        Returns:
+            The Buildset that has been added.
+
+        .. _buildbot forcescheduler's documentation:
+            http://docs.buildbot.net/latest/developer/rest.html#forcescheduler
 
         """
         force_sched_name = self.getw('/forceschedulers')['name']
-        res = self.post(
-            '/forceschedulers/{}'.format(force_sched_name),
-            'force', {
-                'branch': branch,
-                'owner': 'John Doe <john@doe.net>',
-                'reason': reason
-            })  # yapf: disable
+        res = self.post('/forceschedulers/{}'.format(force_sched_name),
+                        'force', kwargs)
 
-        buildset = BuildSet(self, res[0])
+        buildset = BuildSet(api=self, id_=res[0])
         return buildset
 
 
@@ -262,14 +263,15 @@ class ApiResource(object):
     default_get_params = None
 
     def __init__(self, api, id_, url_params=None):
-        """
-        Base class to represent a Resource from the API
+        """Represent a Resource from the API.
+
         Args:
-            api: the API instance
-            id_: The ID of the resource
-            url_params: some objects need to specify additional parameters on
-                        the url to be retrieved (e.g., to retrieve a step,
-                        you need to specify a buildid).
+            api: The API instance.
+            id_: The ID of the resource.
+            url_params (dict): Some objects needed to specify additional
+                parameters on the url to be retrieved (e.g. to retrieve a step,
+                you need to specify a buildid).
+
         """
         self._api = api
         self._id = id_
@@ -282,19 +284,22 @@ class ApiResource(object):
 
     @classmethod
     def find(cls, api, url_params=None, get_params=None, expected_count=1):
-        """
-        Find one or more resources from the API.
+        """Find one or more resources from the API.
 
         Args:
-            api: the API object
-            url_params: see __init__ docstring
-            get_params: the get parameters to add to the URL
-            expected_count: the number of resources that are expected.
-             default==1.
+            api: The API object.
+            url_params (dict): See __init__ docstring.
+            get_params (dict): The get parameters to add to the URL.
+            expected_count (int): The number of resources that are expected
+                (default to 1).
 
-        Returns: If expected_count == 1, returns a single resource. Otherwise,
-                 returns a list of resources.
-        Raises: Exception if the expected_count is not matched.
+        Returns:
+            If expected_count == 1, returns a single resource. Otherwise,
+            returns a list of resources.
+
+        Raises:
+            Exception: If the expected_count is not matched.
+
         """
         if url_params is None:
             url_params = {}
@@ -319,14 +324,17 @@ class ApiResource(object):
     def __getattr__(self, item):
         if self._dict is None:
             self._refresh()
-        return self._dict[item]
+        try:
+            return self._dict[item]
+        except KeyError:
+            raise AttributeError('{} does not exist'.format(item))
 
     def wait_for_finish(self, timeout=360):
-        """
-        waits for a resource until it has results.
+        """Wait for a resource until it has results.
 
         Args:
-            timeout: the number of seconds to wait for it
+            timeout (int): The number of seconds to wait for it.
+
         """
         if self.results_field is None:
             return self
@@ -342,9 +350,7 @@ class ApiResource(object):
 
     @property
     def result(self):
-        """
-        Returns: Waits for and returns the result of the resource
-        """
+        """Wait for and return the result of the resource."""
         assert self.results_field is not None
         self.wait_for_finish()
         result_code = self._dict[self.results_field]
@@ -352,9 +358,8 @@ class ApiResource(object):
 
 
 class BuildSet(ApiResource):
-    """
-    A BuildSet API object
-    """
+    """Represent a BuildSet API object."""
+
     base_path = '/buildsets'
     results_field = 'results'
     id_field = 'bsid'
@@ -366,9 +371,8 @@ class BuildSet(ApiResource):
 
 
 class BuildRequest(ApiResource):
-    """
-    A BuildRequest API object
-    """
+    """Represent a BuildRequest API object."""
+
     base_path = '/buildrequests'
     results_field = 'results'
     id_field = 'buildrequestid'
@@ -384,9 +388,8 @@ class BuildRequest(ApiResource):
 
 
 class Build(ApiResource):
-    """
-    A Build API object
-    """
+    """Represent a Build API object."""
+
     base_path = '/builds'
     results_field = 'results'
     id_field = 'buildid'
@@ -394,10 +397,7 @@ class Build(ApiResource):
 
     @property
     def children(self):
-        """
-        Returns: The builds which the parent_buildid is this instance
-
-        """
+        """Return the builds which the parent_buildid is this instance."""
         return BuildSet.find(
             self._api,
             get_params={'parent_buildid': self.buildid},
@@ -405,31 +405,35 @@ class Build(ApiResource):
 
     @property
     def steps(self):
-        """
-        Returns: The steps of this build
-
-        """
-        return Steps.find(
+        """Return the steps of this build."""
+        return Step.find(
             self._api,
             url_params={'buildid': self.buildid},
             expected_count=None)
 
     @property
     def first_failing_step(self):
-        """
-        Returns: the first step that failed, or raises an exception
-
-        """
+        """Return the first step that failed, or raises an exception."""
         for step in self.steps:
             if step.results not in (0, 1, 3):  # success, warning, skipped
                 return step
         raise Exception('There is no failing steps under this build')
 
 
-class Steps(ApiResource):
-    """
-    A Steps API object
-    """
+class Step(ApiResource):
+    """Represent a Step API object."""
+
     base_path = '/builds/{buildid}/steps'
     results_field = 'results'
     id_field = 'number'
+
+    def rawlog(self, log_slug):
+        """Return the step log contents as text.
+
+        Args:
+            log_slug (str): The name of the log. e.g., 'stdio'.
+
+        """
+        route = (self.base_path + '/{step_number}/logs/{log_slug}/raw').format(
+            buildid=self.buildid, step_number=self.number, log_slug=log_slug)
+        return self._api.get(route=route, raw=True)

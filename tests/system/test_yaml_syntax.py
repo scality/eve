@@ -16,6 +16,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor,
 # Boston, MA  02110-1301, USA.
 """This test suite checks end-to-end operation of EVE."""
+
 import unittest
 
 from tests.util.cluster import Cluster
@@ -40,27 +41,22 @@ class TestYamlSyntax(unittest.TestCase):
         del self.local_repo
 
     def test_empty_yaml(self):
-        """Tests that the build fails when the YAML file is empty
-        """
+        """Test that the build fails when the YAML file is empty."""
         self.local_repo.push(yaml=RawYaml(''))
-        buildset = self.cluster.force(self.local_repo.branch)
+        buildset = self.cluster.api.force(branch=self.local_repo.branch)
         assert buildset.result == 'failure'
 
     def test_skip_if_no_branch_in_yml(self):
-        """Tests that the build is cancelled when the branch is not covered by
-        the eve/main.yml file.
-        """
+        """Test build cancelled when branch not covered by eve.yml."""
 
         self.local_repo.push(yaml=YamlFactory(branches={}, stages={}))
-        buildset = self.cluster.force(self.local_repo.branch)
+        buildset = self.cluster.api.force(branch=self.local_repo.branch)
         assert buildset.result == 'cancelled'
 
     def test_simple_failure(self):
-        """
-        Tests that the build fails if there is an 'exit 1' command in a step
-        """
+        """Test that build fails if there is an 'exit 1' command in a step."""
         self.local_repo.push(yaml=SingleCommandYaml('exit 1'))
-        buildset = self.cluster.force(self.local_repo.branch)
+        buildset = self.cluster.api.force(branch=self.local_repo.branch)
         assert buildset.result == 'failure'
 
         build = buildset.buildrequest.build
@@ -73,11 +69,9 @@ class TestYamlSyntax(unittest.TestCase):
         assert failing_step.state_string == "'exit 1' (failure)"
 
     def test_simple_success(self):
-        """
-        Tests that the build succeeds when it is expected to succeed.
-        """
+        """Test that the build succeeds when it is expected to succeed."""
         self.local_repo.push(yaml=SingleCommandYaml('exit 0'))
-        buildset = self.cluster.force(self.local_repo.branch)
+        buildset = self.cluster.api.force(branch=self.local_repo.branch)
         assert buildset.result == 'success'
         build = buildset.buildrequest.build
         child_buildsets = build.children

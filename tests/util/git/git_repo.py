@@ -15,9 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor,
 # Boston, MA  02110-1301, USA.
-"""
-Create and interact with a local git repository
-"""
+"""Create and interact with a local git repository."""
 
 from __future__ import print_function
 
@@ -44,9 +42,10 @@ class LocalGitRepo(object):
         """Create a new commit to trigger a test build.
 
         Args:
-            yaml (YamlFactory or str): The yaml file to be pushed
-            dirs (list): Additional folders to be pushed to the git repo root
-            branch (str): the branch name to push to
+            yaml (YamlFactory or str): The yaml file to be pushed.
+            dirs (list): Additional folders to be pushed to the git repo root.
+            branch (str): The branch name to push to.
+
         """
         if branch is None:
             branch = 'bugfix/heal_the_world_{}'.format(uuid4())
@@ -72,10 +71,11 @@ class LocalGitRepo(object):
 
     @property
     def loglines(self):
-        """
-        Returns (list): the lines resulting from git log command
+        """Return a list of loglines from the git log command.
 
-        git log --pretty=format:"%an %ae|%s|%H|%cd" --date=iso
+        Returns:
+            list: The lines resulting from git log command
+                `git log --pretty=format:"%an %ae|%s|%H|%cd" --date=iso`.
 
         """
         res = cmd(
@@ -84,8 +84,6 @@ class LocalGitRepo(object):
         return reversed(res.splitlines())
 
     def cmd(self, *args, **kwargs):
-        """
-        Runs a command in the git repo directory
-        """
+        """Run a command in the git repo directory."""
         kwargs['cwd'] = self._dir
         return cmd(*args, **kwargs)

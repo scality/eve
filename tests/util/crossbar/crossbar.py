@@ -33,14 +33,11 @@ class Crossbar(Daemon):
     _start_wait = 20
 
     def __init__(self):
-        """
-        Crossbar Daemon
-        """
+        """Crossbar Daemon."""
         self.port = self.get_free_port()
         super(Crossbar, self).__init__(name='crossbar_{}'.format(self.port))
 
     def pre_start_hook(self):
-        """Generates the conf file before the crossbar daemon is spawned
-        """
+        """Generate the conf file before the crossbar daemon is spawned."""
         conf = CrossbarConfFactory(port=self.port)
         conf.dump(os.path.join(self._base_path, 'config.json'))

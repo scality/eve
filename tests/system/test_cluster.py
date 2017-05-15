@@ -27,28 +27,28 @@ SUCCESS = 0
 
 class TestCluster(unittest.TestCase):
     def test1_cluster_start_stop(self):
-        """
-        Test cluster start and stop
+        """Test cluster start and stop.
 
         Steps:
-            - start a cluster with 01 frontend and 01 backend
-            - check that there are no errors in logs
-            - stop it
+            - Start a cluster with 01 frontend and 01 backend.
+            - Check that there are no errors in logs.
+            - Stop it.
+
         """
         cluster = Cluster().start()
         cluster.sanity_check()
         cluster.stop()
 
     def test2_bigger_cluster_start_stop(self):
-        """
-        Test addition of extra masters to a cluster
+        """Test addition of extra masters to a cluster.
 
         Steps:
-            - start a cluster with 01 frontend and 01 backend
-            - add a frontend
-            - add a backend
-            - check that there are no errors in logs
-            - stop it
+            - Start a cluster with 01 frontend and 01 backend.
+            - Add a frontend.
+            - Add a backend.
+            - Check that there are no errors in logs.
+            - Stop it.
+
         """
         cluster = Cluster()
         cluster.start()
@@ -60,20 +60,20 @@ class TestCluster(unittest.TestCase):
         cluster.stop()
 
     def test3_simple_success(self):
-        """
-        Test a simple build success on a cluster
+        """Test a simple build success on a cluster.
 
         Steps:
-            - start a cluster with 01 frontend and 01 backend
-            - force a job
-            - check that all the expected steps are there
-            - stop it
+            - Start a cluster with 01 frontend and 01 backend.
+            - Force a job.
+            - Check that all the expected steps are there.
+            - Stop it.
+
         """
         cluster = Cluster().start()
         local_repo = cluster.clone()
 
         local_repo.push()
-        buildset = cluster.force(local_repo.branch)
+        buildset = cluster.api.force(branch=local_repo.branch)
         buildrequestid = cluster.api.getw(
             '/buildrequests', {'buildsetid': buildset.bsid})['buildrequestid']
 
@@ -157,19 +157,49 @@ class TestCluster(unittest.TestCase):
         """Test worker environment.
 
         Steps:
-        * Spawn worker
-        * Check Eve environment variables are not setted in the worker
+            - Spawn worker.
+            - Check Eve environment variables are not setted in the worker.
+
         """
         os.environ['FOO'] = 'bar'
         cluster = Cluster().start()
         local_repo = cluster.clone()
 
         local_repo.push(yaml=SingleCommandYaml('test -z "$FOO"'))
-        buildset = cluster.force(local_repo.branch)
+        buildset = cluster.api.force(branch=local_repo.branch)
         assert buildset.result == 'failure'
         child_build = \
             buildset.buildrequest.build.children[0].buildrequest.build
         assert child_build.first_failing_step.name == 'shell'
         assert child_build.first_failing_step.state_string == \
             "'test -z ...' (failure)"
+        cluster.stop()
+
+    def test_force_parametrized_build(self):
+        """Test forced build with parameters.
+
+        Steps:
+            - Spawn cluster with a parametrized force build scheduler.
+            - Force a build with 2 parameters out of 5.
+            - Check that the parameters are taken into account by reading
+              the step's stdio log.
+
+        """
+        os.environ['FORCE_BUILD_PARAM_COUNT'] = '5'
+        cluster = Cluster().start()
+        local_repo = cluster.clone()
+        local_repo.push(yaml=SingleCommandYaml(
+            'echo The %(prop:color)s %(prop:vehicule)s'))
+        buildset = cluster.api.force(
+            branch=local_repo.branch,
+            prop00_name='vehicule',
+            prop00_value='submarine',
+            prop01_name='color',
+            prop01_value='yellow')
+
+        assert buildset.result == 'success'
+        child_build = buildset.buildrequest.build.children[
+            0].buildrequest.build
+        step = child_build.steps[-1]
+        assert 'The yellow submarine' in step.rawlog('stdio')
         cluster.stop()

@@ -47,7 +47,7 @@ def protocols():
 
 
 def verify_docker_certificates():
-    """Checking that docker env vars are coherent."""
+    """Check that docker env vars are coherent."""
     if not util.env.DOCKER_TLS_VERIFY:
         return
 
@@ -57,6 +57,4 @@ def verify_docker_certificates():
 
 
 def properties():
-    return {
-        'buildbot_version': version
-    }
+    return {'buildbot_version': version}

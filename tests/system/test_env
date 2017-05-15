@@ -13,6 +13,7 @@ DOCKER_SCHEDULER_PREFIX=test_docker_scheduler
 EVE_GITHOST_LOGIN=test_githost_login
 EVE_GITHOST_PWD=test_githost_pwd
 EXTERNAL_URL=test_external_url
+FORCE_BUILD_PARAM_COUNT=0
 FORCE_SCHEDULER_NAME=test_force_scheduler_name
 GITCACHE_HOSTNAME=gitcache
 GITCACHE_IN_USE=1

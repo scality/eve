@@ -102,6 +102,7 @@ class ExecuteTriggerStages(Trigger):
     """Execute simultaneously multiple build steps.
 
     It's a fake Trigger stage which run multiple BuildStep simultaneously.
+
     """
 
     def __init__(self, build_orders, *args, **kwargs):

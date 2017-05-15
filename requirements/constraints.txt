@@ -15,25 +15,13 @@ crossbar==0.15.0
 # crossbar not compatible with latest autobahn
 autobahn==0.17.2
 
-# flake8             depends  pycodestyle>=2.0.0
-# prospector 0.12.4  depends  pycodestyle==2.0.0
-pycodestyle==2.0.0
-
 # docker-compose     depends  requests==2.11.1
 # and, with requests 2.13.0, buildbot plugins trigger:
 #  (requests 2.13.0, Requirement.parse('requests!=2.12.2,!=2.13.0,>=2.10.0'), set(['keystoneauth1']))
 requests==2.11.1
 
-# prospector==0.12.4 not compatible with pylint > 1.6.5
+# older version of pylint crash on zope.interface import
 pylint==1.6.5
-
-# pylint==1.6.5 not compatible with astroid > 1.4.9
-astroid==1.4.9
 
 # python-novaclient 8.0.0 not compatible with current Eve code
 python-novaclient==7.1.0
-
-
-# pydocstyle==2.0.0 raises an AttributeError: 'module' object has no attribute 'PEP257Checker'
-pydocstyle==1.0.0
-

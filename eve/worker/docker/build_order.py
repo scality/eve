@@ -25,8 +25,10 @@ from buildbot.process.results import SKIPPED
 
 
 class DockerBuildOrder(util.BaseBuildOrder):
-    """Base class representing a build to trigger on a Docker container
-    (Scheduler, properties and docker config)
+    """Base class representing a build to trigger on a Docker container.
+
+    Scheduler, properties and docker config.
+
     """
 
     def setup_properties(self):

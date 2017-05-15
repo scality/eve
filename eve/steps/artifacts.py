@@ -15,7 +15,6 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor,
 # Boston, MA  02110-1301, USA.
-
 """Steps allowing eve to interact with artifacts."""
 
 import json
@@ -29,7 +28,6 @@ from buildbot.process.results import FAILURE, SKIPPED, SUCCESS
 from buildbot.steps.shell import SetPropertyFromCommand, ShellCommand
 from packaging import version
 from twisted.internet import defer, reactor
-
 
 CURL_CMD = """curl -s -X POST -H "Content-type: application/json" \
 --progress-bar https://identity.api.rackspacecloud.com/v2.0/tokens \

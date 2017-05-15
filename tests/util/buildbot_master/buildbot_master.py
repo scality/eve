@@ -23,7 +23,6 @@ from os.path import join
 from shutil import copy
 
 import yaml
-
 from tests.util.buildbot_api_client import BuildbotDataAPI
 from tests.util.cmd import cmd
 from tests.util.daemon import Daemon
@@ -43,16 +42,16 @@ class BuildbotMaster(Daemon):
                  db_url=None,
                  master_fqdn='localhost',
                  wamp_url=None):
-        """
-        Class representing a Buildbot Daemon
+        """Class representing a Buildbot Daemon.
 
         Args:
-            mode (str): frontend/backend/standalone/symmetric
-            git_repo (GitHostMock): The remote git repo to use
-            external_url: The external web url
-            db_url: The sqlalchemy url to connect to
-            master_fqdn: the FQDN of the master so the workers can connect to.
-            wamp_url: The url to the wamp router
+            mode (str): A value from frontend/backend/standalone/symmetric.
+            git_repo (GitHostMock): The remote git repo to use.
+            external_url: The external web url.
+            db_url: The sqlalchemy url to connect to.
+            master_fqdn: The FQDN of the master so the workers can connect to.
+            wamp_url: The url to the wamp router.
+
         """
         self.http_port = self.get_free_port()
         name = '{}{}'.format(mode, self.http_port)
@@ -98,9 +97,7 @@ class BuildbotMaster(Daemon):
         self.api = BuildbotDataAPI(self.external_url)
 
     def pre_start_hook(self):
-        """
-        Dump conf and launch the 'create-master' command before starting
-        """
+        """Dump conf and launch the 'create-master' command before starting."""
         master_cfg = join('eve', 'etc', 'master.cfg')
         copy(master_cfg, join(self._base_path, 'master.cfg'))
 
@@ -111,9 +108,7 @@ class BuildbotMaster(Daemon):
         self._env = self.environ
 
     def sanity_check(self):
-        """
-        Check that the buildmaster has no unexpected error messages in logs.
-        """
+        """Check that the buildmaster has no unexpected error msgs in logs."""
         loglines = self.loglines
         for i, logline in enumerate(loglines):
             if 'Traceback' in logline:
@@ -132,12 +127,12 @@ class BuildbotMaster(Daemon):
                     '{} has lost connection to crossbar'.format(self._name))
 
     def add_conf_file(self, yaml_data, filename):
-        """
-        Add configuration files to the master's directory
+        """Add configuration files to the master's directory.
 
         Args:
-            yaml_data (dict): the contents of the conf file
-            filename: the path to the conf file
+            yaml_data (dict): The contents of the conf file.
+            filename (str): The path to the conf file.
+
         """
         abspath = os.path.join(self._base_path, filename)
         pardir = os.path.abspath(os.path.join(abspath, os.pardir))
@@ -148,20 +143,18 @@ class BuildbotMaster(Daemon):
 
     @property
     def environ(self):
-        """
-        Returns: The environment that the buildmaster will run with
-
-        """
+        """Return the environment that the buildmaster will run with."""
         env = os.environ.copy()
         for key, value in self.conf.items():
             env[key] = value
         return env
 
     def dump(self, filename):
-        """
-        Dump the buildmaster's conf
+        """Dump the buildmaster's conf.
+
         Args:
-            filename: the path to the conf file
+            filename: The path to the conf file.
+
         """
         with open(filename, 'w') as fhandle:
             lines = [

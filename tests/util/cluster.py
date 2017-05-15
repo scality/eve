@@ -15,9 +15,8 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor,
 # Boston, MA  02110-1301, USA.
-"""
-Tools to configure and interact with a testing eve cluster
-"""
+"""Tools to configure and interact with a testing eve cluster."""
+
 from collections import OrderedDict
 
 from tests.util.buildbot_master import BuildbotMaster
@@ -36,14 +35,13 @@ class Cluster(object):
     buildbot_master_class = BuildbotMaster
 
     def __init__(self, githost=None):
-        """
-        Configure and interact with a testing eve cluster
+        """Configure and interact with a testing eve cluster.
 
         Args:
-            githost (GitHostMock): optional parameter to specify the git host
-                                   that will be used to fake bitbucket or
-                                   github. The default is specified by
-                                   self.githost_class.
+            githost (GitHostMock): Optional parameter to specify the git host
+                that will be used to fake bitbucket or github. The default is
+                specified by self.githost_class.
+
         """
         self.githost = githost if githost is not None else self.githost_class()
 
@@ -66,55 +64,47 @@ class Cluster(object):
 
         self.add_master('backend')
 
+    def __repr__(self):
+        return 'Cluster {}'.format(self.api.url)
+
     @property
     def githost_url(self):
-        """
-        Generates the url that points to the git repo.
-        """
+        """Generate the url that points to the git repo."""
         return 'git://{}:{}/repo_owner/test.git'.format(
             self.external_ip, self.githost.port)
 
     def clone(self):
-        """
-        clones the git repo from the githost to a local directory
+        """Clone the git repo from the githost to a local directory.
 
-        Returns: LocalGitRepo object
+        Returns:
+            LocalGitRepo: The.repository's local clone.
 
         """
         return LocalGitRepo(remote=self.githost_url)
 
     @property
     def external_ip(self):
-        """
-        Returns: the external IP of the cluster.
-
-        """
+        """Return the external IP of the cluster."""
         return 'localhost'
 
     @property
     def db_url(self):
-        """
-        Returns: the sqlachemy URL of the database of the cluster
-
-        """
+        """Return the sqlachemy URL of the database of the cluster."""
         return self.database.url
 
     @property
     def external_url(self):
-        """
-        Returns: the external web url of the cluster
-
-        """
+        """Return the external web url of the cluster."""
         return self._first_frontend.external_url
 
     def add_master(self, mode):
-        """
-        Add a master to the cluster
+        """Add a master to the cluster.
 
         Args:
-            mode (string): frontend/backend/standalone/symmetric
+            mode (string): Any of frontend/backend/standalone/symmetric.
 
-        Returns: a freshly created self.master_class object
+        Returns:
+            A freshly created self.master_class object.
 
         """
         master = self.buildbot_master_class(
@@ -128,10 +118,10 @@ class Cluster(object):
         return master
 
     def start(self):
-        """
-        Start the cluster (blocking)
+        """Start the cluster (blocking).
 
-        Returns: the cluster instance
+        Returns:
+            The cluster instance.
 
         """
         self.githost.start()
@@ -142,10 +132,10 @@ class Cluster(object):
         return self
 
     def stop(self):
-        """
-        Stop the cluster (blocking)
+        """Stop the cluster (blocking).
 
-        Returns: the cluster instance
+        Returns:
+            The cluster instance.
 
         """
         self.githost.stop()
@@ -156,47 +146,28 @@ class Cluster(object):
 
     @property
     def first_master(self):
-        """
-        Returns: the first master of the cluster. Usually a frontend.
-
-        """
+        """Return the first master of the cluster. Usually a frontend."""
         return self._masters.values()[0]
 
     @property
     def api(self):
-        """
-        Returns: the API object that allows to interact with this cluster.
-
-        """
+        """Return the API object that allows to interact with this cluster."""
         return self.first_master.api
 
     def webhook(self, git_repo):
         return self.api.webhook(git_repo)
 
-    def force(self, branch):
-        """
-        Forces a build from the API
-
-        Args:
-            branch (str): The remote branch to be built
-
-        Returns: An API BuildSet object
-
-        """
-        return self.api.force(branch)
-
     def sanity_check(self):
-        """
-        Check that the cluster has no unexpected error messages in logs.
-        """
+        """Check that the cluster has no unexpected error messages in logs."""
         for master in self._masters.values():
             master.sanity_check()
 
     def __delete__(self, _):
-        """
-        delete the cluster
+        """Delete the cluster.
+
         Args:
-            _: ignored
+            _: Ignored.
+
         """
         self.stop()
         del self._crossbar

@@ -18,6 +18,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor,
 # Boston, MA  02110-1301, USA.
 """A simple command launcher."""
+
 import logging
 import os
 import subprocess
@@ -30,13 +31,14 @@ def cmd(command, ignore_exception=False, cwd=None, wait=True, env=None):
     """Execute a shell command and display output in a readable manner.
 
     Args:
-        command (string): The command to execute
+        command (string): The command to execute.
         ignore_exception (bool): Do not raise a CalledProcessError if return
-                                 code is <> 0
-        cwd (string): the directory that the command will be run from.
-        wait (bool): wait for finish. default==True.
-        env (dict): environement variables to add to os.environ before running
-                    the command
+            code is not 0.
+        cwd (string): The directory that the command will be run from.
+        wait (bool): Wait for finish. default==True.
+        env (dict): Environement variables to add to os.environ before running
+            the command.
+
     """
     output = ''
     logger.info('COMMAND : %s', command)

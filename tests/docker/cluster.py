@@ -35,12 +35,12 @@ class DockerizedCluster(Cluster):
 
     @property
     def external_ip(self):
-        """
-        Returns: The external IP address of the cluster.
+        """Return the external IP address of the cluster.
 
-        On Linux, it returns '172.17.0.1'
-        On Mac OS, it tries to find the address that connects your computer to
-        the Internet.
+        Returns:
+            str: '172.17.0.1' On Linux.
+                Try to find the address that connects the machine to the
+                Internet on Mac.
 
         """
         if self._ext_ip:

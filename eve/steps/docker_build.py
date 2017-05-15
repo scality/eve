@@ -15,7 +15,6 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor,
 # Boston, MA  02110-1301, USA.
-
 """All docker build related steps."""
 
 from buildbot.locks import MasterLock
@@ -37,10 +36,7 @@ class DockerBuild(MasterShellCommand):
             DOCKER_BUILD_LOCK.access('exclusive')
         )
 
-        command = [
-            'docker', 'build',
-            '--tag', image
-        ]
+        command = ['docker', 'build', '--tag', image]
 
         if labels:
             for label_name, label_value in labels.iteritems():

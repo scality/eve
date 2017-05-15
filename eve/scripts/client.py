@@ -15,8 +15,8 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor,
 # Boston, MA  02110-1301, USA.
+"""Eve client allowing to launch builds without pushing code to git."""
 
-"""eve client allowing to launch builds without pushing code to git"""
 from __future__ import print_function
 
 import argparse
@@ -26,7 +26,7 @@ from twisted.python import log
 
 
 def output(*msg):
-    """Monkey patch allowing to print log to stdout in addtion to log file"""
+    """Monkey patch allowing to print log to stdout in addtion to log file."""
     for msgline in msg:
         line = str(msgline)
         print(line)
@@ -34,12 +34,13 @@ def output(*msg):
 
 
 def run(host, port, passwd, wait):
-    """
-    Run eve client
-    :param host: e.g. example.com
-    :param port: e.g. 7999
-    :param passwd: the master try password
-    :return: None
+    """Run eve client.
+
+    Args:
+        host (str): The eve host (e.g. example.com).
+        port (int): The try port (e.g. 7999).
+        passwd (str): The master try password.
+
     """
     tryclient.output = output
     config = dict(
@@ -55,7 +56,7 @@ def run(host, port, passwd, wait):
 
 
 def main():
-    """main"""
+    """Parse commandline and run eve client."""
     parser = argparse.ArgumentParser(description='Send diff to eve')
     parser.add_argument('--host', help='the eve master host name')
     parser.add_argument('--port', help='the eve master try port')

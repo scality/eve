@@ -20,6 +20,7 @@ from buildbot.scripts.runner import run
 
 
 def main():
+    """Launch buildbot runner."""
     run()
 
 

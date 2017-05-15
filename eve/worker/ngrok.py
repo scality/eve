@@ -15,7 +15,6 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor,
 # Boston, MA  02110-1301, USA.
-
 """Allow workers to access local test eve instance."""
 
 import json
@@ -24,10 +23,10 @@ import time
 from os import path
 from subprocess import PIPE, Popen
 
-
 # #########################
 # Ngrok
 # #########################
+
 
 class NgrokNotAvailableError(Exception):
     """ngrok binary could not be found."""
@@ -38,7 +37,7 @@ class NgrokTimeoutError(Exception):
 
 
 class Ngrok(object):
-    """ngrok utility wrapper"""
+    """Wrap ngrok tool."""
 
     MAX_WAIT_TUNNEL = 5
     URL_REGEXP = re.compile(r'URL:\w+://(\S+):(\d+)')
@@ -53,15 +52,16 @@ class Ngrok(object):
         """Start ngrok and returns tunnel url and port.
 
         Args:
-            protocol: str: ngrok tunnel protocol on host
-            port: str: ngrok tunel port on host
-            region: str: --region ngrok option
+            protocol (str): ngrok tunnel protocol on host.
+            port (str): ngrok tunel port on host.
+            region: (str): --region ngrok option.
 
-        Returns: tuple (str, str) : (url, port)
+        Returns:
+            tuple (str, str): (url, port).
 
         Raises:
-            * NgrokNotAvailableError
-            * NgrokTimeoutError
+            NgrokNotAvailableError: if the tunnel is not available.
+            NgrokTimeoutError: On timeout.
 
         """
         command = [
@@ -75,9 +75,7 @@ class Ngrok(object):
         except OSError as error:
             raise NgrokNotAvailableError(
                 "Couldn't start ngrok with command: '%s' : '%s'."
-                "Is Ngrok in the PATH ?" %
-                (command, error)
-            )
+                "Is Ngrok in the PATH ?" % (command, error))
 
         start = time.time()
         while not proc.poll() and time.time() - start < self.MAX_WAIT_TUNNEL:
@@ -102,7 +100,12 @@ class Ngrok(object):
 
     @property
     def running(self):
-        """Returns: boolean: True if ngrok is running."""
+        """Check if ngrok is running.
+
+        Returns:
+            bool: True if ngrok is running, False otherwise.
+
+        """
         return self._state is not None
 
     def stop(self):

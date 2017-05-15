@@ -18,9 +18,7 @@
 
 
 class BaseBuildOrder(object):
-    """Base class representing a build to trigger
-    (Scheduler and properties)
-    """
+    """Class representing a build to trigger (Scheduler and properties)."""
 
     def __init__(self, scheduler, git_repo, stage_name, stage,
                  worker, parent_step):
@@ -37,14 +35,9 @@ class BaseBuildOrder(object):
         self.setup_properties()
 
     def setup_properties(self):
-        """
-        Setup additional properties
-        :return: None
-        """
+        """Set additional properties."""
         properties = self._parent_step.getProperties()
-        self.properties = {
-            k: v[0] for k, v in properties.asDict().iteritems()
-        }
+        self.properties = {k: v[0] for k, v in properties.asDict().iteritems()}
         self.properties.update({
             'stage_name': self._stage_name,
             'reason': self._stage_name,

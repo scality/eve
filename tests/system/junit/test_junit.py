@@ -16,6 +16,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor,
 # Boston, MA  02110-1301, USA.
 """This test suite checks end-to-end operation of EVE."""
+
 import unittest
 from os import pardir
 from os.path import abspath, join
@@ -28,8 +29,9 @@ class TestJunit(unittest.TestCase):
         """Test customized JUnitShellCommand step with OK tests.
 
         Steps:
-        * Spawn worker
-        * Have various commands create JUnit reports and parse them
+            - Spawn worker.
+            - Have various commands create JUnit reports and parse them.
+
         """
         cluster = Cluster().start()
         cluster.sanity_check()
@@ -40,7 +42,7 @@ class TestJunit(unittest.TestCase):
         reports_dir = join(parent, 'reports')
         local_repo.push(yaml=yaml, dirs=(reports_dir, ))
         cluster.sanity_check()
-        buildset = cluster.force(local_repo.branch)
+        buildset = cluster.api.force(branch=local_repo.branch)
         assert buildset.result == 'failure'
         child_build = \
             buildset.buildrequest.build.children[0].buildrequest.build

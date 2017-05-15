@@ -24,10 +24,11 @@ class CrossbarConfFactory(object):
     master_count = 0
 
     def __init__(self, port=None):
-        """
-        Class to generate Crossbar configuration
+        """Generate Crossbar configuration.
+
         Args:
-            port: the port number to use (optional)
+            port (int): The port number to use (optional).
+
         """
         json_conf_path = os.path.join(
             os.path.dirname(os.path.abspath(__file__)), 'crossbar.json')
@@ -39,10 +40,11 @@ class CrossbarConfFactory(object):
                 port
 
     def dump(self, filename):
-        """
-        Dumps the conf to a file
+        """Dump the conf to a file.
+
         Args:
-            filename (str): the file path to dump the conf to
+            filename (str): The file path to dump the conf to.
+
         """
         with open(filename, 'w') as fhandle:
             json.dump(self._conf, fhandle)
