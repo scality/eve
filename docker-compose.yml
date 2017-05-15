@@ -46,4 +46,6 @@ services:
     build: eve/services/gitcache
     ports:
       - "${EXTERNAL_GITCACHE_PORT-8888}:80"
+      - "${EXTERNAL_GITCACHE_LFS_PORT1-8889}:81"
+      - "${EXTERNAL_GITCACHE_LFS_PORT2-8890}:82"
     env_file: "${ENV_FILE-env}"

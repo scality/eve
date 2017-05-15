@@ -91,9 +91,13 @@ class EveDockerLatentWorker(AbstractLatentWorker):
         if util.env.GITCACHE_IN_USE:
             hostname = util.env.GITCACHE_HOSTNAME
             port = util.env.GITCACHE_PORT
+            lfs_port1 = util.env.GITCACHE_LFS_PORT1
+            lfs_port2 = util.env.GITCACHE_LFS_PORT2
             cmd += [
                 '--env', 'GITCACHE_HOSTNAME=%s' % hostname,
                 '--env', 'GITCACHE_PORT=%s' % port,
+                '--env', 'GITCACHE_LFS_PORT1=%s' % lfs_port1,
+                '--env', 'GITCACHE_LFS_PORT2=%s' % lfs_port2,
                 '--link', hostname]
 
         for volume in volumes:

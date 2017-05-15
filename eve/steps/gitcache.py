@@ -67,8 +67,11 @@ class CheckGitCachePresence(ShellCommand):
                     locks=[GITCACHE_BUILD_LOCK.access('exclusive')],
                     hideStepIf=lambda results, s: results == SUCCESS,
                     command=('docker run --detach --name %s '
-                             '--publish %s:80 gitcache_img') % (
+                             '--publish %s:80 --publish %s:81 --publish %s:82 '
+                             'gitcache_img') % (
                                  util.env.GITCACHE_HOSTNAME,
-                                 util.env.GITCACHE_PORT))
+                                 util.env.GITCACHE_PORT,
+                                 util.env.GITCACHE_LFS_PORT1,
+                                 util.env.GITCACHE_LFS_PORT2))
             ])
         defer.returnValue(result)
