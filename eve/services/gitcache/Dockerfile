@@ -8,14 +8,13 @@ RUN \
   apt-get update && \
   apt-get install -y fcgiwrap git nginx python && \
   echo "\ndaemon off;" >> /etc/nginx/nginx.conf && \
+  mkdir -p /data/nginx && \
   rm -rf /var/lib/apt/lists/* && \
   chown -R www-data:www-data /var/lib/nginx && \
   mkdir /git && \
   touch /git/.git-credentials  # empty by default, override in a volume if required
 
-VOLUME ["/var/lib/git"]
-
-EXPOSE 80
+VOLUME ["/var/lib/git", "/data/nginx"]
 
 COPY git_proxy_cache.py /usr/lib/git-core/git_proxy_cache.py
 COPY git-proxy-cache-and-http-backend /usr/lib/git-core/git-proxy-cache-and-http-backend

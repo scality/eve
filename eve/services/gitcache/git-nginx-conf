@@ -1,6 +1,8 @@
-error_log /dev/stdout info;
-access_log /dev/stdout;
+# double reverse proxy cache for git-lfs
+proxy_cache_path  /data/nginx/cache_bitbucket levels=1:2 keys_zone=bitbucket:8m inactive=24h max_size=1g;
+proxy_cache_path  /data/nginx/cache_atlassian levels=1:2 keys_zone=atlassian:8m inactive=24h max_size=16g;
 
+# GIT
 server {
 	listen 80 default_server;
 	listen [::]:80 default_server;
@@ -36,5 +38,61 @@ server {
         fastcgi_param REMOTE_USER $remote_user;
         fastcgi_index /root/git-upload-pack.py;
         fastcgi_pass unix:/var/run/fcgiwrap.socket;
+    }
+}
+
+# GIT LFS
+server {
+    listen 81 default_server;
+    listen [::]:81 default_server;
+    server_name _;
+
+    location /bitbucket {
+            rewrite /bitbucket/(.*) /$1 break;
+
+            # define reverse proxy
+            proxy_pass             https://bitbucket.org/;
+            proxy_set_header       Host bitbucket.org;
+            proxy_set_header       Authorization "Basic ROBOT_BASE64";
+
+            # filter to make links point to the second reverse proxy
+            sub_filter 'https://media-api.atlassian.io/' 'http://gitcache:82/bitbucket/';
+            sub_filter_types application/vnd.git-lfs+json;
+            sub_filter_once off;
+
+            # define cache
+            proxy_buffer_size        16k;
+            proxy_buffers            8 16k;
+            proxy_busy_buffers_size  32k;
+            proxy_ignore_headers     Cache-Control;
+            proxy_cache              bitbucket;
+            proxy_cache_methods      GET HEAD POST;
+            proxy_cache_key          $scheme$proxy_host$request_uri$request_body;
+            proxy_cache_valid        200  1d;
+            proxy_cache_use_stale    error timeout invalid_header updating http_500 http_502 http_503 http_504;
+    }
+}
+
+server {
+    listen 82 default_server;
+    listen [::]:82 default_server;
+    server_name _;
+
+    location /bitbucket {
+            rewrite /bitbucket/(.*) /$1 break;
+
+            # define reverse proxy
+            proxy_pass             https://media-api.atlassian.io/;
+            proxy_set_header       Host media-api.atlassian.io;
+
+            # define cache
+            proxy_buffer_size        16k;
+            proxy_buffers            8 16k;
+            proxy_busy_buffers_size  32k;
+            proxy_ignore_headers     Cache-Control;
+            proxy_cache              atlassian;
+            proxy_cache_methods      GET HEAD;
+            proxy_cache_valid        200  1d;
+            proxy_cache_use_stale    error timeout invalid_header updating http_500 http_502 http_503 http_504;
     }
 }
