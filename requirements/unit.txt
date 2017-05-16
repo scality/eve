@@ -3,7 +3,7 @@
 # Frozen requirements for "requirements/unit.in"
 
 appdirs==1.4.3
-coverage==4.4
+coverage==4.4.1
 funcsigs==1.0.2
 mock==2.0.0
 packaging==16.8

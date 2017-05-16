@@ -25,3 +25,9 @@ pylint==1.6.5
 
 # python-novaclient 8.0.0 not compatible with current Eve code
 python-novaclient==7.1.0
+
+# oslo 3.15.1 dependencies are broken
+# >>> from buildbot.plugins import util
+# >>> util.load_env
+# *** PluginDBError: Requirements are not satisfied for buildbot.util:load_env: (Babel 2.4.0 (/root/bitbucket/scality/ring/venv/lib/python2.7/site-packages), Requirement.parse('Babel!=2.4.0,>=2.3.4'), set(['oslo.i18n']))
+Babel!=2.4.0,>=2.3.4
