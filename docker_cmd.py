@@ -29,11 +29,8 @@ import requests
 import sqlalchemy
 
 
-db_url = sys.argv[1]
-wamp_router_url = sys.argv[2]
-
-print('pinging crossbar...{} ...'.format(wamp_router_url))
-
+print('pinging crossbar...')
+wamp_router_url =  os.environ['WAMP_ROUTER_URL']
 for i in xrange(120):
     try:
         requests.get(wamp_router_url.replace('ws://', 'http://'))
@@ -43,11 +40,11 @@ for i in xrange(120):
             wamp_router_url))
         time.sleep(1)
 else:
-    raise Exception('The wamp server never responded')
+    raise Exception('wamp server never responded')
 
 print('pinging database...')
+db_url = os.environ['DB_URL']
 sa = sqlalchemy.create_engine(db_url.split('?')[0])
-
 for i in xrange(120):
     try:
         sa.execute('select 1;')
@@ -56,17 +53,10 @@ for i in xrange(120):
         print('Waiting for the database to wake up {} ...'.format(db_url))
         time.sleep(1)
 else:
-    raise Exception('The database never responded')
+    raise Exception('database never responded')
 
-if os.environ['MASTER_MODE'] == 'frontend':
-    # Backends must start before frontends because builders need to be
-    # available before launching the first build.
-    # Failure to do so leads to build not triggered during the first 5 minutes
-    # until the next sync.
-    time.sleep(10)
-
-print('Upgrading master...')
+print('upgrading master...')
 subprocess.check_call('buildbot upgrade-master .', shell=True)
 
-print('Starting master...')
+print('starting master...')
 subprocess.check_call('twistd -ny ./buildbot.tac', shell=True)
