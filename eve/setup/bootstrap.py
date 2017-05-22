@@ -33,7 +33,7 @@ from twisted.internet import defer
 @defer.inlineCallbacks
 def eve_canStartBuild(builder, wfb, request):
     yield
-   if isfile(util.env.NO_NEW_BUILD_FILE_PATH):
+    if isfile(util.env.NO_NEW_BUILD_FILE_PATH):
         defer.returnValue(False)
     defer.returnValue(True)
 
