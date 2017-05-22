@@ -28,20 +28,6 @@ class SleepyDaemon(Daemon):
 
 
 class TestDaemon(TestCase):
-    def test_get_free_port(self):
-        """Test the the get_free_port() static method work correctly.
-
-        I suspect it to behave differently depending on the platform.
-
-        """
-        free_ports = set()
-        for _ in range(100):
-            new_port = Daemon.get_free_port()
-            if new_port in free_ports:
-                raise Exception(
-                    'Port {} has been given twice'.format(new_port))
-            free_ports.add(new_port)
-
     def test_start_stop_sleepy_daemon(self):
         """Test start and stop a fake daemon.
 
