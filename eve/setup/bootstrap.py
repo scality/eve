@@ -16,7 +16,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor,
 # Boston, MA  02110-1301, USA.
 
-from os.path import dirname
+from os.path import dirname, isfile
 
 from buildbot.config import BuilderConfig
 from buildbot.plugins import steps, util
@@ -26,6 +26,16 @@ from buildbot.process.results import SKIPPED, SUCCESS
 from buildbot.steps.master import SetProperty
 from buildbot.steps.shell import SetPropertyFromCommand
 from buildbot.steps.source.git import Git
+from twisted.internet import defer
+
+
+# Do not build if NO_NEW_BUILD_FILE_PATH exists
+@defer.inlineCallbacks
+def eve_canStartBuild(builder, wfb, request):
+    yield
+   if isfile(util.env.NO_NEW_BUILD_FILE_PATH):
+        defer.returnValue(False)
+    defer.returnValue(True)
 
 
 def bootstrap_builder(workers):
@@ -123,4 +133,5 @@ def bootstrap_builder(workers):
             'artifacts_url': util.env.ARTIFACTS_URL,
             'artifacts_prefix': util.env.ARTIFACTS_PREFIX,
         },
+        canStartBuild=eve_canStartBuild,
     )
