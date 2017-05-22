@@ -28,21 +28,25 @@ import time
 import requests
 import sqlalchemy
 
+def _print(string):
+    """Print and flush for immediate display."""
+    print(string)
+    sys.stdout.flush()
 
-print('pinging crossbar...')
+_print("pinging crossbar...")
 wamp_router_url =  os.environ['WAMP_ROUTER_URL']
 for i in xrange(120):
     try:
         requests.get(wamp_router_url.replace('ws://', 'http://'))
         break
     except requests.exceptions.ConnectionError:
-        print('Waiting for the wamp queue to wake up {} ...'.format(
+        _print('Waiting for the wamp queue to wake up {} ...'.format(
             wamp_router_url))
         time.sleep(1)
 else:
     raise Exception('wamp server never responded')
 
-print('pinging database...')
+_print("pinging database...")
 db_url = os.environ['DB_URL']
 sa = sqlalchemy.create_engine(db_url.split('?')[0])
 for i in xrange(120):
@@ -50,13 +54,13 @@ for i in xrange(120):
         sa.execute('select 1;')
         break
     except sqlalchemy.exc.OperationalError:
-        print('Waiting for the database to wake up {} ...'.format(db_url))
+        _print('Waiting for the database to wake up {} ...'.format(db_url))
         time.sleep(1)
 else:
     raise Exception('database never responded')
 
-print('upgrading master...')
+_print("upgrading master...")
 subprocess.check_call('buildbot upgrade-master .', shell=True)
 
-print('starting master...')
+_print("starting master...")
 subprocess.check_call('twistd -ny ./buildbot.tac', shell=True)
