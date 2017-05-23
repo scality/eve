@@ -9,7 +9,7 @@ stages:
   pre-merge:
     worker:
       type: docker
-      path: eve/workers/trusty
+      path: build/workers/trusty
       volumes:
         - '/home/eve/workspace'
     steps:
@@ -21,7 +21,7 @@ stages:
   static checks:
     worker:
       type: docker
-      path: eve/workers/trusty
+      path: build/workers/trusty
       volumes:
         - '/home/eve/workspace'
     steps:
@@ -38,7 +38,7 @@ stages:
       type: openstack
       image: Ubuntu 16.04 LTS (Xenial Xerus) (PVHVM)
       flavor: general1-4
-      path: eve/workers/system_tests
+      path: build/workers/system_tests
     steps:
       - Git:
           name: fetch source
