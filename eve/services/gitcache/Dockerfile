@@ -14,7 +14,7 @@ RUN \
   mkdir /git && \
   touch /git/.git-credentials  # empty by default, override in a volume if required
 
-VOLUME ["/var/lib/git", "/data/nginx"]
+VOLUME ["/var/lib/git", "/data/nginx", "/var/log"]
 
 COPY git_proxy_cache.py /usr/lib/git-core/git_proxy_cache.py
 COPY git-proxy-cache-and-http-backend /usr/lib/git-core/git-proxy-cache-and-http-backend
