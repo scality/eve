@@ -13,9 +13,37 @@ stages:
       volumes:
         - '/home/eve/workspace'
     steps:
-      - SetProperty:
-          property: artifacts_name
-          value: "%(prop:build_id)s"
+      - TriggerStages:
+          name: trigger local tests and remote tests simulateneously
+          stage_names:
+            - local tests
+            - docker tests
+          waitForFinish: True
+          haltOnFailure: True
+      - ShellCommand:
+          name: add successful .final_status to artifacts
+          command: >
+              mkdir build_status
+              && echo -n "SUCCESSFUL" > build_status/.final_status
+          haltOnFailure: True
+      - ShellCommand:
+          name: add failed .final_status to artifacts if needed
+          command: >
+              [ -f build_status/.final_status ]
+              || ( mkdir build_status && echo -n "FAILED" > build_status/.final_status )
+          haltOnFailure: True
+          alwaysRun: True
+      - Upload:
+          source: build_status
+          alwaysRun: True
+
+  local tests:
+    worker:
+      type: docker
+      path: build/workers/xenial
+      volumes:
+        - '/home/eve/workspace'
+    steps:
       - Git:
           name: fetch source
           repourl: '%(prop:git_reference)s'
@@ -40,22 +68,19 @@ stages:
           command: tox --sitepackages -e system
           haltOnFailure: True
       - Upload:
-          source: /tmp
+          source: .htmlcov
           urls:
-            - ['\1', '*']
+            - ['coverage report (unit)', 'unit/index.html']
+            - ['coverage report (testutil)', 'util/index.html']
+            - ['coverage report (system)', 'system/index.html']
           alwaysRun: True
-      - TriggerStages:
-          name: trigger docker tests
-          haltOnFailure: True
-          stage_names:
-            - docker tests
 
   docker tests:
     worker:
       type: openstack
       image: Ubuntu 16.04 LTS (Xenial Xerus) (PVHVM)
       flavor: general1-4
-      path: build/workers/system_tests
+      path: build/workers/docker_tests
     steps:
       - Git:
           name: fetch source
@@ -78,3 +103,8 @@ stages:
           name: run docker tests
           command: HOME=/home/eve tox -e docker
           haltOnFailure: True
+      - Upload:
+          source: .htmlcov
+          urls:
+            - ['coverage report (docker)', 'docker/index.html']
+          alwaysRun: True
