@@ -8,8 +8,8 @@ Here are the tested components :
 
 """
 
-import eve.patch.bitbucket_webhook
 from buildbot.www.hooks import bitbucket as bb_hooks
+from eve.patch.bitbucket_webhook import getChanges, patch
 from twisted.trial import unittest
 
 
@@ -22,6 +22,5 @@ class TestBitbucketWebhook(unittest.TestCase):
         by the buildbot.www.hooks module and replace it by the getChanges
         function provided by the eve.patch.bitbucket_webhook module.
         """
-        eve.patch.bitbucket_webhook.patch()
-        self.assertEquals(bb_hooks.getChanges,
-                          eve.patch.bitbucket_webhook.getChanges)
+        patch()
+        self.assertEquals(bb_hooks.getChanges, getChanges)
