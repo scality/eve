@@ -53,13 +53,13 @@ SUCCEEDED_BUILD = {
 
 
 class TestBaseBuildStatusPush(unittest.TestCase):
-    def test_constructor(self):
+    def test_init(self):
         ctx = base.BaseBuildStatusPush(name='foo')
         self.assertIsNotNone(ctx)
 
 
 class TestHipChatBuildStatusPush(unittest.TestCase):
-    def test_constructor(self):
+    def test_init(self):
         ctx = base.HipChatBuildStatusPush(room_id='foo', token='bar')
         self.assertEquals(ctx.room_id, 'foo')
         self.assertEquals(ctx.token, 'bar')

@@ -6,7 +6,7 @@ import eve.steps.docker_build
 
 
 class TestDockerBuild(unittest.TestCase):
-    def test_constructor(self):
+    def test_init(self):
         ctx = eve.steps.docker_build.DockerBuild(
             'image', 'dockerfile', True, {'foo': 'bar'}, {'arg': 'val'})
         self.assertEquals(ctx.image, 'image')

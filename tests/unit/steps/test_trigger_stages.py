@@ -24,12 +24,12 @@ class TestTriggerStages(unittest.TestCase):
             ('OPENSTACK_SCHEDULER_NAME', 'foo')
         ])
 
-    def test_constructor(self):
+    def test_init(self):
         ctx = eve.steps.trigger_stages.TriggerStages('stage_names')
         self.assertEquals(ctx.stage_names, 'stage_names')
 
 
 class TestExecuteTriggerStages(unittest.TestCase):
-    def test_constructor(self):
+    def test_init(self):
         ctx = eve.steps.trigger_stages.ExecuteTriggerStages('build_orders')
         self.assertEquals(ctx._build_orders, 'build_orders')

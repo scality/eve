@@ -6,7 +6,7 @@ import eve.steps.publish_coverage_report
 
 
 class TestCodecovIOPublication(unittest.TestCase):
-    def test_constructor(self):
+    def test_init(self):
         ctx = eve.steps.publish_coverage_report.CodecovIOPublication(
             'repository', 'revision', 'branch', 'name', 'flags')
         self.assertEquals(ctx.repository, 'repository')
