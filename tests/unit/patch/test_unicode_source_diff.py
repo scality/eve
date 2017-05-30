@@ -1,8 +1,10 @@
-"""Unit testing of the eve.patch.unicode_source_diff module.
+"""Unit tests of `eve.patch.unicode_source_diff`.
 
 This module simply test the different components of the
-eve.patch.unicode_source_diff module. Here are the tested components :
-    * patch() function
+`eve.patch.unicode_source_diff` module.
+
+Here are the tested components :
+    * `patch()` function
 
 """
 

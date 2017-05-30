@@ -1,1 +1,1 @@
-"""Unit tests of the eve.schedulers module."""
+"""Unit tests of `eve.schedulers`."""

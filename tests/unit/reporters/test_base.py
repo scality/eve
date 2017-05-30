@@ -1,16 +1,15 @@
-"""
-Test module for the eve.reporters.base module.
+"""Unit tests of `eve.reporters.base`.
 
-This module will test functions and classes nested in the eve.reporter.base
-module.
-
+This module will test functions and classes in `eve.reporter.base`.
 
 Attributes:
     FAILED_BUILD (dict): Module level dictionary which is used as a failed
-    build fixture for status push related tests.
+        build fixture for status push related tests.
     SUCCEEDED_BUILD (dict): Module level dictionary which is used as a
-    succeeded build fixture for status push related tests
+        succeeded build fixture for status push related tests.
+
 """
+
 from eve.reporters import base
 from twisted.internet import defer
 from twisted.trial import unittest

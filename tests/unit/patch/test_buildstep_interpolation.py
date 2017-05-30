@@ -1,10 +1,13 @@
-"""Unit testing of the eve.patch.buildstep_interpolation module.
+"""Unit tests of `eve.patch.buildstep_interpolation`.
 
 This module simply test the different components of the
-eve.patch.buildstep_interpolation module. Here are the tested components :
-    * patch function
+`eve.patch.buildstep_interpolation` module.
+
+Here are the tested components :
+    * `patch()` function
 
 """
+
 from buildbot.process.buildstep import BuildStep
 from eve.patch.buildstep_interpolation import patch
 from twisted.trial import unittest

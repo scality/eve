@@ -1,1 +1,1 @@
-"""Unit tests of the eve.reporters module."""
+"""Unit tests of `eve.reporters`."""

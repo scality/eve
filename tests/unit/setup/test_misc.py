@@ -1,3 +1,5 @@
+"""Unit tests of `eve.setup.misc`."""
+
 import shutil
 import time
 import unittest

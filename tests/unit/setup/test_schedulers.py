@@ -1,3 +1,5 @@
+"""Unit tests of `eve.setup.schedulers`."""
+
 import unittest
 
 import eve.setup.schedulers

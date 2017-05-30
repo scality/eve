@@ -1,9 +1,11 @@
-"""Test module for eve.setup.boostrap module.
+"""Unit tests of `eve.setup.boostrap`.
 
 Attributes:
     DumbWorker (namedtuple): structure to define a fake buildbot worker for
         bootstrap tests.
+
 """
+
 import collections
 import unittest
 

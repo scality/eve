@@ -1,10 +1,13 @@
-"""Unit testing of the eve.patch.bitbucket_webhook module.
+"""Unit tests of `eve.patch.bitbucket_webhook`.
 
 This module simply test the different components of the
-eve.patch.bitbucket_webhook module. Here are the tested components :
-    * patch() function
+`eve.patch.bitbucket_webhook` module.
+
+Here are the tested components :
+    * `patch()` function
 
 """
+
 import eve.patch.bitbucket_webhook
 from buildbot.www.hooks import bitbucket as bb_hooks
 from twisted.trial import unittest

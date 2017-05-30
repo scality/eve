@@ -1,3 +1,5 @@
+"""Unit tests of `eve.setup.local_jobs`."""
+
 import shutil
 import unittest
 from collections import namedtuple

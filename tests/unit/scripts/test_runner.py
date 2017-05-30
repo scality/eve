@@ -1,6 +1,5 @@
-"""
-Test module for the eve.scripts.runner module
-"""
+"""Unit tests of `eve.scripts.runner`."""
+
 import eve.scripts.runner
 from twisted.trial import unittest
 

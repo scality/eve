@@ -1,3 +1,5 @@
+"""Unit tests of `eve.steps.junit`."""
+
 import unittest
 
 import eve.steps.junit

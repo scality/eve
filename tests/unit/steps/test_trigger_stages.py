@@ -1,4 +1,5 @@
-"""Unit tests of the eve.steps.trigger_stages module."""
+"""Unit tests of `eve.steps.trigger_stages`."""
+
 import unittest
 
 import eve.steps.trigger_stages

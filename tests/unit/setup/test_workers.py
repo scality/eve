@@ -1,3 +1,5 @@
+"""Unit tests of `eve.setup.workers`."""
+
 import unittest
 
 import eve.setup.workers

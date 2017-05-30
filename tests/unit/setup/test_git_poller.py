@@ -1,3 +1,5 @@
+"""Unit tests of `eve.setup.git_poller`."""
+
 import unittest
 
 import eve.setup.git_poller

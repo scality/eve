@@ -1,3 +1,5 @@
+"""Unit tests of `eve.steps.docker_build`."""
+
 import unittest
 
 import eve.steps.docker_build

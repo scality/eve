@@ -1,4 +1,5 @@
-"""Test module of the eve.steps.public_coverage_report module."""
+"""Unit tests of `eve.steps.public_coverage_report`."""
+
 import unittest
 
 import eve.steps.publish_coverage_report
