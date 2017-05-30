@@ -151,7 +151,7 @@ class TestJunit(unittest.TestCase):
                 u'no test results found',
                 'failure'
             )
-        ]  # yapf: disable
+        ]
 
         self.assertEqual(results, expected)
         cluster.stop()

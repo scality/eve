@@ -20,7 +20,6 @@ class SetupMiscTest(unittest.TestCase):
 
     def test_verify_docker_certificates(self):
         """Test the verify_docker_certificate function."""
-        # yapf: disable
         util.env = util.load_env([
             ('DOCKER_TLS_VERIFY', True),
             ('DOCKER_CERT_PATH', self.tmpdir)
@@ -31,7 +30,6 @@ class SetupMiscTest(unittest.TestCase):
         """Test the very_docker_certificate function
         with no TLS verification.
         """
-        # yapf: disable
         util.env = util.load_env([
             ('DOCKER_TLS_VERIFY', False)
         ])
@@ -43,7 +41,6 @@ class SetupMiscTest(unittest.TestCase):
 
     def test_wamp(self):
         """Test the wamp function."""
-        # yapf: disable
         util.env = util.load_env([
             ('WAMP_REALM', 'bar'),
             ('WAMP_ROUTER_URL', 'foo')

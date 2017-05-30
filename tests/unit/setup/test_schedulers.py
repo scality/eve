@@ -7,7 +7,6 @@ from buildbot.plugins import util
 class SetupSchedulersTest(unittest.TestCase):
     def test_any_branch_scheduler(self):
         """Test the any_branch_scheduler function."""
-        # yapf: disable
         util.env = util.load_env([
             ('BOOTSTRAP_BUILDER_NAME', ''),
             ('BOOTSTRAP_SCHEDULER_NAME', '')
@@ -17,7 +16,6 @@ class SetupSchedulersTest(unittest.TestCase):
     def test_force_scheduler(self):
         """
         Test the force_scheduler function."""
-        # yapf: disable
         util.env = util.load_env([
             ('BOOTSTRAP_BUILDER_NAME', 'foo'),
             ('GITCACHE_IN_USE', '0', int),
@@ -31,7 +29,6 @@ class SetupSchedulersTest(unittest.TestCase):
 
     def test_try_scheduler(self):
         """Test the try_scheduler function."""
-        # yapf: disable
         util.env = util.load_env([
             ('BOOTSTRAP_BUILDER_NAME', 'foo'),
             ('TRY_SCHEDULER_NAME', 'foo'),

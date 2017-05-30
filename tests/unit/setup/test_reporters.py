@@ -7,7 +7,6 @@ from buildbot.plugins import util
 class SetupReportersTest(unittest.TestCase):
     def test_hipchat_reporter(self):
         """Test the hipchat_reporter function."""
-        # yapf: disable
         util.env = util.load_env([
             ('DOCKER_BUILDER_NAME', 'foo'),
             ('HIPCHAT_ROOM', 'foo'),
@@ -18,7 +17,6 @@ class SetupReportersTest(unittest.TestCase):
 
     def test_github_reporter(self):
         """Test the github_reporter function."""
-        # yapf: disable
         util.env = util.load_env([
             ('DOCKER_BUILDER_NAME', 'foo'),
             ('GITHUB_TOKEN', 'foo'),
@@ -28,7 +26,6 @@ class SetupReportersTest(unittest.TestCase):
 
     def test_bitbucket_reporter(self):
         """Test the bitbucket_reporter function."""
-        # yapf: disable
         util.env = util.load_env([
             ('DOCKER_BUILDER_NAME', 'foo'),
             ('EVE_GITHOST_LOGIN', 'foo'),

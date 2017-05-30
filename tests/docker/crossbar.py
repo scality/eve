@@ -38,7 +38,7 @@ class DockerizedCrossbar(Crossbar):
             '-p', '{}:10990'.format(self.port),
             '-v', '{}:/node/.crossbar/config.json'.format(conf),
             'crossbario/crossbar'
-        ]  # yapf: disable
+        ]
 
     def _log(self):
         """Return the logs of the Crossbar docker container."""

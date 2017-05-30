@@ -72,7 +72,7 @@ class TestPublishCodeCoverage(unittest.TestCase):
             os.environ.update({
                 'CODECOV_IO_BASE_URL': self.codecov_io_server.url,
                 'CODECOV_IO_UPLOAD_TOKEN': 'FAKE_TOKEN',
-            })  # yapf: disable
+            })
 
         self.cluster = Cluster()
         for master in self.cluster._masters.values():

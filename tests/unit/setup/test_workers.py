@@ -7,7 +7,6 @@ from buildbot.plugins import util
 class SetupWorkersTest(unittest.TestCase):
     def test_local_workers(self):
         """Test the local_workers function."""
-        # yapf: disable
         util.env = util.load_env([
             ('GIT_SLUG', 'slug'),
             ('MAX_LOCAL_WORKERS', 3),
@@ -18,7 +17,6 @@ class SetupWorkersTest(unittest.TestCase):
 
     def test_docker_workers(self):
         """Test that the docker_workers function."""
-        # yapf: disable
         util.env = util.load_env([
             ('ARTIFACTS_PREFIX', 'foo_'),
             ('DOCKER_CONTAINER_MAX_CPU', 4),
@@ -34,7 +32,6 @@ class SetupWorkersTest(unittest.TestCase):
 
     def test_openstack_workers(self):
         """Test that the openstack_workers function."""
-        # yapf: disable
         util.env = util.load_env([
             ('CLOUD_INIT_SCRIPT', 'foo'),
             ('EXTERNAL_PB_PORT', 12345),

@@ -45,7 +45,7 @@ class DockerizedBuildbotMaster(BuildbotMaster):
             '{}:9999'.format(port), '-e', 'EXTERNAL_PB_PORT={}'.format(port),
             '-v', '/var/run/docker.sock:/var/run/docker.sock', '--env-file',
             self._env_file, 'eve_master'
-        ]  # yapf: disable
+        ]
 
     def pre_start_hook(self):
         """Build an eve docker image and prepare the environment to run it."""

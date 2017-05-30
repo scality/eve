@@ -56,7 +56,7 @@ class DockerizedMySQL(Daemon):
             '-e', 'MYSQL_USER={}'.format(MYSQL_USER),
             '-e', 'MYSQL_PASSWORD={}'.format(MYSQL_PASSWORD),
             'mysql/mysql-server:5.7'
-        ]  # yapf: disable
+        ]
 
     def _log(self):
         """Return the logs of the MySQL docker container."""

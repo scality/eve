@@ -5,4 +5,3 @@
 autoflake
 autopep8
 isort
-yapf

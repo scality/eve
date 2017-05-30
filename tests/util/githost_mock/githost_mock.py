@@ -37,7 +37,7 @@ class GitHostMock(Daemon):
             '--enable=receive-pack',
             '--base-path={}'.format(self._base_path),
             '--port={}'.format(self.port)
-        ]  # yapf: disable
+        ]
 
     def pre_start_hook(self):
         """Create a bare git repo before starting the git daemon."""

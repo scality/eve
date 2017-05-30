@@ -7,7 +7,6 @@ from buildbot.plugins import util
 
 class StepsTriggerStages(unittest.TestCase):
     def setUp(self):
-        # yapf: disable
         util.env = util.load_env([
             ('LOCAL_SCHEDULER_NAME', 'foo'),
             ('DOCKER_SCHEDULER_NAME', 'bar'),
@@ -18,7 +17,6 @@ class StepsTriggerStages(unittest.TestCase):
 class TestTriggerStages(unittest.TestCase):
 
     def setUp(self):
-        # yapf: disable
         util.env = util.load_env([
             ('LOCAL_SCHEDULER_NAME', 'foo'),
             ('DOCKER_SCHEDULER_NAME', 'bar'),

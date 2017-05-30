@@ -39,7 +39,6 @@ class SetupLocalJobsTest(unittest.TestCase):
         Test the local_jobs function twice: without any exception thrown
         and with an exception thrown.
         """
-        # yapf: disable
         self.assertIsNotNone(
             eve.setup.local_jobs.local_jobs([DumbWorker(name='foo')]))
 
