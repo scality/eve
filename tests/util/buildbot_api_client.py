@@ -98,7 +98,7 @@ class BuildbotDataAPI(object):
         return res.json()[object_name]
 
     def getw(self, route, get_params=None, retry=180, expected_count=1):
-        """Get data from the REST API."""
+        """Wait for and return a given number of results from the REST API."""
         for i in xrange(retry):
             try:
                 res = self.get(route=route, get_params=get_params)
