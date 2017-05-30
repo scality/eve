@@ -36,15 +36,16 @@ class DockerizedBuildbotMaster(BuildbotMaster):
         """
         super(DockerizedBuildbotMaster, self).__init__(*args, **kwargs)
         self._env_file = os.path.join(self._base_path, 'docker.env')
-        port = self.conf.pop('PB_PORT')
+        port = self.conf.get('PB_PORT')
         self._start_cmd = [
             'docker', 'run',
             '--name', self._name,
-            '-p', '{}:8999'.format(self.conf.pop('HTTP_PORT')),
-            '-p',
-            '{}:9999'.format(port), '-e', 'EXTERNAL_PB_PORT={}'.format(port),
-            '-v', '/var/run/docker.sock:/var/run/docker.sock', '--env-file',
-            self._env_file, 'eve_master'
+            '-p', '{0}:{0}'.format(self.conf.get('HTTP_PORT')),
+            '-p', '{0}:{0}'.format(port),
+            '-e', 'EXTERNAL_PB_PORT={}'.format(port),
+            '-v', '/var/run/docker.sock:/var/run/docker.sock',
+            '--env-file', self._env_file,
+            'eve_master'
         ]
         self.vault = kwargs['vault']
 
