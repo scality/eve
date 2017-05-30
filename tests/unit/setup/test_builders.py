@@ -24,10 +24,6 @@ class SetupBuildersTest(unittest.TestCase):
         ])
 
     def test_triggerable_builder(self):
-        """
-        Test that the triggerable_builder function is run without throwing
-        an exception and returns something different than None.
-        """
         builder_conf = eve.setup.builders.triggerable_builder(
             'foo', [DumbWorker(name='bar')])
         self.assertEquals(builder_conf.name, 'foo')

@@ -14,8 +14,4 @@ class SetupGitPollerTest(unittest.TestCase):
         ])
 
     def test_git_poller(self):
-        """
-        Test that the git_poller function is run without throwing an exception
-        and that it returns something different than None.
-        """
         self.assertIsNotNone(eve.setup.git_poller.git_poller())

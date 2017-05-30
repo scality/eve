@@ -14,5 +14,4 @@ from twisted.trial import unittest
 
 class TestWorkerRetry(unittest.TestCase):
     def test_patch(self):
-        """Test the patch function."""
         patch()

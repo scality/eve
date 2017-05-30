@@ -8,7 +8,6 @@ from buildbot.plugins import util
 
 class SetupSchedulersTest(unittest.TestCase):
     def test_any_branch_scheduler(self):
-        """Test the any_branch_scheduler function."""
         util.env = util.load_env([
             ('BOOTSTRAP_BUILDER_NAME', ''),
             ('BOOTSTRAP_SCHEDULER_NAME', '')
@@ -16,8 +15,6 @@ class SetupSchedulersTest(unittest.TestCase):
         self.assertIsNotNone(eve.setup.schedulers.any_branch_scheduler())
 
     def test_force_scheduler(self):
-        """
-        Test the force_scheduler function."""
         util.env = util.load_env([
             ('BOOTSTRAP_BUILDER_NAME', 'foo'),
             ('GITCACHE_IN_USE', '0', int),
@@ -30,7 +27,6 @@ class SetupSchedulersTest(unittest.TestCase):
         self.assertIsNotNone(eve.setup.schedulers.force_scheduler())
 
     def test_try_scheduler(self):
-        """Test the try_scheduler function."""
         util.env = util.load_env([
             ('BOOTSTRAP_BUILDER_NAME', 'foo'),
             ('TRY_SCHEDULER_NAME', 'foo'),
@@ -40,6 +36,5 @@ class SetupSchedulersTest(unittest.TestCase):
         self.assertIsNotNone(eve.setup.schedulers.try_scheduler())
 
     def test_triggerable_scheduler(self):
-        """Test the triggerable_scheduler function."""
         self.assertIsNotNone(eve.setup.schedulers.triggerable_scheduler('foo',
                                                                         'bar'))

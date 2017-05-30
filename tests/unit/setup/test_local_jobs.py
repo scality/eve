@@ -31,16 +31,9 @@ class SetupLocalJobsTest(unittest.TestCase):
         self.yaml.filedump(self.filename)
 
     def tearDown(self):
-        """
-        Remove the environment for the tests.
-        """
         shutil.rmtree(self.tmpdir)
 
     def test_local_jobs(self):
-        """
-        Test the local_jobs function twice: without any exception thrown
-        and with an exception thrown.
-        """
         self.assertIsNotNone(
             eve.setup.local_jobs.local_jobs([DumbWorker(name='foo')]))
 

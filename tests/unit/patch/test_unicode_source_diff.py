@@ -28,8 +28,6 @@ class TestUnicodeSourceDiff(unittest.TestCase):
 
 
 class TestTempSourceStamp(unittest.TestCase):
-    """Unit test the TempSourceStamp class."""
-
     def test_asDict(self):
         """Test the asDict method of the TempSourceStamp class.
 

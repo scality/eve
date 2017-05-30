@@ -38,7 +38,6 @@ class TestSetupBootstrap(unittest.TestCase):
         ])
 
     def test_bootstrap_builder(self):
-        """Test the bootstrap_builder function."""
         builder_config = eve.setup.bootstrap.bootstrap_builder(
             [DumbWorker(name='foo')])
         self.assertEquals(len(builder_config.factory.steps), 10)

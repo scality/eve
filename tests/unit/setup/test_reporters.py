@@ -8,7 +8,6 @@ from buildbot.plugins import util
 
 class SetupReportersTest(unittest.TestCase):
     def test_hipchat_reporter(self):
-        """Test the hipchat_reporter function."""
         util.env = util.load_env([
             ('DOCKER_BUILDER_NAME', 'foo'),
             ('HIPCHAT_ROOM', 'foo'),
@@ -18,7 +17,6 @@ class SetupReportersTest(unittest.TestCase):
         self.assertIsNotNone(eve.setup.reporters.hipchat_reporter())
 
     def test_github_reporter(self):
-        """Test the github_reporter function."""
         util.env = util.load_env([
             ('DOCKER_BUILDER_NAME', 'foo'),
             ('GITHUB_TOKEN', 'foo'),
@@ -27,7 +25,6 @@ class SetupReportersTest(unittest.TestCase):
         self.assertIsNotNone(eve.setup.reporters.github_reporter())
 
     def test_bitbucket_reporter(self):
-        """Test the bitbucket_reporter function."""
         util.env = util.load_env([
             ('DOCKER_BUILDER_NAME', 'foo'),
             ('EVE_GITHOST_LOGIN', 'foo'),

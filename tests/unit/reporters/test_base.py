@@ -54,20 +54,17 @@ SUCCEEDED_BUILD = {
 
 class TestBaseBuildStatusPush(unittest.TestCase):
     def test_constructor(self):
-        """Test the __init__ method of the BaseBuildStatusPush class."""
         ctx = base.BaseBuildStatusPush(name='foo')
         self.assertIsNotNone(ctx)
 
 
 class TestHipChatBuildStatusPush(unittest.TestCase):
     def test_constructor(self):
-        """Test the __init__ method of the HipChatBuildStatusPush class."""
         ctx = base.HipChatBuildStatusPush(room_id='foo', token='bar')
         self.assertEquals(ctx.room_id, 'foo')
         self.assertEquals(ctx.token, 'bar')
 
     def test_add_tag(self):
-        """Test the addTag method of the HipChatBuildStatusPush class."""
         ctx = base.HipChatBuildStatusPush(room_id='foo', token='bar')
         ctx.add_tag('foo', 'bar', 'baz', color='green')
         self.assertEquals(ctx.attributes[0], {
@@ -82,14 +79,12 @@ class TestHipChatBuildStatusPush(unittest.TestCase):
         })
 
     def test_filterBuilds(self):
-        """Test the filterBuilds method of the HipChatBuildStatusPush class."""
         ctx = base.HipChatBuildStatusPush(room_id='foo', token='bar')
         ctx.builders = None
         self.assertTrue(ctx.filterBuilds(SUCCEEDED_BUILD))
 
     @defer.inlineCallbacks
     def test_send(self):
-        """Test the send method of the HipChatBuildStatusPush class."""
         ctx = base.HipChatBuildStatusPush(room_id='foo', token='bar')
         with self.assertRaises(AttributeError):
             yield ctx.send(SUCCEEDED_BUILD)
@@ -100,14 +95,11 @@ class TestHipChatBuildStatusPush(unittest.TestCase):
 
 class TestBitbucketBuildStatusPush(unittest.TestCase):
     def test_constructor(self):
-        """Test the __init__ method of the BitbucketBuildStatusPush class."""
         build_status = base.BitbucketBuildStatusPush(
             login='foo', password='bar')
         self.assertIsNotNone(build_status)
 
     def test_gather_data(self):
-        """Test the gather_data method of the BitbucketBuildStatusPush class.
-        """
         build_status = base.BitbucketBuildStatusPush(
             login='foo', password='bar')
         data = build_status.gather_data(SUCCEEDED_BUILD)
@@ -116,7 +108,6 @@ class TestBitbucketBuildStatusPush(unittest.TestCase):
                                  'Hooray!'))
 
     def test_forge_url(self):
-        """Test the forge_url method of the BitbucketBuildStatusPush class."""
         build_status = base.BitbucketBuildStatusPush(
             login='foo', password='bar')
         build_status.gather_data(SUCCEEDED_BUILD)
