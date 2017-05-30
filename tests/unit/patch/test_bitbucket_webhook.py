@@ -15,12 +15,12 @@ from twisted.trial import unittest
 
 class TestBitbucketWebhook(unittest.TestCase):
     def test_patch(self):
-        """Test the patch function in the eve.patch.bitbucket_webhook
-        module.
+        """Test `patch()` properly monkeypatch the bitbucket webhook.
 
-        The patch function should patch the getChanges function exported
-        by the buildbot.www.hooks module and replace it by the getChanges
-        function provided by the eve.patch.bitbucket_webhook module.
+        The patch function should patch the `getChanges()` function exported
+        by `buildbot.www.hooks` and replace it by the `getChanges()` function
+        provided in `eve.patch.bitbucket_webhook`.
+
         """
         patch()
         self.assertEquals(bb_hooks.getChanges, getChanges)

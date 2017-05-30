@@ -6,6 +6,6 @@ from twisted.trial import unittest
 
 class TestRunner(unittest.TestCase):
     def test_main(self):
-        """Test that the main function is runs and raises SystemExit."""
+        """Test that `main()` raises SystemExit."""
         with self.assertRaises(SystemExit):
             eve.scripts.runner.main()

@@ -15,13 +15,13 @@ from twisted.trial import unittest
 
 class TestBuildStepInterpolation(unittest.TestCase):
     def test_patch(self):
-        """Test the patch function in the eve.patch.buildstep_interpolation
-        module.
+        """Test `patch()` properly monkeypatch `BuildStep` class.
 
-        The patch function should patch the __init__ and startStep
-        methods from the BuildStep class exported by the
-        buildbot.process.buildstep module and replace it by decorated
-        methods provided by the eve.patch.buildstep_interpolation module.
+        The `patch()` function should patch the `__init__()` and `startStep()`
+        methods from the `BuildStep` class exported by
+        `buildbot.process.buildstep` and replace it by decorated
+        methods provided in `eve.patch.buildstep_interpolation`.
+
         """
 
         init_method = BuildStep.__init__

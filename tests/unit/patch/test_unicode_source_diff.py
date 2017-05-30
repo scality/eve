@@ -15,13 +15,12 @@ from twisted.trial import unittest
 
 class TestUnicodeSourceDiff(unittest.TestCase):
     def test_patch(self):
-        """Test that the patch() function in the eve.patch.unicode_source_diff
-        module.
+        """Test `patch()` properly monkeypatch `TempSourceStamp` class.
 
-        The patch() function should patch the TempSourceStamp class exported
-        by the buildbot.process.buildrequest module and replace it by
-        the TempSourceStamp provided by the eve.patch.unicode_source_diff
-        module.
+        The `patch()` function should patch the `TempSourceStamp` class
+        exported by `buildbot.process.buildrequest` and replace it by
+        the `TempSourceStamp` provided in `eve.patch.unicode_source_diff`.
+
         """
         patch()
         self.assertEquals(bb_buildrequest.TempSourceStamp, TempSourceStamp)
@@ -29,12 +28,13 @@ class TestUnicodeSourceDiff(unittest.TestCase):
 
 class TestTempSourceStamp(unittest.TestCase):
     def test_asDict(self):
-        """Test the asDict method of the TempSourceStamp class.
+        """Test the `asDict()` method of the `TempSourceStamp` class.
 
         Steps:
-            - Instanciate TempSourceStamp
-            - update its attributes
-            - check that the asDict method return value
+            - Instanciate `TempSourceStamp`.
+            - update its attributes.
+            - check that the `asDict()` method return correct values.
+
         """
         ctx = TempSourceStamp()
         ctx.ssid = 'foo'

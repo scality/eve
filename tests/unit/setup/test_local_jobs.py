@@ -14,12 +14,12 @@ DumbWorker = namedtuple('DumbWorker', ['name'])
 
 class TestSetupLocalJobs(unittest.TestCase):
     def setUp(self):
-        """
-        Set up the environments for the tests.
+        """Set up the environments for the tests.
 
         Steps:
-            - Set a fake environment
-            - Create a fake yaml file
+            - Set a fake environment.
+            - Create a fake yaml file.
+
         """
         self.tmpdir = mkdtemp()
         util.env = util.load_env([
