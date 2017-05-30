@@ -38,23 +38,61 @@ class DockerBuildOrder(util.BaseBuildOrder):
             '{0}:{0}'.format('/var/run/docker.sock')
         ]
 
-        self.properties['worker_path'] = self._worker.get('path')
-        if self.properties['worker_path'] is None:
+        # handle case of externally-supplied image
+        if self._worker.get('image', False):
             self.properties['docker_image'] = Interpolate(
                 self._worker['image'])
             return
 
+        basename = self._worker.get('path', None)
+        self.properties['worker_path'] = basename
+
         full_docker_path = '%s/build/%s' % (
             self.properties['master_builddir'],
-            self.properties['worker_path'],
-        )
-        self.properties['docker_image'] = '%s-%06d' % (
-            self.properties['worker_path'],
-            self.properties['buildnumber'],
+            basename,
         )
 
+        use_registry = bool(util.env.DOCKER_REGISTRY_URL)
+
+        def should_build(step):
+            if not use_registry:
+                # No docker registry, always build
+                return True
+            properties = step.build.getProperties()
+            image_exists = properties.getProperty(
+                'exists_' + basename, False)
+            return not image_exists
+
+        if use_registry:
+            self.preliminary_steps.append(steps.DockerComputeImageFingerprint(
+                label=basename,
+                context_dir=full_docker_path,
+            ))
+
+            image = Interpolate('{0}/{1}:%(prop:fingerprint_{1}:-)s'.format(
+                util.env.DOCKER_REGISTRY_URL, basename))
+
+            self.preliminary_steps.append(steps.DockerCheckLocalImage(
+                label=basename,
+                image=image
+            ))
+
+            self.preliminary_steps.append(steps.DockerPull(
+                label=basename,
+                image=image,
+                doStepIf=should_build
+            ))
+        else:
+            image = '%s-%06d' % (
+                self.properties['worker_path'],
+                self.properties['buildnumber'],
+            )
+
+        self.properties['docker_image'] = image
+
         common_args = {
-            'image': self.properties['docker_image'],
+            'label': basename,
+            'image': image,
             'dockerfile': self._worker.get('dockerfile'),
             'workdir': full_docker_path,
             'build_args': {
@@ -66,11 +104,9 @@ class DockerBuildOrder(util.BaseBuildOrder):
         }
 
         self.preliminary_steps.append(steps.DockerBuild(
-            name='build docker image from {0}'.format(
-                self.properties['worker_path']
-            )[0:49],  # buildbot raises an exception if name is too long
             flunkOnFailure=False,
             haltOnFailure=False,
+            doStepIf=should_build,
             **common_args
         ))
 
@@ -88,12 +124,17 @@ class DockerBuildOrder(util.BaseBuildOrder):
             return prec_failed_image == step.image
 
         self.preliminary_steps.append(steps.DockerBuild(
-            name='docker build retry from {0}'.format(
-                self.properties['worker_path']
-            )[0:49],  # buildbot raises an exception if name is too long
+            name='[{0}] build retry'.format(basename)[0:49],
             is_retry=True,
             hideStepIf=lambda results, s: results == SKIPPED,
             doStepIf=is_prev_build_failed,
             **common_args
         ))
         # end of workaround
+
+        if use_registry:
+            self.preliminary_steps.append(steps.DockerPush(
+                label=basename,
+                image=image,
+                doStepIf=should_build
+            ))

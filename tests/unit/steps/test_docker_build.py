@@ -8,7 +8,8 @@ import eve.steps.docker_build
 class TestDockerBuild(unittest.TestCase):
     def test_init(self):
         ctx = eve.steps.docker_build.DockerBuild(
-            'image', 'dockerfile', True, {'foo': 'bar'}, {'arg': 'val'})
+            'label', 'image', 'dockerfile', True,
+            {'foo': 'bar'}, {'arg': 'val'})
         self.assertEquals(ctx.image, 'image')
         self.assertTrue(ctx.is_retry)
         self.assertFalse(ctx.isNewStyle())

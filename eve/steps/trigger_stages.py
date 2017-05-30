@@ -52,7 +52,6 @@ class TriggerStages(BuildStep):
         }
         super(TriggerStages, self).__init__(**kwargs)
 
-    @defer.inlineCallbacks
     def run(self):
         conf = self.getProperty('conf')
 
@@ -67,23 +66,13 @@ class TriggerStages(BuildStep):
                 worker['type'])
 
             if build_order_class is None:
-                defer.returnValue(FAILURE)
+                return FAILURE
 
             build_order = build_order_class(
                 scheduler_name, util.env.GIT_REPO,
                 stage_name, stage, worker, self
             )
 
-            def set_property(result, build_order, propname):
-                build_order.properties[propname] = result
-
-            setprop_defers = []
-            for propname, propvalue in build_order.properties.iteritems():
-                setprop_defer = self.build.render(propvalue)
-                setprop_defer.addCallback(set_property, build_order, propname)
-                setprop_defers.append(setprop_defer)
-
-            yield defer.gatherResults(setprop_defers)
             build_orders.append(build_order)
 
             for step in build_order.preliminary_steps:
@@ -96,7 +85,7 @@ class TriggerStages(BuildStep):
         ])
         self.build.addStepsAfterCurrentStep(list(preliminary_steps))
 
-        defer.returnValue(SUCCESS)
+        return SUCCESS
 
 
 class ExecuteTriggerStages(Trigger):
@@ -114,9 +103,26 @@ class ExecuteTriggerStages(Trigger):
 
         self._build_orders = build_orders
 
+    @defer.inlineCallbacks
     def getSchedulersAndProperties(self):
-        return [{
-            'sched_name': build_order.scheduler,
-            'props_to_set': build_order.properties,
-            'unimportant': False
-        } for build_order in self._build_orders]
+        scheds_and_props = []
+
+        def set_property(result, build_order, propname):
+            build_order.properties[propname] = result
+
+        for build_order in self._build_orders:
+            # wait for properties from preliminary steps
+            setprop_defers = []
+            for propname, propvalue in build_order.properties.iteritems():
+                setprop_defer = self.build.render(propvalue)
+                setprop_defer.addCallback(set_property, build_order, propname)
+                setprop_defers.append(setprop_defer)
+
+            yield defer.gatherResults(setprop_defers)
+
+            scheds_and_props.append({
+                'sched_name': build_order.scheduler,
+                'props_to_set': build_order.properties,
+                'unimportant': False
+            })
+        defer.returnValue(scheds_and_props)

@@ -33,14 +33,17 @@ class Cluster(object):
     db_class = Sqlite
     crossbar_class = Crossbar
     buildbot_master_class = BuildbotMaster
+    registry_class = None
 
-    def __init__(self, githost=None):
+    def __init__(self, githost=None, use_registry=False):
         """Configure and interact with a testing eve cluster.
 
         Args:
             githost (GitHostMock): Optional parameter to specify the git host
                 that will be used to fake bitbucket or github. The default is
                 specified by self.githost_class.
+            use_registry (bool): Mount a local registry if True and
+                registry_class is not None. Asserts if registry_class is None
 
         """
         self.githost = githost if githost is not None else self.githost_class()
@@ -53,6 +56,11 @@ class Cluster(object):
         self.database = self.db_class(external_ip=self.external_ip)
 
         self.vault = self.add_vault()
+        self.registry = None
+        if use_registry:
+            assert self.registry_class is not None
+            # pylint: disable=not-callable
+            self.registry = self.registry_class(external_ip=self.external_ip)
 
         self._masters = OrderedDict()
 
@@ -62,7 +70,9 @@ class Cluster(object):
             vault=self.vault,
             git_repo=self.githost_url,
             master_fqdn=self.external_ip,
-            wamp_url=self.wamp_url)
+            wamp_url=self.wamp_url,
+            registry=self.registry,
+        )
         self._masters[self._first_frontend._name] = self._first_frontend
 
         self.add_master('backend')
@@ -120,7 +130,9 @@ class Cluster(object):
             db_url=self.db_url,
             vault=self.vault,
             master_fqdn=self.external_ip,
-            wamp_url=self.wamp_url, )
+            wamp_url=self.wamp_url,
+            registry=self.registry,
+        )
         self._masters[master._name] = master
         return master
 
@@ -136,6 +148,8 @@ class Cluster(object):
         self.database.start()
         if self.vault:
             self.vault.start()
+        if self.registry:
+            self.registry.start()
         for master in self._masters.values():
             master.start()
         return self
@@ -147,12 +161,15 @@ class Cluster(object):
             The cluster instance.
 
         """
-        self.githost.stop()
         for master in self._masters.values():
             master.stop()
-        self._crossbar.stop()
+        if self.registry:
+            self.registry.stop()
         if self.vault:
             self.vault.stop()
+        self.database.stop()
+        self._crossbar.stop()
+        self.githost.stop()
         return self
 
     @property

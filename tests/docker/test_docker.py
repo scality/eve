@@ -62,7 +62,7 @@ class TestDockerCluster(unittest.TestCase):
         # Check that the failing build step is The good one
         fstep = buildset.buildrequest.build.first_failing_step
         self.assertEqual(fstep.name,
-                         'build docker image from bad-ubuntu-xenial-ctxt')
+                         '[bad-ubuntu-xenial-ctxt] build')
 
     def test2_simple_failure_in_docker(self):
         """Test that a command failure fails the whole build.

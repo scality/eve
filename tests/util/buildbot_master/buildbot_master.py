@@ -42,7 +42,8 @@ class BuildbotMaster(Daemon):
                  db_url=None,
                  vault=None,
                  master_fqdn='localhost',
-                 wamp_url=None):
+                 wamp_url=None,
+                 registry=None):
         """Class representing a Buildbot Daemon.
 
         Args:
@@ -91,6 +92,10 @@ class BuildbotMaster(Daemon):
             SECRET_ARTIFACT_CREDS='None',
             SUFFIX='test_suffix',
             DB_URL=self.db_url, )
+
+        if registry:
+            self.conf['DOCKER_REGISTRY_URL'] = 'localhost:{}'.format(
+                registry.port)
 
         if wamp_url:
             self.conf['WAMP_ROUTER_URL'] = wamp_url

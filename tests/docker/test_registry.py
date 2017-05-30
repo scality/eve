@@ -1,0 +1,27 @@
+import unittest
+
+from tests.docker.registry import DockerRegistry
+from tests.util.cmd import cmd
+
+
+class TestDockerRegistry(unittest.TestCase):
+    def setUp(self):
+        self.registry = DockerRegistry()
+        print 'Registry URL: {}:{}'.format(self.registry.external_ip,
+                                           self.registry.port)
+        assert self.registry is self.registry.start()
+
+    def tearDown(self):
+        self.registry.stop()
+
+    def test_start_stop(self):
+        cmd('docker pull ubuntu:xenial')
+        name = '{}:{}/test_registry_start_stop'.format(
+            self.registry.external_ip, self.registry.port)
+        cmd('docker tag ubuntu:xenial {}'.format(name))
+        cmd('docker push {}'.format(name))
+        assert name in cmd('docker images')
+        cmd('docker rmi {}'.format(name))
+        assert name not in cmd('docker images')
+        cmd('docker pull {}'.format(name))
+        assert name in cmd('docker images')
