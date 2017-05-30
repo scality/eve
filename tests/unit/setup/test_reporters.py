@@ -14,7 +14,7 @@ class SetupReportersTest(unittest.TestCase):
             ('HIPCHAT_TOKEN', 'bar'),
             ('OPENSTACK_BUILDER_NAME', 'bar')
         ])
-        self.assertTrue(eve.setup.reporters.hipchat_reporter() is not None)
+        self.assertIsNotNone(eve.setup.reporters.hipchat_reporter())
 
     def test_github_reporter(self):
         """Test the github_reporter function."""
@@ -24,7 +24,7 @@ class SetupReportersTest(unittest.TestCase):
             ('GITHUB_TOKEN', 'foo'),
             ('OPENSTACK_BUILDER_NAME', 'bar')
         ])
-        self.assertTrue(eve.setup.reporters.github_reporter() is not None)
+        self.assertIsNotNone(eve.setup.reporters.github_reporter())
 
     def test_bitbucket_reporter(self):
         """Test the bitbucket_reporter function."""
@@ -35,4 +35,4 @@ class SetupReportersTest(unittest.TestCase):
             ('EVE_GITHOST_PWD', 'bar'),
             ('OPENSTACK_BUILDER_NAME', 'bar')
         ])
-        self.assertTrue(eve.setup.reporters.bitbucket_reporter() is not None)
+        self.assertIsNotNone(eve.setup.reporters.bitbucket_reporter())

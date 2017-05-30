@@ -99,51 +99,46 @@ class TestCluster(unittest.TestCase):
 
         step_names_and_descriptions = [(step['name'], step['state_string'])
                                        for step in bootstrap_steps]
-        assert step_names_and_descriptions == \
-            [
-
-                (u'checkout git branch', u'update'),
-                (u'Cancel builds for commits that are not branch tips',
-                 u'CancelNonTipBuild'),
-                (u'setting the master_builddir property', u'Set'),
-                (u'check if any steps should currently be patched',
-                 u'finished (skipped)'),
-                (u'get the git host', u'Set'),
-                (u'get the git owner', u'Set'),
-                (u'get the repository name', u'Set'),
-                (u'get the product version',
-                 u"property 'product_version' set"),
-                (u'read eve/main.yml', u'uploading main.yml'),
-                (u'get the commit short_revision',
-                 u"property 'commit_short_revision' set"),
-                (u'get the commit timestamp',
-                 u"property 'commit_timestamp' set"),
-                (u'get the pipeline name', u'Set'),
-                (u'get the b4nb', u'Set'),
-                (u'set the artifacts base name',
-                 u"property 'artifacts_base_name' set"),
-                (u'set the artifacts name',
-                 u"property 'artifacts_name' set"),
-                (u'set the artifacts local reverse proxy', u'Set'),
-                (u'set the artifacts private url',
-                 u"property 'artifacts_private_url' set"),
-                (u'set the artifacts public url',
-                 u"property 'artifacts_public_url' set"),
-                (u'get the API version', u'Set'),
-                (u'prepare 1 stage(s)', u'finished'),
-                (u'trigger', u'triggered local-test_suffix')
-            ]
+        self.assertEqual(step_names_and_descriptions, [
+            (u'checkout git branch', u'update'),
+            (u'Cancel builds for commits that are not branch tips',
+             u'CancelNonTipBuild'),
+            (u'setting the master_builddir property', u'Set'),
+            (u'check if any steps should currently be patched',
+             u'finished (skipped)'),
+            (u'get the git host', u'Set'),
+            (u'get the git owner', u'Set'),
+            (u'get the repository name', u'Set'),
+            (u'get the product version',
+             u"property 'product_version' set"),
+            (u'read eve/main.yml', u'uploading main.yml'),
+            (u'get the commit short_revision',
+             u"property 'commit_short_revision' set"),
+            (u'get the commit timestamp',
+             u"property 'commit_timestamp' set"),
+            (u'get the pipeline name', u'Set'),
+            (u'get the b4nb', u'Set'),
+            (u'set the artifacts base name',
+             u"property 'artifacts_base_name' set"),
+            (u'set the artifacts name',
+             u"property 'artifacts_name' set"),
+            (u'set the artifacts local reverse proxy', u'Set'),
+            (u'set the artifacts private url',
+             u"property 'artifacts_private_url' set"),
+            (u'set the artifacts public url',
+             u"property 'artifacts_public_url' set"),
+            (u'get the API version', u'Set'),
+            (u'prepare 1 stage(s)', u'finished'),
+            (u'trigger', u'triggered local-test_suffix')])
         local_steps = cluster.api.getw(
             '/builds/{}/steps'.format(local_build['buildid']),
             expected_count=3)
         step_names_and_descriptions = [(step['name'], step['state_string'])
                                        for step in local_steps]
-        assert step_names_and_descriptions == \
-            [
-                (u'prevent unuseful restarts', u"'[ $(expr ...'"),
-                (u'extract steps from yaml', u'finished'),
-                (u'shell', u"'exit 0'")
-            ]
+        self.assertEqual(step_names_and_descriptions, [
+            (u'prevent unuseful restarts', u"'[ $(expr ...'"),
+            (u'extract steps from yaml', u'finished'),
+            (u'shell', u"'exit 0'")])
 
         bootstrap_properties = cluster.api.getw(
             '/builds/{}'.format(bootstrap_build['buildid']),
@@ -167,12 +162,12 @@ class TestCluster(unittest.TestCase):
 
         local_repo.push(yaml=SingleCommandYaml('test -z "$FOO"'))
         buildset = cluster.api.force(branch=local_repo.branch)
-        assert buildset.result == 'failure'
+        self.assertEqual(buildset.result, 'failure')
         child_build = \
             buildset.buildrequest.build.children[0].buildrequest.build
-        assert child_build.first_failing_step.name == 'shell'
-        assert child_build.first_failing_step.state_string == \
-            "'test -z ...' (failure)"
+        self.assertEqual(child_build.first_failing_step.name, 'shell')
+        self.assertEqual(child_build.first_failing_step.state_string,
+                         "'test -z ...' (failure)")
         cluster.stop()
 
     def test_force_parametrized_build(self):
@@ -197,9 +192,9 @@ class TestCluster(unittest.TestCase):
             prop01_name='color',
             prop01_value='yellow')
 
-        assert buildset.result == 'success'
+        self.assertEqual(buildset.result, 'success')
         child_build = buildset.buildrequest.build.children[
             0].buildrequest.build
         step = child_build.steps[-1]
-        assert 'The yellow submarine' in step.rawlog('stdio')
+        self.assertIn('The yellow submarine', step.rawlog('stdio'))
         cluster.stop()

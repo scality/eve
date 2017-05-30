@@ -48,6 +48,6 @@ class TestGitHostMock(TestCase):
         cmd('git add -A', cwd=clone_dir)
         cmd('git commit -m "add yaml file"', cwd=clone_dir)
         cmd('git push -u origin HEAD:mybranch', cwd=clone_dir)
-        assert 'set up to track remote branch mybranch' in \
-               cmd('git checkout mybranch', cwd=clone_dir)
+        self.assertIn('set up to track remote branch mybranch',
+                      cmd('git checkout mybranch', cwd=clone_dir))
         ghm.stop()

@@ -39,7 +39,7 @@ class SetupMiscTest(unittest.TestCase):
 
     def test_properties(self):
         """Test the properties function."""
-        self.assertTrue(eve.setup.misc.properties() is not None)
+        self.assertIsNotNone(eve.setup.misc.properties())
 
     def test_wamp(self):
         """Test the wamp function."""
@@ -48,14 +48,14 @@ class SetupMiscTest(unittest.TestCase):
             ('WAMP_REALM', 'bar'),
             ('WAMP_ROUTER_URL', 'foo')
         ])
-        self.assertTrue(eve.setup.misc.wamp() is not None)
+        self.assertIsNotNone(eve.setup.misc.wamp())
 
     def test_protocols(self):
         """Test the protocols function."""
         util.env = util.load_env([
             ('PB_PORT', '12345'),
         ])
-        self.assertTrue(eve.setup.misc.protocols() is not None)
+        self.assertIsNotNone(eve.setup.misc.protocols())
 
     def test_register_starttime(self):
         """Test the register_starttime function."""

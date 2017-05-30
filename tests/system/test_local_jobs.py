@@ -82,19 +82,19 @@ class TestLocalJobs(unittest.TestCase):
                 filename='local2/sub/periodic.yml')
             master.conf['LOCAL_JOBS_DIRPATH'] = 'local2/sub'
             path = os.path.join(master._base_path, 'local2/sub/periodic.yml')
-            assert os.path.isfile(path)
+            self.assertTrue(os.path.isfile(path))
 
         cluster.start()
         cluster.sanity_check()
         scheduler = cluster.api.getw(
             '/schedulers',
             get_params={'name': PERIODIC_LOCAL_JOB['scheduler']['name']})
-        assert scheduler['enabled']
+        self.assertTrue(scheduler['enabled'])
         builder = cluster.api.getw(
             '/builders',
             get_params={'name': PERIODIC_LOCAL_JOB['builder']['name']})
-        assert builder['description'] == PERIODIC_LOCAL_JOB['builder'][
-            'description']
+        self.assertEqual(builder['description'],
+                         PERIODIC_LOCAL_JOB['builder']['description'])
 
         # let job trigger at least once
         buildset = cluster.api.getw(
@@ -103,9 +103,8 @@ class TestLocalJobs(unittest.TestCase):
                 'limit': 1,
                 'results': 0,  # SUCCESS
             })
-        assert buildset['reason'] == "The Periodic scheduler named " \
-                                     "'my-periodic-scheduler' " \
-                                     "triggered this build"
+        self.assertEqual(buildset['reason'], "The Periodic scheduler named "
+                         "'my-periodic-scheduler' triggered this build")
         cluster.stop()
 
     def test_local_job_empty(self):  # pylint: disable=no-self-use
@@ -176,17 +175,17 @@ class TestLocalJobs(unittest.TestCase):
             yaml_data=NIGHTLY_LOCAL_JOB, filename='local2/sub/nightly.yml')
         master.conf['LOCAL_JOBS_DIRPATH'] = 'local2/sub'
         path = os.path.join(master._base_path, 'local2/sub/nightly.yml')
-        assert os.path.isfile(path)
+        self.assertTrue(os.path.isfile(path))
 
         cluster.start()
         cluster.sanity_check()
         scheduler = cluster.api.getw(
             '/schedulers',
             get_params={'name': NIGHTLY_LOCAL_JOB['scheduler']['name']})
-        assert scheduler['enabled']
+        self.assertTrue(scheduler['enabled'])
         builder = cluster.api.getw(
             '/builders',
             get_params={'name': NIGHTLY_LOCAL_JOB['builder']['name']})
-        assert builder['description'] == NIGHTLY_LOCAL_JOB['builder'][
-            'description']
+        self.assertEqual(builder['description'],
+                         NIGHTLY_LOCAL_JOB['builder']['description'])
         cluster.stop()

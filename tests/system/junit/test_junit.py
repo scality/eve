@@ -43,7 +43,7 @@ class TestJunit(unittest.TestCase):
         local_repo.push(yaml=yaml, dirs=(reports_dir, ))
         cluster.sanity_check()
         buildset = cluster.api.force(branch=local_repo.branch)
-        assert buildset.result == 'failure'
+        self.assertEqual(buildset.result, 'failure')
         child_build = \
             buildset.buildrequest.build.children[0].buildrequest.build
 
@@ -153,5 +153,5 @@ class TestJunit(unittest.TestCase):
             )
         ]  # yapf: disable
 
-        assert results == expected
+        self.assertEqual(results, expected)
         cluster.stop()

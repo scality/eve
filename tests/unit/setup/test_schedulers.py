@@ -12,8 +12,7 @@ class SetupSchedulersTest(unittest.TestCase):
             ('BOOTSTRAP_BUILDER_NAME', ''),
             ('BOOTSTRAP_SCHEDULER_NAME', '')
         ])
-        self.assertTrue(
-            eve.setup.schedulers.any_branch_scheduler() is not None)
+        self.assertIsNotNone(eve.setup.schedulers.any_branch_scheduler())
 
     def test_force_scheduler(self):
         """
@@ -28,7 +27,7 @@ class SetupSchedulersTest(unittest.TestCase):
             ('FORCE_SCHEDULER_NAME', 'bar'),
             ('FORCE_BUILD_PARAM_COUNT', '0', int)
         ])
-        self.assertTrue(eve.setup.schedulers.force_scheduler() is not None)
+        self.assertIsNotNone(eve.setup.schedulers.force_scheduler())
 
     def test_try_scheduler(self):
         """Test the try_scheduler function."""
@@ -39,10 +38,9 @@ class SetupSchedulersTest(unittest.TestCase):
             ('TRY_PWD', 'bar'),
             ('TRY_PORT', '12345'),
         ])
-        self.assertTrue(eve.setup.schedulers.try_scheduler() is not None)
+        self.assertIsNotNone(eve.setup.schedulers.try_scheduler())
 
     def test_triggerable_scheduler(self):
         """Test the triggerable_scheduler function."""
-        self.assertTrue(
-            eve.setup.schedulers.triggerable_scheduler('foo', 'bar')
-            is not None)
+        self.assertIsNotNone(eve.setup.schedulers.triggerable_scheduler('foo',
+                                                                        'bar'))

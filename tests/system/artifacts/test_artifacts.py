@@ -40,13 +40,13 @@ class TestArtifacts(unittest.TestCase):
         """Test that artifacts properties are well set."""
         self.local_repo.push(yaml=SingleCommandYaml('exit 0'))
         buildset = self.cluster.api.force(branch=self.local_repo.branch)
-        assert buildset.result == 'success'
+        self.assertEqual(buildset.result, 'success')
 
         build = buildset.buildrequest.build
         child_buildsets = build.children
-        assert len(child_buildsets) == 1
+        self.assertEqual(len(child_buildsets), 1)
         child_build = child_buildsets[0].buildrequest.build
-        assert child_build.result == 'success'
+        self.assertEqual(child_build.result, 'success')
 
         short_hash = self.local_repo.cmd('git rev-parse --short HEAD')
         timestamp = self.local_repo.cmd('git log -1 --format=%cd '
@@ -54,8 +54,9 @@ class TestArtifacts(unittest.TestCase):
 
         expected = 'mock:repo_owner:test:staging-0.0.0.r{}.{}.pre-merge.' \
                    '00000001'.format(timestamp.strip(), short_hash.strip())
-        assert child_build.properties['artifacts_name'][0] == expected
+        self.assertEqual(child_build.properties['artifacts_name'][0], expected)
 
         # TODO: pass a fake env variable and test
         expected = 'None/' + expected
-        assert child_build.properties['artifacts_public_url'][0] == expected
+        self.assertEqual(child_build.properties['artifacts_public_url'][0],
+                         expected)

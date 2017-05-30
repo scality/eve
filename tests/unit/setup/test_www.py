@@ -23,7 +23,7 @@ class TestSetupWww(unittest.TestCase):
         util.env = util.load_env([
             ('HTTP_PORT', '8080')
         ])
-        self.assertTrue(eve.setup.www.www() is not None)
+        self.assertIsNotNone(eve.setup.www.www())
 
     def test_auth_oauth2(self):
         """Test the auth function with oauth2 support."""
@@ -33,7 +33,7 @@ class TestSetupWww(unittest.TestCase):
             ('OAUTH2_PROVIDER', 'bitbucket'),
             ('OAUTH2_CLIENT_SECRET', 'foo'),
         ])
-        self.assertTrue(eve.setup.www.auth() is not None)
+        self.assertIsNotNone(eve.setup.www.auth())
 
     def test_auth_www(self):
         """Test the www function with www support."""
@@ -43,7 +43,7 @@ class TestSetupWww(unittest.TestCase):
             ('WWW_PLAIN_LOGIN', 'foo'),
             ('WWW_PLAIN_PASSWORD', 'foo'),
         ])
-        self.assertTrue(eve.setup.www.auth() is not None)
+        self.assertIsNotNone(eve.setup.www.auth())
 
     def test_auth_no_auth(self):
         """Test the auth function is no authentication support."""
@@ -53,7 +53,7 @@ class TestSetupWww(unittest.TestCase):
             ('WWW_PLAIN_LOGIN', ''),
             ('WWW_PLAIN_PASSWORD', 'foo'),
         ])
-        self.assertTrue(eve.setup.www.auth() is not None)
+        self.assertIsNotNone(eve.setup.www.auth())
 
     def test_authz_default(self):
         """Test the authz function is no authentication support."""
@@ -62,7 +62,7 @@ class TestSetupWww(unittest.TestCase):
             ('OAUTH2_CLIENT_ID', ''),
             ('WWW_PLAIN_LOGIN', ''),
         ])
-        self.assertTrue(eve.setup.www.authz() is not None)
+        self.assertIsNotNone(eve.setup.www.authz())
 
     def test_authz_client(self):
         """Test the authz function with oauth2 client id."""
@@ -72,7 +72,7 @@ class TestSetupWww(unittest.TestCase):
             ('OAUTH2_CLIENT_ID', 'foo'),
             ('OAUTH2_GROUP', 'foo'),
         ])
-        self.assertTrue(eve.setup.www.authz() is not None)
+        self.assertIsNotNone(eve.setup.www.authz())
 
     def test_authz_group(self):
         """Test the authz function with oauth2 group."""
@@ -83,4 +83,4 @@ class TestSetupWww(unittest.TestCase):
             ('OAUTH2_GROUP', 'foo'),
             ('WWW_PLAIN_LOGIN', 'foo'),
         ])
-        self.assertTrue(eve.setup.www.authz() is not None)
+        self.assertIsNotNone(eve.setup.www.authz())

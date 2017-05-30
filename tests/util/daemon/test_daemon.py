@@ -40,6 +40,6 @@ class TestDaemon(TestCase):
         """
         fake_daemon = SleepyDaemon('sleep1H')
         fake_daemon.start()
-        assert 'sleep 3600' in cmd('ps aux')
+        self.assertIn('sleep 3600', cmd('ps aux'), 'Daemon did not start')
         fake_daemon.stop()
-        assert 'sleep 3600' not in cmd('ps aux')
+        self.assertNotIn('sleep 3600', cmd('ps aux'), 'Daemon did not stop')

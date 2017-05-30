@@ -58,11 +58,11 @@ class TestDockerCluster(unittest.TestCase):
             ])
         self.cluster.sanity_check()
         buildset = self.cluster.api.force(branch=local_repo.branch)
-        assert buildset.result == 'failure'
+        self.assertEqual(buildset.result, 'failure')
         # Check that the failing build step is The good one
         fstep = buildset.buildrequest.build.first_failing_step
-        assert fstep.name == 'build docker image from ' \
-                             'bad-ubuntu-xenial-ctxt'
+        self.assertEqual(fstep.name,
+                         'build docker image from bad-ubuntu-xenial-ctxt')
 
     def test2_simple_failure_in_docker(self):
         """Test that a command failure fails the whole build.
@@ -85,12 +85,12 @@ class TestDockerCluster(unittest.TestCase):
             ])
         self.cluster.sanity_check()
         buildset = self.cluster.api.force(branch=local_repo.branch)
-        assert buildset.result == 'failure'
+        self.assertEqual(buildset.result, 'failure')
         child_build = \
             buildset.buildrequest.build.children[0].buildrequest.build
-        assert child_build.first_failing_step.name == 'shell'
-        assert child_build.first_failing_step.state_string == \
-            "'exit 1' (failure)"
+        self.assertEqual(child_build.first_failing_step.name, 'shell')
+        self.assertEqual(child_build.first_failing_step.state_string,
+                         "'exit 1' (failure)")
 
     def test3_simple_success_in_docker(self):
         """Test a successful build success with a docker worker.
@@ -112,10 +112,10 @@ class TestDockerCluster(unittest.TestCase):
             ])
         self.cluster.sanity_check()
         buildset = self.cluster.api.force(branch=local_repo.branch)
-        assert buildset.result == 'success'
+        self.assertEqual(buildset.result, 'success')
         child_build = \
             buildset.buildrequest.build.children[0].buildrequest.build
-        assert child_build.result == 'success'
+        self.assertEqual(child_build.result, 'success')
 
     @unittest.skip('Flaky, need to understand how this works')
     def test_docker_build_label(self):
@@ -145,13 +145,13 @@ class TestDockerCluster(unittest.TestCase):
 
         self.cluster.sanity_check()
         buildset = self.cluster.api.force(branch=local_repo.branch)
-        assert buildset.result == 'success'
+        self.assertEqual(buildset.result, 'success')
         child_build = \
             buildset.buildrequest.build.children[0].buildrequest.build
-        assert child_build.result == 'success'
+        self.assertEqual(child_build.result, 'success')
         timestamp = int(child_build.properties['docker_image_timestamp'][0])
-        assert timestamp >= time.time() - 120
-        assert timestamp <= time.time()
+        self.assertGreaterEqual(timestamp, time.time() - 120)
+        self.assertLessEqual(timestamp, time.time())
 
     def test_use_different_dockerfile(self):
         """Test to build Docker image with a different Dockerfile.
@@ -179,10 +179,10 @@ class TestDockerCluster(unittest.TestCase):
             ])
         self.cluster.sanity_check()
         buildset = self.cluster.api.force(branch=local_repo.branch)
-        assert buildset.result == 'success'
+        self.assertEqual(buildset.result, 'success')
         child_build = \
             buildset.buildrequest.build.children[0].buildrequest.build
-        assert child_build.result == 'success'
+        self.assertEqual(child_build.result, 'success')
 
     def test_git_clone_in_docker_worker(self):
         """Test passwordless git clone works from within docker workers."""
@@ -210,10 +210,10 @@ class TestDockerCluster(unittest.TestCase):
             ])
         self.cluster.sanity_check()
         buildset = self.cluster.api.force(branch=local_repo.branch)
-        assert buildset.result == 'success'
+        self.assertEqual(buildset.result, 'success')
         child_build = \
             buildset.buildrequest.build.children[0].buildrequest.build
-        assert child_build.result == 'success'
+        self.assertEqual(child_build.result, 'success')
 
     def test_docker_in_docker(self):
         """Test that we can launch a docker command inside a docker worker.
@@ -240,10 +240,10 @@ class TestDockerCluster(unittest.TestCase):
             ])
         self.cluster.sanity_check()
         buildset = self.cluster.api.force(branch=local_repo.branch)
-        assert buildset.result == 'success'
+        self.assertEqual(buildset.result, 'success')
         child_build = \
             buildset.buildrequest.build.children[0].buildrequest.build
-        assert child_build.result == 'success'
+        self.assertEqual(child_build.result, 'success')
 
     def test_use_premade_docker_img(self):
         """Test that we can build docker images on our own.
@@ -270,10 +270,10 @@ class TestDockerCluster(unittest.TestCase):
 
         self.cluster.sanity_check()
         buildset = self.cluster.api.force(branch=local_repo.branch)
-        assert buildset.result == 'success'
+        self.assertEqual(buildset.result, 'success')
         child_build = \
             buildset.buildrequest.build.children[0].buildrequest.build
-        assert child_build.result == 'success'
+        self.assertEqual(child_build.result, 'success')
 
     def test_use_premade_docker_img_p(self):
         """Test use of premade image but use property to store the image id."""
@@ -292,10 +292,10 @@ class TestDockerCluster(unittest.TestCase):
             ])
         self.cluster.sanity_check()
         buildset = self.cluster.api.force(branch=local_repo.branch)
-        assert buildset.result == 'success'
+        self.assertEqual(buildset.result, 'success')
         child_build = \
             buildset.buildrequest.build.children[0].buildrequest.build
-        assert child_build.result == 'success'
+        self.assertEqual(child_build.result, 'success')
 
     def test_write_read_from_cache(self):
         """Test docker cache volumes.
@@ -316,4 +316,4 @@ class TestDockerCluster(unittest.TestCase):
             ])
         # self.cluster.sanity_check()
         buildset = self.cluster.api.force(branch=local_repo.branch)
-        assert buildset.result == 'success'
+        self.assertEqual(buildset.result, 'success')

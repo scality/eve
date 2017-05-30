@@ -192,13 +192,13 @@ class TestPublishCodeCoverage(unittest.TestCase):
         }]))
 
         buildset = self.cluster.api.force(branch=self.local_repo.branch)
-        assert buildset.result == 'success'
+        self.assertEqual(buildset.result, 'success')
 
         build = buildset.buildrequest.build
         child_buildsets = build.children
-        assert len(child_buildsets) == 1
+        self.assertEqual(len(child_buildsets), 1)
         child_build = child_buildsets[0].buildrequest.build
-        assert child_build.result == 'success'
+        self.assertEqual(child_build.result, 'success')
 
         if self.codecov_io_server is None:
             return

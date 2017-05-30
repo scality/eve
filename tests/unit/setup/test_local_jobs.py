@@ -40,8 +40,8 @@ class SetupLocalJobsTest(unittest.TestCase):
         and with an exception thrown.
         """
         # yapf: disable
-        self.assertTrue(eve.setup.local_jobs.local_jobs(
-            [DumbWorker(name='foo')]) is not None)
+        self.assertIsNotNone(
+            eve.setup.local_jobs.local_jobs([DumbWorker(name='foo')]))
 
         # When there is no job, a generic exception is thrown
         with self.assertRaises(Exception):

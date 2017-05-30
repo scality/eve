@@ -34,6 +34,8 @@ class TestMaster(TestCase):
         """
         master = BuildbotMaster(mode='standalone', git_repo='something')
         master.start()
-        assert 'BuildMaster is running' in master.loglines[-1]
+        self.assertIn('BuildMaster is running', master.loglines[-1],
+                      'BuildMaster is not running')
         master.stop()
-        assert 'Server Shut Down.' in master.loglines[-1]
+        self.assertIn('Server Shut Down.', master.loglines[-1],
+                      'BuildMaster didn\'t properly shut down')

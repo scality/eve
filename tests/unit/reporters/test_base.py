@@ -57,7 +57,7 @@ class TestBaseBuildStatusPush(unittest.TestCase):
     def test_constructor(self):
         """Test the __init__ method of the BaseBuildStatusPush class."""
         ctx = base.BaseBuildStatusPush(name='foo')
-        self.assertTrue(ctx is not None)
+        self.assertIsNotNone(ctx)
 
 
 class TestHipChatBuildStatusPush(unittest.TestCase):
@@ -104,7 +104,7 @@ class TestBitbucketBuildStatusPush(unittest.TestCase):
         """Test the __init__ method of the BitbucketBuildStatusPush class."""
         build_status = base.BitbucketBuildStatusPush(
             login='foo', password='bar')
-        self.assertTrue(build_status is not None)
+        self.assertIsNotNone(build_status)
 
     def test_gather_data(self):
         """Test the gather_data method of the BitbucketBuildStatusPush class.

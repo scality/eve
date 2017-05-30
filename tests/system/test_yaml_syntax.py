@@ -44,37 +44,37 @@ class TestYamlSyntax(unittest.TestCase):
         """Test that the build fails when the YAML file is empty."""
         self.local_repo.push(yaml=RawYaml(''))
         buildset = self.cluster.api.force(branch=self.local_repo.branch)
-        assert buildset.result == 'failure'
+        self.assertEqual(buildset.result, 'failure')
 
     def test_skip_if_no_branch_in_yml(self):
         """Test build cancelled when branch not covered by eve.yml."""
 
         self.local_repo.push(yaml=YamlFactory(branches={}, stages={}))
         buildset = self.cluster.api.force(branch=self.local_repo.branch)
-        assert buildset.result == 'cancelled'
+        self.assertEqual(buildset.result, 'cancelled')
 
     def test_simple_failure(self):
         """Test that build fails if there is an 'exit 1' command in a step."""
         self.local_repo.push(yaml=SingleCommandYaml('exit 1'))
         buildset = self.cluster.api.force(branch=self.local_repo.branch)
-        assert buildset.result == 'failure'
+        self.assertEqual(buildset.result, 'failure')
 
         build = buildset.buildrequest.build
         child_buildsets = build.children
-        assert len(child_buildsets) == 1
+        self.assertEqual(len(child_buildsets), 1)
         child_build = child_buildsets[0].buildrequest.build
-        assert child_build.result == 'failure'
+        self.assertEqual(child_build.result, 'failure')
 
         failing_step = child_build.first_failing_step
-        assert failing_step.state_string == "'exit 1' (failure)"
+        self.assertEqual(failing_step.state_string, "'exit 1' (failure)")
 
     def test_simple_success(self):
         """Test that the build succeeds when it is expected to succeed."""
         self.local_repo.push(yaml=SingleCommandYaml('exit 0'))
         buildset = self.cluster.api.force(branch=self.local_repo.branch)
-        assert buildset.result == 'success'
+        self.assertEqual(buildset.result, 'success')
         build = buildset.buildrequest.build
         child_buildsets = build.children
-        assert len(child_buildsets) == 1
+        self.assertEqual(len(child_buildsets), 1)
         child_build = child_buildsets[0].buildrequest.build
-        assert child_build.result == 'success'
+        self.assertEqual(child_build.result, 'success')

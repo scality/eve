@@ -42,6 +42,6 @@ class TestGitRepo(TestCase):
         command = 'do something'
         branch = 'feature/1'
         local.push(SingleCommandYaml(command), branch=branch)
-        assert command in cmd('cat eve/main.yml', cwd=local._dir)
-        assert branch in cmd('git branch', cwd=local._dir)
-        assert branch in cmd('git branch', cwd=remote)
+        self.assertIn(command, cmd('cat eve/main.yml', cwd=local._dir))
+        self.assertIn(branch, cmd('git branch', cwd=local._dir))
+        self.assertIn(branch, cmd('git branch', cwd=remote))
