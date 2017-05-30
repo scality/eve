@@ -19,10 +19,9 @@
 import os
 import unittest
 
+from buildbot.process.results import SUCCESS
 from tests.util.cluster import Cluster
 from tests.util.yaml_factory import SingleCommandYaml
-
-SUCCESS = 0
 
 
 class TestCluster(unittest.TestCase):
