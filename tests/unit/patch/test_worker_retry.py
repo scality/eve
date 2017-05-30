@@ -12,6 +12,6 @@ from eve.patch.worker_retry import patch
 from twisted.trial import unittest
 
 
-class TestWorkerRetry(unittest.TestCase):
+class TestPatchWorkerRetry(unittest.TestCase):
     def test_patch(self):
         patch()

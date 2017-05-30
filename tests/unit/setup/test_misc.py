@@ -10,7 +10,7 @@ import eve.setup.misc
 from buildbot.plugins import util
 
 
-class SetupMiscTest(unittest.TestCase):
+class TestSetupMisc(unittest.TestCase):
     def setUp(self):
         self.tmpdir = mkdtemp()
         open('%s/ca.pem' % self.tmpdir, 'w').close()

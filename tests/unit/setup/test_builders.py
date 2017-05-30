@@ -15,7 +15,7 @@ from buildbot.plugins import util
 DumbWorker = collections.namedtuple('DumbWorker', ['name'])
 
 
-class SetupBuildersTest(unittest.TestCase):
+class TestSetupBuilders(unittest.TestCase):
     def setUp(self):
         util.env = util.load_env([
             ('DOCKER_BUILDER_NAME', 'foo'),

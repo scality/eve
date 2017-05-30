@@ -15,7 +15,7 @@ from buildbot.plugins import util
 DumbWorker = collections.namedtuple('DumbWorker', ['name'])
 
 
-class TestSetupBootstrap(unittest.TestCase):
+class TestBootstrap(unittest.TestCase):
     def setUp(self):
         """Set up a random environment for maximum code coverage."""
         util.env = util.load_env([

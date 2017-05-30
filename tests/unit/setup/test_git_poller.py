@@ -6,7 +6,7 @@ import eve.setup.git_poller
 from buildbot.plugins import util
 
 
-class SetupGitPollerTest(unittest.TestCase):
+class TestSetupGitPoller(unittest.TestCase):
     def setUp(self):
         util.env = util.load_env([
             ('GIT_POLLING', 'foo'),

@@ -4,7 +4,7 @@ import eve.scripts.client
 from twisted.trial import unittest
 
 
-class TestScriptsClient(unittest.TestCase):
+class TestClient(unittest.TestCase):
     def test_main(self):
         """
         Test that the main() function is run without throwing an exception.

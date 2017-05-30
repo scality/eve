@@ -12,7 +12,7 @@ from tests.util.yaml_factory import LocalJobsYaml
 DumbWorker = namedtuple('DumbWorker', ['name'])
 
 
-class SetupLocalJobsTest(unittest.TestCase):
+class TestSetupLocalJobs(unittest.TestCase):
     def setUp(self):
         """
         Set up the environments for the tests.

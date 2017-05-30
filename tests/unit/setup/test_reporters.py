@@ -6,7 +6,7 @@ import eve.setup.reporters
 from buildbot.plugins import util
 
 
-class SetupReportersTest(unittest.TestCase):
+class TestSetupReporters(unittest.TestCase):
     def test_hipchat_reporter(self):
         util.env = util.load_env([
             ('DOCKER_BUILDER_NAME', 'foo'),

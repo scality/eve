@@ -13,7 +13,7 @@ from eve.patch.buildstep_interpolation import patch
 from twisted.trial import unittest
 
 
-class TestBuildInterpolation(unittest.TestCase):
+class TestBuildStepInterpolation(unittest.TestCase):
     def test_patch(self):
         """Test the patch function in the eve.patch.buildstep_interpolation
         module.

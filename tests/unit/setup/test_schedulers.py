@@ -6,7 +6,7 @@ import eve.setup.schedulers
 from buildbot.plugins import util
 
 
-class SetupSchedulersTest(unittest.TestCase):
+class TestSetupSchedulers(unittest.TestCase):
     def test_any_branch_scheduler(self):
         util.env = util.load_env([
             ('BOOTSTRAP_BUILDER_NAME', ''),

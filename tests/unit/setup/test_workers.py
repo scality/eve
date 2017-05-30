@@ -6,7 +6,7 @@ import eve.setup.workers
 from buildbot.plugins import util
 
 
-class SetupWorkersTest(unittest.TestCase):
+class TestSetupWorkers(unittest.TestCase):
     def test_local_workers(self):
         util.env = util.load_env([
             ('GIT_SLUG', 'slug'),
