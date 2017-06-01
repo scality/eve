@@ -13,6 +13,7 @@ buildbot-www        # used in www setup
 buildbot[tls]       # core technology
 lz4                 # used by buildbot to compress logs
 netifaces           # used by bootstrap job
+packaging           # used by artifacts and YAMLParser
 python-novaclient   # used by EveOpenStackLatentWorker
 raven               # used by sentry
 requests[security]  # used by step_factory

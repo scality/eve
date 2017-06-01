@@ -1,10 +1,10 @@
 # CONSTRAINTS for all installs
 
 # fix version of buildbot
-buildbot==0.9.5
-buildbot-worker==0.9.5
-buildbot-pkg==0.9.5
-buildbot-www==0.9.5
+buildbot==0.9.7
+buildbot-worker==0.9.7
+buildbot-pkg==0.9.7
+buildbot-www==0.9.7
 
 # buildbot not compatible with latest twisted
 twisted<17

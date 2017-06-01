@@ -32,9 +32,6 @@ def wamp():
         'type': 'wamp',
         'router_url': util.env.WAMP_ROUTER_URL,
         'realm': util.env.WAMP_REALM.decode(),
-        'debug': True,
-        'debug_websockets': False,
-        'debug_lowlevel': False,
     }
 
 

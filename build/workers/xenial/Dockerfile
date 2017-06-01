@@ -11,7 +11,7 @@ RUN apt-get update \
     && rm -f /tmp/packages.list
 
 COPY ./requirements.txt /tmp
-ARG BUILDBOT_VERSION
+
 RUN wget -q -O - https://bootstrap.pypa.io/get-pip.py | python2 - 'pip==9.0.1' \
  && pip install --no-binary buildbot --no-cache-dir -r /tmp/requirements.txt \
  && rm -f /tmp/requirements.txt
@@ -38,6 +38,8 @@ RUN mkdir -p /home/eve/workspace/ \
 #
 # Run buildbot-worker on startup
 #
+ARG BUILDBOT_VERSION
+RUN sudo pip install buildbot-worker==$BUILDBOT_VERSION
 
 WORKDIR /home/eve/workspace
 CMD buildbot-worker create-worker . "$BUILDMASTER:$BUILDMASTER_PORT" "$WORKERNAME" "$WORKERPASS" \
