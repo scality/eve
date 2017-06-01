@@ -2,8 +2,9 @@
 
 import unittest
 
-import eve.setup.www
 from buildbot.plugins import util
+
+import eve.setup.www
 
 
 class TestDenyRebuildIntermediateBuild(unittest.TestCase):

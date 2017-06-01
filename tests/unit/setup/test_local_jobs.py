@@ -5,9 +5,10 @@ import unittest
 from collections import namedtuple
 from tempfile import mkdtemp, mktemp
 
-import eve.setup.local_jobs
 from buildbot.plugins import util
 from tests.util.yaml_factory import LocalJobsYaml
+
+import eve.setup.local_jobs
 
 DumbWorker = namedtuple('DumbWorker', ['name'])
 

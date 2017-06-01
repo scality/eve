@@ -2,8 +2,9 @@
 
 import unittest
 
-import eve.setup.reporters
 from buildbot.plugins import util
+
+import eve.setup.reporters
 
 
 class TestSetupReporters(unittest.TestCase):

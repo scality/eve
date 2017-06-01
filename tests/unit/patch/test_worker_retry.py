@@ -9,8 +9,9 @@ Here are the tested components :
 """
 
 import buildbot.process.build
-from eve.patch.worker_retry import patch
 from twisted.trial import unittest
+
+from eve.patch.worker_retry import patch
 
 
 class TestPatchWorkerRetry(unittest.TestCase):

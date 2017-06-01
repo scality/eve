@@ -2,8 +2,9 @@
 
 import unittest
 
-import eve.setup.workers
 from buildbot.plugins import util
+
+import eve.setup.workers
 
 
 class TestSetupWorkers(unittest.TestCase):

@@ -9,8 +9,9 @@ Attributes:
 import collections
 import unittest
 
-import eve.setup.bootstrap
 from buildbot.plugins import util
+
+import eve.setup.bootstrap
 
 DumbWorker = collections.namedtuple('DumbWorker', ['name'])
 

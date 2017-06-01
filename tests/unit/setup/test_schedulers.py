@@ -2,8 +2,9 @@
 
 import unittest
 
-import eve.setup.schedulers
 from buildbot.plugins import util
+
+import eve.setup.schedulers
 
 
 class TestSetupSchedulers(unittest.TestCase):
