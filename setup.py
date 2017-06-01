@@ -18,11 +18,11 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor,
 # Boston, MA  02110-1301, USA.
 
-from setuptools import setup, find_packages
 from os.path import abspath, dirname, join
-from pip.req import parse_requirements
-from pip.download import PipSession
 
+from pip.download import PipSession
+from pip.req import parse_requirements
+from setuptools import find_packages, setup
 
 CWD = dirname(abspath(__file__))
 
