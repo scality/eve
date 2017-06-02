@@ -21,7 +21,7 @@ import time
 import buildbot
 from buildbot.plugins import steps, util
 from buildbot.process.properties import Interpolate
-from buildbot.process.results import SKIPPED
+from buildbot.process.results import SKIPPED, SUCCESS
 
 
 class DockerBuildOrder(util.BaseBuildOrder):
@@ -67,6 +67,7 @@ class DockerBuildOrder(util.BaseBuildOrder):
             self.preliminary_steps.append(steps.DockerComputeImageFingerprint(
                 label=basename,
                 context_dir=full_docker_path,
+                hideStepIf=lambda results, s: results == SUCCESS
             ))
 
             image = Interpolate('{0}/{1}:%(prop:fingerprint_{1}:-)s'.format(
@@ -74,13 +75,15 @@ class DockerBuildOrder(util.BaseBuildOrder):
 
             self.preliminary_steps.append(steps.DockerCheckLocalImage(
                 label=basename,
-                image=image
+                image=image,
+                hideStepIf=lambda results, s: results == SUCCESS
             ))
 
             self.preliminary_steps.append(steps.DockerPull(
                 label=basename,
                 image=image,
-                doStepIf=should_build
+                doStepIf=should_build,
+                hideStepIf=lambda results, s: results == SUCCESS
             ))
         else:
             image = '%s-%06d' % (
@@ -106,6 +109,7 @@ class DockerBuildOrder(util.BaseBuildOrder):
         self.preliminary_steps.append(steps.DockerBuild(
             flunkOnFailure=False,
             haltOnFailure=False,
+            hideStepIf=lambda results, s: results == SUCCESS,
             doStepIf=should_build,
             **common_args
         ))
@@ -136,5 +140,6 @@ class DockerBuildOrder(util.BaseBuildOrder):
             self.preliminary_steps.append(steps.DockerPush(
                 label=basename,
                 image=image,
-                doStepIf=should_build
+                doStepIf=should_build,
+                hideStepIf=lambda results, s: results == SUCCESS
             ))
