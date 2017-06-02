@@ -52,11 +52,14 @@ class Cluster(object):
 
         self.database = self.db_class(external_ip=self.external_ip)
 
+        self.vault = self.add_vault()
+
         self._masters = OrderedDict()
 
         self._first_frontend = self.buildbot_master_class(
             'frontend',
             db_url=self.database.url,
+            vault=self.vault,
             git_repo=self.githost_url,
             master_fqdn=self.external_ip,
             wamp_url=self.wamp_url)
@@ -97,6 +100,9 @@ class Cluster(object):
         """Return the external web url of the cluster."""
         return self._first_frontend.external_url
 
+    def add_vault(self):
+        return None
+
     def add_master(self, mode):
         """Add a master to the cluster.
 
@@ -112,6 +118,7 @@ class Cluster(object):
             git_repo=self.githost_url,
             external_url=self.external_url,
             db_url=self.db_url,
+            vault=self.vault,
             master_fqdn=self.external_ip,
             wamp_url=self.wamp_url, )
         self._masters[master._name] = master
@@ -127,6 +134,8 @@ class Cluster(object):
         self.githost.start()
         self._crossbar.start()
         self.database.start()
+        if self.vault:
+            self.vault.start()
         for master in self._masters.values():
             master.start()
         return self
@@ -142,6 +151,8 @@ class Cluster(object):
         for master in self._masters.values():
             master.stop()
         self._crossbar.stop()
+        if self.vault:
+            self.vault.stop()
         return self
 
     @property
