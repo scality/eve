@@ -7,6 +7,7 @@ buildbot[tls]
 lz4
 MySQL-python # Used in production with a mysql database
 netifaces
+packaging
 python-dateutil
 python-novaclient # 2.35.0
 PyYAML
