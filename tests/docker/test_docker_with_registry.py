@@ -242,6 +242,3 @@ class Tests(unittest.TestCase):
             (u'[ubuntu-xenial-ctxt] build retry', u'Ran (skipped)'),
             (u'[ubuntu-xenial-ctxt] push', u'Ran (skipped)'),
             (u'trigger', u'triggered docker-test_suffix')]
-
-    def test_supplied_build_image(self):
-        pass
