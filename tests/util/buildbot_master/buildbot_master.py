@@ -40,6 +40,7 @@ class BuildbotMaster(Daemon):
                  git_repo,
                  external_url=None,
                  db_url=None,
+                 vault=None,
                  master_fqdn='localhost',
                  wamp_url=None):
         """Class representing a Buildbot Daemon.
@@ -64,6 +65,7 @@ class BuildbotMaster(Daemon):
             'sqlite:///' + os.path.join(self._base_path, 'state.sqlite')
 
         max_local_workers = 4
+        self.vault = vault
 
         self.conf = dict(
             MASTER_NAME=name,
@@ -103,8 +105,11 @@ class BuildbotMaster(Daemon):
 
         cmd('buildbot create-master --relocatable --db={} {}'.format(
             self.db_url, self._base_path))
-        import pprint
-        pprint.pprint(self.environ)
+        if self.vault:
+            self.conf['VAULT_IN_USE'] = '1'
+            self.conf['VAULT_URL'] = self.vault.url
+            self.conf['VAULT_TOKEN'] = self.vault.token
+
         self._env = self.environ
 
     def sanity_check(self):
@@ -125,6 +130,10 @@ class BuildbotMaster(Daemon):
                 self.print_loglines()
                 raise RuntimeError(
                     '{} has lost connection to crossbar'.format(self._name))
+            if 'Configuration Errors:' in logline:
+                self.print_loglines()
+                raise RuntimeError(
+                    '{} has lost configuration errors'.format(self._name))
 
     def add_conf_file(self, yaml_data, filename):
         """Add configuration files to the master's directory.

@@ -83,7 +83,7 @@ class PreMerge(YamlFactory):
 
 
 class SingleCommandYaml(PreMerge):
-    def __init__(self, command='exit 0', worker=None):
+    def __init__(self, command='exit 0', worker=None, env={}):
         """Generate a YAML file with a single stage that runs a single command.
 
         Args:
@@ -91,7 +91,7 @@ class SingleCommandYaml(PreMerge):
             worker (dict): The worker definition (default: {'type': 'local'}).
 
         """
-        shell_command_step = {'ShellCommand': {'command': command}}
+        shell_command_step = {'ShellCommand': {'command': command, 'env': env}}
         super(SingleCommandYaml, self).__init__(
             steps=[shell_command_step], worker=worker)
 
