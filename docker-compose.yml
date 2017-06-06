@@ -34,13 +34,17 @@ services:
   db:
     image: mysql/mysql-server:5.7
     restart: always
-    env_file: "${ENV_FILE-env}"
+    environment:
+      - MYSQL_ROOT_PASSWORD=4m4zingroot
+      - MYSQL_DATABASE=buildbot_db
+      - MYSQL_USER=eve
+      - MYSQL_PASSWORD=4m4zing
 
   crossbar:
     image: crossbario/crossbar
     restart: always
     volumes:
-      - ./tests/system/factories/crossbar.json:/node/.crossbar/config.json
+      - ./tests/util/crossbar/crossbar.json:/node/.crossbar/config.json
 
   gitcache:
     build: eve/services/gitcache
