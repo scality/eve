@@ -59,6 +59,14 @@ for i in xrange(120):
 else:
     raise Exception('database never responded')
 
+if os.environ['MASTER_MODE'] in ['frontend', 'standalone']:
+    _print("removing disconnected masters...")
+    try:
+        sa.execute('DELETE FROM masters WHERE active=0 AND last_active=0;')
+    except sqlalchemy.exc.ProgrammingError:
+        # table may not exist
+        pass
+
 _print("upgrading master...")
 subprocess.check_call('buildbot upgrade-master .', shell=True)
 
