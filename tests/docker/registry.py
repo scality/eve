@@ -20,14 +20,14 @@ from tests.util.cmd import cmd
 from tests.util.daemon import Daemon
 
 
-class DockerRegistry(Daemon):
+class DockerizedRegistry(Daemon):
     _post_start_delay = 1
     _stop_cmd = 'docker rm -f {name}'
 
     def __init__(self, external_ip='localhost'):
         self.external_ip = external_ip
         self.port = self.get_free_port()
-        super(DockerRegistry,
+        super(DockerizedRegistry,
               self).__init__(name='registry_{}'.format(self.port))
         self._start_cmd = None
 

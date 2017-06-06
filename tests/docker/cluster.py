@@ -21,8 +21,8 @@ import platform
 from tests.docker.buildbot_master import DockerizedBuildbotMaster
 from tests.docker.crossbar import DockerizedCrossbar
 from tests.docker.mysql import DockerizedMySQL
+from tests.docker.registry import DockerizedRegistry
 from tests.docker.vault import DockerizedVault
-from tests.docker.registry import DockerRegistry
 from tests.util.cluster import Cluster
 from tests.util.cmd import cmd
 from tests.util.githost_mock.githost_mock import GitHostMock
@@ -35,7 +35,7 @@ class DockerizedCluster(Cluster):
     vault_class = DockerizedVault
     crossbar_class = DockerizedCrossbar
     buildbot_master_class = DockerizedBuildbotMaster
-    registry_class = DockerRegistry
+    registry_class = DockerizedRegistry
 
     def add_vault(self):
         return DockerizedVault(external_ip=self.external_ip)

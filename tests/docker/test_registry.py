@@ -1,12 +1,12 @@
 import unittest
 
-from tests.docker.registry import DockerRegistry
+from tests.docker.registry import DockerizedRegistry
 from tests.util.cmd import cmd
 
 
-class TestDockerRegistry(unittest.TestCase):
+class TestDockerizedRegistry(unittest.TestCase):
     def setUp(self):
-        self.registry = DockerRegistry()
+        self.registry = DockerizedRegistry()
         print 'Registry URL: {}:{}'.format(self.registry.external_ip,
                                            self.registry.port)
         assert self.registry is self.registry.start()
