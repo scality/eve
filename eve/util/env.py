@@ -49,7 +49,11 @@ class Settings(dict):
             if default is None:
                 raise
             value = default
-        self[name] = convert(value)
+        try:
+            self[name] = convert(value)
+        except ValueError:
+            raise ValueError('Cannot convert {}={} to an {}'.format(
+                name, value, convert))
 
     def __getattr__(self, name):
         return self[name]
