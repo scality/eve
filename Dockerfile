@@ -24,7 +24,7 @@ RUN git config --global url."http://gitcache/https/bitbucket.org/".insteadOf git
  && git config --global url."http://gitcache/git/mock/".insteadOf git@mock: \
  && mkdir /root/eve
 
-VOLUME ['root/eve']
+VOLUME /root/eve
 WORKDIR /root/eve
 
 # Freezing requirements
