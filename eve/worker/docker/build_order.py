@@ -16,7 +16,9 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor,
 # Boston, MA  02110-1301, USA.
 
-import time
+from hashlib import sha1
+from os import path
+from time import time
 
 import buildbot
 from buildbot.plugins import steps, util
@@ -44,13 +46,18 @@ class DockerBuildOrder(util.BaseBuildOrder):
                 self._worker['image'])
             return
 
-        basename = self._worker.get('path', None)
-        self.properties['worker_path'] = basename
+        worker_path = self._worker.get('path', None)
+        self.properties['worker_path'] = worker_path
 
         full_docker_path = '%s/build/%s' % (
             self.properties['master_builddir'],
-            basename,
+            worker_path,
         )
+
+        # image name is last dir name + hash of path to avoid collisions
+        basename = "{0}_{1}".format(
+            path.basename(worker_path),
+            sha1(worker_path).hexdigest()[:4])
 
         use_registry = bool(util.env.DOCKER_REGISTRY_URL)
 
@@ -70,7 +77,7 @@ class DockerBuildOrder(util.BaseBuildOrder):
                 hideStepIf=lambda results, s: results == SUCCESS
             ))
 
-            image = Interpolate('{0}/{1}:%(prop:fingerprint_{1}:-)s'.format(
+            image = Interpolate('{0}/{1}:%(prop:fingerprint_{1})s'.format(
                 util.env.DOCKER_REGISTRY_URL, basename))
 
             self.preliminary_steps.append(steps.DockerCheckLocalImage(
@@ -102,7 +109,7 @@ class DockerBuildOrder(util.BaseBuildOrder):
                 'BUILDBOT_VERSION': buildbot.version
             },
             'labels': {
-                'eve.build.ts': '{0:.0f}'.format(time.time())
+                'eve.build.ts': '{0:.0f}'.format(time())
             }
         }
 

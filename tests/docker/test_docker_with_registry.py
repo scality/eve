@@ -115,12 +115,12 @@ class Tests(unittest.TestCase):
              (u'set the artifacts public url', u"property 'artifacts_public_url' set"),  # noqa
              (u'get the API version', u'Set'),
              (u'prepare 1 stage(s)', u'finished'),
-             (u'[ubuntu-xenial-ctxt] fingerprint', u"property 'fingerprint_ubuntu-xenial-ctxt' set"),  # noqa
-             (u'[ubuntu-xenial-ctxt] look up', u"property 'exists_ubuntu-xenial-ctxt' set (failure)"),  # noqa
-             (u'[ubuntu-xenial-ctxt] pull', u"property 'exists_ubuntu-xenial-ctxt' set (failure)"),  # noqa
-             (u'[ubuntu-xenial-ctxt] build', u'Ran'),
-             (u'[ubuntu-xenial-ctxt] build retry', u'Ran (skipped)'),
-             (u'[ubuntu-xenial-ctxt] push', u'Ran'),
+             (u'[ubuntu-xenial-ctxt_930a] fingerprint', u"property 'fingerprint_ubuntu-xenial-ctxt_930a' set"),  # noqa
+             (u'[ubuntu-xenial-ctxt_930a] look up', u"property 'exists_ubuntu-xenial-ctxt_930a' set (failure)"),  # noqa
+             (u'[ubuntu-xenial-ctxt_930a] pull', u"property 'exists_ubuntu-xenial-ctxt_930a' set (failure)"),  # noqa
+             (u'[ubuntu-xenial-ctxt_930a] build', u'Ran'),
+             (u'[ubuntu-xenial-ctxt_930a] build retry', u'Ran (skipped)'),
+             (u'[ubuntu-xenial-ctxt_930a] push', u'Ran'),
              (u'trigger', u'triggered docker-test_suffix'),
         ]
 
@@ -178,12 +178,12 @@ class Tests(unittest.TestCase):
             (u'set the artifacts public url', u"property 'artifacts_public_url' set"),  # noqa
             (u'get the API version', u'Set'),
             (u'prepare 1 stage(s)', u'finished'),
-            (u'[ubuntu-xenial-ctxt] fingerprint', u"property 'fingerprint_ubuntu-xenial-ctxt' set"),  # noqa
-            (u'[ubuntu-xenial-ctxt] look up', u"property 'exists_ubuntu-xenial-ctxt' set"),  # noqa
-            (u'[ubuntu-xenial-ctxt] pull', u"'docker pull ...' (skipped)"),
-            (u'[ubuntu-xenial-ctxt] build', u'Ran (skipped)'),
-            (u'[ubuntu-xenial-ctxt] build retry', u'Ran (skipped)'),
-            (u'[ubuntu-xenial-ctxt] push', u'Ran (skipped)'),
+            (u'[ubuntu-xenial-ctxt_930a] fingerprint', u"property 'fingerprint_ubuntu-xenial-ctxt_930a' set"),  # noqa
+            (u'[ubuntu-xenial-ctxt_930a] look up', u"property 'exists_ubuntu-xenial-ctxt_930a' set"),  # noqa
+            (u'[ubuntu-xenial-ctxt_930a] pull', u"'docker pull ...' (skipped)"),  # noqa
+            (u'[ubuntu-xenial-ctxt_930a] build', u'Ran (skipped)'),
+            (u'[ubuntu-xenial-ctxt_930a] build retry', u'Ran (skipped)'),
+            (u'[ubuntu-xenial-ctxt_930a] push', u'Ran (skipped)'),
             (u'trigger', u'triggered docker-test_suffix')]
 
         # do the same build one last time, but erase the local image first
@@ -235,10 +235,10 @@ class Tests(unittest.TestCase):
             (u'set the artifacts public url', u"property 'artifacts_public_url' set"),  # noqa
             (u'get the API version', u'Set'),
             (u'prepare 1 stage(s)', u'finished'),
-            (u'[ubuntu-xenial-ctxt] fingerprint', u"property 'fingerprint_ubuntu-xenial-ctxt' set"),  # noqa
-            (u'[ubuntu-xenial-ctxt] look up', u"property 'exists_ubuntu-xenial-ctxt' set (failure)"),  # noqa
-            (u'[ubuntu-xenial-ctxt] pull', u"property 'exists_ubuntu-xenial-ctxt' set"),  # noqa
-            (u'[ubuntu-xenial-ctxt] build', u'Ran (skipped)'),
-            (u'[ubuntu-xenial-ctxt] build retry', u'Ran (skipped)'),
-            (u'[ubuntu-xenial-ctxt] push', u'Ran (skipped)'),
+            (u'[ubuntu-xenial-ctxt_930a] fingerprint', u"property 'fingerprint_ubuntu-xenial-ctxt_930a' set"),  # noqa
+            (u'[ubuntu-xenial-ctxt_930a] look up', u"property 'exists_ubuntu-xenial-ctxt_930a' set (failure)"),  # noqa
+            (u'[ubuntu-xenial-ctxt_930a] pull', u"property 'exists_ubuntu-xenial-ctxt_930a' set"),  # noqa
+            (u'[ubuntu-xenial-ctxt_930a] build', u'Ran (skipped)'),
+            (u'[ubuntu-xenial-ctxt_930a] build retry', u'Ran (skipped)'),
+            (u'[ubuntu-xenial-ctxt_930a] push', u'Ran (skipped)'),
             (u'trigger', u'triggered docker-test_suffix')]
