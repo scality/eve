@@ -19,10 +19,9 @@ RUN pip install --upgrade pip
 
 RUN curl -sSL https://get.docker.com/ | sh
 
-RUN git config --global url."http://gitcache/https/bitbucket.org/".insteadOf git@bitbucket.org: \
- && git config --global url."http://gitcache/https/github.com/".insteadOf git@github.com: \
- && git config --global url."http://gitcache/git/mock/".insteadOf git@mock: \
- && mkdir /root/eve
+RUN mkdir /root/eve /root/gitconfig \
+ && touch /root/gitconfig/gitconfig \
+ && ln -s /root/gitconfig/gitconfig /root/.gitconfig
 
 VOLUME /root/eve
 WORKDIR /root/eve
