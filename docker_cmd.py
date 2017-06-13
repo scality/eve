@@ -67,6 +67,11 @@ if os.environ['MASTER_MODE'] in ['frontend', 'standalone']:
         # table may not exist
         pass
 
+_print("checking cloud key mode...")
+openstack_key =  os.environ.get('OS_SSH_KEY', False)
+if openstack_key:
+    subprocess.check_call('chmod 600 $OS_SSH_KEY', shell=True)
+
 _print("upgrading master...")
 subprocess.check_call('buildbot upgrade-master .', shell=True)
 
