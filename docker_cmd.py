@@ -72,6 +72,19 @@ openstack_key =  os.environ.get('OS_SSH_KEY', False)
 if openstack_key:
     subprocess.check_call('chmod 600 $OS_SSH_KEY', shell=True)
 
+if os.environ.get('DEBUG_MODE', '0') in ['true', 'True', '1', 'y', 'yes']:
+    _print("starting in debug mode...")
+    _print("-> to start buildbot manually, connect to container then type:")
+    _print("   $ twistd -ny ./buildbot.tac")
+    _print("-> to resume normal startup sequence, type:")
+    _print("   $ pkill -f tail")
+
+    try:
+        subprocess.check_call('tail -f /dev/null', shell=True)
+    except:
+        pass
+    _print("resuming startup sequence")
+
 _print("upgrading master...")
 subprocess.check_call('buildbot upgrade-master .', shell=True)
 
