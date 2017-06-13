@@ -9,8 +9,9 @@ Here are the tested components :
 """
 
 from buildbot.www.hooks import bitbucket as bb_hooks
-from eve.patch.bitbucket_webhook import getChanges, patch
 from twisted.trial import unittest
+
+from eve.patch.bitbucket_webhook import getChanges, patch
 
 
 class TestBitbucketWebhook(unittest.TestCase):

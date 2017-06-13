@@ -2,8 +2,9 @@
 
 import unittest
 
-import eve.setup.git_poller
 from buildbot.plugins import util
+
+import eve.setup.git_poller
 
 
 class TestSetupGitPoller(unittest.TestCase):

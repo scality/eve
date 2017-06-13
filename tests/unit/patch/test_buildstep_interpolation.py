@@ -9,8 +9,9 @@ Here are the tested components :
 """
 
 from buildbot.process.buildstep import BuildStep
-from eve.patch.buildstep_interpolation import patch
 from twisted.trial import unittest
+
+from eve.patch.buildstep_interpolation import patch
 
 
 class TestBuildStepInterpolation(unittest.TestCase):

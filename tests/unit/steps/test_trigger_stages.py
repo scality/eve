@@ -2,8 +2,9 @@
 
 import unittest
 
-import eve.steps.trigger_stages
 from buildbot.plugins import util
+
+import eve.steps.trigger_stages
 
 
 class StepsTriggerStages(unittest.TestCase):

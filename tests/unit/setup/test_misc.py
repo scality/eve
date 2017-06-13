@@ -6,8 +6,9 @@ import unittest
 from math import ceil
 from tempfile import mkdtemp
 
-import eve.setup.misc
 from buildbot.plugins import util
+
+import eve.setup.misc
 
 
 class TestSetupMisc(unittest.TestCase):

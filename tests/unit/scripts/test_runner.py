@@ -1,7 +1,8 @@
 """Unit tests of `eve.scripts.runner`."""
 
-import eve.scripts.runner
 from twisted.trial import unittest
+
+import eve.scripts.runner
 
 
 class TestRunner(unittest.TestCase):

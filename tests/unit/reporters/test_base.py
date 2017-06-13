@@ -10,9 +10,10 @@ Attributes:
 
 """
 
-from eve.reporters import base
 from twisted.internet import defer
 from twisted.trial import unittest
+
+from eve.reporters import base
 
 FAILED_BUILD = {
     'buildid': 1,

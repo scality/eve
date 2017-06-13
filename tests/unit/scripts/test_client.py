@@ -1,7 +1,8 @@
 """Unit tests of `eve.scripts.client`."""
 
-import eve.scripts.client
 from twisted.trial import unittest
+
+import eve.scripts.client
 
 
 class TestClient(unittest.TestCase):

@@ -9,8 +9,9 @@ Here are the tested components :
 """
 
 from buildbot.process import buildrequest as bb_buildrequest
-from eve.patch.unicode_source_diff import TempSourceStamp, patch
 from twisted.trial import unittest
+
+from eve.patch.unicode_source_diff import TempSourceStamp, patch
 
 
 class TestUnicodeSourceDiff(unittest.TestCase):
