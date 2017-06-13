@@ -4,13 +4,14 @@ RUN         apt-get update && \
             DEBIAN_FRONTEND=noninteractive apt-get -y install -q \
                 build-essential \
                 curl \
-                python-dev \
-                libffi-dev \
-                libssl-dev \
-                python-pip \
-                libmysqlclient-dev \
                 git \
-                python-psycopg2 && \
+                libffi-dev \
+                libmysqlclient-dev \
+                libssl-dev \
+                python-dev \
+                python-pip \
+                python-psycopg2 \
+                vim.tiny && \
             rm -rf /var/lib/apt/lists/*
 
 RUN pip install --upgrade pip
