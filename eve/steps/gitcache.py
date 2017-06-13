@@ -61,7 +61,7 @@ class CheckGitCachePresence(ShellCommand):
                     haltOnFailure=False,
                     locks=[GITCACHE_BUILD_LOCK.access('exclusive')],
                     hideStepIf=lambda results, s: results == SUCCESS,
-                    command='docker rm %s' % util.env.GITCACHE_BUILDDIR),
+                    command='docker rm %s' % util.env.GITCACHE_HOSTNAME),
                 MasterShellCommand(
                     name='launch new gitcache container',
                     locks=[GITCACHE_BUILD_LOCK.access('exclusive')],
