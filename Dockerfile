@@ -1,9 +1,7 @@
 FROM        ubuntu:xenial
-ARG         DEBIAN_FRONTEND=noninteractive
 
 RUN         apt-get update && \
-            apt-get -y upgrade && \
-            apt-get -y install -q \
+            DEBIAN_FRONTEND=noninteractive apt-get -y install -q \
                 build-essential \
                 curl \
                 python-dev \
