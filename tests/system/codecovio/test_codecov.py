@@ -227,6 +227,7 @@ class TestPublishCodeCoverage(unittest.TestCase):
                 '.codecov.yml',
             }, {
                 'Accept': 'text/plain',
+                'Content-Length': '0',
             }), ('PUT', '/s3/fake_report.txt', {
                 'AWSAccessKeyId': 'FAKEAWSACCESSKID',
                 'Expires': str(self.codecov_io_server.expires),

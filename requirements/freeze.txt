@@ -9,6 +9,6 @@ funcsigs==1.0.2
 mock==2.0.0
 pbr==3.0.1
 setuptools==36.0.1
-sh==1.12.13
+sh==1.12.14
 six==1.10.0
 

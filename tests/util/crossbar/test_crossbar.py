@@ -34,7 +34,7 @@ class TestCrossbar(TestCase):
         """
         crossbar = Crossbar().start()
         self.assertIn("Router 'worker-001': transport 'transport-001' started",
-                      crossbar.loglines[-1])
+                      crossbar.loglines[-2])
 
         crossbar.stop()
-        self.assertIn('Shutting down node...', crossbar.loglines[-1])
+        self.assertIn('Node shutdown requested', crossbar.loglines[-1])

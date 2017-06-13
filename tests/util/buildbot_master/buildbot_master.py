@@ -70,7 +70,7 @@ class BuildbotMaster(Daemon):
 
         self.conf = dict(
             MASTER_NAME=name,
-            HTTP_PORT=str(self.http_port),
+            HTTP_PORT='tcp:%s' % str(self.http_port),
             PB_PORT=str(self.get_free_port()),
             TRY_PORT=str(self.get_free_port()),
             EXTERNAL_URL=str(self.external_url),

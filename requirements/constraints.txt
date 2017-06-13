@@ -6,15 +6,6 @@ buildbot-worker==0.9.7
 buildbot-pkg==0.9.7
 buildbot-www==0.9.7
 
-# buildbot not compatible with latest twisted
-twisted<17
-
-# buildbot not compatible with latest crossbar
-crossbar==0.15.0
-
-# crossbar not compatible with latest autobahn
-autobahn==0.17.2
-
 # docker-compose     depends  requests==2.11.1
 # and, with requests 2.13.0, buildbot plugins trigger:
 #  (requests 2.13.0, Requirement.parse('requests!=2.12.2,!=2.13.0,>=2.10.0'), set(['keystoneauth1']))
