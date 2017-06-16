@@ -100,8 +100,12 @@ class DenyRebuildIntermediateBuild(EndpointMatcherBase):
 
 
 def www():
+    try:
+        port = 'tcp:{}'.format(int(util.env.HTTP_PORT))
+    except ValueError:
+        port = util.env.HTTP_PORT
     return {
-        'port': util.env.HTTP_PORT,
+        'port': port,
         'plugins': {},
         'change_hook_dialects': {
             'bitbucket': True,
