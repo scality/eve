@@ -147,14 +147,16 @@ class EveOpenStackLatentWorker(OpenStackLatentWorker):
     @retry(wait_exponential_multiplier=10000, stop_max_delay=300000)
     # 10s exponential backoff and giving up after about five minutes
     def _start(self, image, flavor, init_script):
-        self.logger.debug('Spawning Openstack machine'
-                          ' <image:{}> <flavor:{}> <init_script:{}>...'.
-                          format(image, flavor, init_script))
+        self.logger.debug('Spawning Openstack machine '
+                          '<name:{}> <image:{}> <flavor:{}> <init_script:{}>'.
+                          format(self.workername, image, flavor, init_script))
 
         # delete any existing instance of this worker (from previous trials)
         servers = get_active_servers_by_name(self.workername, self.novaclient)
         for instance in servers:
-            self._stop_instance(instance, False)
+            self.logger.warn('Found an orphan or duplicate instance: '
+                             'name: {} UUID: {}.'.
+                             format(self.workername, instance.id))
 
         image_obj = get_openstack_image_by_name(image, self.novaclient)
         self.logger.debug('Openstack image UUID: {}'.format(image_obj.id))
