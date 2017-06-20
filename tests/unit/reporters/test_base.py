@@ -33,7 +33,7 @@ FAILED_BUILD = {
     }
 }
 
-SUCCEEDED_BUILD = {
+SUCCEEDED_PREMERGE_BUILD = {
     'buildid': 1,
     'state_string': 'SUCCESS',
     'results': 0,
@@ -42,6 +42,25 @@ SUCCEEDED_BUILD = {
     'started_at': 1,
     'properties': {
         'stage_name': ['pre-merge']
+    },
+    'buildset': {
+        'sourcestamps': [{
+            'repository': 'scality/ring.git',
+            'branch': 'master',
+            'revision': 'cafebabe',
+        }]
+    }
+}
+
+SUCCEEDED_POSTMERGE_BUILD = {
+    'buildid': 1,
+    'state_string': 'SUCCESS',
+    'results': 0,
+    'url': 'baz',
+    'complete_at': 10,
+    'started_at': 1,
+    'properties': {
+        'stage_name': ['post-merge']
     },
     'buildset': {
         'sourcestamps': [{
@@ -79,16 +98,21 @@ class TestHipChatBuildStatusPush(unittest.TestCase):
             }
         })
 
-    def test_filterBuilds(self):
+    def test_filterBuilds_premerge(self):
         ctx = base.HipChatBuildStatusPush(room_id='foo', token='bar')
         ctx.builders = None
-        self.assertTrue(ctx.filterBuilds(SUCCEEDED_BUILD))
+        self.assertFalse(ctx.filterBuilds(SUCCEEDED_PREMERGE_BUILD))
+
+    def test_filterBuilds_postmerge(self):
+        ctx = base.HipChatBuildStatusPush(room_id='foo', token='bar')
+        ctx.builders = None
+        self.assertTrue(ctx.filterBuilds(SUCCEEDED_POSTMERGE_BUILD))
 
     @defer.inlineCallbacks
     def test_send(self):
         ctx = base.HipChatBuildStatusPush(room_id='foo', token='bar')
         with self.assertRaises(AttributeError):
-            yield ctx.send(SUCCEEDED_BUILD)
+            yield ctx.send(SUCCEEDED_POSTMERGE_BUILD)
 
         with self.assertRaises(AttributeError):
             yield ctx.send(FAILED_BUILD)
@@ -103,7 +127,7 @@ class TestBitbucketBuildStatusPush(unittest.TestCase):
     def test_gather_data(self):
         build_status = base.BitbucketBuildStatusPush(
             login='foo', password='bar')
-        data = build_status.gather_data(SUCCEEDED_BUILD)
+        data = build_status.gather_data(SUCCEEDED_PREMERGE_BUILD)
         self.assertEquals(data, ('pre-merge', 0, 'build #1',
                                  '(SUCCESS) build #1 on ring:master [success]',
                                  'Hooray!'))
@@ -111,11 +135,11 @@ class TestBitbucketBuildStatusPush(unittest.TestCase):
     def test_forge_url(self):
         build_status = base.BitbucketBuildStatusPush(
             login='foo', password='bar')
-        build_status.gather_data(SUCCEEDED_BUILD)
-        url = build_status.forge_url(SUCCEEDED_BUILD)
+        build_status.gather_data(SUCCEEDED_PREMERGE_BUILD)
+        url = build_status.forge_url(SUCCEEDED_PREMERGE_BUILD)
         self.assertEquals(url, ('https://api.bitbucket.org/2.0/repositories/'
                                 'scality/ring/commit/cafebabe/statuses/build'))
         base.BitbucketBuildStatusPush.base_url = 'https://localhost:12345'
-        url = build_status.forge_url(SUCCEEDED_BUILD)
+        url = build_status.forge_url(SUCCEEDED_PREMERGE_BUILD)
         self.assertEquals(url, ('https://localhost:12345/2.0/repositories/'
                                 'scality/ring/commit/cafebabe/statuses/build'))
