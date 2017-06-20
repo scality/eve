@@ -300,8 +300,6 @@ class BitbucketBuildStatusPush(BaseBuildStatusPush, BuildStatusPushMixin):
         """Send build status to Bitbucket."""
         self.description_suffix = ''
         key, result, _, summary, description = self.gather_data(build)
-        # Temporary hack to keep previous behaviour
-        # Do not send status for other stages than 'pre-merge' or 'post-merge'
         data = {
             'state': self.BITBUCKET_STATUS_CORRESP[result],
             'key': key,
