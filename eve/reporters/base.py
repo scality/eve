@@ -155,7 +155,7 @@ class BuildStatusPushMixin(object):
         except (KeyError, IndexError):
             self.logger.error('no valid stage_name property found')
         else:
-            if key not in ['pre-merge', 'post-merge']:
+            if key not in self.stages:
                 return False
         return filter_build(build)
 
@@ -191,6 +191,7 @@ class HipChatBuildStatusPush(BaseBuildStatusPush, BuildStatusPushMixin):
     def __init__(self, room_id, token, **kwargs):
         self.room_id = room_id
         self.token = token
+        self.stages = ['post-merge']
         super(HipChatBuildStatusPush, self).__init__(**kwargs)
 
     def add_tag(self, name, value, icon, color=None):
@@ -271,6 +272,7 @@ class BitbucketBuildStatusPush(BaseBuildStatusPush, BuildStatusPushMixin):
     def __init__(self, login, password, **kwargs):
         self.login = login
         self.password = password
+        self.stages = ['pre-merge', 'post-merge']
         super(BitbucketBuildStatusPush, self).__init__(**kwargs)
 
     def forge_url(self, build):
