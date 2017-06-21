@@ -44,14 +44,15 @@ class ReadConfFromYaml(FileUpload):
 
     """
 
+    name = 'ReadConfFromYaml'
+
     logger = Logger('eve.steps.ReadConfFromYaml')
 
-    def __init__(self, **kwargs):
-        self.yaml = util.env.PROJECT_YAML
+    def __init__(self, yaml, **kwargs):
+        self.yaml = yaml
         self.masterdest = mktemp()
         FileUpload.__init__(
             self,
-            name='read %s' % self.yaml,
             workersrc=self.yaml,
             masterdest=self.masterdest,
             haltOnFailure=True,
