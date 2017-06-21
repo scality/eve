@@ -21,7 +21,6 @@ import time
 from json import loads
 from subprocess import STDOUT, CalledProcessError, check_output
 
-import netifaces
 from buildbot.plugins import util
 from buildbot.process.properties import Property
 from buildbot.worker.latent import AbstractLatentWorker
@@ -67,15 +66,17 @@ class EveDockerLatentWorker(AbstractLatentWorker):
 
     def _thd_start(self, image, volumes, buildnumber):
         docker_host_ip = None
+        docker_host_ip_cmd = [
+            'docker',
+            'network',
+            'inspect',
+            '--format="{{range .IPAM.Config}}{{.Gateway}}{{end}}"',
+            'bridge'
+        ]
         try:
-            docker_addresses = netifaces.ifaddresses('docker0')
-        except ValueError:
+            docker_host_ip = check_output(docker_host_ip_cmd).strip()
+        except CalledProcessError:
             pass
-        else:
-            try:
-                docker_host_ip = docker_addresses[netifaces.AF_INET][0]['addr']
-            except KeyError:
-                pass
 
         cmd = [
             'run',

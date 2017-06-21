@@ -19,9 +19,9 @@
 import re
 import time
 from fnmatch import fnmatch
+from subprocess import CalledProcessError, check_output
 from tempfile import mktemp
 
-import netifaces
 import yaml
 from buildbot.plugins import steps, util
 from buildbot.process.buildstep import BuildStep
@@ -320,13 +320,15 @@ class GetApiVersion(SetProperty):
 
 def get_docker_host_ip():
     docker_host_ip = '127.0.0.1'  # Dummy default value
+    docker_host_ip_cmd = [
+        'docker',
+        'network',
+        'inspect',
+        '--format="{{range .IPAM.Config}}{{.Gateway}}{{end}}"',
+        'bridge'
+    ]
     try:
-        docker_addresses = netifaces.ifaddresses('docker0')
-    except ValueError:
+        docker_host_ip = check_output(docker_host_ip_cmd).strip()
+    except CalledProcessError:
         pass
-    else:
-        try:
-            docker_host_ip = (docker_addresses[netifaces.AF_INET][0]['addr'])
-        except KeyError:
-            pass
     return docker_host_ip
