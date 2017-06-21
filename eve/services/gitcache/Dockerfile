@@ -25,6 +25,7 @@ RUN \
   git config --system credential.helper 'store --file=/var/lib/git/.git-credentials'
 
 CMD \
+  sed -i "s/ROBOT_BASE64/`grep bitbucket.org /git/.git-credentials | tr -d '\n' | sed -e 's|https://\(.*\)@.*|\1|' | base64`/" /etc/nginx/sites-enabled/default && \
   cp /git/.git-credentials /var/lib/git && \
   chown -R www-data:www-data /var/lib/git && \
   echo "FCGI_GROUP=${GIT_GROUP}" > /etc/default/fcgiwrap && \
