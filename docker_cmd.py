@@ -76,6 +76,8 @@ if os.environ.get('DEBUG_MODE', '0') in ['true', 'True', '1', 'y', 'yes']:
     _print("starting in debug mode...")
     _print("-> to start buildbot manually, connect to container then type:")
     _print("   $ twistd -ny ./buildbot.tac")
+    _print("-> to connect to interactive session, type:")
+    _print("   $ telnet 127.0.0.1 12345")
     _print("-> to resume normal startup sequence, type:")
     _print("   $ pkill -f tail")
 
