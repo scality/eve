@@ -11,6 +11,7 @@ RUN         apt-get update && \
                 python-dev \
                 python-pip \
                 python-psycopg2 \
+                telnet \
                 vim.tiny && \
             rm -rf /var/lib/apt/lists/*
 
