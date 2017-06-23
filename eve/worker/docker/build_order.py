@@ -23,7 +23,6 @@ from time import time
 import buildbot
 from buildbot.plugins import steps, util
 from buildbot.process.properties import Interpolate
-from buildbot.process.results import SKIPPED, SUCCESS
 
 
 class DockerBuildOrder(util.BaseBuildOrder):
@@ -74,7 +73,7 @@ class DockerBuildOrder(util.BaseBuildOrder):
             self.preliminary_steps.append(steps.DockerComputeImageFingerprint(
                 label=basename,
                 context_dir=full_docker_path,
-                hideStepIf=lambda results, s: results == SUCCESS
+                hideStepIf=util.hideStepIfSuccess
             ))
 
             image = Interpolate('{0}/{1}:%(prop:fingerprint_{1})s'.format(
@@ -83,14 +82,14 @@ class DockerBuildOrder(util.BaseBuildOrder):
             self.preliminary_steps.append(steps.DockerCheckLocalImage(
                 label=basename,
                 image=image,
-                hideStepIf=lambda results, s: results == SUCCESS
+                hideStepIf=util.hideStepIfSuccess
             ))
 
             self.preliminary_steps.append(steps.DockerPull(
                 label=basename,
                 image=image,
                 doStepIf=should_build,
-                hideStepIf=lambda results, s: results == SUCCESS
+                hideStepIf=util.hideStepIfSuccess
             ))
         else:
             image = '%s-%06d' % (
@@ -116,7 +115,7 @@ class DockerBuildOrder(util.BaseBuildOrder):
         self.preliminary_steps.append(steps.DockerBuild(
             flunkOnFailure=False,
             haltOnFailure=False,
-            hideStepIf=lambda results, s: results == SUCCESS,
+            hideStepIf=util.hideStepIfSuccess,
             doStepIf=should_build,
             **common_args
         ))
@@ -137,7 +136,7 @@ class DockerBuildOrder(util.BaseBuildOrder):
         self.preliminary_steps.append(steps.DockerBuild(
             name='[{0}] build retry'.format(basename)[0:49],
             is_retry=True,
-            hideStepIf=lambda results, s: results == SKIPPED,
+            hideStepIf=util.hideStepIfSkipped,
             doStepIf=is_prev_build_failed,
             **common_args
         ))
@@ -148,5 +147,5 @@ class DockerBuildOrder(util.BaseBuildOrder):
                 label=basename,
                 image=image,
                 doStepIf=should_build,
-                hideStepIf=lambda results, s: results == SUCCESS
+                hideStepIf=util.hideStepIfSuccess
             ))

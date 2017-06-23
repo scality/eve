@@ -33,7 +33,7 @@ class CheckGitCachePresence(ShellCommand):
     def __init__(self, **kwargs):
         kwargs.setdefault('flunkOnFailure', False)
         kwargs.setdefault('haltOnFailure', False)
-        kwargs.setdefault('hideStepIf', lambda results, s: results == SUCCESS)
+        kwargs.setdefault('hideStepIf', util.hideStepIfSuccess)
         kwargs.setdefault('name', 'check presence of gitcache')
         super(CheckGitCachePresence, self).__init__(
             command='docker ps --format {{.Names}} --filter name=%s' %
@@ -52,7 +52,7 @@ class CheckGitCachePresence(ShellCommand):
                 MasterShellCommand(
                     name='build gitcache image',
                     locks=[GITCACHE_BUILD_LOCK.access('exclusive')],
-                    hideStepIf=lambda results, s: results == SUCCESS,
+                    hideStepIf=util.hideStepIfSuccess,
                     command='docker build -t gitcache_img %s' %
                             util.env.GITCACHE_BUILDDIR),
                 MasterShellCommand(
@@ -60,12 +60,12 @@ class CheckGitCachePresence(ShellCommand):
                     flunkOnFailure=False,
                     haltOnFailure=False,
                     locks=[GITCACHE_BUILD_LOCK.access('exclusive')],
-                    hideStepIf=lambda results, s: results == SUCCESS,
+                    hideStepIf=util.hideStepIfSuccess,
                     command='docker rm %s' % util.env.GITCACHE_HOSTNAME),
                 MasterShellCommand(
                     name='launch new gitcache container',
                     locks=[GITCACHE_BUILD_LOCK.access('exclusive')],
-                    hideStepIf=lambda results, s: results == SUCCESS,
+                    hideStepIf=util.hideStepIfSuccess,
                     command='docker run --detach --name %s gitcache_img' %
                             util.env.GITCACHE_HOSTNAME)
             ])

@@ -19,7 +19,6 @@
 from buildbot.config import BuilderConfig
 from buildbot.plugins import steps, util
 from buildbot.process.factory import BuildFactory
-from buildbot.process.results import SUCCESS
 from buildbot.steps.shell import ShellCommand
 
 
@@ -32,7 +31,7 @@ def triggerable_builder(builder_name, workers):
             builder_name == util.env.DOCKER_BUILDER_NAME):
         factory.addStep(ShellCommand(
             name='customize git settings to hit on cache',
-            hideStepIf=lambda results, s: results == SUCCESS,
+            hideStepIf=util.hideStepIfSuccess,
             haltOnFailure=True,
 
             command='git config --global '
@@ -57,7 +56,7 @@ def triggerable_builder(builder_name, workers):
     # Extract steps from conf
     factory.addStep(steps.StepExtractor(
         name='extract steps from yaml',
-        hideStepIf=lambda results, s: results == SUCCESS
+        hideStepIf=util.hideStepIfSuccess
     ))
 
     return BuilderConfig(

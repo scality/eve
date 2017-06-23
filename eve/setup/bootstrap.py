@@ -22,7 +22,6 @@ from buildbot.config import BuilderConfig
 from buildbot.plugins import steps, util
 from buildbot.process.factory import BuildFactory
 from buildbot.process.properties import Property
-from buildbot.process.results import SKIPPED, SUCCESS
 from buildbot.steps.master import SetProperty
 from buildbot.steps.shell import SetPropertyFromCommand
 from buildbot.steps.source.git import Git
@@ -75,7 +74,7 @@ def bootstrap_builder(workers):
             submodules=True,
             branch=Property('branch'),
             mode='incremental',
-            hideStepIf=lambda results, s: results == SUCCESS,
+            hideStepIf=util.hideStepIfSuccess,
             haltOnFailure=True,
             config=git_config))
 
@@ -85,7 +84,7 @@ def bootstrap_builder(workers):
         SetProperty(
             name='setting the master_builddir property',
             property='master_builddir',
-            hideStepIf=lambda results, s: results == SUCCESS,
+            hideStepIf=util.hideStepIfSuccess,
             value=Property('builddir')))
 
     # Read patcher conf and populate related properties
@@ -94,24 +93,24 @@ def bootstrap_builder(workers):
             conf_path=util.env.PATCHER_FILE_PATH,
             name='check if any steps should currently be patched',
             doStepIf=bool(util.env.PATCHER_FILE_PATH),
-            hideStepIf=lambda results, s: results in (SUCCESS, SKIPPED)))
+            hideStepIf=util.hideStepIfSuccessOrSkipped))
 
     bootstrap_factory.addStep(SetProperty(
         name='get the git host',
         property='git_host',
-        hideStepIf=lambda results, s: results == SUCCESS,
+        hideStepIf=util.hideStepIfSuccess,
         value=util.env.GIT_HOST))
 
     bootstrap_factory.addStep(SetProperty(
         name='get the git owner',
         property='git_owner',
-        hideStepIf=lambda results, s: results == SUCCESS,
+        hideStepIf=util.hideStepIfSuccess,
         value=util.env.GIT_OWNER))
 
     bootstrap_factory.addStep(SetProperty(
         name='get the repository name',
         property='git_slug',
-        hideStepIf=lambda results, s: results == SUCCESS,
+        hideStepIf=util.hideStepIfSuccess,
         value=util.env.GIT_SLUG))
 
     yaml_dirpath = dirname(util.env.PROJECT_YAML)
@@ -119,7 +118,7 @@ def bootstrap_builder(workers):
         name='get the product version',
         command=('./{}/get_product_version.sh 2> /dev/null'
                  ' || echo 0.0.0'.format(yaml_dirpath)),
-        hideStepIf=lambda results, s: results == SUCCESS,
+        hideStepIf=util.hideStepIfSuccess,
         property='product_version'))
 
     # Read conf from yaml file
