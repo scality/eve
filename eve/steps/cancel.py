@@ -18,7 +18,7 @@
 
 from buildbot.plugins import util
 from buildbot.process.properties import Interpolate
-from buildbot.process.results import CANCELLED, SUCCESS
+from buildbot.process.results import CANCELLED
 from buildbot.steps.shell import ShellCommand
 
 
@@ -43,7 +43,7 @@ class CancelNonTipBuild(CancelCommand):
                                 '|| [ "$(git rev-list -1 %(prop:branch)s)"'
                                 ' = "%(prop:revision)s" ]'),
             descriptionDone='CancelNonTipBuild',
-            hideStepIf=lambda results, s: results == SUCCESS,
+            hideStepIf=util.hideStepIfSuccess,
             **kwargs
         )
 
@@ -55,7 +55,7 @@ class CancelOldBuild(CancelCommand):
         # pylint: disable=anomalous-backslash-in-string
         super(CancelOldBuild, self).__init__(
             name='prevent unuseful restarts',
-            hideStepIf=lambda results, s: results == SUCCESS,
+            hideStepIf=util.hideStepIfSuccess,
             command=Interpolate(
                 '[ $(expr "{}" \< "%(prop:start_time)s") -eq 1 ]'.format(
                     util.env.MASTER_START_TIME)),

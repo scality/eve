@@ -54,7 +54,7 @@ class ReadConfFromYaml(FileUpload):
             workersrc=self.yaml,
             masterdest=self.masterdest,
             haltOnFailure=True,
-            hideStepIf=lambda results, s: results == SUCCESS,
+            hideStepIf=util.hideStepIfSuccess,
             **kwargs)
 
     @defer.inlineCallbacks
@@ -217,7 +217,7 @@ class GetCommitShortVersion(SetPropertyFromCommand):
             name='get the commit short_revision',
             command=Interpolate(
                 'git rev-parse --verify --short ' + branch),
-            hideStepIf=lambda results, s: results == SUCCESS,
+            hideStepIf=util.hideStepIfSuccess,
             property='commit_short_revision',
             haltOnFailure=True)
 
@@ -228,7 +228,7 @@ class GetCommitTimestamp(SetPropertyFromCommand):
             name='get the commit timestamp',
             command='git log -1 --format=%cd '
                     '--date="format-local:%y%m%d%H%M%S"',
-            hideStepIf=lambda results, s: results == SUCCESS,
+            hideStepIf=util.hideStepIfSuccess,
             haltOnFailure=True,
             property='commit_timestamp')
 
@@ -238,7 +238,7 @@ class GetPipelineName(SetProperty):
         super(GetPipelineName, self).__init__(
             name='get the pipeline name',
             property='pipeline',
-            hideStepIf=lambda results, s: results == SUCCESS,
+            hideStepIf=util.hideStepIfSuccess,
             haltOnFailure=True,
             value=stage_name)
 
@@ -248,7 +248,7 @@ class GetB4NB(SetProperty):
         super(GetB4NB, self).__init__(
             name='get the b4nb',
             property='b4nb',
-            hideStepIf=lambda results, s: results == SUCCESS,
+            hideStepIf=util.hideStepIfSuccess,
             haltOnFailure=True,
             value=buildnumber.zfill(8))
 
@@ -264,7 +264,7 @@ class SetArtifactsBaseName(SetPropertyFromCommand):
                                 '%(prop:product_version)s'
                                 '.r%(prop:commit_timestamp)s'
                                 '.%(prop:commit_short_revision)s'),
-            hideStepIf=lambda results, s: results == SUCCESS,
+            hideStepIf=util.hideStepIfSuccess,
             property='artifacts_base_name')
 
 
@@ -275,7 +275,7 @@ class SetArtifactsName(SetPropertyFromCommand):
             command=Interpolate('echo %(prop:artifacts_base_name)s'
                                 '.%(prop:pipeline)s'
                                 '.%(prop:b4nb)s'),
-            hideStepIf=lambda results, s: results == SUCCESS,
+            hideStepIf=util.hideStepIfSuccess,
             property='artifacts_name')
 
 
@@ -284,7 +284,7 @@ class SetArtifactsLocalReverseProxy(SetProperty):
         super(SetArtifactsLocalReverseProxy, self).__init__(
             name='set the artifacts local reverse proxy',
             property='artifacts_local_reverse_proxy',
-            hideStepIf=lambda results, s: results == SUCCESS,
+            hideStepIf=util.hideStepIfSuccess,
             value='http://' + docker_host_ip + ':1080/')
 
 
@@ -295,7 +295,7 @@ class SetArtifactsPrivateURL(SetPropertyFromCommand):
             command=Interpolate('echo http://' + docker_host_ip +
                                 ':1080/builds/'
                                 '%(prop:artifacts_name)s'),
-            hideStepIf=lambda results, s: results == SUCCESS,
+            hideStepIf=util.hideStepIfSuccess,
             property='artifacts_private_url')
 
 
@@ -305,7 +305,7 @@ class SetArtifactsPublicURL(SetPropertyFromCommand):
             name='set the artifacts public url',
             command=Interpolate('echo ' + util.env.ARTIFACTS_URL +
                                 '/%(prop:artifacts_name)s'),
-            hideStepIf=lambda results, s: results == SUCCESS,
+            hideStepIf=util.hideStepIfSuccess,
             property='artifacts_public_url')
 
 
@@ -314,7 +314,7 @@ class GetApiVersion(SetProperty):
         super(GetApiVersion, self).__init__(
             name='get the API version',
             property='eve_api_version',
-            hideStepIf=lambda results, s: results == SUCCESS,
+            hideStepIf=util.hideStepIfSuccess,
             value=eve_api_version)
 
 

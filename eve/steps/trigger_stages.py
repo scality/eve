@@ -47,7 +47,7 @@ class TriggerStages(BuildStep):
 
         kwargs = {
             'name': 'prepare {0} stage(s)'.format(len(self.stage_names)),
-            'hideStepIf': lambda results, s: results == SUCCESS,
+            'hideStepIf': util.hideStepIfSuccess,
             'haltOnFailure': True,
         }
         super(TriggerStages, self).__init__(**kwargs)
