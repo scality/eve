@@ -153,10 +153,22 @@ class BuildStatusPushMixin(object):
         try:
             key = build['properties']['stage_name'][0]
         except (KeyError, IndexError):
-            self.logger.error('no valid stage_name property found')
+            self.logger.debug(
+                '_filterBuilds: stage_name property not found '
+                '(requiring: {}) -> ignore build status'
+                .format(self.stages))
+            return False
         else:
             if key not in self.stages:
+                self.logger.debug(
+                    '_filterBuilds: stage_name property "{0}" does not match '
+                    '(requiring: {1}) -> ignore build status'
+                    .format(key, self.stages))
                 return False
+        self.logger.debug(
+            '_filterBuilds: stage_name property "{0}" matches '
+            '(requiring: {1}) -> pass build status decision to parent'
+            .format(key, self.stages))
         return filter_build(build)
 
 
