@@ -26,7 +26,7 @@ from twisted.internet import defer
 
 from ..util.build_order import BaseBuildOrder
 from ..worker.docker.build_order import DockerBuildOrder
-from ..worker.openstack.build_order import OpenStackBuildOrder
+from ..worker.openstack_heat.build_order import HeatOpenStackBuildOrder
 
 
 class TriggerStages(BuildStep):
@@ -36,7 +36,7 @@ class TriggerStages(BuildStep):
         self.workers = {
             'local': (BaseBuildOrder, util.env.LOCAL_SCHEDULER_NAME),
             'docker': (DockerBuildOrder, util.env.DOCKER_SCHEDULER_NAME),
-            'openstack': (OpenStackBuildOrder,
+            'openstack': (HeatOpenStackBuildOrder,
                           util.env.OPENSTACK_SCHEDULER_NAME)
         }
 
