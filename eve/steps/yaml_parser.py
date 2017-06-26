@@ -18,6 +18,7 @@
 
 import re
 import time
+from collections import defaultdict
 from fnmatch import fnmatch
 from tempfile import mktemp
 
@@ -43,14 +44,15 @@ class ReadConfFromYaml(FileUpload):
 
     """
 
+    name = 'ReadConfFromYaml'
+
     logger = Logger('eve.steps.ReadConfFromYaml')
 
-    def __init__(self, **kwargs):
-        self.yaml = util.env.PROJECT_YAML
+    def __init__(self, yaml, **kwargs):
+        self.yaml = yaml
         self.masterdest = mktemp()
         FileUpload.__init__(
             self,
-            name='read %s' % self.yaml,
             workersrc=self.yaml,
             masterdest=self.masterdest,
             haltOnFailure=True,
@@ -66,7 +68,46 @@ class ReadConfFromYaml(FileUpload):
 
         raw_conf = open(self.masterdest).read()
         self.addCompleteLog(self.yaml, raw_conf)
-        conf = yaml.load(raw_conf)
+
+        # Make sure all interpolation have correct syntax
+        d = defaultdict(str)
+        try:
+            raw_conf % d
+        except ValueError as error:
+            if 'unsupported format character' in error.args[0]:
+                msg = error.args[0]
+                index = int(msg[msg.find('index') + 6:])
+                fmt = raw_conf[:index + 1]
+                line = fmt.count('\n') + 1
+                fmt = fmt[fmt.rfind('%'):]
+                self.addCompleteLog('stderr',
+                                    'Error in yaml file:\n  '
+                                    'Unsupported format character "%s" line '
+                                    '%d: "%s"' % (fmt[-1], line, fmt))
+                defer.returnValue(FAILURE)
+            else:
+                raise
+        except TypeError as error:
+            if 'not enough arguments' in error.args[0]:
+                self.addCompleteLog('stderr',
+                                    'Every format string needs a mapping key '
+                                    '("%(my_key)s" instead of "%s")')
+                defer.returnValue(FAILURE)
+            else:
+                raise
+
+        # Make sure yaml is properly formatted
+        try:
+            conf = yaml.load(raw_conf)
+        except yaml.YAMLError as error:
+            self.addCompleteLog('stderr', 'Error in yaml file:\n%s' % error)
+            defer.returnValue(FAILURE)
+
+        # Yaml should define a mapping
+        if not isinstance(conf, dict):
+            self.addCompleteLog('stderr',
+                                'Error in yaml file:\nShould define a mapping')
+            defer.returnValue(FAILURE)
 
         # Extract Eve API version (call str() to support buggy yaml files)
         if conf and 'version' in conf.keys():
