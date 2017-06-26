@@ -100,7 +100,9 @@ def bootstrap_builder(workers):
         property='product_version'))
 
     # Read conf from yaml file
-    bootstrap_factory.addStep(steps.ReadConfFromYaml())
+    bootstrap_factory.addStep(
+        steps.ReadConfFromYaml(name='read %s' % util.env.PROJECT_YAML,
+                               yaml=util.env.PROJECT_YAML))
 
     return BuilderConfig(
         name=util.env.BOOTSTRAP_BUILDER_NAME,
