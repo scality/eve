@@ -111,8 +111,6 @@ class ReadConfFromYaml(FileUpload):
                     'stderr', 'Branch <%s> not covered by yaml file' % branch)
                 defer.returnValue(CANCELLED)
 
-        self.setProperty('stage_name', stage_name, 'ReadConfFromYaml Step')
-
         self.build.addStepsAfterCurrentStep([
             GetApiVersion(eve_api_version=eve_api_version),
             steps.TriggerStages([
