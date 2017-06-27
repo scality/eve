@@ -113,4 +113,5 @@ def bootstrap_builder(workers):
             'artifacts_prefix': util.env.ARTIFACTS_PREFIX,
         },
         canStartBuild=eve_canStartBuild,
+        nextBuild=util.nextBootstrapBuild,
     )
