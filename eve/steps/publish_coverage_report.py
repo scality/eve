@@ -539,7 +539,37 @@ class PublishCoverageReport(_UploadCoverageReportsMixin, BuildStep):
         else:
             return SUCCESS
 
-    def start(self):
+    @defer.inlineCallbacks
+    def startUploadAndPublishReports(self, tmpdir):
+        publication = self.publication_cls(
+            self.repository, self.revision,
+            branch=self.branch,
+            name=self.uploadName,
+            flags=self.flags,
+            config_file=self.configFile,
+        )
+
+        (result, reports) = yield self.uploadCoverageReports(tmpdir)
+        if result in [SUCCESS, WARNINGS]:
+            (result, name, text) = yield publication.publish(
+                self.build, reports
+            )
+
+            if result == SUCCESS and \
+               publication.url_name and \
+               publication.url:
+                self.addURL(
+                    publication.url_name,
+                    publication.url
+                )
+
+            if name and text:
+                self.addCompleteLog(name, text)
+
+        defer.returnValue(result)
+
+    @defer.inlineCallbacks
+    def run(self):
         """Start the publish step.
 
         Mandatory arguments:
@@ -558,57 +588,25 @@ class PublishCoverageReport(_UploadCoverageReportsMixin, BuildStep):
         """
         result = self.prepare_publication()
         if result != SUCCESS:
-            return self.finished(result)
+            defer.returnValue(result)
 
         nsrcs = len(self.filepaths)
         self.descriptionDone = 'publishing {0:d} coverage {1}'.format(
             nsrcs, 'report' if nsrcs == 1 else 'reports'
         )
 
-        publication = self.publication_cls(
-            self.repository, self.revision,
-            branch=self.branch,
-            name=self.uploadName,
-            flags=self.flags,
-            config_file=self.configFile,
-        )
+        try:
+            results = yield self.startUploadAndPublishReports(self.tmpdir)
+        except Exception:  # pylint: disable=broad-except
+            results = FAILURE
 
-        @defer.inlineCallbacks
-        def startUploadAndPublishReports(tmpdir):
-            (result, reports) = yield self.uploadCoverageReports(tmpdir)
-            if result in [SUCCESS, WARNINGS]:
-                (result, name, text) = yield publication.publish(
-                    self.build, reports
-                )
+        log.msg('Removing temporary directory "{0}"...'.format(self.tmpdir))
 
-                if result == SUCCESS and \
-                   publication.url_name and \
-                   publication.url:
-                    self.addURL(
-                        publication.url_name,
-                        publication.url
-                    )
+        def warnOnError(_func, path, excinfo):
+            log.msg('Warning: Unable to remove "{0}": {1}'.format(
+                path, excinfo
+            ))
 
-                if name and text:
-                    self.addCompleteLog(name, text)
+        shutil.rmtree(self.tmpdir, onerror=warnOnError)
 
-            defer.returnValue(result)
-
-        finished = startUploadAndPublishReports(self.tmpdir)
-
-        def removeTmpdir(result, tmpdir):
-            log.msg('Removing temporary directory "{0}"...'.format(tmpdir))
-
-            def warnOnError(_func, path, excinfo):
-                log.msg('Warning: Unable to remove "{0}": {1}'.format(
-                    path, excinfo
-                ))
-
-            shutil.rmtree(tmpdir, onerror=warnOnError)
-            return result
-
-        # noqa: E501, pylint: disable=no-member
-        finished.addBoth(removeTmpdir, self.tmpdir)
-
-        finished.addCallback(self.finished)  # pylint: disable=no-member
-        finished.addErrback(self.failed)  # pylint: disable=no-member
+        defer.returnValue(results)
