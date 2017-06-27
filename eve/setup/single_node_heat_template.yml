@@ -53,44 +53,64 @@ resources:
         str_replace:
           template: |
                 #!/bin/bash
-                set -e
+                set -o xtrace -o errexit -o nounset -o pipefail
 
-                cat << 'EOF_WIS' > /tmp/worker_init_script.sh
+                # Add Google and OpenDNS nameservers
+                echo "nameserver 8.8.8.8" >> /etc/resolv.conf
+                echo "nameserver 208.67.222.222" >> /etc/resolv.conf
+
+                cat << 'EOF1' | head -c -1 > /tmp/worker_init_script.sh
                 $worker_init_script
-                EOF_WIS
+                EOF1
 
-                cat << 'EOF_WRS' > /tmp/worker_requirements_script.sh
+                cat << 'EOF2' | head -c -1 > /tmp/worker_requirements_script.sh
                 $worker_requirements_script
-                EOF_WRS
+                EOF2
 
-                bash /tmp/worker_init_script.sh $worker_version
+                if [ ! -s /tmp/worker_init_script.sh ] && [ ! -s /tmp/worker_requirements_script.sh ]
+                then
+                  echo "no code found in init.sh or requirements.sh, aborting"
+                  exit 1
+                fi
 
-                OS="$(lsb_release -is)"
+                if [ -s /tmp/worker_init_script.sh ] && [ -s /tmp/worker_requirements_script.sh ]
+                then
+                  echo "code found both in init.sh and requirements.sh, aborting"
+                  exit 1
+                fi
+
+                #install git, pip, setuptools (and needed dependencies)
                 if [ -f /etc/redhat-release ]
                 then
-                    echo "CentOS/RedHat";
-                    sudo yum -y install git gcc python-devel python-setuptools
-                    sudo easy_install pip
+                  echo "CentOS/RedHat";
+                  sudo yum -y install git gcc python-devel python-setuptools
+                  sudo easy_install pip
                 elif [ -f /etc/lsb-release ]
                 then
-                    echo "Debian/Ubuntu";
-                    sudo apt-get update
-                    sudo apt-get install --no-install-recommends --yes git python-pip python-twisted python-setuptools
+                  echo "Debian/Ubuntu";
+                  sudo apt-get update
+                  sudo apt-get install --no-install-recommends --yes git gcc python-pip python-setuptools
                 else
-                    echo "Unsupported Operating System";
-                    exit 1;
+                  echo "Unsupported Operating System";
+                  exit 1;
                 fi
 
                 #upgrade pip
                 sudo pip install --upgrade pip
 
-                # configure user eve
-                adduser -u 1042 --home /home/eve --disabled-password --gecos "" eve || echo "User eve already exists."
-                adduser eve sudo
-                echo "%sudo ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+                if [ -s /tmp/worker_init_script.sh ]
+                then
+                  bash /tmp/worker_init_script.sh $worker_version
+                else
+                  # configure user eve
+                  adduser -u 1042 --home /home/eve --disabled-password --gecos "" eve
+                  adduser eve sudo
+                  echo "%sudo ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
-                sudo pip install buildbot-worker==$worker_version
-                sudo -u eve bash /tmp/worker_requirements_script.sh
+                  sudo pip install twisted==16.4.0
+                  sudo pip install buildbot-worker==$worker_version
+                  sudo -Hu eve bash /tmp/worker_requirements_script.sh
+                fi
                 $start_worker_script
           params:
             "$worker_version": {get_param: worker_version}
