@@ -22,7 +22,7 @@ from StringIO import StringIO
 from xml.etree.ElementTree import ParseError
 
 from buildbot.process.buildstep import CommandMixin
-from buildbot.process.results import FAILURE, WARNINGS
+from buildbot.process.results import FAILURE, SUCCESS, WARNINGS
 from buildbot.steps.shell import ShellCommand
 from buildbot.steps.worker import CompositeStepMixin
 from twisted.internet import defer
@@ -54,6 +54,7 @@ class JUnitShellCommand(ShellCommand, CommandMixin, CompositeStepMixin):
     errors = 0
     skipped = 0
     total = 0
+    setup_warnings = False
     first_failure = None
     first_error = None
     name = 'junit_shell'
@@ -63,41 +64,44 @@ class JUnitShellCommand(ShellCommand, CommandMixin, CompositeStepMixin):
         super(JUnitShellCommand, self).__init__(*args, **kwargs)
         self.report_dir = report_dir
 
-    def fail_or_warning(self, cmd):
+    def evaluateCommand(self, cmd):  # NOQA flake8 to ignore camelCase
         """Return failure if the command failed, warning otherwise."""
         if cmd.didFail():
-            self.finished(FAILURE)
-        self.finished(WARNINGS)
+            return FAILURE
+
+        if self.setup_warnings:
+            return WARNINGS
+
+        if self.failures or self.errors:
+            return FAILURE
+
+        return SUCCESS
 
     @defer.inlineCallbacks
     def commandComplete(self, cmd):  # flake8: noqa
         if not self.report_dir:
-            self.fail_or_warning(cmd)
+            self.setup_warnings = True
             return
 
         has_path = yield self.pathExists(
             self.build.path_module.join(self.workdir, self.report_dir))
 
         if not has_path:
-            self.fail_or_warning(cmd)
+            self.setup_warnings = True
             return
 
         contents = yield self.runGlob(
             os.path.join(self.workdir, self.report_dir, '*.xml'))
 
         if not contents:
-            self.fail_or_warning(cmd)
+            self.setup_warnings = True
             return
 
         for report_file in contents:
             yield self.parse_report(report_file)
 
-        if self.failures or self.errors:
-            self.finished(FAILURE)
-            return
-
         if not self.total:
-            self.fail_or_warning(cmd)
+            self.setup_warnings = True
             return
 
     @defer.inlineCallbacks
