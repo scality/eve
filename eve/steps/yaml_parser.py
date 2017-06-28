@@ -88,13 +88,7 @@ class ReadConfFromYaml(FileUpload):
             else:
                 raise
         except TypeError as error:
-            if 'not enough arguments' in error.args[0]:
-                self.addCompleteLog('stderr',
-                                    'Every format string needs a mapping key '
-                                    '("%(my_key)s" instead of "%s")')
-                defer.returnValue(FAILURE)
-            else:
-                raise
+            pass
 
         # Make sure yaml is properly formatted
         try:

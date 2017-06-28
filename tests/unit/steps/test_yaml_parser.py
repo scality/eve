@@ -92,14 +92,6 @@ class TestReadConfFromYamlExecution(steps.BuildStepMixin, unittest.TestCase):
                            '"%(prop:revision)j"')
         return self.runStep()
 
-    def testFormatStringWithoutName(self):
-        self.setupStep(SingleCommandYaml('echo "%(prop:revision)s %s"'))
-        self.expectOutcome(FAILURE)
-        self.expectLogfile('stderr',
-                           'Every format string needs a mapping key '
-                           '("%(my_key)s" instead of "%s")')
-        return self.runStep()
-
     def testWrongYamlSyntax(self):
         self.setupStep(RawYaml('foo: bar: baz'))
         self.expectOutcome(FAILURE)
