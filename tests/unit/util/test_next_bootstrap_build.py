@@ -6,23 +6,23 @@ from collections import namedtuple
 from buildbot.plugins import util
 
 Source = namedtuple('MockSource', 'branch')
-Request = namedtuple('MockRequest', 'source')
+Request = namedtuple('MockRequest', 'sources')
 
 
 class TestNextBootstrapBuild(unittest.TestCase):
 
     def setUp(self):
         self.requests = [
-            Request(Source('development/4.3')),
-            Request(Source('feature/foo')),
-            Request(Source('feature/bar')),
-            Request(Source('development/5.1')),
-            Request(Source('bugfix/spam')),
-            Request(Source('development/5.1')),
-            Request(Source('feature/baz')),
-            Request(Source('bugfix/egg')),
-            Request(Source('bugfix/bacon')),
-            Request(Source('improvement/cool')),
+            Request({'': Source('development/4.3')}),
+            Request({'': Source('feature/foo')}),
+            Request({'': Source('feature/bar')}),
+            Request({'': Source('development/5.1')}),
+            Request({'': Source('bugfix/spam')}),
+            Request({'': Source('development/5.1')}),
+            Request({'': Source('feature/baz')}),
+            Request({'': Source('bugfix/egg')}),
+            Request({'': Source('bugfix/bacon')}),
+            Request({'': Source('improvement/cool')}),
         ]
         self.recall = util.env.get('LOW_PRIORITY_BRANCH', None)
         if not self.recall:

@@ -25,6 +25,6 @@ def nextBootstrapBuild(bldr, requests):
     if util.env.LOW_PRIORITY_BRANCH:
         for request in requests:
             if not re.match(util.env.LOW_PRIORITY_BRANCH,
-                            request.source.branch):
+                            request.sources[''].branch):
                 return request
     return requests[0]
