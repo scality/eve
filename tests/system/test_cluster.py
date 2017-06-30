@@ -58,7 +58,7 @@ class TestCluster(unittest.TestCase):
         cluster.sanity_check()
         cluster.stop()
 
-    def test3_simple_success(self):
+    def test_simple_success(self):
         """Test a simple build success on a cluster.
 
         Steps:
@@ -76,7 +76,6 @@ class TestCluster(unittest.TestCase):
         buildrequestid = cluster.api.getw(
             '/buildrequests', {'buildsetid': buildset.bsid})['buildrequestid']
 
-        print cluster.api.url
         bootstrap = cluster.api.getw('/builders', {
             'name': 'bootstrap',
         })['builderid']
@@ -128,7 +127,7 @@ class TestCluster(unittest.TestCase):
              u"property 'artifacts_public_url' set"),
             (u'get the API version', u'Set'),
             (u'prepare 1 stage(s)', u'finished'),
-            (u'trigger', u'triggered local-test_suffix')])
+            (u'trigger', u'triggered pre-merge')])
         local_steps = cluster.api.getw(
             '/builds/{}/steps'.format(local_build['buildid']),
             expected_count=3)
