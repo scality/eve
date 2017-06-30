@@ -315,7 +315,7 @@ class BitbucketBuildStatusPush(BaseBuildStatusPush, BuildStatusPushMixin):
         data = {
             'state': self.BITBUCKET_STATUS_CORRESP[result],
             'key': key,
-            'name': summary,
+            'name': summary[:255],
             'url': build['url'],
             'description': description + self.description_suffix,
         }
