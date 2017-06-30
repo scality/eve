@@ -57,19 +57,20 @@ def define_local_job(job_conf_file, workers, suffix):
 
     factory = BuildFactory()
 
-    logger.debug('creating a new build factory for local job %s' %
-                 job_conf_file)
+    logger.debug('creating a new build factory for local job {job}',
+                 job=job_conf_file)
     for step in conf['steps']:
         step_type, params = next(step.iteritems())
-        logger.debug('adding step %s with params: %s' % (step_type, params))
+        logger.debug('adding step {step} with params: {params}',
+                     step=step_type, params=params)
         factory.addStep(util.step_factory({}, step_type, **params))
 
     builder = conf.get('builder', {})
     builder_name = \
         builder.pop('name', '{0}-{1}'.format(default_name, suffix))
-    logger.debug('creating builder %s with params: %s' % (
-        builder_name, builder))
-    logger.debug('workers: %s' % [lw.name for lw in workers])
+    logger.debug('creating builder {builder} with params: {params}',
+                 builder=builder_name, params=builder)
+    logger.debug('workers: {workers}', workers=[lw.name for lw in workers])
     builder = BuilderConfig(
         name=builder_name,
         factory=factory,
@@ -82,8 +83,11 @@ def define_local_job(job_conf_file, workers, suffix):
     scheduler_name = \
         scheduler.pop(
             'name', '{0}-scheduler-{1}'.format(default_name, suffix))
-    logger.debug('creating scheduler %s (%s) with params: %s' % (
-        scheduler_name, _type, scheduler))
+    logger.debug('creating scheduler {scheduler} ({scheduler_type}) with '
+                 'params: {params}',
+                 scheduler=scheduler_name,
+                 scheduler_type=_type,
+                 params=scheduler)
     scheduler = _cls(
         name=scheduler_name,
         builderNames=[builder_name],
