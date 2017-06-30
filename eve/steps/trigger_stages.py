@@ -126,3 +126,9 @@ class ExecuteTriggerStages(Trigger):
                 'unimportant': False
             })
         defer.returnValue(scheds_and_props)
+
+    def getCurrentSummary(self):
+        if not self.triggeredNames:
+            return {u'step': u'running'}
+        return {u'step': u'triggered %s' % (
+            u', '.join(bo.properties['reason'] for bo in self._build_orders))}
