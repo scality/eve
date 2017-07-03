@@ -1,0 +1,57 @@
+#!/usr/bin/env python
+
+from __future__ import print_function
+import requests
+import sys
+from os import environ, execve
+from time import sleep
+
+def get_command(cmd_list):
+    """Extract command from a docker command line."""
+    for word in cmd_list:
+        if word.startswith('-'):
+            continue
+        return word
+    return ''
+
+def handle_remote(remote, cmd):
+    try:
+        response = requests.put(
+            'http://{host}/{cmd}'.format(host=remote, cmd=cmd),
+            data=' '.join(sys.argv))
+    except requests.ConnectionError:
+        sys.exit('docker service not available')
+
+    if response.status_code != 202:
+        sys.exit('command is not available')
+
+    task_url = response.headers['Location']
+
+    sleep(0.5)
+    for _ in range(300):
+        response = requests.get(task_url)
+        response.raise_for_status()
+        state = response.json()['state']
+        if state == 'SUCCESS':
+            print(response.json()['output'])
+            sys.exit(int(response.json()['retcode']))
+        elif state == 'FAILURE':
+            sys.exit('error')
+        sleep(1)
+
+    sys.exit('command timeout')
+
+def handle_local(client, server):
+    sys.argv[0] = client
+    execve(sys.argv[0], sys.argv, {'DOCKER_HOST': server})
+
+docker_server_hook = environ.get('DOCKER_HOST', 'localhost:2377')
+docker_server_real = environ.get('DOCKER_SERVER', 'localhost:2378')
+docker_local_client = environ.get('DOCKER_CLIENT', '/usr/bin/docker')
+cmd = get_command(sys.argv[1:])
+
+if cmd in ['kill', 'login', 'logout', 'logs',
+           'pull', 'push', 'run', 'inspect']:
+    handle_remote(docker_server_hook, cmd)
+else:
+    handle_local(docker_local_client, docker_server_real)
