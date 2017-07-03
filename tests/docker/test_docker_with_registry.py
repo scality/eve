@@ -121,7 +121,7 @@ class Tests(unittest.TestCase):
              (u'[ubuntu-xenial-ctxt_930a] build', u'Ran'),
              (u'[ubuntu-xenial-ctxt_930a] build retry', u'Ran (skipped)'),
              (u'[ubuntu-xenial-ctxt_930a] push', u'Ran'),
-             (u'trigger', u'triggered docker-test_suffix'),
+             (u'trigger', u'triggered pre-merge'),
         ]
 
         steps = self.cluster.api.getw(
@@ -184,7 +184,7 @@ class Tests(unittest.TestCase):
             (u'[ubuntu-xenial-ctxt_930a] build', u'Ran (skipped)'),
             (u'[ubuntu-xenial-ctxt_930a] build retry', u'Ran (skipped)'),
             (u'[ubuntu-xenial-ctxt_930a] push', u'Ran (skipped)'),
-            (u'trigger', u'triggered docker-test_suffix')]
+            (u'trigger', u'triggered pre-merge')]
 
         # do the same build one last time, but erase the local image first
         build = self.cluster.api.getw('/builds', {
@@ -241,4 +241,4 @@ class Tests(unittest.TestCase):
             (u'[ubuntu-xenial-ctxt_930a] build', u'Ran (skipped)'),
             (u'[ubuntu-xenial-ctxt_930a] build retry', u'Ran (skipped)'),
             (u'[ubuntu-xenial-ctxt_930a] push', u'Ran (skipped)'),
-            (u'trigger', u'triggered docker-test_suffix')]
+            (u'trigger', u'triggered pre-merge')]
