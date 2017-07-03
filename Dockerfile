@@ -18,6 +18,7 @@ RUN         apt-get update && \
 RUN pip install --upgrade pip
 
 RUN curl -sSL https://get.docker.com/ | sh
+COPY eve/services/docker_controller/docker /usr/local/bin/
 
 RUN mkdir /root/eve /root/gitconfig \
  && touch /root/gitconfig/gitconfig \
