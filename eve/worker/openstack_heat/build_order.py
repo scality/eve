@@ -50,6 +50,7 @@ class HeatOpenStackBuildOrder(util.BaseBuildOrder):
             init_script_contents = open(init_script).read()
 
         self.properties.update({
+            'worker_path': self._worker['path'],
             'init_script': init_script_contents,
             'requirements_script': requirements_script_contents,
             'openstack_image': self._worker.get('image', self.DEFAULT_IMAGE),
