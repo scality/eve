@@ -61,7 +61,7 @@ class HeatLatentWorker(AbstractLatentWorker):
             auth_url=os_auth_url,
             username=os_username,
             password=os_password,
-            project_id=os_project_id)
+            project_name=os_project_id)
 
         sess = session.Session(auth=auth)
         self.heat_client = heatclient.client.Client(
