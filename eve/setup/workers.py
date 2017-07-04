@@ -55,10 +55,14 @@ def docker_workers():
 
 
 START_WORKER_SCRIPT = """
-sudo -Hu eve \echo https://{githost_login}:{githost_pwd}@bitbucket.org \
-  > /home/eve/.git_credentials
-sudo -Hu eve echo https://{githost_login}:{githost_pwd}@github.com  \
-  >/home/eve/.git_credentials
+echo https://{githost_login}:{githost_pwd}@bitbucket.org \
+  >> /home/eve/.git_credentials
+echo https://{githost_login}:{githost_pwd}@github.com  \
+  >> /home/eve/.git_credentials
+chown eve.eve /home/eve/.git_credentials
+chmod 600 /home/eve/.git_credentials
+sudo -Hu eve git config --global \
+  credential.helper 'store --file=/home/eve/.git_credentials'
 sudo -Hu eve git config --global \
   url.https://bitbucket.org/.insteadOf git@bitbucket.org:
 sudo -Hu eve git config --global \
