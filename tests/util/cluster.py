@@ -77,6 +77,12 @@ class Cluster(object):
         for _ in range(backends):
             self.add_master('backend')
 
+    def __enter__(self):
+        return self.start()
+
+    def __exit__(self, type, value, traceback):
+        self.stop()
+
     def __repr__(self):
         return 'Cluster {}'.format(self.api.url)
 
