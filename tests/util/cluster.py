@@ -27,7 +27,6 @@ from tests.util.sqlite import Sqlite
 
 
 class Cluster(object):
-    cluster_count = 0
     database = None
     githost_class = GitHostMock
     db_class = Sqlite
