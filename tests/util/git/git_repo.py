@@ -78,6 +78,10 @@ class LocalGitRepo(object):
         return self
 
     @property
+    def revision(self):
+        return cmd('git rev-parse %s' % self.branch, cwd=self._dir).strip()
+
+    @property
     def loglines(self):
         """Return a list of loglines from the git log command.
 
