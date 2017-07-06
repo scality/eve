@@ -72,9 +72,7 @@ class TestCluster(unittest.TestCase):
                 '/buildrequests',
                 {'buildsetid': buildset.bsid})['buildrequestid']
 
-            bootstrap = cluster.api.getw('/builders', {
-                'name': 'bootstrap',
-            })['builderid']
+            bootstrap = cluster.api.get_builder('bootstrap')
 
             bootstrap_build = cluster.api.getw('/builds', {
                 'buildrequestid': buildrequestid,
