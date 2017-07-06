@@ -189,23 +189,25 @@ class BuildbotDataAPI(object):
                             (name, builder['builderid'], build_number))
         return step[0]
 
-    def webhook(self, git_repo):
+    def webhook(self, git_repo, revision=None):
         """Notify Eve's bitbucket hook of a new change."""
         commits = []
         for line in git_repo.loglines:
-            author, message, revision, _ = line.split('|')
+            author, message, rev, _ = line.split('|')
+            if not rev.startswith(revision):
+                continue
             commits.append({
                 'new': {
                     'type': 'branch',
                     'target': {
-                        'hash': revision,
+                        'hash': rev,
                         'author': {
                             'raw': author
                         },
                         'message': message,
                         'links': {
                             'html': {
-                                'href': revision
+                                'href': rev
                             }
                         },
                     },

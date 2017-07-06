@@ -182,8 +182,8 @@ class Cluster(object):
         """Return the API object that allows to interact with this cluster."""
         return self.first_master.api
 
-    def webhook(self, git_repo):
-        return self.api.webhook(git_repo)
+    def webhook(self, git_repo, revision=None):
+        return self.api.webhook(git_repo, revision)
 
     def sanity_check(self):
         """Check that the cluster has no unexpected error messages in logs."""
