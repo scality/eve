@@ -21,7 +21,7 @@ from __future__ import print_function
 
 import shutil
 import tempfile
-from os import mkdir
+from os import errno, mkdir
 from os.path import basename, join
 from uuid import uuid4
 
@@ -55,7 +55,11 @@ class LocalGitRepo(object):
         self.branch = branch
         cmd('git checkout -b %s' % branch, cwd=self._dir)
 
-        mkdir(join(self._dir, 'eve'))
+        try:
+            mkdir(join(self._dir, 'eve'))
+        except OSError as error:
+            if not error.errno == errno.EEXIST:
+                raise
         if isinstance(yaml, RawYaml):
             yaml.filedump(join(self._dir, 'eve', 'main.yml'))
         else:
