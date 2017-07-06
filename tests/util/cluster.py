@@ -34,7 +34,7 @@ class Cluster(object):
     buildbot_master_class = BuildbotMaster
     registry_class = None
 
-    def __init__(self, githost=None, use_registry=False):
+    def __init__(self, githost=None, use_registry=False, backends=1):
         """Configure and interact with a testing eve cluster.
 
         Args:
@@ -74,7 +74,8 @@ class Cluster(object):
         )
         self._masters[self._first_frontend._name] = self._first_frontend
 
-        self.add_master('backend')
+        for _ in range(backends):
+            self.add_master('backend')
 
     def __repr__(self):
         return 'Cluster {}'.format(self.api.url)
