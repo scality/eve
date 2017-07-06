@@ -96,7 +96,7 @@ class Tests(unittest.TestCase):
                                        for step in bootstrap_steps]
         assert step_names_and_descriptions == [
              (u'checkout git branch', u'update'),
-             (u'Cancel builds for commits that are not branch tips', u'CancelNonTipBuild'),  # noqa
+             (u'cancel builds for commits that are not branch tips', u'CancelNonTipBuild'),  # noqa
              (u'setting the master_builddir property', u'Set'),
              (u'check if any steps should currently be patched', u'finished (skipped)'),  # noqa
              (u'get the git host', u'Set'),
@@ -159,7 +159,7 @@ class Tests(unittest.TestCase):
                                        for step in bootstrap_steps]
         assert step_names_and_descriptions == [
             (u'checkout git branch', u'update'),
-            (u'Cancel builds for commits that are not branch tips', u'CancelNonTipBuild'),  # noqa
+            (u'cancel builds for commits that are not branch tips', u'CancelNonTipBuild'),  # noqa
             (u'setting the master_builddir property', u'Set'),
             (u'check if any steps should currently be patched', u'finished (skipped)'),  # noqa
             (u'get the git host', u'Set'),
@@ -216,7 +216,7 @@ class Tests(unittest.TestCase):
                                        for step in bootstrap_steps]
         assert step_names_and_descriptions == [
             (u'checkout git branch', u'update'),
-            (u'Cancel builds for commits that are not branch tips', u'CancelNonTipBuild'),  # noqa
+            (u'cancel builds for commits that are not branch tips', u'CancelNonTipBuild'),  # noqa
             (u'setting the master_builddir property', u'Set'),
             (u'check if any steps should currently be patched', u'finished (skipped)'),  # noqa
             (u'get the git host', u'Set'),

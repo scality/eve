@@ -25,6 +25,8 @@ from buildbot.steps.shell import ShellCommand
 class CancelCommand(ShellCommand):
     """Cancel a build according to result of command."""
 
+    name = 'CancelCommand'
+
     def commandComplete(self, cmd):
         if cmd.didFail():
             self.finished(CANCELLED)
@@ -36,6 +38,8 @@ class CancelCommand(ShellCommand):
 class CancelNonTipBuild(CancelCommand):
     """Cancel if the current revision is not the tip of the branch."""
 
+    name = 'CancelNonTipBuild'
+
     def __init__(self, **kwargs):
         super(CancelNonTipBuild, self).__init__(
             command=Interpolate(
@@ -44,17 +48,17 @@ class CancelNonTipBuild(CancelCommand):
                 '"%(prop:revision)s" ]'),
             descriptionDone='CancelNonTipBuild',
             hideStepIf=util.hideStepIfSuccess,
-            **kwargs
-        )
+            **kwargs)
 
 
 class CancelOldBuild(CancelCommand):
     """Cancel if the build is previous buildbot instance."""
 
+    name = 'CancelOldBuild'
+
     def __init__(self, **kwargs):
         # pylint: disable=anomalous-backslash-in-string
         super(CancelOldBuild, self).__init__(
-            name='prevent unuseful restarts',
             hideStepIf=util.hideStepIfSuccess,
             command=Interpolate(
                 '[ $(expr "{}" \< "%(prop:start_time)s") -eq 1 ]'.format(

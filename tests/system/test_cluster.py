@@ -19,7 +19,7 @@
 import os
 import unittest
 
-from buildbot.process.results import SUCCESS
+from buildbot.process.results import CANCELLED, SUCCESS
 from tests.util.cluster import Cluster
 from tests.util.yaml_factory import SingleCommandYaml
 
@@ -93,7 +93,7 @@ class TestCluster(unittest.TestCase):
                                            for step in bootstrap_steps]
             self.assertEqual(step_names_and_descriptions, [
                 (u'checkout git branch', u'update'),
-                (u'Cancel builds for commits that are not branch tips',
+                (u'cancel builds for commits that are not branch tips',
                  u'CancelNonTipBuild'),
                 (u'setting the master_builddir property', u'Set'),
                 (u'check if any steps should currently be patched',
@@ -187,3 +187,14 @@ class TestCluster(unittest.TestCase):
                 0].buildrequest.build
             step = child_build.steps[-1]
             self.assertIn('The yellow submarine', step.rawlog('stdio'))
+
+    def test_cancel_non_tip_build(self):
+        with Cluster() as cluster:
+            repo = cluster.clone()
+            repo.push(branch='spam', yaml=SingleCommandYaml('exit 0'))
+            old_revision = repo.revision
+            repo.push(branch='spam', yaml=SingleCommandYaml('exit 1'))
+            cluster.webhook(repo, old_revision)
+
+            build = cluster.api.get_finished_build()
+            self.assertEqual(build['results'], CANCELLED)

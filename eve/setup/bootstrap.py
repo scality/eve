@@ -78,7 +78,8 @@ def bootstrap_builder(workers):
             haltOnFailure=True,
             config=git_config))
 
-    bootstrap_factory.addStep(steps.CancelNonTipBuild())
+    bootstrap_factory.addStep(steps.CancelNonTipBuild(
+        name='cancel builds for commits that are not branch tips'))
 
     bootstrap_factory.addStep(
         SetProperty(
