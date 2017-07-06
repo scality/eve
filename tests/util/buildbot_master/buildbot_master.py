@@ -78,6 +78,7 @@ class BuildbotMaster(Daemon):
             GIT_OWNER='repo_owner',
             GIT_REPO=git_repo,
             GIT_SLUG='test',
+            HIDE_INTERNAL_STEPS='0',
             HTTP_PORT=str(self.http_port),
             MASTER_FQDN=master_fqdn,
             MASTER_MODE=mode,
