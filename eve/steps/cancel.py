@@ -38,10 +38,10 @@ class CancelNonTipBuild(CancelCommand):
 
     def __init__(self, **kwargs):
         super(CancelNonTipBuild, self).__init__(
-            name='Cancel builds for commits that are not branch tips',
-            command=Interpolate('[ "%(prop:revision)s" = "" ]'
-                                '|| [ "$(git rev-list -1 %(prop:branch)s)"'
-                                ' = "%(prop:revision)s" ]'),
+            command=Interpolate(
+                '[ "%(prop:revision)s" = "" ] '
+                '|| [ "$(git ls-remote origin %(prop:branch)s | cut -f1)" = '
+                '"%(prop:revision)s" ]'),
             descriptionDone='CancelNonTipBuild',
             hideStepIf=util.hideStepIfSuccess,
             **kwargs
@@ -59,4 +59,4 @@ class CancelOldBuild(CancelCommand):
             command=Interpolate(
                 '[ $(expr "{}" \< "%(prop:start_time)s") -eq 1 ]'.format(
                     util.env.MASTER_START_TIME)),
-        )
+            **kwargs)
