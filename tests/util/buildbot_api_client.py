@@ -163,6 +163,17 @@ class BuildbotDataAPI(object):
                             'builder=%s, branch=%s' % (builder, branch))
         return the_build
 
+    def get_finished_build(self, builder='bootstrap', branch=None, timeout=60):
+        for _ in range(timeout):
+            build = self.get_build(builder, branch, timeout)
+            if build['results'] is None:
+                time.sleep(1)
+            else:
+                break
+        else:
+            raise Exception('Timeout while waiting for build to finish')
+        return build
+
     def get_build_steps(self, build):
         """Return steps from specified build."""
         return self.get('/builders/%d/builds/%d/steps' %
