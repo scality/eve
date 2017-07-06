@@ -23,6 +23,7 @@ import shutil
 import tempfile
 from os import errno, mkdir
 from os.path import basename, join
+from subprocess import CalledProcessError
 from uuid import uuid4
 
 from tests.util.cmd import cmd
@@ -53,7 +54,10 @@ class LocalGitRepo(object):
             yaml = SingleCommandYaml()
 
         self.branch = branch
-        cmd('git checkout -b %s' % branch, cwd=self._dir)
+        try:
+            cmd('git checkout %s' % branch, cwd=self._dir)
+        except CalledProcessError:
+            cmd('git checkout -b %s' % branch, cwd=self._dir)
 
         try:
             mkdir(join(self._dir, 'eve'))
