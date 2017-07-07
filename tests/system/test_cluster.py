@@ -65,30 +65,13 @@ class TestCluster(unittest.TestCase):
         """
         with Cluster() as cluster:
             local_repo = cluster.clone()
-
             local_repo.push()
-            buildset = cluster.api.force(branch=local_repo.branch)
-            buildrequestid = cluster.api.getw(
-                '/buildrequests',
-                {'buildsetid': buildset.bsid})['buildrequestid']
+            cluster.api.force(branch=local_repo.branch)
 
-            bootstrap = cluster.api.get_builder('bootstrap')
-
-            bootstrap_build = cluster.api.getw('/builds', {
-                'buildrequestid': buildrequestid,
-                'builderid': bootstrap,
-                'results': SUCCESS
-            })
-            local_builder = cluster.api.getw(
-                '/builders', {'name': 'local-test_suffix'})['builderid']
-
-            local_build = cluster.api.getw(
-                '/builds', {'builderid': local_builder,
-                            'results': SUCCESS})
-            bootstrap_steps = cluster.api.getw(
-                '/builds/{}/steps'.format(bootstrap_build['buildid']),
-                expected_count=21)
-
+            # Check bootstrap
+            bootstrap_build = cluster.api.get_finished_build()
+            self.assertEqual(bootstrap_build['results'], SUCCESS)
+            bootstrap_steps = cluster.api.get_build_steps(bootstrap_build)
             step_names_and_descriptions = [(step['name'], step['state_string'])
                                            for step in bootstrap_steps]
             self.assertEqual(step_names_and_descriptions, [
@@ -122,16 +105,20 @@ class TestCluster(unittest.TestCase):
                 (u'get the API version', u'Set'),
                 (u'prepare 1 stage(s)', u'finished'),
                 (u'trigger', u'triggered pre-merge')])
-            local_steps = cluster.api.getw(
-                '/builds/{}/steps'.format(local_build['buildid']),
-                expected_count=3)
+
+            # Check pre-merge
+            premerge_build = cluster.api.get_finished_build(
+                'local-test_suffix')
+            self.assertEqual(premerge_build['results'], SUCCESS)
+            premerge_steps = cluster.api.get_build_steps(premerge_build)
             step_names_and_descriptions = [(step['name'], step['state_string'])
-                                           for step in local_steps]
+                                           for step in premerge_steps]
             self.assertEqual(step_names_and_descriptions, [
                 (u'prevent unuseful restarts', u"'[ $(expr ...'"),
                 (u'extract steps from yaml', u'finished'),
                 (u'shell', u"'exit 0'")])
 
+            # Check build properties
             bootstrap_properties = cluster.api.getw(
                 '/builds/{}'.format(bootstrap_build['buildid']),
                 get_params={'property': '*'})

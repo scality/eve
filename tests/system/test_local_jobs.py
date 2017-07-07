@@ -86,13 +86,11 @@ class TestLocalJobs(unittest.TestCase):
 
         with cluster:
             cluster.sanity_check()
-            scheduler = cluster.api.getw(
-                '/schedulers',
-                get_params={'name': PERIODIC_LOCAL_JOB['scheduler']['name']})
+            scheduler = cluster.api.get_scheduler(
+                PERIODIC_LOCAL_JOB['scheduler']['name'])
             self.assertTrue(scheduler['enabled'])
-            builder = cluster.api.getw(
-                '/builders',
-                get_params={'name': PERIODIC_LOCAL_JOB['builder']['name']})
+            builder = cluster.api.get_builder(
+                PERIODIC_LOCAL_JOB['builder']['name'])
             self.assertEqual(builder['description'],
                              PERIODIC_LOCAL_JOB['builder']['description'])
 
@@ -178,12 +176,10 @@ class TestLocalJobs(unittest.TestCase):
 
         with cluster:
             cluster.sanity_check()
-            scheduler = cluster.api.getw(
-                '/schedulers',
-                get_params={'name': NIGHTLY_LOCAL_JOB['scheduler']['name']})
+            scheduler = cluster.api.get_scheduler(
+                NIGHTLY_LOCAL_JOB['scheduler']['name'])
             self.assertTrue(scheduler['enabled'])
-            builder = cluster.api.getw(
-                '/builders',
-                get_params={'name': NIGHTLY_LOCAL_JOB['builder']['name']})
+            builder = cluster.api.get_builder(
+                NIGHTLY_LOCAL_JOB['builder']['name'])
             self.assertEqual(builder['description'],
                              NIGHTLY_LOCAL_JOB['builder']['description'])
