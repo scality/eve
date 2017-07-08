@@ -24,7 +24,7 @@ from buildbot.steps.shell import ShellCommand
 
 def triggerable_builder(builder_name, workers):
     factory = BuildFactory()
-    factory.addStep(steps.CancelOldBuild())
+    factory.addStep(steps.CancelOldBuild(name='prevent unuseful restarts'))
 
     # customize global Git conf to hit on docker cache
     if (util.env.GITCACHE_IN_USE and

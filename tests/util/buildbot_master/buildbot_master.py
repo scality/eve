@@ -69,29 +69,30 @@ class BuildbotMaster(Daemon):
         self.vault = vault
 
         self.conf = dict(
-            MASTER_NAME=name,
-            HTTP_PORT='tcp:%s' % str(self.http_port),
-            PB_PORT=str(self.get_free_port()),
-            TRY_PORT=str(self.get_free_port()),
-            EXTERNAL_URL=str(self.external_url),
-            MASTER_FQDN=master_fqdn,
-            WORKER_SUFFIX='test-eve',
-            MAX_LOCAL_WORKERS=str(max_local_workers),
-            MASTER_MODE=mode,
-            WAMP_REALM='realm1',
             ARTIFACTS_URL='None',
             CLOUDFILES_URL='None',
+            DB_URL=self.db_url,
             DOCKER_API_VERSION='1.25',
+            EXTERNAL_URL=str(self.external_url),
             GIT_HOST='mock',
-            GIT_SLUG='test',
             GIT_OWNER='repo_owner',
             GIT_REPO=git_repo,
-            # GIT_REPO='git@mock:repo_owner/test.git',
+            GIT_SLUG='test',
+            HIDE_INTERNAL_STEPS='0',
+            HTTP_PORT='tcp:%s' % str(self.http_port),
+            MASTER_FQDN=master_fqdn,
+            MASTER_MODE=mode,
+            MASTER_NAME=name,
+            MAX_LOCAL_WORKERS=str(max_local_workers),
+            PB_PORT=str(self.get_free_port()),
             PROJECT_URL='www.example.com',
             PROJECT_YAML='eve/main.yml',
             SECRET_ARTIFACT_CREDS='None',
             SUFFIX='test_suffix',
-            DB_URL=self.db_url, )
+            TRY_PORT=str(self.get_free_port()),
+            WAMP_REALM='realm1',
+            WORKER_SUFFIX='test-eve',
+        )
 
         if registry:
             self.conf['DOCKER_REGISTRY_URL'] = 'localhost:{}'.format(

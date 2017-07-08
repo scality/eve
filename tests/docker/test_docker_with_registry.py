@@ -58,7 +58,6 @@ class Tests(unittest.TestCase):
 
         """
         local_repo = self.cluster.clone()
-
         local_repo.push(
             yaml=SingleCommandYaml(
                 'exit 0',
@@ -69,73 +68,56 @@ class Tests(unittest.TestCase):
                     join(__file__, pardir, 'contexts',
                          'ubuntu-xenial-ctxt'))
             ])
-        buildset = self.cluster.api.force(branch=local_repo.branch)
-        buildrequestid = self.cluster.api.getw(
-            '/buildrequests', {'buildsetid': buildset.bsid})['buildrequestid']
+        self.cluster.api.force(branch=local_repo.branch)
 
-        bootstrap = self.cluster.api.getw('/builders', {
-            'name': 'bootstrap',
-        })['builderid']
-
-        bootstrap_build = self.cluster.api.getw('/builds', {
-            'buildrequestid': buildrequestid,
-            'builderid': bootstrap,
-            'results': SUCCESS
-        })
-        builder = self.cluster.api.getw(
-            '/builders', {'name': 'docker-test_suffix'})['builderid']
-
-        build = self.cluster.api.getw(
-            '/builds', {'builderid': builder,
-                        'results': SUCCESS})
-        bootstrap_steps = self.cluster.api.getw(
-            '/builds/{}/steps'.format(bootstrap_build['buildid']),
-            expected_count=27)
-
+        # Check bootstrap
+        bootstrap = self.cluster.api.get_builder('bootstrap')
+        bootstrap_build = self.cluster.api.get_finished_build('bootstrap')
+        self.assertEqual(bootstrap_build['results'], SUCCESS)
+        bootstrap_steps = self.cluster.api.get_build_steps(bootstrap_build)
         step_names_and_descriptions = [(step['name'], step['state_string'])
                                        for step in bootstrap_steps]
-        assert step_names_and_descriptions == [
-             (u'checkout git branch', u'update'),
-             (u'Cancel builds for commits that are not branch tips', u'CancelNonTipBuild'),  # noqa
-             (u'setting the master_builddir property', u'Set'),
-             (u'check if any steps should currently be patched', u'finished (skipped)'),  # noqa
-             (u'get the git host', u'Set'),
-             (u'get the git owner', u'Set'),
-             (u'get the repository name', u'Set'),
-             (u'get the product version', u"property 'product_version' set"),  # noqa
-             (u'read eve/main.yml', u'uploading main.yml'),
-             (u'get the commit short_revision', u"property 'commit_short_revision' set"),  # noqa
-             (u'get the commit timestamp', u"property 'commit_timestamp' set"),
-             (u'get the pipeline name', u'Set'),
-             (u'get the b4nb', u'Set'),
-             (u'set the artifacts base name', u"property 'artifacts_base_name' set"),  # noqa
-             (u'set the artifacts name', u"property 'artifacts_name' set"),
-             (u'set the artifacts local reverse proxy', u'Set'),
-             (u'set the artifacts private url', u"property 'artifacts_private_url' set"),  # noqa
-             (u'set the artifacts public url', u"property 'artifacts_public_url' set"),  # noqa
-             (u'get the API version', u'Set'),
-             (u'prepare 1 stage(s)', u'finished'),
-             (u'[ubuntu-xenial-ctxt_930a] fingerprint', u"property 'fingerprint_ubuntu-xenial-ctxt_930a' set"),  # noqa
-             (u'[ubuntu-xenial-ctxt_930a] look up', u"property 'exists_ubuntu-xenial-ctxt_930a' set (failure)"),  # noqa
-             (u'[ubuntu-xenial-ctxt_930a] pull', u"property 'exists_ubuntu-xenial-ctxt_930a' set (failure)"),  # noqa
-             (u'[ubuntu-xenial-ctxt_930a] build', u'Ran'),
-             (u'[ubuntu-xenial-ctxt_930a] build retry', u'Ran (skipped)'),
-             (u'[ubuntu-xenial-ctxt_930a] push', u'Ran'),
-             (u'trigger', u'triggered pre-merge'),
-        ]
+        self.assertEqual(step_names_and_descriptions, [
+            (u'checkout git branch', u'update'),
+            (u'cancel builds for commits that are not branch tips', u'CancelNonTipBuild'),  # noqa
+            (u'setting the master_builddir property', u'Set'),
+            (u'check if any steps should currently be patched', u'finished (skipped)'),  # noqa
+            (u'get the git host', u'Set'),
+            (u'get the git owner', u'Set'),
+            (u'get the repository name', u'Set'),
+            (u'get the product version', u"property 'product_version' set"),  # noqa
+            (u'read eve/main.yml', u'uploading main.yml'),
+            (u'get the commit short_revision', u"property 'commit_short_revision' set"),  # noqa
+            (u'get the commit timestamp', u"property 'commit_timestamp' set"),
+            (u'get the pipeline name', u'Set'),
+            (u'get the b4nb', u'Set'),
+            (u'set the artifacts base name', u"property 'artifacts_base_name' set"),  # noqa
+            (u'set the artifacts name', u"property 'artifacts_name' set"),
+            (u'set the artifacts local reverse proxy', u'Set'),
+            (u'set the artifacts private url', u"property 'artifacts_private_url' set"),  # noqa
+            (u'set the artifacts public url', u"property 'artifacts_public_url' set"),  # noqa
+            (u'get the API version', u'Set'),
+            (u'prepare 1 stage(s)', u'finished'),
+            (u'[ubuntu-xenial-ctxt_930a] fingerprint', u"property 'fingerprint_ubuntu-xenial-ctxt_930a' set"),  # noqa
+            (u'[ubuntu-xenial-ctxt_930a] look up', u"property 'exists_ubuntu-xenial-ctxt_930a' set (failure)"),  # noqa
+            (u'[ubuntu-xenial-ctxt_930a] pull', u"property 'exists_ubuntu-xenial-ctxt_930a' set (failure)"),  # noqa
+            (u'[ubuntu-xenial-ctxt_930a] build', u'Ran'),
+            (u'[ubuntu-xenial-ctxt_930a] build retry', u'Ran (skipped)'),
+            (u'[ubuntu-xenial-ctxt_930a] push', u'Ran'),
+            (u'trigger', u'triggered pre-merge')])
 
-        steps = self.cluster.api.getw(
-            '/builds/{}/steps'.format(build['buildid']),
-            expected_count=3)
+        # Check build
+        build = self.cluster.api.get_finished_build('docker-test_suffix')
+        self.assertEqual(build['results'], SUCCESS)
+        steps = self.cluster.api.get_build_steps(build)
         step_names_and_descriptions = [(step['name'], step['state_string'])
                                        for step in steps]
-        assert step_names_and_descriptions == \
-            [
-                (u'prevent unuseful restarts', u"'[ $(expr ...'"),
-                (u'extract steps from yaml', u'finished'),
-                (u'shell', u"'exit 0'")
-            ]
+        self.assertEqual(step_names_and_descriptions, [
+            (u'prevent unuseful restarts', u"'[ $(expr ...'"),
+            (u'extract steps from yaml', u'finished'),
+            (u'shell', u"'exit 0'")])
 
+        # Check properties
         bootstrap_properties = self.cluster.api.getw(
             '/builds/{}'.format(bootstrap_build['buildid']),
             get_params={'property': '*'})
@@ -148,18 +130,15 @@ class Tests(unittest.TestCase):
 
         bootstrap_build = self.cluster.api.getw('/builds', {
             'buildrequestid': buildrequestid,
-            'builderid': bootstrap,
+            'builderid': bootstrap['builderid'],
             'results': SUCCESS
         })
-        bootstrap_steps = self.cluster.api.getw(
-            '/builds/{}/steps'.format(bootstrap_build['buildid']),
-            expected_count=27)
-
+        bootstrap_steps = self.cluster.api.get_build_steps(bootstrap_build)
         step_names_and_descriptions = [(step['name'], step['state_string'])
                                        for step in bootstrap_steps]
-        assert step_names_and_descriptions == [
+        self.assertEqual(step_names_and_descriptions, [
             (u'checkout git branch', u'update'),
-            (u'Cancel builds for commits that are not branch tips', u'CancelNonTipBuild'),  # noqa
+            (u'cancel builds for commits that are not branch tips', u'CancelNonTipBuild'),  # noqa
             (u'setting the master_builddir property', u'Set'),
             (u'check if any steps should currently be patched', u'finished (skipped)'),  # noqa
             (u'get the git host', u'Set'),
@@ -184,11 +163,11 @@ class Tests(unittest.TestCase):
             (u'[ubuntu-xenial-ctxt_930a] build', u'Ran (skipped)'),
             (u'[ubuntu-xenial-ctxt_930a] build retry', u'Ran (skipped)'),
             (u'[ubuntu-xenial-ctxt_930a] push', u'Ran (skipped)'),
-            (u'trigger', u'triggered pre-merge')]
+            (u'trigger', u'triggered pre-merge')])
 
         # do the same build one last time, but erase the local image first
         build = self.cluster.api.getw('/builds', {
-            'builderid': builder,
+            'builderid': build['builderid'],
             'results': SUCCESS},
             expected_count=2
         )[1]
@@ -205,18 +184,15 @@ class Tests(unittest.TestCase):
 
         bootstrap_build = self.cluster.api.getw('/builds', {
             'buildrequestid': buildrequestid,
-            'builderid': bootstrap,
+            'builderid': bootstrap['builderid'],
             'results': SUCCESS
         })
-        bootstrap_steps = self.cluster.api.getw(
-            '/builds/{}/steps'.format(bootstrap_build['buildid']),
-            expected_count=27)
-
+        bootstrap_steps = self.cluster.api.get_build_steps(bootstrap_build)
         step_names_and_descriptions = [(step['name'], step['state_string'])
                                        for step in bootstrap_steps]
-        assert step_names_and_descriptions == [
+        self.assertEqual(step_names_and_descriptions, [
             (u'checkout git branch', u'update'),
-            (u'Cancel builds for commits that are not branch tips', u'CancelNonTipBuild'),  # noqa
+            (u'cancel builds for commits that are not branch tips', u'CancelNonTipBuild'),  # noqa
             (u'setting the master_builddir property', u'Set'),
             (u'check if any steps should currently be patched', u'finished (skipped)'),  # noqa
             (u'get the git host', u'Set'),
@@ -241,4 +217,4 @@ class Tests(unittest.TestCase):
             (u'[ubuntu-xenial-ctxt_930a] build', u'Ran (skipped)'),
             (u'[ubuntu-xenial-ctxt_930a] build retry', u'Ran (skipped)'),
             (u'[ubuntu-xenial-ctxt_930a] push', u'Ran (skipped)'),
-            (u'trigger', u'triggered pre-merge')]
+            (u'trigger', u'triggered pre-merge')])

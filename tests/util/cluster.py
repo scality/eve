@@ -27,7 +27,6 @@ from tests.util.sqlite import Sqlite
 
 
 class Cluster(object):
-    cluster_count = 0
     database = None
     githost_class = GitHostMock
     db_class = Sqlite
@@ -35,7 +34,7 @@ class Cluster(object):
     buildbot_master_class = BuildbotMaster
     registry_class = None
 
-    def __init__(self, githost=None, use_registry=False):
+    def __init__(self, githost=None, use_registry=False, backends=1):
         """Configure and interact with a testing eve cluster.
 
         Args:
@@ -75,7 +74,14 @@ class Cluster(object):
         )
         self._masters[self._first_frontend._name] = self._first_frontend
 
-        self.add_master('backend')
+        for _ in range(backends):
+            self.add_master('backend')
+
+    def __enter__(self):
+        return self.start()
+
+    def __exit__(self, type, value, traceback):
+        self.stop()
 
     def __repr__(self):
         return 'Cluster {}'.format(self.api.url)
@@ -182,8 +188,8 @@ class Cluster(object):
         """Return the API object that allows to interact with this cluster."""
         return self.first_master.api
 
-    def webhook(self, git_repo):
-        return self.api.webhook(git_repo)
+    def webhook(self, git_repo, revision=None):
+        return self.api.webhook(git_repo, revision)
 
     def sanity_check(self):
         """Check that the cluster has no unexpected error messages in logs."""

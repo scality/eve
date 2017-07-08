@@ -21,8 +21,9 @@ from __future__ import print_function
 
 import shutil
 import tempfile
-from os import mkdir
+from os import errno, mkdir
 from os.path import basename, join
+from subprocess import CalledProcessError
 from uuid import uuid4
 
 from tests.util.cmd import cmd
@@ -53,9 +54,16 @@ class LocalGitRepo(object):
             yaml = SingleCommandYaml()
 
         self.branch = branch
-        cmd('git checkout -b %s' % branch, cwd=self._dir)
+        try:
+            cmd('git checkout %s' % branch, cwd=self._dir)
+        except CalledProcessError:
+            cmd('git checkout -b %s' % branch, cwd=self._dir)
 
-        mkdir(join(self._dir, 'eve'))
+        try:
+            mkdir(join(self._dir, 'eve'))
+        except OSError as error:
+            if not error.errno == errno.EEXIST:
+                raise
         if isinstance(yaml, RawYaml):
             yaml.filedump(join(self._dir, 'eve', 'main.yml'))
         else:
@@ -68,6 +76,10 @@ class LocalGitRepo(object):
         cmd('git commit -m "add yaml file"', cwd=self._dir)
         cmd('git push -u origin HEAD:%s' % branch, cwd=self._dir)
         return self
+
+    @property
+    def revision(self):
+        return cmd('git rev-parse %s' % self.branch, cwd=self._dir).strip()
 
     @property
     def loglines(self):

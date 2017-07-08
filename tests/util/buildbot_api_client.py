@@ -129,31 +129,27 @@ class BuildbotDataAPI(object):
         raise Exception('The route {} exists but never reached the expected '
                         'count'.format(self.api_url + route))
 
-    def get_builder(self, name):
+    def get_builder(self, name='bootstrap'):
         """Get builder named name from the Buildbot's API."""
-        return self.get('/builders?name=%s' % name)['builders'][0]
+        return self.get('/builders', {'name': name})[0]
 
     def get_scheduler(self, name):
         """Get scheduler named name from the Buildbot's API."""
-        return self.get('/schedulers?name=%s' % name)['schedulers'][0]
+        return self.get('/schedulers', {'name': name})[0]
 
     def get_builds(self, builder='bootstrap'):
         builder = self.get_builder(builder)
-        return self.get('/builds?'
-                        'property=*'
-                        '&builderid=%d' % (builder['builderid']))['builds']
+        return self.get('/builders/%d/builds' % builder['builderid'])
 
-    def get_build(self, builder='boostrap', branch=None):
+    def get_build(self, builder='boostrap', branch=None, timeout=10):
         """Wait for build to start and return its infos."""
         the_build = None
-        for _ in range(60):
+        for _ in range(timeout):
             if the_build:
                 break
-            builds = self.get_builds(builder=builder)
-            the_build = None
+            builds = self.get_builds(builder=builder) or []
             for build in builds:
-                prop_branch = build['properties'].get('/branch')
-                print(branch, prop_branch)
+                prop_branch = build['properties'].get('branch')
                 if not branch or (prop_branch and
                                   str(prop_branch[0]) == branch):
                     the_build = build
@@ -167,45 +163,49 @@ class BuildbotDataAPI(object):
                             'builder=%s, branch=%s' % (builder, branch))
         return the_build
 
-    def get_build_steps(self, builder='bootstrap', build_number=1):
-        """Return steps from specified builder and build."""
-        builder = self.get_builder(builder)
-        try:
-            return self.get('builders/%d/builds/%d/steps' %
-                            (builder['builderid'], build_number))['steps']
-        except KeyError:
-            raise Exception('unable to find build steps, '
-                            'builderid=%d, build_number=%d' %
-                            (builder['builderid'], build_number))
+    def get_finished_build(self, builder='bootstrap', branch=None, timeout=60):
+        for _ in range(timeout):
+            build = self.get_build(builder, branch, timeout)
+            if build['results'] is None:
+                time.sleep(1)
+            else:
+                break
+        else:
+            raise Exception('Timeout while waiting for build to finish')
+        return build
 
-    def get_step(self, name, builder='bootstrap', build_number=1):
+    def get_build_steps(self, build):
+        """Return steps from specified build."""
+        return self.get('/builders/%d/builds/%d/steps' %
+                        (build['builderid'], build['number']))
+
+    def get_step(self, name, build):
         """Return matching step from specified builder and build number."""
-        steps = self.get_build_steps(
-            builder=builder, build_number=build_number)
+        steps = self.get_build_steps(build)
         step = [s for s in steps if s["name"] == name]
         if not step:
-            raise Exception('unable to find build step %r, '
-                            'builderid=%d, build_number=%d' %
-                            (name, builder['builderid'], build_number))
+            raise Exception('unable to find build step with this name')
         return step[0]
 
-    def webhook(self, git_repo):
+    def webhook(self, git_repo, revision=None):
         """Notify Eve's bitbucket hook of a new change."""
         commits = []
         for line in git_repo.loglines:
-            author, message, revision, _ = line.split('|')
+            author, message, rev, _ = line.split('|')
+            if not rev.startswith(revision):
+                continue
             commits.append({
                 'new': {
                     'type': 'branch',
                     'target': {
-                        'hash': revision,
+                        'hash': rev,
                         'author': {
                             'raw': author
                         },
                         'message': message,
                         'links': {
                             'html': {
-                                'href': revision
+                                'href': rev
                             }
                         },
                     },

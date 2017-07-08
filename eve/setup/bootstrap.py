@@ -56,7 +56,8 @@ def bootstrap_builder(workers):
             hideStepIf=util.hideStepIfSuccess,
             haltOnFailure=True))
 
-    bootstrap_factory.addStep(steps.CancelNonTipBuild())
+    bootstrap_factory.addStep(steps.CancelNonTipBuild(
+        name='cancel builds for commits that are not branch tips'))
 
     bootstrap_factory.addStep(
         SetProperty(
