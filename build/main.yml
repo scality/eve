@@ -14,7 +14,7 @@ stages:
         - '/home/eve/workspace'
     steps:
       - TriggerStages:
-          name: trigger local tests and remote tests simulateneously
+          name: trigger local tests and remote tests simultaneously
           stage_names:
             - local tests
             - docker tests
