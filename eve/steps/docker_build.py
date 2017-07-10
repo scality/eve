@@ -161,7 +161,9 @@ class DockerComputeImageFingerprint(MasterShellCommand):
         kwargs.setdefault('name',
                           '[{0}] fingerprint'.format(label)[:49])
         self.label = label
-        command = 'tar -c --mtime 0 . | sha256sum | cut -f 1 -d " "'
+        command = 'tar -c --mtime="1990-02-11 00:00Z" --group=0 ' \
+                  '--owner=0 --numeric-owner --sort=name --mode=0 . ' \
+                  '| sha256sum | cut -f 1 -d " "'
         super(DockerComputeImageFingerprint, self).__init__(
             command=command, workdir=context_dir, **kwargs
         )
