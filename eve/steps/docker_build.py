@@ -18,8 +18,8 @@
 """All docker build related steps."""
 
 from buildbot.locks import MasterLock
-from buildbot.plugins import steps
-from buildbot.process.results import FAILURE
+from buildbot.process import logobserver
+from buildbot.process.results import FAILURE, SUCCESS
 from buildbot.steps.master import MasterShellCommand
 from twisted.internet import defer
 
@@ -101,7 +101,7 @@ class DockerBuild(MasterShellCommand):
                 (self.is_retry) == (other.is_retry))
 
 
-class DockerCheckLocalImage(steps.SetPropertyFromCommand):
+class DockerCheckLocalImage(MasterShellCommand):
     """Check for existence of a Docker image locally.
 
     Look up the fingerprint of given image in local images, and sets
@@ -119,20 +119,32 @@ class DockerCheckLocalImage(steps.SetPropertyFromCommand):
 
     def __init__(self, label, image, **kwargs):
         kwargs.setdefault('name', '[{0}] look up'.format(label)[:49])
-        kwargs.setdefault('flunkOnFailure', False)
+        kwargs.setdefault('locks', []).append(
+            DOCKER_BUILD_LOCK.access('exclusive')
+        )
         self.label = label
         command = ['docker', 'image', 'inspect', image]
         super(DockerCheckLocalImage, self).__init__(
             command=command,
-            extract_fn=self.extract_fn,
-            includeStdout=False,
             **kwargs)
 
-    def extract_fn(self, rc, stdout, stderr):
-        return {'exists_{0}'.format(self.label): rc == 0}
+    def isNewStyle(self):  # flake8: noqa
+        # needed because we redefine `run` below
+        return False
+
+    @defer.inlineCallbacks
+    def run(self):
+        result = yield super(DockerCheckLocalImage, self).run()
+        properties = self.build.getProperties()
+        properties.setProperty(
+            'exists_{0}'.format(self.label),
+            result == SUCCESS,
+            'DockerCheckLocalImage',
+            runtime=True)
+        defer.returnValue(SUCCESS)
 
 
-class DockerComputeImageFingerprint(steps.SetPropertyFromCommand):
+class DockerComputeImageFingerprint(MasterShellCommand):
     """Compute the fingerprint of a docker context.
 
     This step computes the sha256 fingerprint of an image given its context
@@ -148,14 +160,35 @@ class DockerComputeImageFingerprint(steps.SetPropertyFromCommand):
     def __init__(self, label, context_dir, **kwargs):
         kwargs.setdefault('name',
                           '[{0}] fingerprint'.format(label)[:49])
-        prop_name = 'fingerprint_{0}'.format(label)
-        command = 'tar -c --mtime 0 . | sha256sum | cut -f 1 -d " "'
+        self.label = label
+        command = 'tar -c --mtime="1990-02-11 00:00Z" --group=0 ' \
+                  '--owner=0 --numeric-owner --sort=name --mode=0 . ' \
+                  '| sha256sum | cut -f 1 -d " "'
         super(DockerComputeImageFingerprint, self).__init__(
-            command=command, property=prop_name, workdir=context_dir, **kwargs
+            command=command, workdir=context_dir, **kwargs
         )
+        self.observer = logobserver.BufferLogObserver(wantStdout=True,
+                                                      wantStderr=True)
+        self.addLogObserver('stdio', self.observer)
+
+    def isNewStyle(self):  # flake8: noqa
+        # needed because we redefine `run` below
+        return False
+
+    @defer.inlineCallbacks
+    def run(self):
+        result = yield super(DockerComputeImageFingerprint, self).run()
+        fingerprint = self.observer.getStdout().splitlines()[0]
+        properties = self.build.getProperties()
+        properties.setProperty(
+            'fingerprint_{0}'.format(self.label),
+            fingerprint,
+            'DockerComputeImageFingerprint',
+            runtime=True)
+        defer.returnValue(result)
 
 
-class DockerPull(steps.SetPropertyFromCommand):
+class DockerPull(MasterShellCommand):
     """Pull an image from a registry.
 
     This step attempts to pull an image from a registry referenced in the
@@ -172,17 +205,29 @@ class DockerPull(steps.SetPropertyFromCommand):
     def __init__(self, label, image, **kwargs):
         kwargs.setdefault('name',
                           '[{0}] pull'.format(label)[:49])
-        kwargs.setdefault('flunkOnFailure', False)
+        kwargs.setdefault('locks', []).append(
+            DOCKER_BUILD_LOCK.access('exclusive')
+        )
         self.label = label
         command = ['docker', 'pull', image]
         super(DockerPull, self).__init__(
             command=command,
-            extract_fn=self.extract_fn,
-            includeStdout=False,
             **kwargs)
 
-    def extract_fn(self, rc, stdout, stderr):
-        return {'exists_{0}'.format(self.label): rc == 0}
+    def isNewStyle(self):  # flake8: noqa
+        # needed because we redefine `run` below
+        return False
+
+    @defer.inlineCallbacks
+    def run(self):
+        result = yield super(DockerPull, self).run()
+        properties = self.build.getProperties()
+        properties.setProperty(
+            'exists_{0}'.format(self.label),
+            result == SUCCESS,
+            'DockerPull',
+            runtime=True)
+        defer.returnValue(SUCCESS)
 
 
 class DockerPush(MasterShellCommand):
