@@ -18,7 +18,6 @@
 """Allow eve to use docker workers."""
 
 import time
-from json import loads
 from subprocess import STDOUT, CalledProcessError, check_output
 
 import netifaces
@@ -27,7 +26,6 @@ from buildbot.process.properties import Property
 from buildbot.worker.latent import AbstractLatentWorker
 from twisted.internet import defer, threads
 from twisted.logger import Logger
-from twisted.python import log
 
 
 class EveDockerLatentWorker(AbstractLatentWorker):
@@ -61,11 +59,11 @@ class EveDockerLatentWorker(AbstractLatentWorker):
         image = yield build.render(self.image)
         volumes = build.getProperty('docker_volumes')
         buildnumber = yield build.render(Property('buildnumber'))
-        res = yield threads.deferToThread(self._thd_start, image,
+        res = yield threads.deferToThread(self._thd_start_instance, image,
                                           volumes, buildnumber)
         defer.returnValue(res)
 
-    def _thd_start(self, image, volumes, buildnumber):
+    def _thd_start_instance(self, image, volumes, buildnumber):
         docker_host_ip = None
         try:
             docker_addresses = netifaces.ifaddresses('docker0')
@@ -97,17 +95,7 @@ class EveDockerLatentWorker(AbstractLatentWorker):
                 '--env', 'GITCACHE_HOSTNAME=%s' % hostname,
                 '--link', hostname]
 
-        for volume in volumes:
-            if isinstance(volume, dict):
-                volume_ = volume['name']
-                if volume.get('temp', False):
-                    if volume_.startswith('/'):
-                        raise Exception('Unsupported temp volume type')
-                    volume_ = 'AUTODELETE_' + volume_
-            else:
-                volume_ = volume
-            volume_ = volume_ % {'buildnumber': buildnumber}
-            cmd.append('--volume=%s' % volume_)
+        cmd.extend(['--volume=%s' % volume for volume in volumes])
 
         cmd.append(image)
         self.instance = self.docker_invoke(*cmd)
@@ -124,29 +112,9 @@ class EveDockerLatentWorker(AbstractLatentWorker):
 
     def _thd_stop_instance(self, instance):
         self.logger.debug('Stopping container %s...' % instance)
-
-        mounts_content = self.docker_invoke(
-            'inspect',
-            '--format', '{{ json .Mounts }}',
-            instance
-        )
-
-        try:
-            mounts = loads(mounts_content)
-        except (TypeError, ValueError) as exc:
-            log.msg('Output: %r' % mounts_content)
-            log.err(exc, 'Error: Unable to parse JSON content'
-                         ' from docker inspect command')
-            mounts = None
-
         self.docker_invoke('kill', instance)
         self.docker_invoke('wait', instance)
         self.docker_invoke('rm', '--volumes', instance)
-        if mounts:
-            for mount in mounts:
-                mount_name = mount.get('Name', '')
-                if mount_name.startswith('AUTODELETE_'):
-                    self.docker_invoke('volume', 'rm', mount_name)
         self.logger.debug('Container %s stopped successfully.' % instance)
 
     def docker_invoke(self, *args):
