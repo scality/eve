@@ -18,7 +18,6 @@ class TestSetupSchedulers(unittest.TestCase):
     def test_force_scheduler(self):
         util.env = util.load_env([
             ('BOOTSTRAP_BUILDER_NAME', 'foo'),
-            ('GITCACHE_IN_USE', '0', int),
             ('GIT_OWNER', 'foo'),
             ('GIT_REPO', 'blblbl'),
             ('GIT_SLUG', 'bar'),

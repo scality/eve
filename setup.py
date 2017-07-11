@@ -62,7 +62,6 @@ setup(
         'buildbot.steps': [
             'CancelNonTipBuild=eve.steps.cancel:CancelNonTipBuild',
             'CancelOldBuild=eve.steps.cancel:CancelOldBuild',
-            'CheckGitCachePresence=eve.steps.gitcache:CheckGitCachePresence',
             'CloudfilesAuthenticate=eve.steps.artifacts:CloudfilesAuthenticate',
             'DockerBuild=eve.steps.docker_build:DockerBuild',
             'DockerCheckLocalImage=eve.steps.docker_build:DockerCheckLocalImage',

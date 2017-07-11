@@ -21,7 +21,6 @@ import time
 from subprocess import STDOUT, CalledProcessError, check_output
 
 import netifaces
-from buildbot.plugins import util
 from buildbot.process.properties import Property
 from buildbot.worker.latent import AbstractLatentWorker
 from twisted.internet import defer, threads
@@ -88,12 +87,6 @@ class EveDockerLatentWorker(AbstractLatentWorker):
             '--memory=%s' % self.max_memory,
             '--cpus=%s' % self.max_cpus
         ]
-
-        if util.env.GITCACHE_IN_USE:
-            hostname = util.env.GITCACHE_HOSTNAME
-            cmd += [
-                '--env', 'GITCACHE_HOSTNAME=%s' % hostname,
-                '--link', hostname]
 
         cmd.extend(['--volume=%s' % volume for volume in volumes])
 

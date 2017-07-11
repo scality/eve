@@ -30,7 +30,6 @@ class TestBootstrap(unittest.TestCase):
             ('GIT_CACHE_HOST', 'foo'),
             ('GIT_CACHE_PORT', '11111', int),
             ('GIT_REPO', 'foo/bar.git'),
-            ('GITCACHE_IN_USE', '0', int),
             ('MASTER_START_TIME', '9999'),
             ('PATCHER_FILE_PATH', ''),
             ('PROJECT_YAML', ''),

@@ -19,10 +19,6 @@ RUN pip install --upgrade pip
 
 RUN curl -sSL https://get.docker.com/ | sh
 
-RUN mkdir /root/eve /root/gitconfig \
- && touch /root/gitconfig/gitconfig \
- && ln -s /root/gitconfig/gitconfig /root/.gitconfig
-
 VOLUME /root/eve
 WORKDIR /root/eve
 

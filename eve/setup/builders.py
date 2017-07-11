@@ -19,39 +19,11 @@
 from buildbot.config import BuilderConfig
 from buildbot.plugins import steps, util
 from buildbot.process.factory import BuildFactory
-from buildbot.steps.shell import ShellCommand
 
 
 def triggerable_builder(builder_name, workers):
     factory = BuildFactory()
     factory.addStep(steps.CancelOldBuild(name='prevent unuseful restarts'))
-
-    # customize global Git conf to hit on docker cache
-    if (util.env.GITCACHE_IN_USE and
-            builder_name == util.env.DOCKER_BUILDER_NAME):
-        factory.addStep(ShellCommand(
-            name='customize git settings to hit on cache',
-            hideStepIf=util.hideStepIfSuccess,
-            haltOnFailure=True,
-
-            command='git config --global '
-                    'url.http://%(gitcache)s/https/bitbucket.org/.insteadOf '
-                    'git@bitbucket.org: && '
-                    'git config --global '
-                    'url.http://%(gitcache)s/https/github.com/.insteadOf '
-                    'git@github.com: && '
-                    'git config --global '
-                    'url.http://%(gitcache)s/git/mock/.insteadOf git@mock: && '
-                    'git config --global '
-                    'lfs.url '
-                    '"http://%(gitcache)s:81/'
-                    '%(githost)s/%(gitowner)s/%(gitslug)s.git/info/lfs"' % {
-                        'gitcache': util.env.GITCACHE_HOSTNAME,
-                        'githost': util.env.GIT_HOST,
-                        'gitowner': util.env.GIT_OWNER,
-                        'gitslug': util.env.GIT_SLUG
-                    },
-        ))
 
     # Extract steps from conf
     factory.addStep(steps.StepExtractor(

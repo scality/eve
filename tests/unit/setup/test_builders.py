@@ -20,7 +20,6 @@ class TestSetupBuilders(unittest.TestCase):
     def setUp(self):
         util.env = util.load_env([
             ('DOCKER_BUILDER_NAME', 'foo'),
-            ('GITCACHE_IN_USE', '0', int),
             ('MASTER_START_TIME', '9999', int),
         ])
 
