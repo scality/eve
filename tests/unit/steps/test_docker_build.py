@@ -22,27 +22,16 @@ class TestDockerCheckLocalImage(unittest.TestCase):
         ctx = eve.steps.docker_build.DockerCheckLocalImage(
             label='label', image='image', name='zippy')
         self.assertEquals(ctx.label, 'label')
+        self.assertFalse(ctx.isNewStyle())
         self.assertEquals(ctx.name, 'zippy')
-
-    def test_extract_fn(self):
-        ctx = eve.steps.docker_build.DockerCheckLocalImage(
-            label='label', image='image')
-        self.assertEquals(
-            ctx.extract_fn(0, 'stdout', 'stderr'),
-            {'exists_label': True})
-        self.assertEquals(
-            ctx.extract_fn(1, 'stdout', 'stderr'),
-            {'exists_label': False})
-        self.assertEquals(
-            ctx.extract_fn(127, 'stdout', 'stderr'),
-            {'exists_label': False})
 
 
 class DockerComputeImageFingerprint(unittest.TestCase):
     def test_init(self):
         ctx = eve.steps.docker_build.DockerComputeImageFingerprint(
             label='label', context_dir='/dummy', name='zippy')
-        self.assertEquals(ctx.property, 'fingerprint_label')
+        self.assertEquals(ctx.label, 'label')
+        self.assertFalse(ctx.isNewStyle())
         self.assertEquals(ctx.name, 'zippy')
 
 
@@ -51,20 +40,8 @@ class TestDockerPull(unittest.TestCase):
         ctx = eve.steps.docker_build.DockerPull(
             label='label', image='image', name='zippy')
         self.assertEquals(ctx.label, 'label')
+        self.assertFalse(ctx.isNewStyle())
         self.assertEquals(ctx.name, 'zippy')
-
-    def test_extract_fn(self):
-        ctx = eve.steps.docker_build.DockerPull(
-            label='label', image='image')
-        self.assertEquals(
-            ctx.extract_fn(0, 'stdout', 'stderr'),
-            {'exists_label': True})
-        self.assertEquals(
-            ctx.extract_fn(1, 'stdout', 'stderr'),
-            {'exists_label': False})
-        self.assertEquals(
-            ctx.extract_fn(127, 'stdout', 'stderr'),
-            {'exists_label': False})
 
 
 class TestDockerPush(unittest.TestCase):
