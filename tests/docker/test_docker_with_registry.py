@@ -98,9 +98,9 @@ class Tests(unittest.TestCase):
             (u'set the artifacts public url', u"property 'artifacts_public_url' set"),  # noqa
             (u'get the API version', u'Set'),
             (u'prepare 1 stage(s)', u'finished'),
-            (u'[ubuntu-xenial-ctxt_930a] fingerprint', u"property 'fingerprint_ubuntu-xenial-ctxt_930a' set"),  # noqa
-            (u'[ubuntu-xenial-ctxt_930a] look up', u"property 'exists_ubuntu-xenial-ctxt_930a' set (failure)"),  # noqa
-            (u'[ubuntu-xenial-ctxt_930a] pull', u"property 'exists_ubuntu-xenial-ctxt_930a' set (failure)"),  # noqa
+            (u'[ubuntu-xenial-ctxt_930a] fingerprint', u"Ran"),  # noqa
+            (u'[ubuntu-xenial-ctxt_930a] look up', u"failed (1)"),  # noqa
+            (u'[ubuntu-xenial-ctxt_930a] pull', u"failed (1)"),  # noqa
             (u'[ubuntu-xenial-ctxt_930a] build', u'Ran'),
             (u'[ubuntu-xenial-ctxt_930a] build retry', u'Ran (skipped)'),
             (u'[ubuntu-xenial-ctxt_930a] push', u'Ran'),
@@ -157,9 +157,9 @@ class Tests(unittest.TestCase):
             (u'set the artifacts public url', u"property 'artifacts_public_url' set"),  # noqa
             (u'get the API version', u'Set'),
             (u'prepare 1 stage(s)', u'finished'),
-            (u'[ubuntu-xenial-ctxt_930a] fingerprint', u"property 'fingerprint_ubuntu-xenial-ctxt_930a' set"),  # noqa
-            (u'[ubuntu-xenial-ctxt_930a] look up', u"property 'exists_ubuntu-xenial-ctxt_930a' set"),  # noqa
-            (u'[ubuntu-xenial-ctxt_930a] pull', u"'docker pull ...' (skipped)"),  # noqa
+            (u'[ubuntu-xenial-ctxt_930a] fingerprint', u"Ran"),  # noqa
+            (u'[ubuntu-xenial-ctxt_930a] look up', u"Ran"),  # noqa
+            (u'[ubuntu-xenial-ctxt_930a] pull', u"Ran (skipped)"),  # noqa
             (u'[ubuntu-xenial-ctxt_930a] build', u'Ran (skipped)'),
             (u'[ubuntu-xenial-ctxt_930a] build retry', u'Ran (skipped)'),
             (u'[ubuntu-xenial-ctxt_930a] push', u'Ran (skipped)'),
@@ -211,9 +211,9 @@ class Tests(unittest.TestCase):
             (u'set the artifacts public url', u"property 'artifacts_public_url' set"),  # noqa
             (u'get the API version', u'Set'),
             (u'prepare 1 stage(s)', u'finished'),
-            (u'[ubuntu-xenial-ctxt_930a] fingerprint', u"property 'fingerprint_ubuntu-xenial-ctxt_930a' set"),  # noqa
-            (u'[ubuntu-xenial-ctxt_930a] look up', u"property 'exists_ubuntu-xenial-ctxt_930a' set (failure)"),  # noqa
-            (u'[ubuntu-xenial-ctxt_930a] pull', u"property 'exists_ubuntu-xenial-ctxt_930a' set"),  # noqa
+            (u'[ubuntu-xenial-ctxt_930a] fingerprint', u"Ran"),  # noqa
+            (u'[ubuntu-xenial-ctxt_930a] look up', u"failed (1)"),  # noqa
+            (u'[ubuntu-xenial-ctxt_930a] pull', u"Ran"),  # noqa
             (u'[ubuntu-xenial-ctxt_930a] build', u'Ran (skipped)'),
             (u'[ubuntu-xenial-ctxt_930a] build retry', u'Ran (skipped)'),
             (u'[ubuntu-xenial-ctxt_930a] push', u'Ran (skipped)'),
