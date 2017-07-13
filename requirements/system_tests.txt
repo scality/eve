@@ -6,7 +6,7 @@ apipkg==1.4
 argh==0.26.2
 asn1crypto==0.22.0
 attrs==17.2.0
-autobahn==17.6.1
+autobahn==17.6.2
 automat==0.6.0
 bitstring==3.1.5
 cbor==1.0.0
@@ -14,14 +14,14 @@ cffi==1.10.0
 click==6.7
 constantly==15.1.0
 coverage==4.4.1
-crossbar==17.5.1
+crossbar==17.6.1.post3
 cryptography==1.9
 enum34==1.1.6
 execnet==1.4.1
 h2==2.6.2
 hpack==3.0.0
 hyperframe==5.1.0
-hyperlink==17.1.1
+hyperlink==17.2.1
 idna==2.5
 incremental==17.5.0
 ipaddress==1.0.18
@@ -37,14 +37,14 @@ py==1.4.34
 py-ubjson==0.9.0
 pyasn1==0.2.3
 pyasn1-modules==0.0.9
-pycparser==2.17
+pycparser==2.18
 pygments==2.2.0
 pynacl==1.1.2
-pyopenssl==17.0.0
+pyopenssl==17.1.0
 pyqrcode==1.2.1
-pytest==3.1.2
+pytest==3.1.3
 pytest-cov==2.5.1
-pytest-xdist==1.17.1
+pytest-xdist==1.18.1
 python-dotenv==0.6.4
 pytrie==0.3
 pyyaml==3.12
@@ -61,5 +61,5 @@ twisted==17.5.0
 txaio==2.8.0
 u-msgpack-python==2.4.1
 watchdog==0.8.3
-zope.interface==4.4.1
+zope.interface==4.4.2
 
