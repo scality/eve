@@ -1,0 +1,78 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "{{ name }}"
+spec:
+  template:
+    metadata:
+      labels:
+        k8s-app: eve-worker
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: "{{ name }}"
+          image: "{{ image }}"
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            privileged: {{ privileged }}
+          lifecycle:
+            postStart:
+              exec:
+                command: ["/bin/sh", "-c", "sudo chmod 777 /usr/local/bin/docker"]
+          volumeMounts:
+            - name: gitconfig
+              readOnly: true
+              mountPath: /etc/gitconfig
+              subPath: gitconfig
+            - name: docker-hook
+              readOnly: false
+              mountPath: /usr/local/bin/docker
+              subPath: docker
+            - name: docker-host-data
+              readOnly: false
+              mountPath: /var/lib/docker
+            - name: docker-host-sock
+              readOnly: false
+              mountPath: /var/run/docker.sock
+            {% for v in volume %}
+            {% if v %}
+            - name: "{{ v.name }}"
+              readOnly: {{ v.readonly }}
+              mountPath: "{{ v.mountpath }}"
+            {% endif %}
+            {% endfor %}
+          env:
+            {% for e in env %}
+            - name: "{{ e.name }}"
+              value: "{{ e.value }}"
+            {% endfor %}
+            - name: DOCKER_API_VERSION
+              value: "1.23"
+          {% if publish %}
+          ports:
+            {% for p in publish %}
+            - containerPort: "{{ p.value }}"
+              name: "{{ p.name }}"
+              protocol: "TCP"
+            {% endfor %}
+          {% endif %}
+      volumes:
+        - name: gitconfig
+          configMap:
+            name: gitconfig
+        - name: docker-hook
+          configMap:
+            name: docker-hook
+        - name: docker-host-data
+          hostPath:
+            path: /var/lib/docker
+        - name: docker-host-sock
+          hostPath:
+            path: /var/run/docker.sock
+        {% for v in volume %}
+        {% if v %}
+        - name: "{{ v.name }}"
+          emptyDir: {}
+        {% endif %}
+        {% endfor %}
