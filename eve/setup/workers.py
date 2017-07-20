@@ -78,6 +78,11 @@ def openstack_heat_workers():
     heat_template = open(join(dirname(abspath(__file__)),
                               'single_node_heat_template.yml')).read()
 
+    networks = util.env.OS_NETWORKS.split(',')
+    if len(networks) != 2:
+        raise Exception('OS_NETWORKS must contain '
+                        '"public_network,private_network"')
+
     for i in range(util.env.MAX_OPENSTACK_WORKERS):
         name = 'hw%03d-%s-%s' % (i, util.env.GIT_SLUG, util.env.SUFFIX)
         password = util.password_generator()
@@ -105,7 +110,8 @@ def openstack_heat_workers():
                     'worker_requirements_script': Property(
                         'requirements_script'),
                     'start_worker_script': start_worker_script,
-                    'public_network': util.env.OS_NETWORKS
+                    'public_network': networks[0],
+                    'private_network': networks[1]
                 },
                 os_auth_url=util.env.OS_AUTH_URL,
                 os_username=util.env.OS_USERNAME,

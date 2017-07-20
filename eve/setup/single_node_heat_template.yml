@@ -37,6 +37,10 @@ parameters:
     type: string
     label: Public network name or ID
     description: Public network to attach instance to.
+  private_network:
+    type: string
+    label: Private network name or ID
+    description: Private network to attach instance to.
 
 
 resources:
@@ -47,7 +51,8 @@ resources:
       flavor: {get_param: flavor}
       key_name: {get_param: key_name}
       networks:
-        - network: { get_param: public_network }
+        - network: {get_param: public_network}
+        - network: {get_param: private_network}
       config_drive: "true"
       user_data_format: RAW
       user_data:

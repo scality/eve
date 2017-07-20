@@ -40,7 +40,7 @@ class TestSetupWorkers(unittest.TestCase):
             ('MAX_OPENSTACK_WORKERS', 3),
             ('OS_AUTH_URL', 'foo'),
             ('OS_KEY_NAME', 'bar'),
-            ('OS_NETWORKS', 'foo'),
+            ('OS_NETWORKS', 'foo,foo'),
             ('OS_REGION_NAME', 'foo'),
             ('OS_SSH_KEY', 'foo'),
             ('OS_TENANT_NAME', 'foo'),
