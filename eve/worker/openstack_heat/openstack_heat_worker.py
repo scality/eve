@@ -21,6 +21,7 @@ import time
 
 import heatclient
 import heatclient.client
+from buildbot.process.properties import Property
 from buildbot.worker import AbstractWorker
 from buildbot.worker.latent import AbstractLatentWorker
 from keystoneauth1 import loading, session
@@ -70,13 +71,14 @@ class HeatLatentWorker(AbstractLatentWorker):
     @defer.inlineCallbacks
     def start_instance(self, build):
         heat_template = yield build.render(self.heat_template)
+        tmp_heat_template_parameters = {}
         for key, value in self.heat_template_parameters.items():
-            self.heat_template_parameters[key] = yield build.render(value)
+            tmp_heat_template_parameters[key] = yield build.render(value)
 
         res = yield threads.deferToThread(self._start_instance,
                                           self.name,
                                           heat_template,
-                                          self.heat_template_parameters)
+                                          tmp_heat_template_parameters)
         defer.returnValue(res)
 
     def _start_instance(
