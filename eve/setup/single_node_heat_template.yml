@@ -84,13 +84,13 @@ resources:
                 if [ -f /etc/redhat-release ]
                 then
                   echo "CentOS/RedHat";
-                  sudo yum -y install git gcc python-devel python-setuptools
+                  sudo yum -y install git make gcc python-devel python-setuptools
                   sudo easy_install pip
                 elif [ -f /etc/lsb-release ]
                 then
                   echo "Debian/Ubuntu";
                   sudo apt-get update
-                  sudo apt-get install --no-install-recommends --yes git gcc python-pip python-setuptools
+                  sudo apt-get install --no-install-recommends --yes git make gcc python-pip python-setuptools
                 else
                   echo "Unsupported Operating System";
                   exit 1;
