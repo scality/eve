@@ -19,7 +19,7 @@ spec:
           lifecycle:
             postStart:
               exec:
-                command: ["/bin/sh", "-c", "sudo chmod 777 /usr/local/bin/docker"]
+                command: ["/bin/sh", "-c", "sudo chmod 755 /usr/local/bin/docker"]
           volumeMounts:
             - name: gitconfig
               readOnly: true

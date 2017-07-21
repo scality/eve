@@ -59,14 +59,6 @@ for i in xrange(120):
 else:
     raise Exception('database never responded')
 
-if os.environ['MASTER_MODE'] in ['frontend', 'standalone']:
-    _print("removing disconnected masters...")
-    try:
-        sa.execute('DELETE FROM masters WHERE active=0 AND last_active=0;')
-    except sqlalchemy.exc.ProgrammingError:
-        # table may not exist
-        pass
-
 _print("checking cloud key mode...")
 openstack_key =  os.environ.get('OS_SSH_KEY', False)
 if openstack_key:
@@ -87,8 +79,9 @@ if os.environ.get('DEBUG_MODE', '0') in ['true', 'True', '1', 'y', 'yes']:
         pass
     _print("resuming startup sequence")
 
-_print("upgrading master...")
-subprocess.check_call('buildbot upgrade-master .', shell=True)
+if os.environ['MASTER_MODE'] in ['frontend', 'standalone']:
+    _print("upgrading master...")
+    subprocess.check_call('buildbot upgrade-master .', shell=True)
 
 _print("starting master...")
 subprocess.check_call('twistd -ny ./buildbot.tac', shell=True)
