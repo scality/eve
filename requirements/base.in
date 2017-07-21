@@ -14,10 +14,9 @@ buildbot[tls]       # core technology
 lz4                 # used by buildbot to compress logs
 netifaces           # used by bootstrap job
 packaging           # used by artifacts and YAMLParser
-python-novaclient   # used by EveOpenStackLatentWorker
+python-heatclient   # used by HeatOpenStackLatentWorker
 raven               # used by sentry
 requests[security]  # used by step_factory
-retrying            # used by EveOpenStackLatentWorker
 six                 # used by CodecovIOPublication
 treq                # used by buildbot for the HTTP service
 xunitparser         # used by JunitShellCommand
