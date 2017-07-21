@@ -1,0 +1,125 @@
+heat_template_version: 2013-05-23
+
+description: Simple template to deploy a single buildbot worker
+
+parameters:
+  image:
+    type: string
+    label: Image
+    description: Image
+  flavor:
+    type: string
+    label: Flavor
+    description: Flavor
+  key_name:
+    type: string
+    label: Key name
+    description: Key name
+  worker_init_script:
+    type: string
+    label: Init script
+    description: Initialization script
+    default: ""
+  worker_requirements_script:
+    type: string
+    label: Requirements script
+    description: Requirements script
+    default: ""
+  start_worker_script:
+    type: string
+    label: Start buildbot worker script
+    description: Start buildbot worker script
+  worker_version:
+    type: string
+    label: Worker version
+    description: Buildbot worker version
+  public_network:
+    type: string
+    label: Public network name or ID
+    description: Public network to attach instance to.
+  private_network:
+    type: string
+    label: Private network name or ID
+    description: Private network to attach instance to.
+
+
+resources:
+  heat_worker:
+    type: OS::Nova::Server
+    properties:
+      image: {get_param: image}
+      flavor: {get_param: flavor}
+      key_name: {get_param: key_name}
+      networks:
+        - network: {get_param: public_network}
+        - network: {get_param: private_network}
+      config_drive: "true"
+      user_data_format: RAW
+      user_data:
+        str_replace:
+          template: |
+                #!/bin/bash
+                set -o xtrace -o errexit -o nounset -o pipefail
+
+                # Add Google and OpenDNS nameservers
+                echo "nameserver 8.8.8.8" >> /etc/resolv.conf
+                echo "nameserver 208.67.222.222" >> /etc/resolv.conf
+
+                cat << 'EOF1' | head -c -1 > /tmp/worker_init_script.sh
+                $worker_init_script
+                EOF1
+
+                cat << 'EOF2' | head -c -1 > /tmp/worker_requirements_script.sh
+                $worker_requirements_script
+                EOF2
+
+                if [ ! -s /tmp/worker_init_script.sh ] && [ ! -s /tmp/worker_requirements_script.sh ]
+                then
+                  echo "no code found in init.sh or requirements.sh, aborting"
+                  exit 1
+                fi
+
+                if [ -s /tmp/worker_init_script.sh ] && [ -s /tmp/worker_requirements_script.sh ]
+                then
+                  echo "code found both in init.sh and requirements.sh, aborting"
+                  exit 1
+                fi
+
+                #install git, pip, setuptools (and needed dependencies)
+                if [ -f /etc/redhat-release ]
+                then
+                  echo "CentOS/RedHat";
+                  sudo yum -y install git make gcc python-devel python-setuptools
+                  sudo easy_install pip
+                elif [ -f /etc/lsb-release ]
+                then
+                  echo "Debian/Ubuntu";
+                  sudo apt-get update
+                  sudo apt-get install --no-install-recommends --yes git make gcc python-pip python-setuptools
+                else
+                  echo "Unsupported Operating System";
+                  exit 1;
+                fi
+
+                #upgrade pip
+                sudo pip install --upgrade pip
+
+                if [ -s /tmp/worker_init_script.sh ]
+                then
+                  bash /tmp/worker_init_script.sh $worker_version
+                else
+                  # configure user eve
+                  adduser -u 1042 --home /home/eve --disabled-password --gecos "" eve
+                  adduser eve sudo
+                  echo "%sudo ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
+                  sudo pip install twisted==16.4.0
+                  sudo pip install buildbot-worker==$worker_version
+                  sudo -Hu eve bash /tmp/worker_requirements_script.sh
+                fi
+                $start_worker_script
+          params:
+            "$worker_version": {get_param: worker_version}
+            "$worker_init_script": {get_param: worker_init_script}
+            "$worker_requirements_script": {get_param: worker_requirements_script}
+            "$start_worker_script": {get_param: start_worker_script}

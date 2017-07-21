@@ -95,7 +95,7 @@ setup(
         ],
         'buildbot.worker': [
             'EveDockerLatentWorker=eve.worker.docker.docker_worker:EveDockerLatentWorker',
-            'EveOpenStackLatentWorker=eve.worker.openstack.openstack_worker:EveOpenStackLatentWorker'
+            'HeatLatentWorker=eve.worker.openstack_heat.openstack_heat_worker:HeatLatentWorker',
         ]
     },
     zip_safe=False

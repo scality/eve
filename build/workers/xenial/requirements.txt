@@ -3,6 +3,7 @@
 # Frozen requirements for "build/workers/xenial/requirements.in"
 
 apipkg==1.4
+appdirs==1.4.3
 argh==0.26.2
 asn1crypto==0.22.0
 astroid==1.4.9
@@ -20,6 +21,8 @@ buildbot-www==0.9.7
 cbor==1.0.0
 cffi==1.10.0
 click==6.7
+cliff==2.7.0
+cmd2==0.7.3
 configparser==3.5.0
 constantly==15.1.0
 contextlib2==0.5.5
@@ -33,6 +36,7 @@ execnet==1.4.1
 flake8==3.3.0
 funcsigs==1.0.2
 future==0.16.0
+futures==3.1.1
 h2==2.6.2
 hpack==3.0.0
 hyperframe==5.1.0
@@ -57,6 +61,8 @@ mysql-python==1.2.5
 ndg-httpsclient==0.4.2
 netaddr==0.7.19
 netifaces==0.10.6
+os-client-config==1.27.0
+osc-lib==1.6.0
 oslo.i18n==3.16.0
 oslo.serialization==2.19.1
 oslo.utils==3.27.0
@@ -88,13 +94,14 @@ pytest-cov==2.5.1
 pytest-xdist==1.18.1
 python-dateutil==2.6.1
 python-dotenv==0.6.4
-python-novaclient==7.1.0
+python-heatclient==1.10.0
+python-swiftclient==3.3.0
 pytrie==0.3
 pytz==2017.2
 pyyaml==3.12
 raven==6.1.0
 requests==2.11.1
-retrying==1.3.3
+requestsexceptions==1.2.0
 sdnotify==0.3.1
 service-identity==17.0.0
 setproctitle==1.1.10
@@ -114,6 +121,7 @@ treq==17.3.1
 twisted==17.5.0
 txaio==2.8.0
 u-msgpack-python==2.4.1
+unicodecsv==0.14.1
 virtualenv==15.1.0
 watchdog==0.8.3
 wrapt==1.10.10

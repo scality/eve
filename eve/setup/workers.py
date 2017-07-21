@@ -16,8 +16,10 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor,
 # Boston, MA  02110-1301, USA.
 
+from os.path import abspath, dirname, join
+
 from buildbot.plugins import util, worker
-from buildbot.process.properties import Property
+from buildbot.process.properties import Interpolate, Property
 from buildbot.worker.local import LocalWorker
 from twisted.python.reflect import namedModule
 
@@ -52,28 +54,71 @@ def docker_workers():
     return workers
 
 
-def openstack_workers():
+START_WORKER_SCRIPT = """
+echo https://{githost_login}:{githost_pwd}@bitbucket.org \
+  >> /home/eve/.git_credentials
+echo https://{githost_login}:{githost_pwd}@github.com  \
+  >> /home/eve/.git_credentials
+chown eve.eve /home/eve/.git_credentials
+chmod 600 /home/eve/.git_credentials
+sudo -Hu eve git config --global \
+  credential.helper 'store --file=/home/eve/.git_credentials'
+sudo -Hu eve git config --global \
+  url.https://bitbucket.org/.insteadOf git@bitbucket.org:
+sudo -Hu eve git config --global \
+  url.https://github.com/.insteadOf git@github.com:
+sudo -Hu eve buildbot-worker create-worker --umask=022 /home/eve/worker \
+"{master_fqdn}:{master_port}" {worker_name} "{worker_password}"
+sudo -Hu eve buildbot-worker start /home/eve/worker
+"""
+
+
+def openstack_heat_workers():
     workers = []
+    heat_template = open(join(dirname(abspath(__file__)),
+                              'single_node_heat_template.yml')).read()
+
+    networks = util.env.OS_NETWORKS.split(',')
+    if len(networks) != 2:
+        raise Exception('OS_NETWORKS must contain '
+                        '"public_network,private_network"')
+
     for i in range(util.env.MAX_OPENSTACK_WORKERS):
+        name = 'hw%03d-%s-%s' % (i, util.env.GIT_SLUG, util.env.SUFFIX)
+        password = util.password_generator()
+
+        start_worker_script = Interpolate(START_WORKER_SCRIPT.format(
+            githost_login=util.env.EVE_GITHOST_LOGIN,
+            githost_pwd=util.env.EVE_GITHOST_PWD,
+            master_fqdn=util.env.MASTER_FQDN,
+            master_port=util.env.EXTERNAL_PB_PORT,
+            worker_name=name,
+            worker_password=password,
+        ))
+
         workers.append(
-            worker.EveOpenStackLatentWorker(
-                name='ow%03d-%s-%s' % (i, util.env.GIT_SLUG, util.env.SUFFIX),
-                password=util.password_generator(),
-                image=Property('openstack_image'),
-                flavor=Property('openstack_flavor'),
-                block_devices=None,
+            worker.HeatLatentWorker(
+                name=name,
+                password=password,
+                heat_template=heat_template,
+                heat_template_parameters={
+                    'image': Property('openstack_image'),
+                    'flavor': Property('openstack_flavor'),
+                    'key_name': util.env.OS_KEY_NAME,
+                    'worker_version': '0.9.7',
+                    'worker_init_script': Property('init_script'),
+                    'worker_requirements_script': Property(
+                        'requirements_script'),
+                    'start_worker_script': start_worker_script,
+                    'public_network': networks[0],
+                    'private_network': networks[1]
+                },
                 os_auth_url=util.env.OS_AUTH_URL,
-                os_tenant_name=util.env.OS_TENANT_NAME,
                 os_username=util.env.OS_USERNAME,
                 os_password=util.env.SECRET_OS_PASSWORD,
-                region=util.env.OS_REGION_NAME,
-                ssh_key=util.env.OS_SSH_KEY,
-                cloud_init=util.env.CLOUD_INIT_SCRIPT,
-                meta=None,
-                masterFQDN=util.env.MASTER_FQDN,
-                pb_port=util.env.EXTERNAL_PB_PORT,
-                nova_args=dict(key_name=util.env.OS_KEY_NAME),
-                build_wait_timeout=0,  # do not reuse the instance
-                keepalive_interval=300,
-                client_version='2'))
+                os_project_id=util.env.OS_TENANT_NAME,
+                os_region_name=util.env.OS_REGION_NAME,
+                build_wait_timeout=0,  # do not reuse the stack
+                keepalive_interval=300
+            ))
     return workers
