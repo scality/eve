@@ -64,9 +64,9 @@ chmod 600 /home/eve/.git_credentials
 sudo -Hu eve git config --global \
   credential.helper 'store --file=/home/eve/.git_credentials'
 sudo -Hu eve git config --global \
-  url.https://bitbucket.org/.insteadOf git@bitbucket.org:
+  url.https://{githost_login}:{githost_pwd}@bitbucket.org/.insteadOf git@bitbucket.org:
 sudo -Hu eve git config --global \
-  url.https://github.com/.insteadOf git@github.com:
+  url.https://{githost_login}:{githost_pwd}@github.com/.insteadOf git@github.com:
 sudo -Hu eve buildbot-worker create-worker --umask=022 /home/eve/worker \
 "{master_fqdn}:{master_port}" {worker_name} "{worker_password}"
 sudo -Hu eve buildbot-worker start /home/eve/worker
