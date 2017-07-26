@@ -49,6 +49,12 @@ spec:
             {% endfor %}
             - name: DOCKER_API_VERSION
               value: "1.23"
+            - name: DOCKER_HOOK_HOST
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: DOCKER_HOOK_PORT
+              value: '32766'
           {% if publish %}
           ports:
             {% for p in publish %}

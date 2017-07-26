@@ -17,7 +17,9 @@ def get_command(cmd_list):
     return ''
 
 def handle_remote(cmd):
-    remote = environ.get('DOCKER_HOST', 'localhost:2377')
+    node = environ.get('DOCKER_HOOK_HOST')
+    port = environ.get('DOCKER_HOOK_PORT')
+    remote = '{node}:{port}'.format(node=node, port=port)
 
     try:
         response = requests.put(
@@ -27,7 +29,8 @@ def handle_remote(cmd):
         sys.exit('The Docker service is currently unavailable.')
 
     if response.status_code != 202:
-        sys.exit('This Docker command is not available on this platform (%s).' % response.status_code)
+        sys.exit('This Docker command is not available ' \
+                 'on the platform ({}).'.format(response.status_code))
 
     task_url = response.headers['Location']
 
