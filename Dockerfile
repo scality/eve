@@ -8,6 +8,7 @@ RUN         apt-get update && \
                 libffi-dev \
                 libmysqlclient-dev \
                 libssl-dev \
+                mysql-client \
                 python-dev \
                 python-pip \
                 python-psycopg2 \
