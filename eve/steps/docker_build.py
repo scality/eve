@@ -43,6 +43,10 @@ class DockerBuild(MasterShellCommand):
 
     """
 
+    renderables = [
+        'image',
+    ]
+
     def __init__(self, label, image, dockerfile=None, is_retry=False,
                  labels=None, build_args=None, **kwargs):
         kwargs.setdefault('name',
@@ -241,6 +245,10 @@ class DockerPush(MasterShellCommand):
         image (interpolate): the full repo:name:tag of the image to look up.
 
     """
+
+    renderables = [
+        'image',
+    ]
 
     def __init__(self, label, image, **kwargs):
         kwargs.setdefault('name',
