@@ -21,7 +21,6 @@ import time
 
 import heatclient
 import heatclient.client
-from buildbot.process.properties import Property
 from buildbot.worker import AbstractWorker
 from buildbot.worker.latent import AbstractLatentWorker
 from keystoneauth1 import loading, session
