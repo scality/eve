@@ -101,8 +101,7 @@ class HeatLatentWorker(AbstractLatentWorker):
     def stop_instance(self, fast=False):
         # this allows to call the stack deletion in a thread so we can wait
         # until we are sure they are deleted.
-        threads.deferToThread(self._stop_instance, self.stack_id, fast)
-        return AbstractWorker.disconnect(self)
+        return threads.deferToThread(self._stop_instance, self.stack_id, fast)
 
     def _stop_instance(self, stack_id, fast):
         stack = self.heat_client.stacks.get(stack_id=stack_id)
