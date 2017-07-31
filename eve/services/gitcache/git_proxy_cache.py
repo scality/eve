@@ -35,7 +35,7 @@ if os.path.exists(repocachedir):
     except OSError:
         pass
     os.chdir(repocachedir)
-    subprocess.check_output(['git', 'remote', 'update', '--prune'])
+    os.execlp('git', 'git', 'remote', 'update', '--prune')
 else:
     # This is the first time this repo is requested.
     # creating the cache parent folder...
@@ -46,9 +46,11 @@ else:
 
     remote_url = '{}://{}/{}/{}'.format(scheme, githost, account, reponame)
 
-    subprocess.check_output(['git',
-                             'clone',
-                             '--quiet',
-                             '--mirror',
-                             remote_url,
-                             repocachedir])
+    subprocess.call(['git', 'gc', '--auto', '--quiet'])
+    os.execlp('git',
+              'git',
+              'clone',
+              '--quiet',
+              '--mirror',
+              remote_url,
+              repocachedir)
