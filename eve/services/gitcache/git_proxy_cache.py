@@ -19,6 +19,7 @@
 # Boston, MA  02110-1301, USA.
 
 import os
+import subprocess
 
 project_root = os.environ['GIT_PROJECT_ROOT']
 reporelpath = os.environ['PATH_INFO']
@@ -45,6 +46,7 @@ else:
 
     remote_url = '{}://{}/{}/{}'.format(scheme, githost, account, reponame)
 
+    subprocess.call(['git', 'gc', '--auto', '--quiet'])
     os.execlp('git',
               'git',
               'clone',
