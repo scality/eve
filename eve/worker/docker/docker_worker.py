@@ -35,6 +35,9 @@ class EveDockerLatentWorker(AbstractLatentWorker):
 
     """
 
+    quarantine_timeout = quarantine_initial_timeout = 5 * 60
+    quarantine_max_timeout = 60 * 60
+
     logger = Logger('eve.workers.EveDockerLatentWorker')
     instance = None
 
