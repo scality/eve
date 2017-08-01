@@ -21,12 +21,13 @@ import time
 
 import heatclient
 import heatclient.client
-from buildbot.process.properties import Property
 from buildbot.worker import AbstractWorker
 from buildbot.worker.latent import AbstractLatentWorker
 from keystoneauth1 import loading, session
 from twisted.internet import defer, threads
 from twisted.logger import Logger
+
+MISSING_TIMEOUT = 15 * 60
 
 
 class HeatLatentWorker(AbstractLatentWorker):
@@ -67,6 +68,11 @@ class HeatLatentWorker(AbstractLatentWorker):
         sess = session.Session(auth=auth)
         self.heat_client = heatclient.client.Client(
             '1', session=sess, region_name=os_region_name)
+
+    def reconfigService(self, name, password,
+                        **kwargs):
+        kwargs.setdefault('missing_timeout', MISSING_TIMEOUT)
+        super(HeatLatentWorker, self).reconfigService(name, password, **kwargs)
 
     @defer.inlineCallbacks
     def start_instance(self, build):
