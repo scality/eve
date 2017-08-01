@@ -35,6 +35,9 @@ class HeatLatentWorker(AbstractLatentWorker):
 
     logger = Logger('eve.HeatOpenStackLatentWorker')
 
+    quarantine_timeout = quarantine_initial_timeout = 5 * 60
+    quarantine_max_timeout = 60 * 60
+
     def __init__(
             self,
             name,
