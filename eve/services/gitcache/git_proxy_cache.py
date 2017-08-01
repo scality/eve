@@ -35,6 +35,7 @@ if os.path.exists(repocachedir):
     except OSError:
         pass
     os.chdir(repocachedir)
+    subprocess.call(['git', 'gc', '--auto', '--quiet'])
     os.execlp('git', 'git', 'remote', 'update', '--prune')
 else:
     # This is the first time this repo is requested.
@@ -46,7 +47,6 @@ else:
 
     remote_url = '{}://{}/{}/{}'.format(scheme, githost, account, reponame)
 
-    subprocess.call(['git', 'gc', '--auto', '--quiet'])
     os.execlp('git',
               'git',
               'clone',
