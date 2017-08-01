@@ -42,12 +42,15 @@ class HeatOpenStackBuildOrder(util.BaseBuildOrder):
             self.properties['master_builddir'],
             self._worker['path'])
 
-        if os.path.isfile(requirements_script):
+        if os.path.isfile(init_script):
+            init_script_contents = open(init_script).read()
+        else:
             init_script_contents = ''
+
+        if os.path.isfile(requirements_script):
             requirements_script_contents = open(requirements_script).read()
         else:
             requirements_script_contents = ''
-            init_script_contents = open(init_script).read()
 
         self.properties.update({
             'worker_path': self._worker['path'],
