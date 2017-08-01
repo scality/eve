@@ -54,6 +54,12 @@ def docker_workers():
     return workers
 
 
+"""The latest CentOS 6 git package available is 1.7.1. The credential.helper
+store has been introduced in git 1.7.9. To allow CentOS 6 to deal with auth,
+the login/passwd has been added in the insteadOf conf (the credentials will
+not be displayed in logs).
+
+"""
 START_WORKER_SCRIPT = """
 echo https://{githost_login}:{githost_pwd}@bitbucket.org \
   >> /home/eve/.git_credentials
