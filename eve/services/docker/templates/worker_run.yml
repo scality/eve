@@ -10,6 +10,7 @@ spec:
         k8s-app: eve-worker
     spec:
       restartPolicy: Never
+      activeDeadlineSeconds: 36000
       containers:
         - name: "{{ name }}"
           image: "{{ image }}"
