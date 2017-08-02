@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 
 import subprocess
+import traceback
 
 from celery import Celery
 from command import command_factory
-from flask import Flask, abort, jsonify, request, url_for
+from flask import Flask, jsonify, request, url_for
 
 app = Flask(__name__)
 app.config.update(
@@ -58,17 +59,24 @@ def taskstatus(task_id):
     return jsonify(response)
 
 
+def bad_request(code, traceback):
+    response = jsonify({'traceback': traceback})
+    response.status_code = code
+    return response
+
+
 @app.route('/<string:command>', methods=['PUT'])
 def docker(command):
     try:
         cmd = command_factory(command)
     except Exception:
-        abort(403)
+        traceback.print_exc()
+        return bad_request(403, traceback.format_exc())
 
     try:
         target_cmd = cmd.convert(request.data)
     except Exception:
-        abort(500)
+        return bad_request(500, traceback.format_exc())
 
     task = call.delay(target_cmd)
 

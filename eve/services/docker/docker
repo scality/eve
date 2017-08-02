@@ -25,8 +25,10 @@ def handle_remote(cmd):
         sys.exit('The Docker service is currently unavailable.')
 
     if response.status_code != 202:
-        sys.exit('This Docker command is not available ' \
-                 'on the platform ({}).'.format(response.status_code))
+        sys.exit('This Docker command is currently not available ' \
+                 'on the platform ({code})\nRemote traceback:\n{msg}'.format(
+                    code=response.status_code,
+                    msg = response.json().get('traceback', 'unknown error')))
 
     task_url = response.headers['Location']
 
