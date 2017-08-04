@@ -16,6 +16,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor,
 # Boston, MA  02110-1301, USA.
 
+import socket
 from unittest import TestCase
 
 from tests.util.cmd import cmd
@@ -25,6 +26,25 @@ from tests.util.daemon.daemon import Daemon
 class SleepyDaemon(Daemon):
     """A fake daemon for testing purposes. It just sleeps for 1 hour."""
     _start_cmd = ['sleep', '3600']
+
+
+class TestPorts(TestCase):
+    @staticmethod
+    def is_free(port):
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.bind(('', port))
+        sock.close()
+
+    def test_single_port_request_is_free(self):
+        self.is_free(Daemon.get_free_port())
+
+    def test_multi_ports_request(self):
+        ports = Daemon.get_free_port(3)
+        for port in ports:
+            self.is_free(port)
+        self.assertNotEqual(ports[0], ports[1])
+        self.assertNotEqual(ports[0], ports[2])
+        self.assertNotEqual(ports[1], ports[2])
 
 
 class TestDaemon(TestCase):

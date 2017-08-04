@@ -140,13 +140,18 @@ class Daemon(object):
             '{} never finished {}'.format(self._name, self._status))
 
     @staticmethod
-    def get_free_port():
-        """Return a free system port that can be used by the daemon."""
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.bind(('', 0))
-        port = sock.getsockname()[1]
-        sock.close()
-        return port
+    def get_free_port(nb=1):
+        """Return free system ports that can be used by the daemon."""
+        ports = []
+        socks = []
+        for _ in range(nb):
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock.bind(('', 0))
+            socks.append(sock)
+            ports.append(sock.getsockname()[1])
+        for sock in socks:
+            sock.close()
+        return ports[0] if nb == 1 else ports
 
     def sanity_check(self):
         """Check that the daemon has no unexpected error messages in logs."""

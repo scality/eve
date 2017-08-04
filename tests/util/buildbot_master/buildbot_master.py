@@ -35,74 +35,17 @@ class BuildbotMaster(Daemon):
     _stop_cmd = 'buildbot stop --no-wait .'
     _env = None
 
-    def __init__(self,
-                 mode,
-                 git_repo,
-                 external_url=None,
-                 db_url=None,
-                 vault=None,
-                 master_fqdn='localhost',
-                 wamp_url=None,
-                 registry=None):
+    def __init__(self, conf):
         """Class representing a Buildbot Daemon.
 
         Args:
-            mode (str): A value from frontend/backend/standalone/symmetric.
-            git_repo (GitHostMock): The remote git repo to use.
-            external_url: The external web url.
-            db_url: The sqlalchemy url to connect to.
-            master_fqdn: The FQDN of the master so the workers can connect to.
-            wamp_url: The url to the wamp router.
+            conf (dict): eve settings.
 
         """
-        self.http_port = self.get_free_port()
-        name = '{}{}'.format(mode, self.http_port)
-        super(BuildbotMaster, self).__init__(name=name)
-
-        self.external_url = external_url if external_url is not None else \
-            'http://localhost:%s/' % str(self.http_port)
-
-        self.db_url = db_url if db_url is not None else \
-            'sqlite:///' + os.path.join(self._base_path, 'state.sqlite')
-
-        max_local_workers = 4
-        self.vault = vault
-
-        self.conf = dict(
-            ARTIFACTS_URL='None',
-            CLOUDFILES_URL='None',
-            DB_URL=self.db_url,
-            DOCKER_API_VERSION='1.25',
-            EXTERNAL_URL=str(self.external_url),
-            GIT_HOST='mock',
-            GIT_OWNER='repo_owner',
-            GIT_REPO=git_repo,
-            GIT_SLUG='test',
-            HIDE_INTERNAL_STEPS='0',
-            HTTP_PORT='tcp:%s' % str(self.http_port),
-            MASTER_FQDN=master_fqdn,
-            MASTER_MODE=mode,
-            MASTER_NAME=name,
-            MAX_LOCAL_WORKERS=str(max_local_workers),
-            PB_PORT=str(self.get_free_port()),
-            PROJECT_URL='www.example.com',
-            PROJECT_YAML='eve/main.yml',
-            SECRET_ARTIFACT_CREDS='None',
-            SUFFIX='test_suffix',
-            TRY_PORT=str(self.get_free_port()),
-            WAMP_REALM='realm1',
-            WORKER_SUFFIX='test-eve',
-        )
-
-        if registry:
-            self.conf['DOCKER_REGISTRY_URL'] = 'localhost:{}'.format(
-                registry.port)
-
-        if wamp_url:
-            self.conf['WAMP_ROUTER_URL'] = wamp_url
-
+        self.conf = conf
+        super(BuildbotMaster, self).__init__(name=self.conf['MASTER_NAME'])
         self.start_success_msg = 'BuildMaster is running'
-        self.api = BuildbotDataAPI(self.external_url)
+        self.api = BuildbotDataAPI(self.conf['EXTERNAL_URL'])
 
     def pre_start_hook(self):
         """Dump conf and launch the 'create-master' command before starting."""
@@ -110,11 +53,7 @@ class BuildbotMaster(Daemon):
         copy(master_cfg, join(self._base_path, 'master.cfg'))
 
         cmd('buildbot create-master --relocatable --db={} {}'.format(
-            self.db_url, self._base_path))
-        if self.vault:
-            self.conf['VAULT_IN_USE'] = '1'
-            self.conf['VAULT_URL'] = self.vault.url
-            self.conf['VAULT_TOKEN'] = self.vault.token
+            self.conf['DB_URL'], self._base_path))
 
         self._env = self.environ
 
