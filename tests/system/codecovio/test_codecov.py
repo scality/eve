@@ -64,20 +64,17 @@ class TestPublishCodeCoverage(unittest.TestCase):
         don't give this variable to Eve.
 
         """
-
-        if not os.environ.get('CODECOV_IO_UPLOAD_TOKEN'):
+        if not os.environ.get('CODECOV_IO_BASE_URL', None):
             self.codecov_io_server = CodecovIOMockServer()
             self.codecov_io_server.start()
 
-            os.environ.update({
-                'CODECOV_IO_BASE_URL': self.codecov_io_server.url,
-                'CODECOV_IO_UPLOAD_TOKEN': 'FAKE_TOKEN',
-            })
-
-        self.cluster = Cluster()
-        for master in self.cluster._masters.values():
-            master.conf['CODECOV_IO_BASE_URL'] = self.codecov_io_server.url
-            master.conf['CODECOV_IO_UPLOAD_TOKEN'] = 'FAKETOKEN'
+        conf = {
+            'CODECOV_IO_BASE_URL': os.environ.get(
+                'CODECOV_IO_BASE_URL', self.codecov_io_server.url),
+            'CODECOV_IO_UPLOAD_TOKEN': os.environ.get(
+                'CODECOV_IO_UPLOAD_TOKEN', 'FAKETOKEN')
+        }
+        self.cluster = Cluster(extra_conf=conf)
         self.cluster.start()
         self.local_repo = self.cluster.clone()
         super(TestPublishCodeCoverage, self).setUp()
@@ -94,10 +91,6 @@ class TestPublishCodeCoverage(unittest.TestCase):
             self.codecov_io_server.stop()
             self.codecov_io_server = None
 
-        for varname_suffix in ['BASE_URL', 'UPLOAD_TOKEN']:
-            varname = 'CODECOV_IO_{0}'.format(varname_suffix)
-            if varname in os.environ:
-                del os.environ[varname]
         self.cluster.stop()
 
     def _get_publish_codecov_build(self, builder_name='test_docker_builder'):

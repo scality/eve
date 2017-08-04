@@ -47,15 +47,10 @@ class DockerizedBuildbotMaster(BuildbotMaster):
             '--env-file', self._env_file,
             'eve_master'
         ]
-        self.vault = kwargs['vault']
 
     def pre_start_hook(self):
         """Build an eve docker image and prepare the environment to run it."""
         cmd('docker build -t eve_master  .')
-        if self.vault:
-            self.conf['VAULT_IN_USE'] = '1'
-            self.conf['VAULT_URL'] = self.vault.url
-            self.conf['VAULT_TOKEN'] = self.vault.token
         self._env = self.environ
         self.dump(self._env_file)
 
