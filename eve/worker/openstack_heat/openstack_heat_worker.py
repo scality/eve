@@ -28,6 +28,7 @@ from twisted.internet import defer, threads
 from twisted.logger import Logger
 
 MISSING_TIMEOUT = 15 * 60
+POLLING_FREQ = 10
 
 
 class HeatLatentWorker(AbstractLatentWorker):
@@ -100,7 +101,7 @@ class HeatLatentWorker(AbstractLatentWorker):
         self.stack_id = result['stack']['id']
         stack = self.heat_client.stacks.get(stack_id=self.stack_id)
         while stack.stack_status == 'CREATE_IN_PROGRESS':
-            time.sleep(1)
+            time.sleep(POLLING_FREQ)
             stack = self.heat_client.stacks.get(stack_id=self.stack_id)
 
         if stack.stack_status != 'CREATE_COMPLETE':
@@ -120,13 +121,13 @@ class HeatLatentWorker(AbstractLatentWorker):
             # instantaneously after stack.delete() is called. This loop makes
             # sure deletion is in progress or finished before going further.
             stack.delete()
-            time.sleep(1)
+            time.sleep(POLLING_FREQ)
             stack = self.heat_client.stacks.get(stack_id=stack_id)
         if fast:
             return
 
         while stack.stack_status == 'DELETE_IN_PROGRESS':
-            time.sleep(1)
+            time.sleep(POLLING_FREQ)
             stack = self.heat_client.stacks.get(stack_id=stack_id)
 
         if stack.stack_status != 'DELETE_COMPLETE':
