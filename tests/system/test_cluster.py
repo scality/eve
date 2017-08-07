@@ -16,7 +16,6 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor,
 # Boston, MA  02110-1301, USA.
 
-import os
 import unittest
 
 from buildbot.process.results import CANCELLED, SUCCESS
@@ -134,8 +133,8 @@ class TestCluster(unittest.TestCase):
             - Check Eve environment variables are not setted in the worker.
 
         """
-        os.environ['FOO'] = 'bar'
-        with Cluster() as cluster:
+        conf = {'FOO': 'bar'}
+        with Cluster(extra_conf=conf) as cluster:
             local_repo = cluster.clone()
 
             local_repo.push(yaml=SingleCommandYaml('test -z "$FOO"'))
@@ -157,8 +156,8 @@ class TestCluster(unittest.TestCase):
               the step's stdio log.
 
         """
-        os.environ['FORCE_BUILD_PARAM_COUNT'] = '5'
-        with Cluster() as cluster:
+        conf = {'FORCE_BUILD_PARAM_COUNT': '5'}
+        with Cluster(extra_conf=conf) as cluster:
             local_repo = cluster.clone()
             local_repo.push(yaml=SingleCommandYaml(
                 'echo The %(prop:color)s %(prop:vehicule)s'))
