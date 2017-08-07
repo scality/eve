@@ -18,7 +18,7 @@
 
 import unittest
 
-from tests.docker.cluster import DockerizedCluster
+from tests.docker.cluster import DockerizedCluster as Cluster
 from tests.util.yaml_factory import SingleCommandYaml
 
 
@@ -33,21 +33,21 @@ class TestSecrets(unittest.TestCase):
               its value : expected failure + expected success
             - stop the cluster
         """
-        cluster = DockerizedCluster().start()
-        cluster.sanity_check()
-        cluster.vault.write_secret('secret_id', {'value': 'polichinelle'})
-        assert cluster.vault.read_secret('secret_id') == {
-            'value': 'polichinelle'
-        }
+        conf = {'VAULT_IN_USE': '1'}
+        with Cluster(extra_conf=conf) as cluster:
+            cluster.sanity_check()
+            cluster.vault.write_secret('secret_id', {'value': 'polichinelle'})
+            assert cluster.vault.read_secret('secret_id') == {
+                'value': 'polichinelle'
+            }
 
-        for secret_value, expected_result in (('marionette', 'failure'),
-                                              ('polichinelle', 'success')):
-            local_repo = cluster.clone()
-            local_repo.push(yaml=SingleCommandYaml(
-                command='test $SECRET_ID = {}'.format(secret_value),
-                env={'SECRET_ID': '%(secrets:secret_id)s'}))
+            for secret_value, expected_result in (('marionette', 'failure'),
+                                                  ('polichinelle', 'success')):
+                local_repo = cluster.clone()
+                local_repo.push(yaml=SingleCommandYaml(
+                    command='test $SECRET_ID = {}'.format(secret_value),
+                    env={'SECRET_ID': '%(secrets:secret_id)s'}))
 
-            buildset = cluster.api.force(branch=local_repo.branch)
-            assert buildset.result == expected_result
-        cluster.sanity_check()
-        cluster.stop()
+                buildset = cluster.api.force(branch=local_repo.branch)
+                assert buildset.result == expected_result
+            cluster.sanity_check()

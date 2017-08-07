@@ -31,7 +31,8 @@ class Tests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """Start a cluster including a local Docker registry."""
-        cls.cluster = DockerizedCluster(use_registry=True).start()
+        conf = {'DOCKER_REGISTRY_URL': 'mock'}
+        cls.cluster = DockerizedCluster(extra_conf=conf).start()
         print 'API URL:', cls.cluster.api.api_url
         cls.cluster.sanity_check()
 
