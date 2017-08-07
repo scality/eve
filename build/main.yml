@@ -88,18 +88,6 @@ stages:
           shallow: True
           retryFetch: True
       - ShellCommand:
-          name: upgrade pip
-          command: sudo -H pip install --upgrade pip
-          haltOnFailure: True
-      - ShellCommand:
-          name: install mysql client
-          command: sudo apt-get install -qy libmysqlclient-dev
-          haltOnFailure: True
-      - ShellCommand:
-          name: install tox
-          command: sudo -H pip install tox==2.3.2
-          haltOnFailure: True
-      - ShellCommand:
           name: run docker-compose build
           command: HOME=/home/eve tox -e compose-build
           haltOnFailure: True
