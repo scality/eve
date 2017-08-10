@@ -10,6 +10,7 @@ spec:
         k8s-app: eve-worker
     spec:
       restartPolicy: Never
+      activeDeadlineSeconds: 36000
       containers:
         - name: "{{ name }}"
           image: "{{ image }}"
@@ -19,7 +20,12 @@ spec:
           lifecycle:
             postStart:
               exec:
-                command: ["/bin/sh", "-c", "sudo chmod 755 /usr/local/bin/docker"]
+                command:
+                  - "/bin/sh"
+                  - "-c"
+                  - >
+                    sudo chmod 755 /usr/local/bin/docker || chmod 755 /usr/local/bin/docker;
+                    sudo chmod 666 /var/run/docker.sock || chmod 666 /var/run/docker.sock;
           volumeMounts:
             - name: gitconfig
               readOnly: true
