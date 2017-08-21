@@ -104,7 +104,7 @@ class ReadConfFromYaml(FileUpload):
             defer.returnValue(FAILURE)
 
         # Extract Eve API version (call str() to support buggy yaml files)
-        if conf and 'version' in conf.keys():
+        if 'version' in conf.keys():
             eve_api_version = str(conf['version'])
         else:
             eve_api_version = '0.1'
