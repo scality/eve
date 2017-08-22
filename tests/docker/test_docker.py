@@ -329,3 +329,26 @@ class TestDockerCluster(unittest.TestCase):
             buildset = cluster.api.force(branch=local_repo.branch)
             self.assertEqual(buildset.result, 'success')
             cluster.sanity_check()
+
+    def test_long_step_name(self):
+        """Test that the build succeeds when a long step name is provided."""
+        with Cluster() as cluster:
+            local_repo = cluster.clone()
+            local_repo.push(
+                yaml=PreMerge(steps=[{
+                    'ShellCommand': {
+                        'name': 'This is a very long name to describe this'
+                                'very short command; Lorem ipsum dolor sita '
+                                'amet, dis sem wisi ligula conubia ut '
+                                'lectus. Hendrerit ut diam. Massa magna, '
+                                'nunc pede tempor quisque nullam magna. '
+                                'Arcu et suspendisse nam venenatis, wisi '
+                                'metus at arcu nisl massa magna, nulla '
+                                'felis, urna aenean a quam penatibus turpis '
+                                'fringilla, sed a mattis volutpat '
+                                'pellentesque sint est. Ridiculus orci '
+                                'molestie sagittis justo non.',
+                        'command': 'exit 0'}}]))
+            buildset = cluster.api.force(branch=local_repo.branch)
+            self.assertEqual(buildset.result, 'success')
+            cluster.sanity_check()
