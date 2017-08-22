@@ -104,7 +104,7 @@ class ReadConfFromYaml(FileUpload):
             defer.returnValue(FAILURE)
 
         # Extract Eve API version (call str() to support buggy yaml files)
-        if conf and 'version' in conf.keys():
+        if 'version' in conf.keys():
             eve_api_version = str(conf['version'])
         else:
             eve_api_version = '0.1'
@@ -237,9 +237,12 @@ class StepExtractor(BuildStep):
         for step in stage_conf['steps']:
             step_type, params = next(step.iteritems())
             step_type, params = patcher.patch(step_type, params)
+            if 'name' in params:
+                # step names end up as keys in db and can't be too long
+                params['name'] = params['name'][:50]
             bb_step = util.step_factory(globals(), step_type, **params)
             self.build.addStepsAfterLastStep([bb_step])
-            self.logger.debug('Add {step} with params : {params}',
+            self.logger.debug('Add {step} with params: {params}',
                               step=step_type, params=params)
         return defer.succeed(SUCCESS)
 
