@@ -1,4 +1,5 @@
 import argparse
+import re
 from uuid import uuid4
 
 from jinja2 import Environment, FileSystemLoader
@@ -119,56 +120,64 @@ class Run(BaseCommand):
                      '-f', '%resource%']
 
     def register_args(self, parser):
+        def dictify_equal(arg):
+            name, value = arg.split('=')
+            return {'name': name, 'value': value}
+
+        def dictify_port(arg):
+            values = arg.split(':')
+            if len(values) == 1:
+                return {
+                    'value': values[0],
+                    'target': values[0],
+                    'name': 'port-' + str(uuid4())[:13]
+                }
+            elif len(values) == 2:
+                return {
+                    'value': values[0],
+                    'target': values[1],
+                    'name': 'port-' + str(uuid4())[:13]}
+            raise Exception('unsupported port type')
+
+        def dictify_volume(arg):
+            values = arg.split(':')
+            if len(values) == 1:
+                return {
+                    'name': 'volume-' + str(uuid4())[:13],
+                    'mountpath': values[0],
+                    'readonly': False
+                }
+            # ignore unsupported volume specification
+            return None
+
         # unique random name (name is mandatory for kube)
         default_name = 'eve-worker-' + str(uuid4())[:13]
         parser.add_argument('--privileged', action='store_true')
         parser.add_argument('-e', '--env', action='append',
-                            nargs=1, default=[])
+                            default=[], type=dictify_equal)
+        parser.add_argument('-l', '--label', action='append',
+                            default=[], type=dictify_equal)
         parser.add_argument('--name', action='store',
                             default=default_name)
         parser.add_argument('-p', '--publish', action='append',
-                            nargs=1, default=[])
+                            default=[], type=dictify_port)
         parser.add_argument('-v', '--volume', action='append',
-                            nargs=1, default=[])
-        parser.add_argument('--link', action='store', nargs=1)
+                            default=[], type=dictify_volume)
         parser.add_argument('image', action='store')
 
     def adapt_args(self):
         self.resource = '/resource/' + self.namespace.name
+        vars(self.namespace)['docker_hook_sidecar'] = False
 
-        # env: name=value -> {name:, value:}
-        for index, env in enumerate(self.namespace.env):
-            values = env[0].split("=")
-            self.namespace.env[index] = {
-                'name': values[0], 'value': values[1]}
-
-        # publish: port:targetport to {value:, target:, name:}
-        for index, port in enumerate(self.namespace.publish):
-            values = port[0].split(":")
-            if len(values) == 1:
-                self.namespace.publish[index] = {
-                    'value': values[0],
-                    'target': values[0],
-                    'name': 'port-' + str(uuid4())[:13]}
-            elif len(values) == 2:
-                self.namespace.publish[index] = {
-                    'value': values[0],
-                    'target': values[1],
-                    'name': 'port-' + str(uuid4())[:13]}
-            else:
-                raise Exception('unsupported port type')
-
-        # volume: src:dst:opt -> {'src':, 'dst':, 'readonly':}
-        for index, vol in enumerate(self.namespace.volume):
-            values = vol[0].split(":")
-            if len(values) == 1:
-                self.namespace.volume[index] = {
-                    'name': 'volume-' + str(uuid4())[:13],
-                    'mountpath': values[0],
-                    'readonly': False}
-            else:
-                # ignore unsupported volume specification
-                self.namespace.volume[index] = None
+        for label in self.namespace.label:
+            if label['name'] == 'docker_in_docker':
+                vars(self.namespace)['docker_hook_sidecar'] = True
+                vars(self.namespace)['docker_hook_image'] = re.sub(
+                    r'([^/]*/[^/]*/)[^:]*:.*',
+                    r'\1docker-hook:%s' % label['value'],
+                    self.namespace.image
+                )
+                break
 
 
 class Wait(BaseCommand):

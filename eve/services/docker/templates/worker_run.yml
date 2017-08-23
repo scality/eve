@@ -7,7 +7,10 @@ spec:
   template:
     metadata:
       labels:
-        k8s-app: eve-worker
+        k8s-app: "eve-worker"
+        {% for l in label %}
+        {{ l.name }}: "{{ l.value }}"
+        {% endfor %}
     spec:
       restartPolicy: Never
       activeDeadlineSeconds: 36000
@@ -15,8 +18,11 @@ spec:
         - name: "{{ name }}"
           image: "{{ image }}"
           imagePullPolicy: IfNotPresent
+          {% if privileged or docker_hook_sidecar %}
           securityContext:
-            privileged: {{ privileged }}
+            privileged: true
+          {% endif %}
+          {% if docker_hook_sidecar %}
           lifecycle:
             postStart:
               exec:
@@ -26,11 +32,13 @@ spec:
                   - >
                     sudo chmod 755 /usr/local/bin/docker || chmod 755 /usr/local/bin/docker;
                     sudo chmod 666 /var/run/docker.sock || chmod 666 /var/run/docker.sock;
+          {% endif %}
           volumeMounts:
             - name: gitconfig
               readOnly: true
               mountPath: /etc/gitconfig
               subPath: gitconfig
+            {% if docker_hook_sidecar %}
             - name: docker-hook
               readOnly: false
               mountPath: /usr/local/bin/docker
@@ -41,6 +49,7 @@ spec:
             - name: docker-host-sock
               readOnly: false
               mountPath: /var/run/docker.sock
+            {% endif %}
             {% for v in volume %}
             {% if v %}
             - name: "{{ v.name }}"
@@ -53,8 +62,10 @@ spec:
             - name: "{{ e.name }}"
               value: "{{ e.value }}"
             {% endfor %}
+            {% if docker_hook_sidecar %}
             - name: DOCKER_API_VERSION
               value: "1.23"
+            {% endif %}
           {% if publish %}
           ports:
             {% for p in publish %}
@@ -63,10 +74,34 @@ spec:
               protocol: "TCP"
             {% endfor %}
           {% endif %}
+        {% if docker_hook_sidecar %}
+        - name: docker-hook
+          image: "{{ docker_hook_image }}"
+          imagePullPolicy: Always
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - name: creds
+              readOnly: true
+              mountPath: /creds
+            - name: docker-host-data
+              readOnly: false
+              mountPath: /var/lib/docker
+            - name: docker-host-sock
+              readOnly: false
+              mountPath: /var/run/docker.sock
+          env:
+            - name: DOCKER_API_VERSION
+              value: "1.23"
+        {% endif %}
       volumes:
         - name: gitconfig
           configMap:
             name: gitconfig
+        {% if docker_hook_sidecar %}
+        - name: creds
+          secret:
+            secretName: docker-hook-registry-credentials
         - name: docker-hook
           configMap:
             name: docker-hook
@@ -76,6 +111,7 @@ spec:
         - name: docker-host-sock
           hostPath:
             path: /var/run/docker.sock
+        {% endif %}
         {% for v in volume %}
         {% if v %}
         - name: "{{ v.name }}"
