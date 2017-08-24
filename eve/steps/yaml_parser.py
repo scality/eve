@@ -248,8 +248,13 @@ class GetCommitShortVersion(SetPropertyFromCommand):
     def __init__(self, branch):
         super(GetCommitShortVersion, self).__init__(
             name='get the commit short_revision',
-            command=Interpolate(
-                'git rev-parse --verify --short ' + branch),
+            command=[
+                'git',
+                'rev-parse',
+                '--verify',
+                '--short',
+                branch,
+            ],
             hideStepIf=util.hideStepIfSuccess,
             property='commit_short_revision',
             haltOnFailure=True)
@@ -259,8 +264,13 @@ class GetCommitTimestamp(SetPropertyFromCommand):
     def __init__(self):
         super(GetCommitTimestamp, self).__init__(
             name='get the commit timestamp',
-            command='git log -1 --format=%cd '
-                    '--date="format-local:%y%m%d%H%M%S"',
+            command=[
+                'git',
+                'log',
+                '-1',
+                '--format=%cd',
+                '--date=format-local:%y%m%d%H%M%S',
+            ],
             hideStepIf=util.hideStepIfSuccess,
             haltOnFailure=True,
             property='commit_timestamp')
@@ -290,13 +300,16 @@ class SetArtifactsBaseName(SetPropertyFromCommand):
     def __init__(self):
         super(SetArtifactsBaseName, self).__init__(
             name='set the artifacts base name',
-            command=Interpolate('echo %(prop:git_host)s'
-                                ':%(prop:git_owner)s:' +
-                                util.env.GIT_SLUG +
-                                ':%(prop:artifacts_prefix)s'
-                                '%(prop:product_version)s'
-                                '.r%(prop:commit_timestamp)s'
-                                '.%(prop:commit_short_revision)s'),
+            command=[
+                'echo',
+                Interpolate('%(prop:git_host)s'
+                            ':%(prop:git_owner)s:' +
+                            util.env.GIT_SLUG +
+                            ':%(prop:artifacts_prefix)s'
+                            '%(prop:product_version)s'
+                            '.r%(prop:commit_timestamp)s'
+                            '.%(prop:commit_short_revision)s'),
+            ],
             hideStepIf=util.hideStepIfSuccess,
             property='artifacts_base_name')
 
@@ -305,9 +318,12 @@ class SetArtifactsName(SetPropertyFromCommand):
     def __init__(self):
         super(SetArtifactsName, self).__init__(
             name='set the artifacts name',
-            command=Interpolate('echo %(prop:artifacts_base_name)s'
-                                '.%(prop:pipeline)s'
-                                '.%(prop:b4nb)s'),
+            command=[
+                'echo',
+                Interpolate('%(prop:artifacts_base_name)s'
+                            '.%(prop:pipeline)s'
+                            '.%(prop:b4nb)s'),
+            ],
             hideStepIf=util.hideStepIfSuccess,
             property='artifacts_name')
 
@@ -325,8 +341,10 @@ class SetArtifactsPrivateURL(SetPropertyFromCommand):
     def __init__(self):
         super(SetArtifactsPrivateURL, self).__init__(
             name='set the artifacts private url',
-            command=Interpolate('echo http://artifacts/builds/'
-                                '%(prop:artifacts_name)s'),
+            command=[
+                'echo',
+                Interpolate('http://artifacts/builds/%(prop:artifacts_name)s'),
+            ],
             hideStepIf=util.hideStepIfSuccess,
             property='artifacts_private_url')
 
@@ -335,8 +353,11 @@ class SetArtifactsPublicURL(SetPropertyFromCommand):
     def __init__(self):
         super(SetArtifactsPublicURL, self).__init__(
             name='set the artifacts public url',
-            command=Interpolate('echo ' + util.env.ARTIFACTS_URL +
-                                '/%(prop:artifacts_name)s'),
+            command=[
+                'echo',
+                Interpolate(util.env.ARTIFACTS_URL +
+                            '/%(prop:artifacts_name)s'),
+            ],
             hideStepIf=util.hideStepIfSuccess,
             property='artifacts_public_url')
 
