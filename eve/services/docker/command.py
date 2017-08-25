@@ -1,5 +1,6 @@
 import argparse
 import re
+import socket
 from uuid import uuid4
 
 from jinja2 import Environment, FileSystemLoader
@@ -151,7 +152,10 @@ class Run(BaseCommand):
             return None
 
         # unique random name (name is mandatory for kube)
-        default_name = 'eve-worker-' + str(uuid4())[:13]
+        default_name = '%s-worker-%s' % (
+            socket.gethostname(),
+            str(uuid4())[:8]
+        )
         parser.add_argument('--privileged', action='store_true')
         parser.add_argument('-e', '--env', action='append',
                             default=[], type=dictify_equal)
