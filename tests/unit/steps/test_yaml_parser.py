@@ -18,7 +18,7 @@ from eve.steps import yaml_parser
 class TestReadConfFromYamlExecution(steps.BuildStepMixin, unittest.TestCase):
     def setUp(self):
         util.env = util.load_env([
-            ('ARTIFACTS_URL', 'artifacts_url'),
+            ('ARTIFACTS_URL', 'foo.bar.baz'),
             ('DOCKER_SCHEDULER_NAME', 'local_scheduler'),
             ('GIT_SLUG', 'git_slug'),
             ('HIDE_INTERNAL_STEPS', '1'),

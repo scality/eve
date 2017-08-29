@@ -26,7 +26,8 @@ from tests.util.yaml_factory import SingleCommandYaml
 class TestArtifacts(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.cluster = Cluster().start()
+        conf = {'ARTIFACTS_URL': 'foo.bar.baz'}
+        cls.cluster = Cluster(extra_conf=conf).start()
 
     @classmethod
     def tearDownClass(cls):
@@ -56,7 +57,6 @@ class TestArtifacts(unittest.TestCase):
                    '00000001'.format(timestamp.strip(), short_hash.strip())
         self.assertEqual(child_build.properties['artifacts_name'][0], expected)
 
-        # TODO: pass a fake env variable and test
-        expected = 'None/' + expected
+        expected = 'foo.bar.baz/' + expected
         self.assertEqual(child_build.properties['artifacts_public_url'][0],
                          expected)

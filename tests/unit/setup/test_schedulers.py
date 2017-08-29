@@ -18,11 +18,13 @@ class TestSetupSchedulers(unittest.TestCase):
     def test_force_scheduler(self):
         util.env = util.load_env([
             ('BOOTSTRAP_BUILDER_NAME', 'foo'),
+            ('FORCE_SCHEDULER_NAME', 'bar'),
+            ('FORCE_BUILD_PARAM_COUNT', '0', int),
             ('GIT_OWNER', 'foo'),
             ('GIT_REPO', 'blblbl'),
             ('GIT_SLUG', 'bar'),
-            ('FORCE_SCHEDULER_NAME', 'bar'),
-            ('FORCE_BUILD_PARAM_COUNT', '0', int)
+            ('MICROSERVICE_ARTIFACTS_IN_USE', '0', int),
+            ('MICROSERVICE_GITCACHE_IN_USE', '0', int)
         ])
         self.assertIsNotNone(eve.setup.schedulers.force_scheduler())
 

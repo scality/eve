@@ -40,12 +40,6 @@ def eve_canStartBuild(builder, wfb, request):
 def bootstrap_builder(workers):
     bootstrap_factory = BuildFactory()
 
-    if util.env.RAX_LOGIN:
-        bootstrap_factory.addStep(
-            steps.CloudfilesAuthenticate(
-                rax_login=util.env.RAX_LOGIN,
-                rax_pwd=util.env.RAX_PWD))
-
     bootstrap_factory.addStep(
         Git(name='checkout git branch',
             repourl=util.env.GIT_REPO,
@@ -110,7 +104,7 @@ def bootstrap_builder(workers):
         workernames=[lw.name for lw in workers],
         factory=bootstrap_factory,
         properties={
-            'artifacts_url': util.env.ARTIFACTS_URL,
+            'artifacts_url': 'http://artifacts/builds',
             'artifacts_prefix': util.env.ARTIFACTS_PREFIX,
         },
         canStartBuild=eve_canStartBuild,

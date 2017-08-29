@@ -35,4 +35,5 @@ def triggerable_builder(builder_name, workers):
         name=builder_name,
         workernames=[w.name for w in workers],
         factory=factory,
-        collapseRequests=False)
+        collapseRequests=False,
+        env={"HOSTALIASES": "/etc/host.aliases"})

@@ -20,7 +20,6 @@ class TestBootstrap(unittest.TestCase):
     def setUp(self):
         """Set up a random environment for maximum code coverage."""
         util.env = util.load_env([
-            ('ARTIFACTS_URL', ''),
             ('ARTIFACTS_PREFIX', 'foo_'),
             ('BOOTSTRAP_BUILDER_NAME', 'foo'),
             ('DOCKER_BUILDER_NAME', 'foo'),
@@ -31,13 +30,13 @@ class TestBootstrap(unittest.TestCase):
             ('GIT_CACHE_PORT', '11111', int),
             ('GIT_REPO', 'foo/bar.git'),
             ('MASTER_START_TIME', '9999'),
+            ('MICROSERVICE_ARTIFACTS_IN_USE', '0', int),
+            ('MICROSERVICE_GITCACHE_IN_USE', '0', int),
             ('PATCHER_FILE_PATH', ''),
             ('PROJECT_YAML', ''),
-            ('RAX_LOGIN', 'foo'),
-            ('RAX_PWD', 'bar'),
         ])
 
     def test_bootstrap_builder(self):
         builder_config = eve.setup.bootstrap.bootstrap_builder(
             [DumbWorker(name='foo')])
-        self.assertEquals(len(builder_config.factory.steps), 10)
+        self.assertEquals(len(builder_config.factory.steps), 9)
