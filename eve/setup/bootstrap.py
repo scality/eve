@@ -40,32 +40,24 @@ def eve_canStartBuild(builder, wfb, request):
 def bootstrap_builder(workers):
     bootstrap_factory = BuildFactory()
 
-    if util.env.RAX_LOGIN:
-        bootstrap_factory.addStep(
-            steps.CloudfilesAuthenticate(
-                rax_login=util.env.RAX_LOGIN,
-                rax_pwd=util.env.RAX_PWD))
-
     git_config = None
 
-    if util.env.GITCACHE_IN_USE:
-        bootstrap_factory.addStep(steps.CheckGitCachePresence())
-
-    #   gitcache = util.env.GITCACHE_HOSTNAME
-    #   git_config = {
-    #       'url.http://{}/https/bitbucket.org/.insteadOf'.format(gitcache):
-    #           'git@bitbucket.org:',
-    #       'url.http://{}/https/github.com/.insteadOf'.format(gitcache):
-    #           'git@github.com:',
-    #       'url.http://{}/git/.insteadOf'.format(gitcache):
-    #           'git://'
-    #   }
-
-    # The code commented above will only work when we have full dockerization,
+    # The code commented below will only work when we have full dockerization,
     # and bootstrap runs in a docker linked to gitcache. In the meantime, we
     # live without a cache on 'backend' machines (acceptable for the small
-    # repos # only; already deployed without cache on current production eve
+    # repos only; already deployed without cache on current production eve
     # 1.2b1)
+
+    # if util.env.MICROSERVICE_GITCACHE_IN_USE:
+    #     gitcache = 'gitcache'
+    #     git_config = {
+    #         'url.http://{}/https/bitbucket.org/.insteadOf'.format(gitcache):
+    #             'git@bitbucket.org:',
+    #         'url.http://{}/https/github.com/.insteadOf'.format(gitcache):
+    #             'git@github.com:',
+    #         'url.http://{}/git/.insteadOf'.format(gitcache):
+    #             'git://'
+    #     }
 
     bootstrap_factory.addStep(
         Git(name='checkout git branch',
@@ -132,7 +124,7 @@ def bootstrap_builder(workers):
         workernames=[lw.name for lw in workers],
         factory=bootstrap_factory,
         properties={
-            'artifacts_url': util.env.ARTIFACTS_URL,
+            'artifacts_url': 'http://artifacts/builds',
             'artifacts_prefix': util.env.ARTIFACTS_PREFIX,
         },
         canStartBuild=eve_canStartBuild,

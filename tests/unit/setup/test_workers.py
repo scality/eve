@@ -20,6 +20,7 @@ class TestSetupWorkers(unittest.TestCase):
     def test_docker_workers(self):
         util.env = util.load_env([
             ('ARTIFACTS_PREFIX', 'foo_'),
+            ('ARTIFACTS_URL', 'foo.bar.baz'),
             ('DOCKER_CONTAINER_MAX_CPU', 4),
             ('DOCKER_CONTAINER_MAX_MEMORY', 4096),
             ('EXTERNAL_PB_PORT', '12345'),
@@ -38,9 +39,13 @@ class TestSetupWorkers(unittest.TestCase):
             ('GIT_SLUG', 'slug'),
             ('MASTER_FQDN', 'foo'),
             ('MAX_OPENSTACK_WORKERS', 3),
+            ('MICROSERVICE_ARTIFACTS_VM_URL', 'foo.bar'),
+            ('MICROSERVICE_GITCACHE_VM_URL', 'foo.bar'),
             ('OS_AUTH_URL', 'foo'),
             ('OS_KEY_NAME', 'bar'),
-            ('OS_NETWORKS', 'foo,foo'),
+            ('OS_NETWORK_PRIVATE', 'foo'),
+            ('OS_NETWORK_PUBLIC', 'foo'),
+            ('OS_NETWORK_SERVICE', 'foo'),
             ('OS_REGION_NAME', 'foo'),
             ('OS_SSH_KEY', 'foo'),
             ('OS_TENANT_NAME', 'foo'),

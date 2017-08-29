@@ -17,7 +17,6 @@
 # Boston, MA  02110-1301, USA.
 """Steps allowing eve to interact with artifacts."""
 
-import json
 import re
 from collections import defaultdict
 
@@ -28,19 +27,6 @@ from buildbot.process.results import FAILURE, SKIPPED, SUCCESS
 from buildbot.steps.shell import SetPropertyFromCommand, ShellCommand
 from packaging import version
 from twisted.internet import defer, reactor
-
-
-CURL_CMD = """curl -s -X POST -H "Content-type: application/json" \
---progress-bar https://identity.api.rackspacecloud.com/v2.0/tokens \
--d '{ \
-        "auth": { \
-            "passwordCredentials": { \
-                "username": "'$RAX_LOGIN'", \
-                "password": "'$RAX_PWD'" \
-            } \
-        } \
-    }'
-"""
 
 
 class GetArtifactsFromStage(SetPropertyFromCommand):
@@ -73,31 +59,6 @@ class GetArtifactsFromStage(SetPropertyFromCommand):
                                  "GetArtifactsFromStage")
                 self.property_changes[self.property] = artifacts_name
                 break
-
-
-class CloudfilesAuthenticate(SetPropertyFromCommand):
-    """Authenticate with rackspace and store the auth token on a property."""
-
-    def __init__(self, rax_login, rax_pwd, **kwargs):
-        SetPropertyFromCommand.__init__(
-            self,
-            name='get cloudfiles authentication params',
-            command=CURL_CMD,
-            property='cloudfiles_token',
-            haltOnFailure=True,
-            env={'RAX_LOGIN': rax_login, 'RAX_PWD': rax_pwd},
-            logEnviron=False,  # Obfuscate $RAX_PWD
-            hideStepIf=util.hideStepIfSuccess,
-            **kwargs
-        )
-
-    def commandComplete(self, cmd):  # NOQA flake8 to ignore camelCase
-        if cmd.didFail():
-            return
-        output = json.loads(self.observer.getStdout())
-        token = output["access"]["token"]["id"]
-        self.setProperty(self.property, str(token), "CloudfilesAuthenticate")
-        self.property_changes[self.property] = token
 
 
 class Upload(ShellCommand):
@@ -142,12 +103,9 @@ class Upload(ShellCommand):
              'echo "No files here. Nothing to do."; exit 0; fi'),
             'tar -chvzf ../artifacts.tar.gz . ',
             'echo tar successful. Calling curl... ',
-            ('curl --verbose --max-time {max_time} -s -T ../artifacts.tar.gz '
-             '-X PUT -H"x-auth-token: ' +
-             self.getProperty('cloudfiles_token') + '" ' +
-             util.env.CLOUDFILES_URL + artifacts_container +
-             '?extract-archive=tar.gz').format(max_time=self.UPLOAD_MAX_TIME)
-        ]
+            ('curl --verbose --max-time {} -s -T ../artifacts.tar.gz -X PUT '
+             'http://artifacts/upload/{}').format(self.UPLOAD_MAX_TIME,
+                                                  artifacts_container)]
 
         # compute configured urls
         links = []

@@ -94,11 +94,11 @@ class EveDockerLatentWorker(AbstractLatentWorker):
             '--cpus=%s' % self.max_cpus
         ]
 
-        if util.env.GITCACHE_IN_USE:
-            hostname = util.env.GITCACHE_HOSTNAME
-            cmd += [
-                '--env', 'GITCACHE_HOSTNAME=%s' % hostname,
-                '--link', hostname]
+        if util.env.MICROSERVICE_ARTIFACTS_IN_USE:
+            cmd += ['--link', 'artifacts']
+
+        if util.env.MICROSERVICE_GITCACHE_IN_USE:
+            cmd += ['--link', 'gitcache']
 
         for volume in volumes:
             if isinstance(volume, dict):

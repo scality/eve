@@ -27,7 +27,7 @@ def triggerable_builder(builder_name, workers):
     factory.addStep(steps.CancelOldBuild(name='prevent unuseful restarts'))
 
     # customize global Git conf to hit on docker cache
-    if (util.env.GITCACHE_IN_USE and
+    if (util.env.MICROSERVICE_GITCACHE_IN_USE and
             builder_name == util.env.DOCKER_BUILDER_NAME):
         factory.addStep(ShellCommand(
             name='customize git settings to hit on cache',
@@ -35,18 +35,17 @@ def triggerable_builder(builder_name, workers):
             haltOnFailure=True,
 
             command='git config --global '
-                    'url.http://%(gitcache)s/https/bitbucket.org/.insteadOf '
+                    'url.http://gitcache/https/bitbucket.org/.insteadOf '
                     'git@bitbucket.org: && '
                     'git config --global '
-                    'url.http://%(gitcache)s/https/github.com/.insteadOf '
+                    'url.http://gitcache/https/github.com/.insteadOf '
                     'git@github.com: && '
                     'git config --global '
-                    'url.http://%(gitcache)s/git/mock/.insteadOf git@mock: && '
+                    'url.http://gitcache/git/mock/.insteadOf git@mock: && '
                     'git config --global '
                     'lfs.url '
-                    '"http://%(gitcache)s:81/'
+                    '"http://gitcache:81/'
                     '%(githost)s/%(gitowner)s/%(gitslug)s.git/info/lfs"' % {
-                        'gitcache': util.env.GITCACHE_HOSTNAME,
                         'githost': util.env.GIT_HOST,
                         'gitowner': util.env.GIT_OWNER,
                         'gitslug': util.env.GIT_SLUG
@@ -63,4 +62,5 @@ def triggerable_builder(builder_name, workers):
         name=builder_name,
         workernames=[w.name for w in workers],
         factory=factory,
-        collapseRequests=False)
+        collapseRequests=False,
+        env={"HOSTALIASES": "/etc/host.aliases"})

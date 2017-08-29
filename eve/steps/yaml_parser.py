@@ -22,7 +22,6 @@ from collections import defaultdict
 from fnmatch import fnmatch
 from tempfile import mktemp
 
-import netifaces
 import yaml
 from buildbot.plugins import steps, util
 from buildbot.process.buildstep import BuildStep
@@ -153,8 +152,6 @@ class ReadConfFromYaml(FileUpload):
             ], waitForFinish=True, haltOnFailure=True)
         ])
 
-        docker_host_ip = get_docker_host_ip()
-
         # compute artifact_name property starting from Eve API 0.2
         if version.parse(eve_api_version) >= version.parse('0.2'):
             buildnumber = str(self.getProperty('buildnumber'))
@@ -165,8 +162,8 @@ class ReadConfFromYaml(FileUpload):
                 GetB4NB(buildnumber=buildnumber),
                 SetArtifactsBaseName(),
                 SetArtifactsName(),
-                SetArtifactsLocalReverseProxy(docker_host_ip=docker_host_ip),
-                SetArtifactsPrivateURL(docker_host_ip=docker_host_ip),
+                SetArtifactsLocalReverseProxy(),
+                SetArtifactsPrivateURL(),
                 SetArtifactsPublicURL(),
             ])
 
@@ -316,20 +313,19 @@ class SetArtifactsName(SetPropertyFromCommand):
 
 
 class SetArtifactsLocalReverseProxy(SetProperty):
-    def __init__(self, docker_host_ip):
+    def __init__(self):
         super(SetArtifactsLocalReverseProxy, self).__init__(
             name='set the artifacts local reverse proxy',
             property='artifacts_local_reverse_proxy',
             hideStepIf=util.hideStepIfSuccess,
-            value='http://' + docker_host_ip + ':1080/')
+            value='http://artifacts/')
 
 
 class SetArtifactsPrivateURL(SetPropertyFromCommand):
-    def __init__(self, docker_host_ip):
+    def __init__(self):
         super(SetArtifactsPrivateURL, self).__init__(
             name='set the artifacts private url',
-            command=Interpolate('echo http://' + docker_host_ip +
-                                ':1080/builds/'
+            command=Interpolate('echo http://artifacts/builds/'
                                 '%(prop:artifacts_name)s'),
             hideStepIf=util.hideStepIfSuccess,
             property='artifacts_private_url')
@@ -352,17 +348,3 @@ class GetApiVersion(SetProperty):
             property='eve_api_version',
             hideStepIf=util.hideStepIfSuccess,
             value=eve_api_version)
-
-
-def get_docker_host_ip():
-    docker_host_ip = '127.0.0.1'  # Dummy default value
-    try:
-        docker_addresses = netifaces.ifaddresses('docker0')
-    except ValueError:
-        pass
-    else:
-        try:
-            docker_host_ip = (docker_addresses[netifaces.AF_INET][0]['addr'])
-        except KeyError:
-            pass
-    return docker_host_ip
