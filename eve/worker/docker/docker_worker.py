@@ -21,7 +21,6 @@ import time
 from json import loads
 from subprocess import STDOUT, CalledProcessError, check_output
 
-import netifaces
 from buildbot.plugins import util
 from buildbot.process.properties import Property
 from buildbot.worker.latent import AbstractLatentWorker
@@ -69,26 +68,15 @@ class EveDockerLatentWorker(AbstractLatentWorker):
         defer.returnValue(res)
 
     def _thd_start(self, image, volumes, buildnumber):
-        docker_host_ip = None
-        try:
-            docker_addresses = netifaces.ifaddresses('docker0')
-        except ValueError:
-            pass
-        else:
-            try:
-                docker_host_ip = docker_addresses[netifaces.AF_INET][0]['addr']
-            except KeyError:
-                pass
-
         cmd = [
             'run',
             '--privileged',
+            '--env', 'ARTIFACTS_PREFIX=%s' % self.artifacts_prefix,
+            '--env', 'ARTIFACTS_URL=%s' % util.env.ARTIFACTS_URL,
             '--env', 'BUILDMASTER=%s' % self.master_fqdn,
+            '--env', 'BUILDMASTER_PORT=%s' % self.pb_port,
             '--env', 'WORKERNAME=%s' % self.name,
             '--env', 'WORKERPASS=%s' % self.password,
-            '--env', 'BUILDMASTER_PORT=%s' % self.pb_port,
-            '--env', 'DOCKER_HOST_IP=%s' % docker_host_ip,
-            '--env', 'ARTIFACTS_PREFIX=%s' % self.artifacts_prefix,
             '--detach',
             '--memory=%s' % self.max_memory,
             '--cpus=%s' % self.max_cpus
