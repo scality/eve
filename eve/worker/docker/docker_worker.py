@@ -69,12 +69,12 @@ class EveDockerLatentWorker(AbstractLatentWorker):
         cmd = [
             'run',
             '--privileged',
+            '--env', 'ARTIFACTS_PREFIX=%s' % self.artifacts_prefix,
+            '--env', 'ARTIFACTS_URL=%s' % util.env.ARTIFACTS_URL,
             '--env', 'BUILDMASTER=%s' % self.master_fqdn,
+            '--env', 'BUILDMASTER_PORT=%s' % self.pb_port,
             '--env', 'WORKERNAME=%s' % self.name,
             '--env', 'WORKERPASS=%s' % self.password,
-            '--env', 'BUILDMASTER_PORT=%s' % self.pb_port,
-            '--env', 'ARTIFACTS_URL=%s' % util.env.ARTIFACTS_URL,
-            '--env', 'ARTIFACTS_PREFIX=%s' % self.artifacts_prefix,
             '--detach',
             '--memory=%s' % self.max_memory,
             '--cpus=%s' % self.max_cpus
