@@ -77,7 +77,7 @@ class DockerBuild(MasterShellCommand):
 
         command += ['.']
 
-        super(DockerBuild, self).__init__(command, **kwargs)
+        super(DockerBuild, self).__init__(command, logEnviron=False, **kwargs)
 
     def isNewStyle(self):  # flake8: noqa
         # needed because we redefine `run` below
@@ -125,7 +125,7 @@ class DockerCheckLocalImage(MasterShellCommand):
         self.label = label
         super(DockerCheckLocalImage, self).__init__(
             ['docker', 'image', 'inspect', image],
-            **kwargs)
+            logEnviron=False, **kwargs)
 
     def isNewStyle(self):  # flake8: noqa
         # needed because we redefine `run` below
@@ -164,7 +164,7 @@ class DockerComputeImageFingerprint(MasterShellCommand):
             'tar -c --mtime="1990-02-11 00:00Z" --group=0 ' \
             '--owner=0 --numeric-owner --sort=name --mode=0 . ' \
             '| sha256sum | cut -f 1 -d " "',
-            workdir=context_dir, **kwargs
+            workdir=context_dir, logEnviron=False, **kwargs
         )
         self.observer = logobserver.BufferLogObserver(wantStdout=True,
                                                       wantStderr=True)
@@ -210,7 +210,7 @@ class DockerPull(MasterShellCommand):
         self.label = label
         super(DockerPull, self).__init__(
             ['docker', 'pull', image],
-            **kwargs)
+            logEnviron=False, **kwargs)
 
     def isNewStyle(self):  # flake8: noqa
         # needed because we redefine `run` below
@@ -248,7 +248,7 @@ class DockerPush(MasterShellCommand):
         )
         self.image = image
         super(DockerPush, self).__init__(['docker', 'push', image],
-                                         **kwargs)
+                                         logEnviron=False, **kwargs)
 
     def __hash__(self):
         return hash(self.image)

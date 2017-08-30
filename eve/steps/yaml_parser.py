@@ -257,7 +257,8 @@ class GetCommitShortVersion(SetPropertyFromCommand):
             ],
             hideStepIf=util.hideStepIfSuccess,
             property='commit_short_revision',
-            haltOnFailure=True)
+            haltOnFailure=True,
+            logEnviron=False)
 
 
 class GetCommitTimestamp(SetPropertyFromCommand):
@@ -273,7 +274,8 @@ class GetCommitTimestamp(SetPropertyFromCommand):
             ],
             hideStepIf=util.hideStepIfSuccess,
             haltOnFailure=True,
-            property='commit_timestamp')
+            property='commit_timestamp',
+            logEnviron=False)
 
 
 class GetPipelineName(SetProperty):
@@ -311,7 +313,8 @@ class SetArtifactsBaseName(SetPropertyFromCommand):
                             '.%(prop:commit_short_revision)s'),
             ],
             hideStepIf=util.hideStepIfSuccess,
-            property='artifacts_base_name')
+            property='artifacts_base_name',
+            logEnviron=False)
 
 
 class SetArtifactsName(SetPropertyFromCommand):
@@ -325,7 +328,8 @@ class SetArtifactsName(SetPropertyFromCommand):
                             '.%(prop:b4nb)s'),
             ],
             hideStepIf=util.hideStepIfSuccess,
-            property='artifacts_name')
+            property='artifacts_name',
+            logEnviron=False)
 
 
 class SetArtifactsLocalReverseProxy(SetProperty):
@@ -346,7 +350,8 @@ class SetArtifactsPrivateURL(SetPropertyFromCommand):
                 Interpolate('http://artifacts/builds/%(prop:artifacts_name)s'),
             ],
             hideStepIf=util.hideStepIfSuccess,
-            property='artifacts_private_url')
+            property='artifacts_private_url',
+            logEnviron=False)
 
 
 class SetArtifactsPublicURL(SetPropertyFromCommand):
@@ -359,7 +364,8 @@ class SetArtifactsPublicURL(SetPropertyFromCommand):
                             '/%(prop:artifacts_name)s'),
             ],
             hideStepIf=util.hideStepIfSuccess,
-            property='artifacts_public_url')
+            property='artifacts_public_url',
+            logEnviron=False)
 
 
 class GetApiVersion(SetProperty):
