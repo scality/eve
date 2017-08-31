@@ -21,6 +21,7 @@ import unittest
 from os import pardir
 from os.path import abspath, join
 
+from buildbot.process.results import SUCCESS
 from tests.docker.cluster import DockerizedCluster as Cluster
 from tests.util.yaml_factory import PreMerge, SingleCommandYaml
 
@@ -331,15 +332,20 @@ class TestDockerCluster(unittest.TestCase):
             cluster.sanity_check()
 
     def test_long_step_name(self):
-        """Test that the build succeeds when a long step name is provided."""
+        """Test that the build succeeds when a long step name is provided.
+
+        Include some interpolated variables in the step name to check
+        that they are correctly handled.
+
+        """
         with Cluster() as cluster:
             local_repo = cluster.clone()
             local_repo.push(
                 yaml=PreMerge(steps=[{
                     'ShellCommand': {
-                        'name': 'This is a very long name to describe this'
-                                'very short command; Lorem ipsum dolor sita '
-                                'amet, dis sem wisi ligula conubia ut '
+                        'name': '%(prop:buildername)s This is a long step '
+                                '%(prop:buildername)s and very short command; '
+                                'Lorem ipsum amet, dis sem wisi ligula conu '
                                 'lectus. Hendrerit ut diam. Massa magna, '
                                 'nunc pede tempor quisque nullam magna. '
                                 'Arcu et suspendisse nam venenatis, wisi '
@@ -347,8 +353,21 @@ class TestDockerCluster(unittest.TestCase):
                                 'felis, urna aenean a quam penatibus turpis '
                                 'fringilla, sed a mattis volutpat '
                                 'pellentesque sint est. Ridiculus orci '
-                                'molestie sagittis justo non.',
+                                'molestie sagittis justo non. ',
                         'command': 'exit 0'}}]))
             buildset = cluster.api.force(branch=local_repo.branch)
             self.assertEqual(buildset.result, 'success')
+
+            # Check pre-merge step
+            premerge_build = cluster.api.get_finished_build(
+                'local-test_suffix')
+            self.assertEqual(premerge_build['results'], SUCCESS)
+            premerge_steps = cluster.api.get_build_steps(premerge_build)
+            step_names_and_descriptions = [(step['name'], step['state_string'])
+                                           for step in premerge_steps]
+            self.assertEqual(step_names_and_descriptions, [
+                (u'prevent unuseful restarts', u"'[ $(expr ...'"),
+                (u'extract steps from yaml', u'finished'),
+                (u'local-test_suffix This is a long step ',
+                    u"'exit 0'")])
             cluster.sanity_check()
