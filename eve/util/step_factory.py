@@ -17,6 +17,7 @@
 # Boston, MA  02110-1301, USA.
 
 from os import environ
+from re import finditer
 
 from buildbot.plugins import steps
 from buildbot.process.properties import Interpolate
@@ -42,6 +43,20 @@ def step_factory(custom_steps, step_type, **params):
                 _cls = getattr(steps, step_type)
             except AttributeError:
                 raise Exception('Could not load step %s' % step_type)
+
+    # step names end up as keys in db and can't be too long
+    if 'name' in params:
+        stepname = params['name']
+        # Take care of cutting interpolates properly.
+        # This is an imperfect solution, as the interpolate
+        # may resolve to a much longer string at build time.
+        # (but the build would then fail)
+        interpolates = list(finditer(r'%\(.*?(\)s)', stepname))
+        for interp in reversed(interpolates):
+            if interp.start() < 50 and interp.end() >= 50:
+                stepname = stepname[:interp.start()]
+                break
+        params['name'] = stepname[:50]
 
     # Replace the %(prop:*)s in the text with an Interpolate obj
     params = replace_with_interpolate(params)

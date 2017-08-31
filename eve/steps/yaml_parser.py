@@ -234,9 +234,6 @@ class StepExtractor(BuildStep):
         for step in stage_conf['steps']:
             step_type, params = next(step.iteritems())
             step_type, params = patcher.patch(step_type, params)
-            if 'name' in params:
-                # step names end up as keys in db and can't be too long
-                params['name'] = params['name'][:50]
             bb_step = util.step_factory(globals(), step_type, **params)
             self.build.addStepsAfterLastStep([bb_step])
             self.logger.debug('Add {step} with params: {params}',
