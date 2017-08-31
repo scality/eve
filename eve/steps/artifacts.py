@@ -38,10 +38,13 @@ class GetArtifactsFromStage(SetPropertyFromCommand):
         SetPropertyFromCommand.__init__(
             self,
             name=name,
-            command=Interpolate('curl -I '
-                                '%(prop:artifacts_local_reverse_proxy)s'
-                                'last_success/%(prop:artifacts_base_name)s'
-                                '.' + stage),
+            command=[
+                'curl',
+                '-I',
+                Interpolate('%(prop:artifacts_local_reverse_proxy)s'
+                            'last_success/%(prop:artifacts_base_name)s.'
+                            + stage),
+            ],
             **kwargs
         )
 

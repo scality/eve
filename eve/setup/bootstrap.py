@@ -48,10 +48,12 @@ def bootstrap_builder(workers):
             branch=Property('branch'),
             mode='incremental',
             hideStepIf=util.hideStepIfSuccess,
-            haltOnFailure=True))
+            haltOnFailure=True,
+            logEnviron=False))
 
     bootstrap_factory.addStep(steps.CancelNonTipBuild(
-        name='cancel builds for commits that are not branch tips'))
+        name='cancel builds for commits that are not branch tips',
+        logEnviron=False))
 
     bootstrap_factory.addStep(
         SetProperty(
@@ -92,7 +94,8 @@ def bootstrap_builder(workers):
         command=('./{}/get_product_version.sh 2> /dev/null'
                  ' || echo 0.0.0'.format(yaml_dirpath)),
         hideStepIf=util.hideStepIfSuccess,
-        property='product_version'))
+        property='product_version',
+        logEnviron=False))
 
     # Read conf from yaml file
     bootstrap_factory.addStep(
