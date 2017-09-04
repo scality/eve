@@ -109,6 +109,12 @@ class HeatLatentWorker(AbstractLatentWorker):
         return stack
 
     def stop_instance(self, fast=False):
+        if self.stack_id is None:
+            # Comment copy/pasted from the ec2 worker code :
+            # be gentle.  Something may just be trying to alert us that an
+            # instance never attached, and it's because, somehow, we never
+            # started.
+            return defer.succeed(None)
         # this allows to call the stack deletion in a thread so we can wait
         # until we are sure they are deleted.
         return threads.deferToThread(self._stop_instance, self.stack_id, fast)
