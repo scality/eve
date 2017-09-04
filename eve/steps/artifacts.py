@@ -40,6 +40,7 @@ class GetArtifactsFromStage(SetPropertyFromCommand):
             name=name,
             command=[
                 'curl',
+                '--fail',
                 '-I',
                 Interpolate('%(prop:artifacts_local_reverse_proxy)s'
                             'last_success/%(prop:artifacts_base_name)s.'
