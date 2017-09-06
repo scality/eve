@@ -44,12 +44,11 @@ class EveDockerLatentWorker(AbstractLatentWorker):
     instance = None
 
     def __init__(self, name, password, image, master_fqdn, pb_port,
-                 artifacts_prefix, max_memory, max_cpus, **kwargs):
+                 max_memory, max_cpus, **kwargs):
         # pylint: disable=too-many-arguments
         self.image = image
         self.master_fqdn = master_fqdn,
         self.pb_port = pb_port
-        self.artifacts_prefix = artifacts_prefix
         self.max_memory = max_memory
         self.max_cpus = max_cpus
         kwargs.setdefault('build_wait_timeout', 0)
@@ -71,8 +70,6 @@ class EveDockerLatentWorker(AbstractLatentWorker):
         cmd = [
             'run',
             '--privileged',
-            '--env', 'ARTIFACTS_PREFIX=%s' % self.artifacts_prefix,
-            '--env', 'ARTIFACTS_URL=%s' % util.env.ARTIFACTS_URL,
             '--env', 'BUILDMASTER=%s' % self.master_fqdn,
             '--env', 'BUILDMASTER_PORT=%s' % self.pb_port,
             '--env', 'WORKERNAME=%s' % self.name,

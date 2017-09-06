@@ -20,7 +20,7 @@ class TestSetupWorkers(unittest.TestCase):
     def test_docker_workers(self):
         util.env = util.load_env([
             ('ARTIFACTS_PREFIX', 'foo_'),
-            ('ARTIFACTS_URL', 'foo.bar.baz'),
+            ('ARTIFACTS_PUBLIC_URL', 'foo.bar.baz'),
             ('DOCKER_CONTAINER_MAX_CPU', 4),
             ('DOCKER_CONTAINER_MAX_MEMORY', 4096),
             ('EXTERNAL_PB_PORT', '12345'),

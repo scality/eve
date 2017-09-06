@@ -126,10 +126,6 @@ def bootstrap_builder(workers):
         name=util.env.BOOTSTRAP_BUILDER_NAME,
         workernames=[lw.name for lw in workers],
         factory=bootstrap_factory,
-        properties={
-            'artifacts_url': 'http://artifacts/builds',
-            'artifacts_prefix': util.env.ARTIFACTS_PREFIX,
-        },
         canStartBuild=eve_canStartBuild,
         nextBuild=util.nextBootstrapBuild,
     )

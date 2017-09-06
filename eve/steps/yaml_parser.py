@@ -158,11 +158,8 @@ class ReadConfFromYaml(FileUpload):
             self.build.addStepsAfterCurrentStep([
                 GetCommitShortVersion(branch=branch),
                 GetCommitTimestamp(),
-                GetPipelineName(stage_name=stage_name),
-                GetB4NB(buildnumber=buildnumber),
-                SetArtifactsBaseName(),
-                SetArtifactsName(),
-                SetArtifactsLocalReverseProxy(),
+                SetArtifactsName(
+                    buildnumber=buildnumber, stage_name=stage_name),
                 SetArtifactsPrivateURL(),
                 SetArtifactsPublicURL(),
             ])
@@ -275,67 +272,17 @@ class GetCommitTimestamp(SetPropertyFromCommand):
             logEnviron=False)
 
 
-class GetPipelineName(SetProperty):
-    def __init__(self, stage_name):
-        super(GetPipelineName, self).__init__(
-            name='get the pipeline name',
-            property='pipeline',
-            hideStepIf=util.hideStepIfSuccess,
-            haltOnFailure=True,
-            value=stage_name)
-
-
-class GetB4NB(SetProperty):
-    def __init__(self, buildnumber):
-        super(GetB4NB, self).__init__(
-            name='get the b4nb',
-            property='b4nb',
-            hideStepIf=util.hideStepIfSuccess,
-            haltOnFailure=True,
-            value=buildnumber.zfill(8))
-
-
-class SetArtifactsBaseName(SetPropertyFromCommand):
-    def __init__(self):
-        super(SetArtifactsBaseName, self).__init__(
-            name='set the artifacts base name',
-            command=[
-                'echo',
-                Interpolate('%(prop:git_host)s'
-                            ':%(prop:git_owner)s:' +
-                            util.env.GIT_SLUG +
-                            ':%(prop:artifacts_prefix)s'
-                            '%(prop:product_version)s'
-                            '.r%(prop:commit_timestamp)s'
-                            '.%(prop:commit_short_revision)s'),
-            ],
-            hideStepIf=util.hideStepIfSuccess,
-            property='artifacts_base_name',
-            logEnviron=False)
-
-
 class SetArtifactsName(SetPropertyFromCommand):
-    def __init__(self):
+    def __init__(self, buildnumber, stage_name):
         super(SetArtifactsName, self).__init__(
             name='set the artifacts name',
             command=[
                 'echo',
-                Interpolate('%(prop:artifacts_base_name)s'
-                            '.%(prop:pipeline)s'
-                            '.%(prop:b4nb)s'),
+                util.get_artifacts_name(buildnumber, stage_name)
             ],
             hideStepIf=util.hideStepIfSuccess,
             property='artifacts_name',
             logEnviron=False)
-
-
-class SetArtifactsLocalReverseProxy(SetProperty):
-    def __init__(self):
-        super(SetArtifactsLocalReverseProxy, self).__init__(
-            name='set the artifacts local reverse proxy',
-            property='artifacts_local_reverse_proxy',
-            hideStepIf=util.hideStepIfSuccess,
-            value='http://artifacts/')
 
 
 class SetArtifactsPrivateURL(SetPropertyFromCommand):
@@ -357,8 +304,8 @@ class SetArtifactsPublicURL(SetPropertyFromCommand):
             name='set the artifacts public url',
             command=[
                 'echo',
-                Interpolate(util.env.ARTIFACTS_URL +
-                            '/%(prop:artifacts_name)s'),
+                Interpolate(util.env.ARTIFACTS_PUBLIC_URL +
+                            '/builds/%(prop:artifacts_name)s'),
             ],
             hideStepIf=util.hideStepIfSuccess,
             property='artifacts_public_url',
