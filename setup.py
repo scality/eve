@@ -80,10 +80,12 @@ setup(
         'buildbot.util': [
             'BaseBuildOrder=eve.util.build_order:BaseBuildOrder',
             'env=eve.util.env:SETTINGS',
+            'get_artifacts_base_name=eve.util.artifacts:get_artifacts_base_name',
+            'get_artifacts_name=eve.util.artifacts:get_artifacts_name',
             'get_local_jobs=eve.util.local_jobs:get_local_jobs',
             'get_secrets=eve.util.env:get_secrets',
-            'hideStepIfSuccess=eve.util.step:hideStepIfSuccess',
             'hideStepIfSkipped=eve.util.step:hideStepIfSkipped',
+            'hideStepIfSuccess=eve.util.step:hideStepIfSuccess',
             'hideStepIfSuccessOrSkipped=eve.util.step:hideStepIfSuccessOrSkipped',
             'init_sentry_logging=eve.util.sentry:init_sentry_logging',
             'load_env=eve.util.env:load_env',

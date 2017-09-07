@@ -45,7 +45,6 @@ def docker_workers():
                 password=util.password_generator(),
                 master_fqdn=util.env.MASTER_FQDN,
                 pb_port=util.env.EXTERNAL_PB_PORT,
-                artifacts_prefix=util.env.ARTIFACTS_PREFIX,
                 max_memory=util.env.DOCKER_CONTAINER_MAX_MEMORY,
                 max_cpus=util.env.DOCKER_CONTAINER_MAX_CPU,
                 image=Property('docker_image'),

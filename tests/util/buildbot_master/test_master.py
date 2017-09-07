@@ -35,7 +35,7 @@ class TestMaster(TestCase):
         """
         ports = Daemon.get_free_port(3)
         conf = dict(
-            ARTIFACTS_URL='None',
+            ARTIFACTS_PUBLIC_URL='None',
             CLOUDFILES_URL='None',
             DB_URL='sqlite:///state.sqlite',
             DOCKER_API_VERSION='1.25',
@@ -50,7 +50,6 @@ class TestMaster(TestCase):
             MASTER_NAME='buildmaster',
             PB_PORT=str(ports[1]),
             PROJECT_URL='www.example.com',
-            SECRET_ARTIFACT_CREDS='None',
             SUFFIX='test_suffix',
             TRY_PORT=str(ports[2]),
             WAMP_REALM='realm1',

@@ -90,11 +90,7 @@ class Tests(unittest.TestCase):
             (u'read eve/main.yml', u'uploading main.yml'),
             (u'get the commit short_revision', u"property 'commit_short_revision' set"),  # noqa
             (u'get the commit timestamp', u"property 'commit_timestamp' set"),
-            (u'get the pipeline name', u'Set'),
-            (u'get the b4nb', u'Set'),
-            (u'set the artifacts base name', u"property 'artifacts_base_name' set"),  # noqa
             (u'set the artifacts name', u"property 'artifacts_name' set"),
-            (u'set the artifacts local reverse proxy', u'Set'),
             (u'set the artifacts private url', u"property 'artifacts_private_url' set"),  # noqa
             (u'set the artifacts public url', u"property 'artifacts_public_url' set"),  # noqa
             (u'get the API version', u'Set'),
@@ -149,11 +145,7 @@ class Tests(unittest.TestCase):
             (u'read eve/main.yml', u'uploading main.yml'),
             (u'get the commit short_revision', u"property 'commit_short_revision' set"),  # noqa
             (u'get the commit timestamp', u"property 'commit_timestamp' set"),
-            (u'get the pipeline name', u'Set'),
-            (u'get the b4nb', u'Set'),
-            (u'set the artifacts base name', u"property 'artifacts_base_name' set"),  # noqa
             (u'set the artifacts name', u"property 'artifacts_name' set"),
-            (u'set the artifacts local reverse proxy', u'Set'),
             (u'set the artifacts private url', u"property 'artifacts_private_url' set"),  # noqa
             (u'set the artifacts public url', u"property 'artifacts_public_url' set"),  # noqa
             (u'get the API version', u'Set'),
@@ -203,11 +195,7 @@ class Tests(unittest.TestCase):
             (u'read eve/main.yml', u'uploading main.yml'),
             (u'get the commit short_revision', u"property 'commit_short_revision' set"),  # noqa
             (u'get the commit timestamp', u"property 'commit_timestamp' set"),  # noqa
-            (u'get the pipeline name', u'Set'),
-            (u'get the b4nb', u'Set'),
-            (u'set the artifacts base name', u"property 'artifacts_base_name' set"),  # noqa
             (u'set the artifacts name', u"property 'artifacts_name' set"),
-            (u'set the artifacts local reverse proxy', u'Set'),
             (u'set the artifacts private url', u"property 'artifacts_private_url' set"),  # noqa
             (u'set the artifacts public url', u"property 'artifacts_public_url' set"),  # noqa
             (u'get the API version', u'Set'),

@@ -42,11 +42,11 @@ stages:
            - ['hello from path: \1', '*hello.txt']
       - SetProperty:
           property: "artifacts_uri"
-          value: "%(prop:artifacts_url)s/%(prop:artifacts_prefix)s%(prop:build_id)s"
+          value: "%(prop:artifacts_url)s/test_artifacts_prefix-%(prop:build_id)s"
       - ShellCommandWithSecrets:
           name: tries to download uploaded files
           command: >
             set -ex;
-            curl --fail -u $ARTIFACT_CREDS %(prop:artifacts_uri)s/hello.txt;
-            curl --fail -u $ARTIFACT_CREDS %(prop:artifacts_uri)s/test/hello.txt;
-            curl --fail -u $ARTIFACT_CREDS %(prop:artifacts_uri)s/test/hello_2.txt;
+            curl --fail -u %(prop:artifacts_uri)s/hello.txt;
+            curl --fail -u %(prop:artifacts_uri)s/test/hello.txt;
+            curl --fail -u %(prop:artifacts_uri)s/test/hello_2.txt;

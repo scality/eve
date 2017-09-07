@@ -1,5 +1,5 @@
 ARTIFACTS_PREFIX=test_artifacts_prefix-
-ARTIFACTS_URL=artifacts.foo.baz/builds
+ARTIFACTS_PUBLIC_URL=https://artifacts.foo.baz
 BOOTSTRAP_BUILDER_NAME=test_bootstrap
 BOOTSTRAP_SCHEDULER_NAME=test_bootstrap_scheduler
 CLOUDFILES_URL=test_cloudfiles_url
@@ -45,7 +45,6 @@ OPENSTACK_SCHEDULER_PREFIX=test_openstack_scheduler
 PB_PORT=2345
 PROJECT_URL=test_project_url
 PROJECT_YAML=eve/main.yml
-SECRET_ARTIFACT_CREDS=test_artifacts_creds
 SUFFIX=test_suffix
 TRY_PORT=3456
 TRY_PWD=test_try_pwd

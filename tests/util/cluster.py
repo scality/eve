@@ -114,7 +114,7 @@ class Cluster(object):
         return None
 
     default_conf = dict(
-        ARTIFACTS_URL='None',
+        ARTIFACTS_PUBLIC_URL='None',
         CLOUDFILES_URL='None',
         DOCKER_API_VERSION='1.25',
         DOCKER_REGISTRY_URL='',
@@ -125,7 +125,6 @@ class Cluster(object):
         MAX_LOCAL_WORKERS='4',
         PROJECT_URL='www.example.com',
         PROJECT_YAML='eve/main.yml',
-        SECRET_ARTIFACT_CREDS='None',
         SUFFIX='test_suffix',
         VAULT_IN_USE='0',
         WAMP_REALM='realm1',

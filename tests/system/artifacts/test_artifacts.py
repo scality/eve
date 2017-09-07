@@ -26,7 +26,10 @@ from tests.util.yaml_factory import SingleCommandYaml
 class TestArtifacts(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        conf = {'ARTIFACTS_URL': 'foo.bar.baz'}
+        conf = {
+            'ARTIFACTS_PREFIX': 'aprefix-',
+            'ARTIFACTS_PUBLIC_URL': 'https://foo.bar.baz'
+        }
         cls.cluster = Cluster(extra_conf=conf).start()
 
     @classmethod
@@ -53,10 +56,12 @@ class TestArtifacts(unittest.TestCase):
         timestamp = self.local_repo.cmd('git log -1 --format=%cd '
                                         '--date="format-local:%y%m%d%H%M%S"')
 
-        expected = 'mock:repo_owner:test:staging-0.0.0.r{}.{}.pre-merge.' \
+        expected = 'mock:repo_owner:test:aprefix-0.0.0.r{}.{}.pre-merge.' \
                    '00000001'.format(timestamp.strip(), short_hash.strip())
         self.assertEqual(child_build.properties['artifacts_name'][0], expected)
 
-        expected = 'foo.bar.baz/' + expected
         self.assertEqual(child_build.properties['artifacts_public_url'][0],
-                         expected)
+                         'https://foo.bar.baz/builds/' + expected)
+
+        self.assertEqual(child_build.properties['artifacts_private_url'][0],
+                         'http://artifacts/builds/' + expected)

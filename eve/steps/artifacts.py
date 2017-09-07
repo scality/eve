@@ -40,10 +40,11 @@ class GetArtifactsFromStage(SetPropertyFromCommand):
             name=name,
             command=[
                 'curl',
+                '--fail',
                 '-I',
-                Interpolate('%(prop:artifacts_local_reverse_proxy)s'
-                            'last_success/%(prop:artifacts_base_name)s.'
-                            + stage),
+                Interpolate('http://artifacts/last_success/'
+                            + util.get_artifacts_base_name()
+                            + '.' + stage),
             ],
             **kwargs
         )
@@ -91,7 +92,7 @@ class Upload(ShellCommand):
                                                       wantStderr=True)
         self.addLogObserver('stdio', self.observer)
 
-    def get_artifacts_container(self):
+    def get_container(self):
         eve_api_version = self.getProperty('eve_api_version')
         if version.parse(eve_api_version) >= version.parse('0.2'):
             return self.getProperty('artifacts_name')
@@ -99,7 +100,6 @@ class Upload(ShellCommand):
             return util.env.ARTIFACTS_PREFIX + self.getProperty('build_id')
 
     def set_command(self, urls):
-        artifacts_container = self.get_artifacts_container()
 
         command = [
             ('if [ ! -n "$(find -L . -type f | head -1)" ]; then '
@@ -108,7 +108,7 @@ class Upload(ShellCommand):
             'echo tar successful. Calling curl... ',
             ('curl --verbose --max-time {} -s -T ../artifacts.tar.gz -X PUT '
              'http://artifacts/upload/{}').format(self.UPLOAD_MAX_TIME,
-                                                  artifacts_container)]
+                                                  self.get_container())]
 
         # compute configured urls
         links = []
@@ -186,11 +186,10 @@ class Upload(ShellCommand):
                     upath)
 
         # adds links in step display, based on existing files
-        artifacts_container = self.get_artifacts_container()
         for (name, upath) in links:
-            url = ('{url}/{artifacts_container}/{path}'.format(
-                url=util.env.ARTIFACTS_URL,
-                artifacts_container=artifacts_container,
+            url = ('{url}/builds/{container}/{path}'.format(
+                url=util.env.ARTIFACTS_PUBLIC_URL,
+                container=self.get_container(),
                 path=upath
             ))
             self.addURL(name, url)
