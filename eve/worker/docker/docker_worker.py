@@ -20,7 +20,6 @@
 import time
 from subprocess import STDOUT, CalledProcessError, check_output
 
-from buildbot.plugins import util
 from buildbot.process.properties import Property
 from buildbot.worker.latent import AbstractLatentWorker
 from twisted.internet import defer, threads
