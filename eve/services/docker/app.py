@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import json
 import subprocess
 import traceback
 
@@ -36,7 +37,7 @@ celery = make_celery(app)
 
 
 @celery.task()
-def call(target_cmd):
+def call(target_cmd, post_cmd):
     """Create a task that runs the provided command."""
     retcode = -1
     try:
@@ -45,6 +46,10 @@ def call(target_cmd):
     except subprocess.CalledProcessError as excp:
         ret = excp.output
         retcode = 1
+
+    if post_cmd:
+        subprocess.check_output(post_cmd, stderr=subprocess.STDOUT)
+
     return {'output': ret,
             'retcode': retcode}
 
@@ -74,11 +79,12 @@ def docker(command):
         return bad_request(403, traceback.format_exc())
 
     try:
-        target_cmd = cmd.convert(request.data)
+        target_cmd, post_cmd = cmd.convert(
+            json.loads(request.form['command']), request.files)
     except Exception:
         return bad_request(500, traceback.format_exc())
 
-    task = call.delay(target_cmd)
+    task = call.delay(target_cmd, post_cmd)
 
     return jsonify({}), 202, {
         'location': url_for('taskstatus', task_id=task.id)}

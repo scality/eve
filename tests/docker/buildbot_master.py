@@ -51,7 +51,7 @@ class DockerizedBuildbotMaster(BuildbotMaster):
 
     def pre_start_hook(self):
         """Build an eve docker image and prepare the environment to run it."""
-        cmd('docker build -t eve_master  .')
+        cmd('docker build --build-arg INTERNAL_DOCKER=1 -t eve_master  .')
         self._env = self.environ
         self.dump(self._env_file)
 
