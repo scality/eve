@@ -21,8 +21,8 @@ RUN pip install --upgrade pip
 ARG INTERNAL_DOCKER
 RUN if [ -n "$INTERNAL_DOCKER" ]; then curl -sSL https://get.docker.com/ | sh; fi
 
-VOLUME /root/eve
-WORKDIR /root/eve
+VOLUME /root/eve/workspace
+WORKDIR /root/eve/workspace
 
 # Freezing requirements
 COPY requirements/base.txt /tmp/requirements.txt

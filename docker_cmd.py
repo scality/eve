@@ -79,6 +79,8 @@ if os.environ.get('DEBUG_MODE', '0') in ['true', 'True', '1', 'y', 'yes']:
         pass
     _print("resuming startup sequence")
 
+os.system("cp /root/eve/master.cfg /root/eve/buildbot.tac /root/eve/workspace")
+
 if os.environ['MASTER_MODE'] in ['frontend', 'standalone']:
     _print("upgrading master...")
     subprocess.check_call('buildbot upgrade-master .', shell=True)

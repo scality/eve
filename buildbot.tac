@@ -6,8 +6,8 @@ from twisted.python.log import ILogObserver
 
 from buildbot.master import BuildMaster
 
-basedir = '/root/eve'
-configfile = 'master.cfg'
+basedir = '/root/eve/workspace'
+configfile = '../master.cfg'
 
 # note: this line is matched against to check that this is a buildmaster
 # directory; do not edit it.
