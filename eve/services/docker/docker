@@ -1,12 +1,15 @@
 #!/usr/bin/env python
 
 from __future__ import print_function
+import json
+import os
 import requests
 import sys
-from os import environ, execve
+import tarfile
+import tempfile
 from time import sleep
+from uuid import uuid4
 
-local_commands = ['build', 'image', 'images']
 
 def get_command(cmd_list):
     """Extract command from a docker command line."""
@@ -16,11 +19,64 @@ def get_command(cmd_list):
         return word
     return ''
 
+
+def build_file_list(root):
+    """This function has been borrowed from docker-py."""
+    files = []
+    for dirname, dirnames, fnames in os.walk(root):
+        for filename in fnames + dirnames:
+            longpath = os.path.join(dirname, filename)
+            files.append(
+                longpath.replace(root, '', 1).lstrip('/')
+            )
+
+    return files
+
+
+def create_archive(root, files=None, fileobj=None, gzip=False):
+    """This function has been borrowed from docker-py."""
+    if not fileobj:
+        fileobj = tempfile.NamedTemporaryFile()
+    t = tarfile.open(mode='w:gz' if gzip else 'w', fileobj=fileobj)
+    if files is None:
+        files = build_file_list(root)
+    print(root, files)
+    for path in files:
+        i = t.gettarinfo(os.path.join(root, path), arcname=path)
+        print(i)
+        if i is None:
+            # This happens when we encounter a socket file. We can safely
+            # ignore it and proceed.
+            continue
+        try:
+            # We open the file object in binary mode for Windows support.
+            with open(os.path.join(root, path), 'rb') as f:
+                t.addfile(i, f)
+        except IOError:
+            # When we encounter a directory the file object is set to None.
+            t.addfile(i, None)
+    t.close()
+    fileobj.seek(0)
+    return fileobj
+
+
 def handle_remote(cmd):
+    files = None
+    timeout = 300
+
+    if cmd == 'build':
+        archive_name = str(uuid4())[:13] + '_context.tar.gz'
+        archive = create_archive(root=sys.argv[-1],
+                                 gzip=True)
+        files = {'docker_context': (archive_name, archive)}
+        timeout = 3600
+
     try:
         response = requests.put(
             'http://localhost:5000/{cmd}'.format(cmd=cmd),
-            data=' '.join(sys.argv))
+            data={'command': json.dumps(sys.argv)},
+            files=files
+        )
     except requests.ConnectionError:
         sys.exit('The Docker service is currently unavailable.')
 
@@ -33,7 +89,7 @@ def handle_remote(cmd):
     task_url = response.headers['Location']
 
     sleep(0.5)
-    for _ in range(300):
+    for _ in range(timeout):
         response = requests.get(task_url)
         response.raise_for_status()
         state = response.json()['state']
@@ -46,17 +102,7 @@ def handle_remote(cmd):
 
     sys.exit('command timeout')
 
-def handle_local():
-    client = environ.get('DOCKER_CLIENT', '/usr/bin/docker')
-    env = {}
-    if environ.get('DOCKER_API_VERSION', ''):
-        env['DOCKER_API_VERSION'] = environ.get('DOCKER_API_VERSION')
-    sys.argv[0] = client
-    execve(sys.argv[0], sys.argv, env)
 
-cmd = get_command(sys.argv[1:])
-
-if cmd in local_commands:
-    handle_local()
-else:
+if __name__ == '__main__':
+    cmd = get_command(sys.argv[1:])
     handle_remote(cmd)
