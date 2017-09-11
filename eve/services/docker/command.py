@@ -183,17 +183,11 @@ class Run(BaseCommand):
 
     def adapt_args(self, files):
         self.resource = '/resource/' + self.namespace.name
-        vars(self.namespace)['docker_hook_sidecar'] = False
-
-        for label in self.namespace.label:
-            if label['name'] == 'docker_in_docker' or True:
-                vars(self.namespace)['docker_hook_sidecar'] = True
-                vars(self.namespace)['docker_hook_image'] = re.sub(
-                    r'([^/]*/[^/]*/)[^:]*:.*',
-                    r'\1docker-hook:%s' % label['value'],
-                    self.namespace.image
-                )
-                break
+        vars(self.namespace)['docker_hook_sidecar'] = True
+        vars(self.namespace)['docker_hook_image'] = re.sub(
+            r'([^/]*/[^/]*/)[^:]*:.*',
+            r'\1docker-hook:%s' % 'bert-test',
+            self.namespace.image)
 
 
 class Docker(BaseCommand):
