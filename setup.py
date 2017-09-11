@@ -62,6 +62,7 @@ setup(
         'buildbot.steps': [
             'CancelNonTipBuild=eve.steps.cancel:CancelNonTipBuild',
             'CancelOldBuild=eve.steps.cancel:CancelOldBuild',
+            'CoverityCommand=eve.steps.coverity:CoverityCommand',
             'DockerBuild=eve.steps.docker_build:DockerBuild',
             'DockerCheckLocalImage=eve.steps.docker_build:DockerCheckLocalImage',
             'DockerComputeImageFingerprint=eve.steps.docker_build:DockerComputeImageFingerprint',
@@ -75,7 +76,7 @@ setup(
             'StepExtractor=eve.steps.yaml_parser:StepExtractor',
             'StepPatcherConfig=eve.steps.step_patcher:StepPatcherConfig',
             'TriggerStages=eve.steps.trigger_stages:TriggerStages',
-            'Upload=eve.steps.artifacts:Upload'
+            'Upload=eve.steps.artifacts:Upload',
         ],
         'buildbot.util': [
             'BaseBuildOrder=eve.util.build_order:BaseBuildOrder',
