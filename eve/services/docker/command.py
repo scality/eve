@@ -186,7 +186,7 @@ class Run(BaseCommand):
         vars(self.namespace)['docker_hook_sidecar'] = True
         vars(self.namespace)['docker_hook_image'] = re.sub(
             r'([^/]*/[^/]*/)[^:]*:.*',
-            r'\1docker-hook:%s' % 'bert-test',
+            r'\1docker-hook:%s' % 'user_bertrand_odr_kube',
             self.namespace.image)
 
 
