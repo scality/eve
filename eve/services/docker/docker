@@ -40,10 +40,8 @@ def create_archive(root, files=None, fileobj=None, gzip=False):
     t = tarfile.open(mode='w:gz' if gzip else 'w', fileobj=fileobj)
     if files is None:
         files = build_file_list(root)
-    print(root, files)
     for path in files:
         i = t.gettarinfo(os.path.join(root, path), arcname=path)
-        print(i)
         if i is None:
             # This happens when we encounter a socket file. We can safely
             # ignore it and proceed.
@@ -94,7 +92,7 @@ def handle_remote(cmd):
         response.raise_for_status()
         state = response.json()['state']
         if state == 'SUCCESS':
-            print(response.json()['output'])
+            print(response.json()['output'].rstrip('\n'))
             sys.exit(int(response.json()['retcode']))
         elif state == 'FAILURE':
             sys.exit('internal error')

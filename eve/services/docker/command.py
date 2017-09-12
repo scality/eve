@@ -72,14 +72,21 @@ class BaseCommand():
 
 class Build(BaseCommand):
     command = 'build'
-    new_command = ['docker', 'build', '--rm', '%resource%']
+    new_command = ['docker', 'build', '%resource%']
     post_command = ['rm', '-rf', '%resource%']
 
     def register_args(self, parser):
+        def dictify_equal(arg):
+            name, value = arg.split('=')
+            return {'name': name, 'value': value}
+
         parser.add_argument('path')
-        parser.add_argument('--rm', action='store_false')
+        parser.add_argument('--rm', action='store_true')
+        parser.add_argument('--quiet', action='store_true')
         parser.add_argument('--build-arg', action='append', default=[])
         parser.add_argument('--tag', '-t', action='append', default=[])
+        parser.add_argument('-l', '--label', action='append',
+                            default=[], type=dictify_equal)
 
     def adapt_args(self, files):
         docker_context_archive = files['docker_context']
@@ -93,6 +100,13 @@ class Build(BaseCommand):
         tar.close()
         os.remove(archive_path)
         self.resource = new_path
+
+        self.new_command = list(self.new_command)
+        if self.namespace.rm:
+            self.new_command.insert(2, '--rm')
+
+        if self.namespace.quiet:
+            self.new_command.insert(2, '--quiet')
 
         for arg in self.namespace.build_arg:
             self.new_command.insert(2, '--build-arg')
