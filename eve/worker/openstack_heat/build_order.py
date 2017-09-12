@@ -34,26 +34,27 @@ class HeatOpenStackBuildOrder(util.BaseBuildOrder):
 
     def setup_properties(self):
         super(HeatOpenStackBuildOrder, self).setup_properties()
-        init_script = "%s/build/%s/init.sh" % (
-            self.properties['master_builddir'],
-            self._worker['path'])
+        worker_path = self._worker.get('path', '')
+        init_script_contents = ''
+        requirements_script_contents = ''
 
-        requirements_script = "%s/build/%s/requirements.sh" % (
-            self.properties['master_builddir'],
-            self._worker['path'])
+        if worker_path:
+            init_script = "%s/build/%s/init.sh" % (
+                self.properties['master_builddir'],
+                self._worker['path'])
 
-        if os.path.isfile(init_script):
-            init_script_contents = open(init_script).read()
-        else:
-            init_script_contents = ''
+            requirements_script = "%s/build/%s/requirements.sh" % (
+                self.properties['master_builddir'],
+                self._worker['path'])
 
-        if os.path.isfile(requirements_script):
-            requirements_script_contents = open(requirements_script).read()
-        else:
-            requirements_script_contents = ''
+            if os.path.isfile(init_script):
+                init_script_contents = open(init_script).read()
+
+            if os.path.isfile(requirements_script):
+                requirements_script_contents = open(requirements_script).read()
 
         self.properties.update({
-            'worker_path': self._worker['path'],
+            'worker_path': worker_path,
             'init_script': init_script_contents,
             'requirements_script': requirements_script_contents,
             'openstack_image': self._worker.get('image', self.DEFAULT_IMAGE),
