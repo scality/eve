@@ -89,7 +89,7 @@ class DockerBuildOrder(util.BaseBuildOrder):
                 label=basename,
                 image=image,
                 doStepIf=should_build,
-                hideStepIf=util.hideStepIfSuccess
+                hideStepIf=util.hideStepIfSuccessOrSkipped
             ))
         else:
             image = '%s-%06d' % (
@@ -115,7 +115,7 @@ class DockerBuildOrder(util.BaseBuildOrder):
         self.preliminary_steps.append(steps.DockerBuild(
             flunkOnFailure=False,
             haltOnFailure=False,
-            hideStepIf=util.hideStepIfSuccess,
+            hideStepIf=util.hideStepIfSuccessOrSkipped,
             doStepIf=should_build,
             **common_args
         ))
@@ -147,5 +147,5 @@ class DockerBuildOrder(util.BaseBuildOrder):
                 label=basename,
                 image=image,
                 doStepIf=should_build,
-                hideStepIf=util.hideStepIfSuccess
+                hideStepIf=util.hideStepIfSuccessOrSkipped
             ))
