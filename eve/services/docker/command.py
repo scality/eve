@@ -116,6 +116,28 @@ class Build(BaseCommand):
             self.new_command.insert(2, '--tag')
             self.new_command.insert(3, tag)
 
+        # TODO use labels for real
+
+
+class Inspect(BaseCommand):
+    command = 'inspect'
+    new_command = ['kubectl', 'get', 'pod', '--no-headers', '%resource%']
+
+    def register_args(self, parser):
+        parser.add_argument('--format', action='append', default=[])
+
+    def adapt_args(self, files):
+        self.new_command = list(self.new_command)
+
+        for arg in self.namespace.format:
+            self.new_command.insert(4, '--output')
+            if arg == '{{.NetworkSettings.IPAddress}}':
+                self.new_command.insert(5, 'custom-columns=ADDRESS:.status.podIP')
+            else:
+                self.new_command.insert(5, 'NOT_IMPLEMENTED')
+
+        self.resource = self.namespace.container
+
 
 class Kill(BaseCommand):
     command = 'kill'
@@ -222,6 +244,7 @@ class Ignore(BaseCommand):
 
 COMMANDS = {
     'build': Build,
+    'inspect': Inspect,
     'kill': Kill,
     'rm': Rm,
     'run': Run,
