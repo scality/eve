@@ -163,18 +163,12 @@ class Run(BaseCommand):
             # ignore unsupported volume specification
             return None
 
-        # unique random name (name is mandatory for kube)
-        default_name = '%s-worker-%s' % (
-            socket.gethostname(),
-            str(uuid4())[:8]
-        )
         parser.add_argument('--privileged', action='store_true')
         parser.add_argument('-e', '--env', action='append',
                             default=[], type=dictify_equal)
         parser.add_argument('-l', '--label', action='append',
                             default=[], type=dictify_equal)
-        parser.add_argument('--name',
-                            default=default_name)
+        parser.add_argument('--name')
         parser.add_argument('-p', '--publish', action='append',
                             default=[], type=dictify_port)
         parser.add_argument('-v', '--volume', action='append',
@@ -182,8 +176,8 @@ class Run(BaseCommand):
         parser.add_argument('image')
 
     def adapt_args(self, files):
-        self.resource = '/resource/' + self.namespace.name
         vars(self.namespace)['docker_hook_sidecar'] = False
+        buildnumber = 0
 
         for label in self.namespace.label:
             if label['name'] == 'docker_in_docker':
@@ -194,6 +188,18 @@ class Run(BaseCommand):
                     self.namespace.image
                 )
                 break
+            if label['name'] == 'buildnumber':
+                buildnumber = label['value']
+
+        # unique random name
+        if self.namespace.name is None:
+            vars(self.namespace)['name'] = '%s-worker-%s-%s' % (
+                socket.gethostname(),
+                buildnumber,
+                str(uuid4())[:5]
+            )
+
+        self.resource = '/resource/' + self.namespace.name
 
 
 class Docker(BaseCommand):

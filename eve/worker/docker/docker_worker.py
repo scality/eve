@@ -71,6 +71,7 @@ class EveDockerLatentWorker(AbstractLatentWorker):
             '--env', 'BUILDMASTER_PORT=%s' % self.pb_port,
             '--env', 'WORKERNAME=%s' % self.name,
             '--env', 'WORKERPASS=%s' % self.password,
+            '--label', 'buildnumber=%s' % buildnumber,
             '--detach',
             '--memory=%s' % self.max_memory,
             '--cpus=%s' % self.max_cpus
