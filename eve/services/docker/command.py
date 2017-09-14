@@ -85,7 +85,7 @@ class Build(BaseCommand):
         parser.add_argument('--quiet', action='store_true')
         parser.add_argument('--build-arg', action='append', default=[])
         parser.add_argument('--tag', '-t', action='append', default=[])
-        parser.add_argument('-l', '--label', action='append',
+        parser.add_argument('--label', '-l', action='append',
                             default=[], type=dictify_equal)
 
     def adapt_args(self, files):
@@ -112,11 +112,13 @@ class Build(BaseCommand):
             self.new_command.insert(2, '--build-arg')
             self.new_command.insert(3, arg)
 
-        for tag in self.namespace.tag:
+        for arg in self.namespace.tag:
             self.new_command.insert(2, '--tag')
-            self.new_command.insert(3, tag)
+            self.new_command.insert(3, arg)
 
-        # TODO use labels for real
+        for arg in self.namespace.label:
+            self.new_command.insert(2, '--label')
+            self.new_command.insert(3, '%s=%s' % (arg['name'], arg['value']))
 
 
 class Inspect(BaseCommand):
