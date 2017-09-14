@@ -25,7 +25,6 @@ from tempfile import mktemp
 import yaml
 from buildbot.plugins import steps, util
 from buildbot.process.buildstep import BuildStep
-from buildbot.process.properties import Interpolate
 from buildbot.process.results import CANCELLED, FAILURE, SUCCESS
 from buildbot.steps.master import SetProperty
 from buildbot.steps.shell import SetPropertyFromCommand
@@ -158,10 +157,10 @@ class ReadConfFromYaml(FileUpload):
             self.build.addStepsAfterCurrentStep([
                 GetCommitShortVersion(branch=branch),
                 GetCommitTimestamp(),
-                SetArtifactsName(
-                    buildnumber=buildnumber, stage_name=stage_name),
-                SetArtifactsPrivateURL(),
-                SetArtifactsPublicURL(),
+                steps.SetArtifactsName(
+                    buildnumber=buildnumber,
+                    stage_name=stage_name),
+                steps.SetArtifactsPublicURL(),
             ])
 
         defer.returnValue(SUCCESS)
@@ -269,46 +268,6 @@ class GetCommitTimestamp(SetPropertyFromCommand):
             hideStepIf=util.hideStepIfSuccess,
             haltOnFailure=True,
             property='commit_timestamp',
-            logEnviron=False)
-
-
-class SetArtifactsName(SetPropertyFromCommand):
-    def __init__(self, buildnumber, stage_name):
-        super(SetArtifactsName, self).__init__(
-            name='set the artifacts name',
-            command=[
-                'echo',
-                util.get_artifacts_name(buildnumber, stage_name)
-            ],
-            hideStepIf=util.hideStepIfSuccess,
-            property='artifacts_name',
-            logEnviron=False)
-
-
-class SetArtifactsPrivateURL(SetPropertyFromCommand):
-    def __init__(self):
-        super(SetArtifactsPrivateURL, self).__init__(
-            name='set the artifacts private url',
-            command=[
-                'echo',
-                Interpolate('http://artifacts/builds/%(prop:artifacts_name)s'),
-            ],
-            hideStepIf=util.hideStepIfSuccess,
-            property='artifacts_private_url',
-            logEnviron=False)
-
-
-class SetArtifactsPublicURL(SetPropertyFromCommand):
-    def __init__(self):
-        super(SetArtifactsPublicURL, self).__init__(
-            name='set the artifacts public url',
-            command=[
-                'echo',
-                Interpolate(util.env.ARTIFACTS_PUBLIC_URL +
-                            '/builds/%(prop:artifacts_name)s'),
-            ],
-            hideStepIf=util.hideStepIfSuccess,
-            property='artifacts_public_url',
             logEnviron=False)
 
 

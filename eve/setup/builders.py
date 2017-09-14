@@ -24,6 +24,8 @@ from buildbot.process.factory import BuildFactory
 def triggerable_builder(builder_name, workers):
     factory = BuildFactory()
     factory.addStep(steps.CancelOldBuild(name='prevent unuseful restarts'))
+    factory.addStep(steps.SetArtifactsPrivateURL(
+        builder_name == util.env.OPENSTACK_BUILDER_NAME))
 
     # Extract steps from conf
     factory.addStep(steps.StepExtractor(
@@ -35,5 +37,4 @@ def triggerable_builder(builder_name, workers):
         name=builder_name,
         workernames=[w.name for w in workers],
         factory=factory,
-        collapseRequests=False,
-        env={"HOSTALIASES": "/etc/host.aliases"})
+        collapseRequests=False)

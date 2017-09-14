@@ -83,15 +83,11 @@ class Tests(unittest.TestCase):
             (u'cancel builds for commits that are not branch tips', u'CancelNonTipBuild'),  # noqa
             (u'setting the master_builddir property', u'Set'),
             (u'check if any steps should currently be patched', u'finished (skipped)'),  # noqa
-            (u'get the git host', u'Set'),
-            (u'get the git owner', u'Set'),
-            (u'get the repository name', u'Set'),
             (u'get the product version', u"property 'product_version' set"),  # noqa
             (u'read eve/main.yml', u'uploading main.yml'),
             (u'get the commit short_revision', u"property 'commit_short_revision' set"),  # noqa
             (u'get the commit timestamp', u"property 'commit_timestamp' set"),
             (u'set the artifacts name', u"property 'artifacts_name' set"),
-            (u'set the artifacts private url', u"property 'artifacts_private_url' set"),  # noqa
             (u'set the artifacts public url', u"property 'artifacts_public_url' set"),  # noqa
             (u'get the API version', u'Set'),
             (u'prepare 1 stage(s)', u'finished'),
@@ -111,6 +107,8 @@ class Tests(unittest.TestCase):
                                        for step in steps]
         self.assertEqual(step_names_and_descriptions, [
             (u'prevent unuseful restarts', u"'[ $(expr ...'"),
+            (u'set the artifacts private url',
+             u"property 'artifacts_private_url' set"),
             (u'extract steps from yaml', u'finished'),
             (u'shell', u"'exit 0'")])
 
@@ -138,15 +136,11 @@ class Tests(unittest.TestCase):
             (u'cancel builds for commits that are not branch tips', u'CancelNonTipBuild'),  # noqa
             (u'setting the master_builddir property', u'Set'),
             (u'check if any steps should currently be patched', u'finished (skipped)'),  # noqa
-            (u'get the git host', u'Set'),
-            (u'get the git owner', u'Set'),
-            (u'get the repository name', u'Set'),
             (u'get the product version', u"property 'product_version' set"),
             (u'read eve/main.yml', u'uploading main.yml'),
             (u'get the commit short_revision', u"property 'commit_short_revision' set"),  # noqa
             (u'get the commit timestamp', u"property 'commit_timestamp' set"),
             (u'set the artifacts name', u"property 'artifacts_name' set"),
-            (u'set the artifacts private url', u"property 'artifacts_private_url' set"),  # noqa
             (u'set the artifacts public url', u"property 'artifacts_public_url' set"),  # noqa
             (u'get the API version', u'Set'),
             (u'prepare 1 stage(s)', u'finished'),
@@ -188,15 +182,11 @@ class Tests(unittest.TestCase):
             (u'cancel builds for commits that are not branch tips', u'CancelNonTipBuild'),  # noqa
             (u'setting the master_builddir property', u'Set'),
             (u'check if any steps should currently be patched', u'finished (skipped)'),  # noqa
-            (u'get the git host', u'Set'),
-            (u'get the git owner', u'Set'),
-            (u'get the repository name', u'Set'),
             (u'get the product version', u"property 'product_version' set"),  # noqa
             (u'read eve/main.yml', u'uploading main.yml'),
             (u'get the commit short_revision', u"property 'commit_short_revision' set"),  # noqa
             (u'get the commit timestamp', u"property 'commit_timestamp' set"),  # noqa
             (u'set the artifacts name', u"property 'artifacts_name' set"),
-            (u'set the artifacts private url', u"property 'artifacts_private_url' set"),  # noqa
             (u'set the artifacts public url', u"property 'artifacts_public_url' set"),  # noqa
             (u'get the API version', u'Set'),
             (u'prepare 1 stage(s)', u'finished'),

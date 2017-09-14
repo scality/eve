@@ -70,24 +70,6 @@ def bootstrap_builder(workers):
             doStepIf=bool(util.env.PATCHER_FILE_PATH),
             hideStepIf=util.hideStepIfSuccessOrSkipped))
 
-    bootstrap_factory.addStep(SetProperty(
-        name='get the git host',
-        property='git_host',
-        hideStepIf=util.hideStepIfSuccess,
-        value=util.env.GIT_HOST))
-
-    bootstrap_factory.addStep(SetProperty(
-        name='get the git owner',
-        property='git_owner',
-        hideStepIf=util.hideStepIfSuccess,
-        value=util.env.GIT_OWNER))
-
-    bootstrap_factory.addStep(SetProperty(
-        name='get the repository name',
-        property='git_slug',
-        hideStepIf=util.hideStepIfSuccess,
-        value=util.env.GIT_SLUG))
-
     yaml_dirpath = dirname(util.env.PROJECT_YAML)
     bootstrap_factory.addStep(SetPropertyFromCommand(
         name='get the product version',
@@ -108,4 +90,9 @@ def bootstrap_builder(workers):
         factory=bootstrap_factory,
         canStartBuild=eve_canStartBuild,
         nextBuild=util.nextBootstrapBuild,
+        properties={
+            'git_host': util.env.GIT_HOST,
+            'git_owner': util.env.GIT_OWNER,
+            'git_slug': util.env.GIT_SLUG,
+        }
     )

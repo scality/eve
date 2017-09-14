@@ -29,6 +29,25 @@ from packaging import version
 from twisted.internet import defer, reactor
 
 
+def get_artifacts_base_name():
+    """Give containing the base name of artifacts container."""
+    return (
+        '%(prop:git_host)s:%(prop:git_owner)s:%(prop:git_slug)s:'
+        + util.env.ARTIFACTS_PREFIX
+        + '%(prop:product_version)s.r%(prop:commit_timestamp)s'
+        + '.%(prop:commit_short_revision)s'
+    )
+
+
+def get_artifacts_name(buildnumber, stage_name):
+    """Give interpolate containing the full name of artifacts container."""
+    b4nb = buildnumber.zfill(8)
+    return Interpolate(
+        get_artifacts_base_name()
+        + '.' + stage_name + '.' + b4nb
+    )
+
+
 class GetArtifactsFromStage(SetPropertyFromCommand):
     """Get artifacts from another stage and store it in a property."""
 
@@ -42,9 +61,9 @@ class GetArtifactsFromStage(SetPropertyFromCommand):
                 'curl',
                 '--fail',
                 '-I',
-                Interpolate('http://artifacts/last_success/'
-                            + util.get_artifacts_base_name()
-                            + '.' + stage),
+                Interpolate('http://artifacts/last_success/{}.{}'.format(
+                            get_artifacts_base_name(),
+                            stage)),
             ],
             **kwargs
         )
@@ -63,6 +82,49 @@ class GetArtifactsFromStage(SetPropertyFromCommand):
                                  "GetArtifactsFromStage")
                 self.property_changes[self.property] = artifacts_name
                 break
+
+
+class SetArtifactsName(SetPropertyFromCommand):
+    def __init__(self, buildnumber, stage_name):
+        super(SetArtifactsName, self).__init__(
+            name='set the artifacts name',
+            command=[
+                'echo',
+                get_artifacts_name(buildnumber, stage_name)
+            ],
+            hideStepIf=util.hideStepIfSuccess,
+            property='artifacts_name',
+            logEnviron=False)
+
+
+class SetArtifactsPublicURL(SetPropertyFromCommand):
+    def __init__(self):
+        super(SetArtifactsPublicURL, self).__init__(
+            name='set the artifacts public url',
+            command=[
+                'echo',
+                Interpolate(util.env.ARTIFACTS_PUBLIC_URL +
+                            '/builds/%(prop:artifacts_name)s'),
+            ],
+            hideStepIf=util.hideStepIfSuccess,
+            property='artifacts_public_url',
+            logEnviron=False)
+
+
+class SetArtifactsPrivateURL(SetPropertyFromCommand):
+    def __init__(self, is_vm):
+        super(SetArtifactsPrivateURL, self).__init__(
+            name='set the artifacts private url',
+            command=[
+                'echo',
+                Interpolate(
+                    'http://{fqdn}/builds/%(prop:artifacts_name)s'.format(
+                        fqdn=(util.env.MICROSERVICE_ARTIFACTS_VM_URL
+                              if is_vm else 'artifacts'))),
+            ],
+            hideStepIf=util.hideStepIfSuccess,
+            property='artifacts_private_url',
+            logEnviron=False)
 
 
 class Upload(ShellCommand):

@@ -56,6 +56,11 @@ class TestJunit(unittest.TestCase):
                 'success'
             ),
             (
+                u'set the artifacts private url',
+                u"property 'artifacts_private_url' set",
+                'success'
+            ),
+            (
                 u'extract steps from yaml',
                 u'finished',
                 'success'
