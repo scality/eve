@@ -114,10 +114,6 @@ def openstack_heat_workers():
                     'worker_init_script': Property('init_script'),
                     'worker_requirements_script': Property(
                         'requirements_script'),
-                    'artifacts_private_fqdn':
-                        util.env.MICROSERVICE_ARTIFACTS_VM_URL,
-                    'gitcache_private_fqdn':
-                        util.env.MICROSERVICE_GITCACHE_VM_URL,
                     'start_worker_script': start_worker_script,
                 },
                 os_auth_url=util.env.OS_AUTH_URL,

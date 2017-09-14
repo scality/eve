@@ -25,6 +25,8 @@ from buildbot.steps.shell import ShellCommand
 def triggerable_builder(builder_name, workers):
     factory = BuildFactory()
     factory.addStep(steps.CancelOldBuild(name='prevent unuseful restarts'))
+    factory.addStep(steps.SetArtifactsPrivateURL(
+        builder_name == util.env.OPENSTACK_BUILDER_NAME))
 
     # customize global Git conf to hit on docker cache
     if (util.env.MICROSERVICE_GITCACHE_IN_USE and
@@ -62,5 +64,4 @@ def triggerable_builder(builder_name, workers):
         name=builder_name,
         workernames=[w.name for w in workers],
         factory=factory,
-        collapseRequests=False,
-        env={"HOSTALIASES": "/etc/host.aliases"})
+        collapseRequests=False)

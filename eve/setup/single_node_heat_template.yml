@@ -25,14 +25,6 @@ parameters:
     label: Requirements script
     description: Requirements script
     default: ""
-  artifacts_private_fqdn:
-    type: string
-    label: Artifacts' private fqdn
-    description: Private fqdn of the eve-microsm VM for artifacts
-  gitcache_private_fqdn:
-    type: string
-    label: Gitcache's private fqdn
-    description: Private fqdn of the eve-microsm VM for gitcache
   start_worker_script:
     type: string
     label: Start buildbot worker script
@@ -153,18 +145,10 @@ resources:
                   retry /tmp/worker_requirements_script.sh
                 fi
 
-                # add eve-*-microsvm' private fqdn to host aliases
-                echo "artifacts $artifacts_private_fqdn" >> /etc/host.aliases
-                echo "gitcache $gitcache_private_fqdn" >> /etc/host.aliases
-                echo "bitbucket.org $gitcache_private_fqdn" >> /etc/host.aliases
-                echo "github.com $gitcache_private_fqdn" >> /etc/host.aliases
-
                 # launch post setup hacks and run buildbot
                 $start_worker_script
           params:
             "$worker_version": {get_param: worker_version}
             "$worker_init_script": {get_param: worker_init_script}
             "$worker_requirements_script": {get_param: worker_requirements_script}
-            "$artifacts_private_fqdn": {get_param: artifacts_private_fqdn}
-            "$gitcache_private_fqdn": {get_param: gitcache_private_fqdn}
             "$start_worker_script": {get_param: start_worker_script}

@@ -367,6 +367,8 @@ class TestDockerCluster(unittest.TestCase):
                                            for step in premerge_steps]
             self.assertEqual(step_names_and_descriptions, [
                 (u'prevent unuseful restarts', u"'[ $(expr ...'"),
+                (u'set the artifacts private url',
+                 u"property 'artifacts_private_url' set"),
                 (u'extract steps from yaml', u'finished'),
                 (u'local-test_suffix This is a long step ',
                     u"'exit 0'")])

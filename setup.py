@@ -71,6 +71,9 @@ setup(
             'JUnitShellCommand=eve.steps.junit:JUnitShellCommand',
             'PublishCoverageReport=eve.steps.publish_coverage_report:PublishCoverageReport',
             'ReadConfFromYaml=eve.steps.yaml_parser:ReadConfFromYaml',
+            'SetArtifactsName=eve.steps.artifacts:SetArtifactsName',
+            'SetArtifactsPrivateURL=eve.steps.artifacts:SetArtifactsPrivateURL',
+            'SetArtifactsPublicURL=eve.steps.artifacts:SetArtifactsPublicURL',
             'ShellCommandWithSecrets=eve.steps.shell_command_with_secrets:ShellCommandWithSecrets',
             'StepExtractor=eve.steps.yaml_parser:StepExtractor',
             'StepPatcherConfig=eve.steps.step_patcher:StepPatcherConfig',
@@ -80,8 +83,6 @@ setup(
         'buildbot.util': [
             'BaseBuildOrder=eve.util.build_order:BaseBuildOrder',
             'env=eve.util.env:SETTINGS',
-            'get_artifacts_base_name=eve.util.artifacts:get_artifacts_base_name',
-            'get_artifacts_name=eve.util.artifacts:get_artifacts_name',
             'get_local_jobs=eve.util.local_jobs:get_local_jobs',
             'get_secrets=eve.util.env:get_secrets',
             'hideStepIfSkipped=eve.util.step:hideStepIfSkipped',
