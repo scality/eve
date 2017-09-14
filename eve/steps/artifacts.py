@@ -48,6 +48,13 @@ def get_artifacts_name(buildnumber, stage_name):
     )
 
 
+def get_artifacts_proxy(builder):
+    """Give correct artifacts proxy based on builder type."""
+    if builder.name.startswith(util.env.OPENSTACK_BUILDER_NAME):
+        return util.env.MICROSERVICE_ARTIFACTS_VM_URL
+    return 'artifacts'
+
+
 class GetArtifactsFromStage(SetPropertyFromCommand):
     """Get artifacts from another stage and store it in a property."""
 
@@ -169,8 +176,10 @@ class Upload(ShellCommand):
             'tar -chvzf ../artifacts.tar.gz . ',
             'echo tar successful. Calling curl... ',
             ('curl --verbose --max-time {} -s -T ../artifacts.tar.gz -X PUT '
-             'http://artifacts/upload/{}').format(self.UPLOAD_MAX_TIME,
-                                                  self.get_container())]
+             'http://{}/upload/{}').format(
+                self.UPLOAD_MAX_TIME,
+                get_artifacts_proxy(self.build.builder),
+                self.get_container())]
 
         # compute configured urls
         links = []
