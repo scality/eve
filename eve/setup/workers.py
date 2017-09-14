@@ -53,26 +53,12 @@ def docker_workers():
     return workers
 
 
-"""The latest CentOS 6 git package available is 1.7.1. The credential.helper
-store has been introduced in git 1.7.9. To allow CentOS 6 to deal with auth,
-the login/passwd has been added in the insteadOf conf (the credentials will
-not be displayed in logs).
-
-"""
 START_WORKER_SCRIPT = """
-echo https://{githost_login}:{githost_pwd}@bitbucket.org \
-  >> /home/eve/.git_credentials
-echo https://{githost_login}:{githost_pwd}@github.com  \
-  >> /home/eve/.git_credentials
-chown eve.eve /home/eve/.git_credentials
-chmod 600 /home/eve/.git_credentials
 sudo -Hu eve git config --global \
-  credential.helper 'store --file=/home/eve/.git_credentials'
-sudo -Hu eve git config --global \
-  url.https://{githost_login}:{githost_pwd}@bitbucket.org/.insteadOf \
+  url.http://{gitcache_host}/https/bitbucket.org/.insteadOf \
   git@bitbucket.org:
 sudo -Hu eve git config --global \
-  url.https://{githost_login}:{githost_pwd}@github.com/.insteadOf \
+  url.http://{gitcache_host}/https/github.com/.insteadOf \
   git@github.com:
 sudo -Hu eve buildbot-worker create-worker --umask=022 /home/eve/worker \
 "{master_fqdn}:{master_port}" {worker_name} "{worker_password}"
@@ -90,8 +76,7 @@ def openstack_heat_workers():
         password = util.password_generator()
 
         start_worker_script = Interpolate(START_WORKER_SCRIPT.format(
-            githost_login=util.env.EVE_GITHOST_LOGIN,
-            githost_pwd=util.env.EVE_GITHOST_PWD,
+            gitcache_host=util.env.MICROSERVICE_GITCACHE_VM_URL,
             master_fqdn=util.env.MASTER_FQDN,
             master_port=util.env.EXTERNAL_PB_PORT,
             worker_name=name,
