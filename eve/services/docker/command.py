@@ -126,6 +126,7 @@ class Inspect(BaseCommand):
     new_command = ['kubectl', 'get', 'pod', '--no-headers', '%resource%']
 
     def register_args(self, parser):
+        parser.add_argument('container')
         parser.add_argument('--format', action='append', default=[])
 
     def adapt_args(self, files):
