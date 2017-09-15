@@ -225,7 +225,7 @@ class Run(BaseCommand):
         parser.add_argument('image')
 
     def adapt_args(self, files):
-        self.resource = '/resource/' + self.namespace.name
+        self.resource = '/resource/' + self.namespace.name.replace("sha256:", "")
         vars(self.namespace)['docker_hook_sidecar'] = True
         vars(self.namespace)['docker_hook_image'] = re.sub(
             r'([^/]*/[^/]*/)[^:]*:.*',
