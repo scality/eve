@@ -3,6 +3,7 @@ import os
 import re
 import socket
 import tarfile
+import time
 from uuid import uuid4
 
 from jinja2 import Environment, FileSystemLoader
@@ -131,6 +132,9 @@ class Inspect(BaseCommand):
 
     def adapt_args(self, files):
         self.new_command = list(self.new_command)
+
+        # TODO remove this hack
+        time.sleep(15)
 
         for arg in self.namespace.format:
             self.new_command.insert(4, '--output')
