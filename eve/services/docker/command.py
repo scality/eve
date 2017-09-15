@@ -123,7 +123,7 @@ class Build(BaseCommand):
 
 class Inspect(BaseCommand):
     command = 'inspect'
-    new_command = ['kubectl', 'get', 'pod', '--no-headers', '%resource%']
+    new_command = ['kubectl', 'get', 'pod', '--no-headers']
 
     def register_args(self, parser):
         parser.add_argument('container')
@@ -139,7 +139,7 @@ class Inspect(BaseCommand):
             else:
                 self.new_command.insert(5, 'NOT_IMPLEMENTED')
 
-        self.resource = self.namespace.container
+        self.new_command.extend(['-l', 'original-name=%s' % self.namespace.container])
 
 
 class Kill(BaseCommand):

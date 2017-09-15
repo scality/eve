@@ -8,6 +8,7 @@ spec:
     metadata:
       labels:
         k8s-app: "eve-worker"
+        original-name: "{{ name }}"
         {% for l in label %}
         {{ l.name }}: "{{ l.value }}"
         {% endfor %}
