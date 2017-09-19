@@ -58,12 +58,15 @@ class EveDockerLatentWorker(AbstractLatentWorker):
             raise ValueError('instance active')
         image = yield build.render(self.image)
         volumes = build.getProperty('docker_volumes')
+        docker_hook_version = build.getProperty('docker_hook', None)
         buildnumber = yield build.render(Property('buildnumber'))
         res = yield threads.deferToThread(self._thd_start_instance, image,
-                                          volumes, buildnumber)
+                                          volumes, buildnumber,
+                                          docker_hook_version)
         defer.returnValue(res)
 
-    def _thd_start_instance(self, image, volumes, buildnumber):
+    def _thd_start_instance(self, image, volumes, buildnumber,
+                            docker_hook_version):
         cmd = [
             'run',
             '--privileged',
@@ -78,6 +81,9 @@ class EveDockerLatentWorker(AbstractLatentWorker):
         ]
 
         cmd.extend(['--volume=%s' % volume for volume in volumes])
+
+        if docker_hook_version:
+            cmd.append('--label=docker_hook=%s' % docker_hook_version)
 
         cmd.append(image)
         self.instance = self.docker_invoke(*cmd)

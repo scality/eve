@@ -373,3 +373,85 @@ class TestDockerCluster(unittest.TestCase):
                 (u'local-test_suffix This is a long step ',
                     u"'exit 0'")])
             cluster.sanity_check()
+
+    def test_docker_hook_workers_on(self):
+        """Test the property docker_hook is set when required.
+
+        Steps:
+            - set the DOCKER_HOOK_... environment to contain worker.
+            - Force a build.
+            - Check that the build succeeds.
+            - Check that bootstrap does not have the property.
+            - Check that the docker build has the property set to True.
+
+        """
+        conf = {
+            'DOCKER_HOOK_IN_USE': '1',
+            'DOCKER_HOOK_VERSION': '1.2.3',
+            'DOCKER_HOOK_WORKERS': 'riri;ubuntu-xenial-with-docker-ctxt;plop',
+        }
+        with Cluster(extra_conf=conf) as cluster:
+            local_repo = cluster.clone()
+            local_repo.push(
+                yaml=SingleCommandYaml(
+                    'exit 0',
+                    worker={
+                        'type': 'docker',
+                        'path': 'ubuntu-xenial-with-docker-ctxt'
+                    }),
+                dirs=[
+                    abspath(
+                        join(__file__, pardir, 'contexts',
+                             'ubuntu-xenial-with-docker-ctxt'))
+                ])
+            buildset = cluster.api.force(branch=local_repo.branch)
+            self.assertEqual(buildset.result, 'success')
+            self.assertTrue('docker_hook' not in
+                            buildset.buildrequest.build.properties)
+
+            child_build = \
+                buildset.buildrequest.build.children[0].buildrequest.build
+            self.assertEqual(child_build.result, 'success')
+            self.assertEqual(child_build.properties['docker_hook'][0], '1.2.3')
+            cluster.sanity_check()
+
+    def test_docker_hook_workers_off(self):
+        """Test the property docker_hook is set when required.
+
+        Steps:
+            - set the DOCKER_HOOK_... environment to invalid data.
+            - Force a build.
+            - Check that the build succeeds.
+            - Check that bootstrap does not have the property.
+            - Check that the docker build has the property set to False.
+
+        """
+        conf = {
+            'DOCKER_HOOK_IN_USE': '1',
+            'DOCKER_HOOK_VERSION': '1.2.3',
+            'DOCKER_HOOK_WORKERS': 'ri;not-ubuntu-xenial-with-docker-ctxt;pl',
+        }
+        with Cluster(extra_conf=conf) as cluster:
+            local_repo = cluster.clone()
+            local_repo.push(
+                yaml=SingleCommandYaml(
+                    'exit 0',
+                    worker={
+                        'type': 'docker',
+                        'path': 'ubuntu-xenial-with-docker-ctxt'
+                    }),
+                dirs=[
+                    abspath(
+                        join(__file__, pardir, 'contexts',
+                             'ubuntu-xenial-with-docker-ctxt'))
+                ])
+            buildset = cluster.api.force(branch=local_repo.branch)
+            self.assertEqual(buildset.result, 'success')
+            self.assertTrue('docker_hook' not in
+                            buildset.buildrequest.build.properties)
+
+            child_build = \
+                buildset.buildrequest.build.children[0].buildrequest.build
+            self.assertEqual(child_build.result, 'success')
+            self.assertTrue('docker_hook' not in child_build.properties)
+            cluster.sanity_check()

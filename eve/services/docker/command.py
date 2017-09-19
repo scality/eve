@@ -180,7 +180,7 @@ class Run(BaseCommand):
         buildnumber = 0
 
         for label in self.namespace.label:
-            if label['name'] == 'docker_in_docker':
+            if label['name'] == 'docker_hook':
                 vars(self.namespace)['docker_hook_sidecar'] = True
                 vars(self.namespace)['docker_hook_image'] = re.sub(
                     r'([^/]*/[^/]*/)[^:]*:.*',

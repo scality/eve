@@ -53,6 +53,10 @@ class DockerBuildOrder(util.BaseBuildOrder):
             worker_path,
         )
 
+        if util.env.DOCKER_HOOK_IN_USE:
+            if worker_path in util.env.DOCKER_HOOK_WORKERS.split(';'):
+                self.properties['docker_hook'] = util.env.DOCKER_HOOK_VERSION
+
         # image name is last dir name + hash of path to avoid collisions
         basename = "{0}_{1}".format(
             path.basename(worker_path),
