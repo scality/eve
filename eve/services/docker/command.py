@@ -2,42 +2,32 @@ import argparse
 import os
 import re
 import socket
-import tarfile
 from uuid import uuid4
 
 from jinja2 import Environment, FileSystemLoader
 
 
 def command_factory(cmd):
-    """Return a command instance selected by input command."""
+    """Return a BaseCommand instance selected by input operation."""
 
     try:
-        return COMMANDS[cmd]()
+        return OPERATIONS[cmd]()
     except KeyError:
         return Docker()
+
+
+class Argparse(argparse.ArgumentParser):
+    def error(self, msg):
+        raise Exception(msg)
 
 
 class BaseCommand():
     """Implement the command interface."""
 
-    command = None
+    operation = None
     template = None
-    template_name = None
-    new_command = None
-    post_command = []
-    namespace = None
-    resource = None
 
-    def __init__(self):
-        env = Environment(
-            loader=FileSystemLoader('/templates'),
-            trim_blocks=True,
-            lstrip_blocks=True
-        )
-        if self.template_name:
-            self.template = env.get_template(self.template_name)
-
-    def convert(self, original_cmd, files=None):
+    def convert(self, original_cmd, stdin, files=None):
         """Convert original docker command to new command.
 
         - parse original command line and return a namespace,
@@ -45,92 +35,194 @@ class BaseCommand():
         - build and return the new command line.
 
         """
-        original_cmd.remove(self.command)
-        parser = argparse.ArgumentParser(prog='docker %s' % self.command,
-                                         description='docker cli parser')
+        cmd = list(original_cmd)
+        cmd.remove(self.operation)
+        parser = Argparse(prog='docker %s' % self.operation,
+                          description='docker cli parser')
         self.register_args(parser)
-        self.namespace = parser.parse_known_args(original_cmd[1:])[0]
+        try:
+            namespace = parser.parse_known_args(cmd[1:])[0]
+        except Exception:
+            return Docker().convert(original_cmd, stdin, files)
 
-        self.adapt_args(files)
+        args = self.adapt_args(namespace, stdin, files) or []
 
         if self.template:
-            self.template.stream(vars(self.namespace)).dump(self.resource)
-        # update resource in cmd line
-        return ([self.resource if it == '%resource%'
-                 else it for it in self.new_command],
-                [self.resource if it == '%resource%'
-                 else it for it in self.post_command])
+            env = Environment(
+                loader=FileSystemLoader('/templates'),
+                trim_blocks=True,
+                lstrip_blocks=True
+            )
+            template = env.get_template(self.template)
+            template.stream(vars(namespace)) \
+                    .dump('/resource/' + self.get_template_basename(namespace))
+
+        return ['/commands/' + self.operation] + args
 
     def register_args(self, parser):
-        """Register command specific args."""
-        raise NotImplementedError()
+        """Register docker command specific args."""
+        pass
 
-    def adapt_args(self, files):
-        """Adapt argument formatting from docker style to kube style."""
+    def adapt_args(self, namespace, stdin, files):
+        """Post process given arguments and return new args."""
+        pass
+
+    def get_new_args(self, namespace, files):
+        return []
+
+    def get_template_basename(self, namespace):
+        """Return basename of rendered template."""
         raise NotImplementedError()
 
 
 class Build(BaseCommand):
-    command = 'build'
-    new_command = ['docker', 'build', '--rm', '%resource%']
-    post_command = ['rm', '-rf', '%resource%']
+    operation = 'build'
 
     def register_args(self, parser):
+        def dictify_equal(arg):
+            name, value = arg.split('=')
+            return {'name': name, 'value': value}
+
         parser.add_argument('path')
-        parser.add_argument('--rm', action='store_false')
+        parser.add_argument('--rm', action='store_true')
+        parser.add_argument('--quiet', '-q', action='store_true')
         parser.add_argument('--build-arg', action='append', default=[])
         parser.add_argument('--tag', '-t', action='append', default=[])
+        parser.add_argument('--label', '-l', action='append',
+                            default=[], type=dictify_equal)
 
-    def adapt_args(self, files):
+    def adapt_args(self, namespace, stdin, files):
         docker_context_archive = files['docker_context']
         archive_name = docker_context_archive.filename
         archive_path = os.path.join('/resource', archive_name)
-        new_path = os.path.join(
-            '/resource', re.sub('\.tar.gz$', '', archive_name))
         docker_context_archive.save(archive_path)
-        tar = tarfile.open(archive_path, "r:gz")
-        tar.extractall(path=new_path)
-        tar.close()
-        os.remove(archive_path)
-        self.resource = new_path
 
-        for arg in self.namespace.build_arg:
-            self.new_command.insert(2, '--build-arg')
-            self.new_command.insert(3, arg)
+        build_cmd = ['docker', 'build']
+        if namespace.rm:
+            build_cmd.append('--rm')
 
-        for tag in self.namespace.tag:
-            self.new_command.insert(2, '--tag')
-            self.new_command.insert(3, tag)
+        if namespace.quiet:
+            build_cmd.append('--quiet')
+
+        for arg in namespace.build_arg:
+            build_cmd.append('--build-arg')
+            build_cmd.append(arg)
+
+        tag = ''
+        for arg in namespace.tag:
+            build_cmd.append('--tag')
+            build_cmd.append(arg)
+            tag = arg
+
+        for arg in namespace.label:
+            build_cmd.append('--label')
+            build_cmd.append('%s=%s' % (arg['name'], arg['value']))
+
+        return [
+            archive_path,
+            os.environ['REGISTRY'],
+            tag,
+            ' '.join(build_cmd)
+        ]
+
+
+class Docker(BaseCommand):
+    """Call docker with original command."""
+
+    def convert(self, original_cmd, stdin, files=None):
+        new_cmd = list(original_cmd)
+        new_cmd[0] = 'docker'
+        return new_cmd
+
+
+class Exec(BaseCommand):
+    operation = 'exec'
+
+    def register_args(self, parser):
+        parser.add_argument('--interactive', '-i', action='store_true')
+        parser.add_argument('--tty', '-t', action='store_true')
+        parser.add_argument('container')
+        parser.add_argument('command')
+        parser.add_argument('args', nargs=argparse.REMAINDER)
+
+    def adapt_args(self, namespace, stdin, files):
+        args = []
+        options = []
+
+        if namespace.interactive:
+            options.append('-i')
+
+        if namespace.tty:
+            options.append('-t')
+
+        args.append(' '.join(options))
+        args.append(namespace.container)
+        args.append(namespace.command)
+        args.append(' '.join(namespace.args))
+        if stdin:
+            args.append('\n'.join(stdin))
+        return args
+
+
+class Ignore(BaseCommand):
+    """Simply ignore command."""
+
+    def convert(self, original_cmd, stdin, files=None):
+        return ['true']  # shell noop
+
+
+class Inspect(BaseCommand):
+    operation = 'inspect'
+
+    def register_args(self, parser):
+        parser.add_argument('container')
+        parser.add_argument('--format', default='')
+
+    def adapt_args(self, namespace, stdin, files):
+        return [namespace.format, namespace.container]
 
 
 class Kill(BaseCommand):
-    command = 'kill'
-    new_command = ['kubectl', 'delete', 'job', '--output=name', '%resource%']
+    operation = 'kill'
 
     def register_args(self, parser):
         parser.add_argument('container')
 
-    def adapt_args(self, files):
-        self.resource = self.namespace.container
+    def adapt_args(self, namespace, stdin, files):
+        return ['-'.join(namespace.container.split('-')[:-1])]
 
 
-class Rm(BaseCommand):
-    command = 'rm'
-    new_command = ['rm', '-f', '%resource%']
+class Ps(BaseCommand):
+    operation = 'ps'
 
     def register_args(self, parser):
-        parser.add_argument('container')
+        def dictify_equal(arg):
+            filter, name, value = arg.split('=')
+            return {'filter': filter, 'name': name, 'value': value}
 
-    def adapt_args(self, files):
-        self.resource = '/resource/' + self.namespace.container
+        parser.add_argument('--filter', '-f', action='append',
+                            default=[], type=dictify_equal)
+        parser.add_argument('--all', '-a', action='store_true')
+
+    def adapt_args(self, namespace, stdin, files):
+        args = []
+
+        if namespace.all:
+            args.append('--show-all')
+
+        for filter in namespace.filter:
+            if filter['filter'] == 'label':
+                args.append('--selector')
+                args.append('%s=%s' % (filter['name'], filter['value']))
+            else:
+                raise NotImplementedError()
+
+        return args
 
 
 class Run(BaseCommand):
-    command = 'run'
-    template_name = 'worker_run.yml'
-    new_command = ['kubectl', 'create', '--no-headers',
-                   '--output=custom-columns=NAME:.metadata.name',
-                   '-f', '%resource%']
+    operation = 'run'
+    template = 'worker_run.yml'
 
     def register_args(self, parser):
         def dictify_equal(arg):
@@ -163,7 +255,13 @@ class Run(BaseCommand):
             # ignore unsupported volume specification
             return None
 
+        parser.add_argument('--cpu-quota')
+        parser.add_argument('--cpu-period')
+        parser.add_argument('--memory')
+        parser.add_argument('--memory-swap')
+        parser.add_argument('--detach', action='store_true')
         parser.add_argument('--privileged', action='store_true')
+        parser.add_argument('--stop-signal')
         parser.add_argument('-e', '--env', action='append',
                             default=[], type=dictify_equal)
         parser.add_argument('-l', '--label', action='append',
@@ -175,53 +273,51 @@ class Run(BaseCommand):
                             default=[], type=dictify_volume)
         parser.add_argument('image')
 
-    def adapt_args(self, files):
-        vars(self.namespace)['docker_hook_sidecar'] = False
+    def adapt_args(self, namespace, stdin, files):
+        vars(namespace)['docker_hook_sidecar'] = False
         buildnumber = 0
 
-        for label in self.namespace.label:
+        if namespace.image.startswith('sha256:'):
+            vars(namespace)['image'] = \
+                namespace.image.replace(
+                    'sha256:',
+                    os.environ['REGISTRY'] + '/unspecified:')
+
+        for label in namespace.label:
             if label['name'] == 'docker_hook':
-                vars(self.namespace)['docker_hook_sidecar'] = True
-                vars(self.namespace)['docker_hook_image'] = re.sub(
+                vars(namespace)['docker_hook_sidecar'] = True
+                vars(namespace)['registry'] = os.environ['REGISTRY']
+                vars(namespace)['docker_hook_image'] = re.sub(
                     r'([^/]*/[^/]*/)[^:]*:.*',
                     r'\1docker-hook:%s' % label['value'],
-                    self.namespace.image
+                    namespace.image
                 )
                 break
             if label['name'] == 'buildnumber':
                 buildnumber = label['value']
 
         # unique random name
-        if self.namespace.name is None:
-            vars(self.namespace)['name'] = '%s-worker-%s-%s' % (
+        if namespace.name is None:
+            vars(namespace)['name'] = '%s-worker-%s-%s' % (
                 socket.gethostname(),
                 buildnumber,
                 str(uuid4())[:5]
             )
 
-        self.resource = '/resource/' + self.namespace.name
+        return [namespace.name]
+
+    def get_template_basename(self, namespace):
+        return namespace.name
 
 
-class Docker(BaseCommand):
-    """Call docker with original command."""
-
-    def convert(self, original_cmd, files=None):
-        new_cmd = original_cmd
-        new_cmd[0] = 'docker'
-        return new_cmd, None
-
-
-class Ignore(BaseCommand):
-    """Simply ignore command."""
-
-    def convert(self, original_cmd, files=None):
-        return ['true'], None  # shell noop
-
-
-COMMANDS = {
+OPERATIONS = {
     'build': Build,
+    'exec': Exec,
+    'inspect': Inspect,
     'kill': Kill,
-    'rm': Rm,
+    'ps': Ps,
+    'rm': Ignore,
     'run': Run,
+    'stop': Kill,
     'wait': Ignore,
 }

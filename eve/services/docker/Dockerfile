@@ -39,6 +39,7 @@ COPY run.sh /
 COPY app.py /
 COPY command.py /
 COPY templates /templates
+COPY commands /commands
 
 VOLUME "/var/lib/docker" "/var/log" "/resource"
 

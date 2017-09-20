@@ -8,6 +8,7 @@ spec:
     metadata:
       labels:
         k8s-app: "eve-worker"
+        name: "{{ name }}"
         {% for l in label %}
         {{ l.name }}: "{{ l.value }}"
         {% endfor %}
@@ -93,6 +94,8 @@ spec:
           env:
             - name: DOCKER_API_VERSION
               value: "1.23"
+            - name: REGISTRY
+              value: {{ registry }}
         {% endif %}
       volumes:
         - name: gitconfig

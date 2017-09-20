@@ -40,10 +40,8 @@ def create_archive(root, files=None, fileobj=None, gzip=False):
     t = tarfile.open(mode='w:gz' if gzip else 'w', fileobj=fileobj)
     if files is None:
         files = build_file_list(root)
-    print(root, files)
     for path in files:
         i = t.gettarinfo(os.path.join(root, path), arcname=path)
-        print(i)
         if i is None:
             # This happens when we encounter a socket file. We can safely
             # ignore it and proceed.
@@ -60,21 +58,39 @@ def create_archive(root, files=None, fileobj=None, gzip=False):
     return fileobj
 
 
+def get_build_context(cmd):
+    build_context = cmd[-1]
+    if not os.path.isdir(build_context):
+        sys.exit('build context path seem incorrect (%s).' % build_context)
+    return build_context
+
+
 def handle_remote(cmd):
     files = None
     timeout = 300
 
     if cmd == 'build':
+        context_path = get_build_context(sys.argv)
         archive_name = str(uuid4())[:13] + '_context.tar.gz'
-        archive = create_archive(root=sys.argv[-1],
-                                 gzip=True)
+        archive = create_archive(root=context_path, gzip=True)
         files = {'docker_context': (archive_name, archive)}
         timeout = 3600
+
+    stdin = []
+    if cmd == 'exec' and '--interactive' in sys.argv or '-i' in sys.argv:
+        try:
+            while True:
+                stdin.append(raw_input())
+        except EOFError:
+            pass
 
     try:
         response = requests.put(
             'http://localhost:5000/{cmd}'.format(cmd=cmd),
-            data={'command': json.dumps(sys.argv)},
+            data={
+                'command': json.dumps(sys.argv),
+                'stdin': json.dumps(stdin),
+            },
             files=files
         )
     except requests.ConnectionError:
@@ -94,7 +110,7 @@ def handle_remote(cmd):
         response.raise_for_status()
         state = response.json()['state']
         if state == 'SUCCESS':
-            print(response.json()['output'])
+            print(response.json()['output'].rstrip('\n'))
             sys.exit(int(response.json()['retcode']))
         elif state == 'FAILURE':
             sys.exit('internal error')

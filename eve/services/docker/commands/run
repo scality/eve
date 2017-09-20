@@ -1,0 +1,55 @@
+#!/bin/sh
+
+job_name="${1}"
+template="/resource/${job_name}"
+pod_name=""
+
+with_retry() {
+    local max_attempts=${ATTEMPTS-10}
+    local delay=${DELAY-10}
+    local attempt=0
+    local exitCode=1
+
+    while [ $attempt -lt $max_attempts ]; do
+        "$@" 2>/dev/null
+        exitCode=$?
+        test $exitCode -eq 0 && break
+        sleep $delay
+        attempt=$(( attempt + 1 ))
+    done
+
+    return $exitCode
+}
+
+get_pod() {
+    local name=$(kubectl get pod \
+                 --selector name=${job_name} \
+                 --no-headers \
+                 --output=custom-columns=ADDRESS:.metadata.name)
+    test -z "${name}" && return 1
+
+    local status=$(kubectl get pod \
+                   ${name} \
+                   --no-headers \
+                   --output=custom-columns=ADDRESS:.status.phase)
+    test "${status}" != "Running" && return 1
+
+    pod_name="${name}"
+}
+
+# spawn job
+JOB=$(kubectl create \
+      --no-headers \
+      --output=custom-columns=NAME:.metadata.name \
+      -f ${template})
+test ! $? -eq 0 && exit 1
+
+# wait for pod
+with_retry get_pod
+
+# cleanup input file
+rm -f ${template}
+
+# return pod name
+test -z "${pod_name}" && exit 1
+echo ${pod_name}

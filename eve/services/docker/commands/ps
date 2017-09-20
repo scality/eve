@@ -1,0 +1,6 @@
+#!/bin/bash
+set -e
+
+kubectl get pod --no-headers \
+                --output custom-columns=NAME:.metadata.name \
+                "$@"

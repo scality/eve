@@ -1,0 +1,36 @@
+#!/bin/bash
+
+archive="$1"
+extracted_path="${archive%%.tar.gz}"
+registry="$2"
+tag="$3"
+build_cmd="$4"
+
+mkdir -p "${extracted_path}"
+tar xf "${archive}" -C ${extracted_path}
+
+if [ -z "${tag}" ]; then
+    SHA256=$(tar -c --mtime="1990-02-11 00:00Z" --group=0 \
+             -C ${extracted_path} \
+             --owner=0 --numeric-owner --sort=name --mode=0 . \
+             | sha256sum | cut -f 1 -d " ")
+    tag="${registry}/unspecified:${SHA256}"
+    build_cmd="${build_cmd} --tag ${tag}"
+else
+    SHA256="${tag##*:}"
+fi
+
+docker pull ${tag} >/dev/null 2>&1
+if [ ! $? -eq 0 ]; then
+    out=$(eval "$build_cmd ${extracted_path}")
+    docker push ${tag} >/dev/null 2>&1
+fi
+
+rm "${archive}"
+rm -r "${extracted_path}"
+
+if [[ "${build_cmd}" == *"quiet"* ]]; then
+    echo "sha256:${SHA256}"
+else
+    echo -e "${out}"
+fi

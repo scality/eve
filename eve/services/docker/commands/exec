@@ -1,0 +1,18 @@
+#!/bin/bash
+
+options=$1
+container=$2
+cmd=$3
+args=$4
+stdin=$5
+stdin_file="/resource/exec_${RANDOM}"
+
+echo -e "${stdin}" > ${stdin_file}
+
+if [ -z "${stdin}" ]; then
+    kubectl exec ${options} ${container} ${cmd} -- ${args}
+else
+    eval "kubectl exec ${options} ${container} ${cmd} -- ${args}" < ${stdin_file}
+fi
+
+rm -f ${stdin_file}

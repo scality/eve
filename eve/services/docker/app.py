@@ -10,6 +10,7 @@ from flask import Flask, jsonify, request, url_for
 
 app = Flask(__name__)
 app.config.update(
+    DEBUG=True,
     CELERY_BROKER_URL='redis://localhost:6379',
     CELERY_RESULT_BACKEND='redis://localhost:6379'
 )
@@ -37,7 +38,7 @@ celery = make_celery(app)
 
 
 @celery.task()
-def call(target_cmd, post_cmd):
+def call(target_cmd):
     """Create a task that runs the provided command."""
     retcode = -1
     try:
@@ -46,9 +47,6 @@ def call(target_cmd, post_cmd):
     except subprocess.CalledProcessError as excp:
         ret = excp.output
         retcode = 1
-
-    if post_cmd:
-        subprocess.check_output(post_cmd, stderr=subprocess.STDOUT)
 
     return {'output': ret,
             'retcode': retcode}
@@ -59,8 +57,14 @@ def taskstatus(task_id):
     task = call.AsyncResult(task_id)
     response = {'state': task.state}
     if task.state == 'SUCCESS':
-        response['output'] = str(task.info.get('output', ''))
-        response['retcode'] = str(task.info.get('retcode', 1))
+        retcode = str(task.info.get('retcode', 1))
+        output = str(task.info.get('output', ''))
+        app.logger.info('<{task}> res: {retcode}, output:\n{output}'.format(
+            task=task.id,
+            retcode=retcode,
+            output=output.decode('utf8')))
+        response['output'] = output
+        response['retcode'] = retcode
     return jsonify(response)
 
 
@@ -78,13 +82,19 @@ def docker(command):
         traceback.print_exc()
         return bad_request(403, traceback.format_exc())
 
+    original_cmd = json.loads(request.form['command'])
+    stdin = json.loads(request.form['stdin'])
     try:
-        target_cmd, post_cmd = cmd.convert(
-            json.loads(request.form['command']), request.files)
+        target_cmd = cmd.convert(original_cmd, stdin, request.files)
     except Exception:
         return bad_request(500, traceback.format_exc())
 
-    task = call.delay(target_cmd, post_cmd)
+    task = call.delay(target_cmd)
+
+    app.logger.info('<{task}> ---> {ori}\n<{task}> <--- {conv}'.format(
+        task=task.id,
+        ori=' '.join(original_cmd),
+        conv=' '.join(target_cmd)))
 
     return jsonify({}), 202, {
         'location': url_for('taskstatus', task_id=task.id)}
