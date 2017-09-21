@@ -27,8 +27,8 @@ from twisted.python.reflect import namedModule
 def local_workers():
     workers = []
     for i in range(util.env.MAX_LOCAL_WORKERS):
-        worker_ = LocalWorker('lw%03d-%s-%s' % (
-            i, util.env.GIT_SLUG, util.env.SUFFIX))
+        worker_ = LocalWorker('lw%03d-%s' % (
+            i, util.env.SUFFIX))
         # Hack to fix a bug stating that LocalWorkers
         # do not have a valid path_module
         worker_.path_module = namedModule('posixpath')
@@ -41,7 +41,7 @@ def docker_workers():
     for i in range(util.env.MAX_DOCKER_WORKERS):
         workers.append(
             worker.EveDockerLatentWorker(
-                name='dw%03d-%s-%s' % (i, util.env.GIT_SLUG, util.env.SUFFIX),
+                name='dw%03d-%s' % (i, util.env.SUFFIX),
                 password=util.password_generator(),
                 master_fqdn=util.env.MASTER_FQDN,
                 pb_port=util.env.EXTERNAL_PB_PORT,
@@ -72,7 +72,7 @@ def openstack_heat_workers():
                               'single_node_heat_template.yml')).read()
 
     for i in range(util.env.MAX_OPENSTACK_WORKERS):
-        name = 'hw%03d-%s-%s' % (i, util.env.GIT_SLUG, util.env.SUFFIX)
+        name = 'hw%03d-%s' % (i, util.env.SUFFIX)
         password = util.password_generator()
 
         start_worker_script = Interpolate(START_WORKER_SCRIPT.format(
