@@ -1,6 +1,11 @@
 #!/bin/bash
 set -e
 
-kubectl get pod --no-headers \
-                --output custom-columns=NAME:.metadata.name \
-                "$@"
+containers=$(kubectl get pod \
+                     --no-headers \
+                     --output custom-columns=NAME:.metadata.name \
+                     "$@" | xargs)
+
+for container in ${containers}; do
+    echo "${container//-/___}"
+done

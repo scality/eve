@@ -189,7 +189,7 @@ class Kill(BaseCommand):
         parser.add_argument('container')
 
     def adapt_args(self, namespace, stdin, files):
-        return ['-'.join(namespace.container.split('-')[:-1])]
+        return [namespace.container]
 
 
 class Ps(BaseCommand):
@@ -197,8 +197,12 @@ class Ps(BaseCommand):
 
     def register_args(self, parser):
         def dictify_equal(arg):
-            filter, name, value = arg.split('=')
-            return {'filter': filter, 'name': name, 'value': value}
+            try:
+                filter_, name, value = arg.split('=')
+            except ValueError:
+                filter_, value = arg.split('=')
+                name = None
+            return {'filter': filter_, 'name': name, 'value': value}
 
         parser.add_argument('--filter', '-f', action='append',
                             default=[], type=dictify_equal)
@@ -210,12 +214,22 @@ class Ps(BaseCommand):
         if namespace.all:
             args.append('--show-all')
 
-        for filter in namespace.filter:
-            if filter['filter'] == 'label':
-                args.append('--selector')
-                args.append('%s=%s' % (filter['name'], filter['value']))
+        filters = []
+        for filter_ in namespace.filter:
+            if filter_['filter'] == 'label':
+                filters.append('--selector')
+                filters.append('%s=%s' % (filter_['name'], filter_['value']))
+            elif filter_['filter'] == 'status':
+                # deliberatly choose to ignore filter for now
+                pass
+            elif filter_['filter'] == 'id':
+                # id is not compatible with selectors
+                args.append(filter_['value'].replace('___', '-'))
+                filters = []
+                break
             else:
                 raise NotImplementedError()
+        args.extend(filters)
 
         return args
 
@@ -310,6 +324,20 @@ class Run(BaseCommand):
         return namespace.name
 
 
+class Stop(BaseCommand):
+    operation = 'stop'
+
+    def register_args(self, parser):
+        parser.add_argument('--time', '-t', default='10')
+        parser.add_argument('container')
+
+    def adapt_args(self, namespace, stdin, files):
+        return [
+            namespace.container,
+            namespace.time
+        ]
+
+
 OPERATIONS = {
     'build': Build,
     'exec': Exec,
@@ -318,6 +346,6 @@ OPERATIONS = {
     'ps': Ps,
     'rm': Ignore,
     'run': Run,
-    'stop': Kill,
+    'stop': Stop,
     'wait': Ignore,
 }
