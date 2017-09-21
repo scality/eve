@@ -1,7 +1,6 @@
 import argparse
 import os
 import re
-import socket
 from uuid import uuid4
 
 from jinja2 import Environment, FileSystemLoader
@@ -262,11 +261,27 @@ class Run(BaseCommand):
             values = arg.split(':')
             if len(values) == 1:
                 return {
+                    'type': 'emptyDir',
                     'name': 'volume-' + str(uuid4())[:13],
                     'mountpath': values[0],
                     'readonly': False
                 }
-            # ignore unsupported volume specification
+            elif len(values) == 2:
+                return {
+                    'type': 'hostPath',
+                    'name': 'volume-' + str(uuid4())[:13],
+                    'hostpath': values[0],
+                    'mountpath': values[1],
+                    'readonly': False
+                }
+            elif len(values) == 3:
+                return {
+                    'type': 'hostPath',
+                    'name': 'volume-' + str(uuid4())[:13],
+                    'hostpath': values[0],
+                    'mountpath': values[1],
+                    'readonly': True if values[2] == 'ro' else False
+                }
             return None
 
         parser.add_argument('--cpu-quota')
@@ -310,10 +325,18 @@ class Run(BaseCommand):
             if label['name'] == 'buildnumber':
                 buildnumber = label['value']
 
+        if namespace.docker_hook_sidecar:
+            # ensure we don't attach doker volumes twice
+            for index, volume in enumerate(namespace.volume):
+                if (volume
+                    and 'hostpath' in volume
+                    and volume['hostpath'] in [
+                        '/var/run/docker.sock', '/var/lib/docker']):
+                    vars(namespace)['volume'][index] = None
+
         # unique random name
         if namespace.name is None:
-            vars(namespace)['name'] = '%s-worker-%s-%s' % (
-                socket.gethostname(),
+            vars(namespace)['name'] = 'eve-worker-%s-%s' % (
                 buildnumber,
                 str(uuid4())[:5]
             )
