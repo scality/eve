@@ -200,10 +200,10 @@ class HipChatBuildStatusPush(BaseBuildStatusPush, BuildStatusPushMixin):
         None: 'gray',
     }
 
-    def __init__(self, room_id, token, **kwargs):
+    def __init__(self, stages, room_id, token, **kwargs):
         self.room_id = room_id
         self.token = token
-        self.stages = ['post-merge']
+        self.stages = [stages] if isinstance(stages, basestring) else stages
         super(HipChatBuildStatusPush, self).__init__(**kwargs)
 
     def add_tag(self, name, value, icon, color=None):
@@ -281,10 +281,10 @@ class BitbucketBuildStatusPush(BaseBuildStatusPush, BuildStatusPushMixin):
         None: 'INPROGRESS',
     }
 
-    def __init__(self, login, password, **kwargs):
+    def __init__(self, stages, login, password, **kwargs):
         self.login = login
         self.password = password
-        self.stages = ['pre-merge', 'post-merge']
+        self.stages = [stages] if isinstance(stages, basestring) else stages
         super(BitbucketBuildStatusPush, self).__init__(**kwargs)
 
     def forge_url(self, build):
@@ -341,6 +341,10 @@ class GithubBuildStatusPush(GitHubStatusPush, BuildStatusPushMixin):
     """Send build result to github build status API."""
 
     logger = Logger('eve.steps.GithubBuildStatusPush')
+
+    def __init__(self, stages, *args, **kwargs):
+        self.stages = [stages] if isinstance(stages, basestring) else stages
+        super(GithubBuildStatusPush, self).__init__(*args, **kwargs)
 
     def filterBuilds(self, build):
         return self._filterBuilds(
