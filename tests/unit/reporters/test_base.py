@@ -80,12 +80,14 @@ class TestBaseBuildStatusPush(unittest.TestCase):
 
 class TestHipChatBuildStatusPush(unittest.TestCase):
     def test_init(self):
-        ctx = base.HipChatBuildStatusPush(room_id='foo', token='bar')
+        ctx = base.HipChatBuildStatusPush('post-merge', room_id='foo',
+                                          token='bar')
         self.assertEquals(ctx.room_id, 'foo')
         self.assertEquals(ctx.token, 'bar')
 
     def test_add_tag(self):
-        ctx = base.HipChatBuildStatusPush(room_id='foo', token='bar')
+        ctx = base.HipChatBuildStatusPush('post-merge', room_id='foo',
+                                          token='bar')
         ctx.add_tag('foo', 'bar', 'baz', color='green')
         self.assertEquals(ctx.attributes[0], {
             'label': 'foo',
@@ -99,18 +101,21 @@ class TestHipChatBuildStatusPush(unittest.TestCase):
         })
 
     def test_filterBuilds_premerge(self):
-        ctx = base.HipChatBuildStatusPush(room_id='foo', token='bar')
+        ctx = base.HipChatBuildStatusPush('post-merge', room_id='foo',
+                                          token='bar')
         ctx.builders = None
         self.assertFalse(ctx.filterBuilds(SUCCEEDED_PREMERGE_BUILD))
 
     def test_filterBuilds_postmerge(self):
-        ctx = base.HipChatBuildStatusPush(room_id='foo', token='bar')
+        ctx = base.HipChatBuildStatusPush('post-merge', room_id='foo',
+                                          token='bar')
         ctx.builders = None
         self.assertTrue(ctx.filterBuilds(SUCCEEDED_POSTMERGE_BUILD))
 
     @defer.inlineCallbacks
     def test_send(self):
-        ctx = base.HipChatBuildStatusPush(room_id='foo', token='bar')
+        ctx = base.HipChatBuildStatusPush('post-merge', room_id='foo',
+                                          token='bar')
         with self.assertRaises(AttributeError):
             yield ctx.send(SUCCEEDED_POSTMERGE_BUILD)
 
@@ -121,12 +126,12 @@ class TestHipChatBuildStatusPush(unittest.TestCase):
 class TestBitbucketBuildStatusPush(unittest.TestCase):
     def test_constructor(self):
         build_status = base.BitbucketBuildStatusPush(
-            login='foo', password='bar')
+            ['pre-merge', 'post-merge'], login='foo', password='bar')
         self.assertIsNotNone(build_status)
 
     def test_gather_data(self):
         build_status = base.BitbucketBuildStatusPush(
-            login='foo', password='bar')
+            ['pre-merge', 'post-merge'], login='foo', password='bar')
         data = build_status.gather_data(SUCCEEDED_PREMERGE_BUILD)
         self.assertEquals(data, ('pre-merge', 0, 'build #1',
                                  '(SUCCESS) build #1 on ring:master [success]',
@@ -134,7 +139,7 @@ class TestBitbucketBuildStatusPush(unittest.TestCase):
 
     def test_forge_url(self):
         build_status = base.BitbucketBuildStatusPush(
-            login='foo', password='bar')
+            ['pre-merge', 'post-merge'], login='foo', password='bar')
         build_status.gather_data(SUCCEEDED_PREMERGE_BUILD)
         url = build_status.forge_url(SUCCEEDED_PREMERGE_BUILD)
         self.assertEquals(url, ('https://api.bitbucket.org/2.0/repositories/'
