@@ -29,6 +29,7 @@ def hipchat_reporter():
     ]
 
     return reporters.HipChatBuildStatusPush(
+        'post-merge',
         util.env.HIPCHAT_ROOM,
         util.env.HIPCHAT_TOKEN,
         builders=builders
@@ -44,6 +45,7 @@ def github_reporter():
     ]
 
     return reporters.GithubBuildStatusPush(
+        ['pre-merge', 'post-merge'],
         util.env.GITHUB_TOKEN,
         builders=builders
     )
@@ -59,6 +61,7 @@ def bitbucket_reporter():
     ]
 
     return reporters.BitbucketBuildStatusPush(
+        ['pre-merge', 'post-merge'],
         util.env.EVE_GITHOST_LOGIN,
         util.env.EVE_GITHOST_PWD,
         builders=builders
