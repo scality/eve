@@ -73,7 +73,8 @@ class Tests(unittest.TestCase):
 
         # Check bootstrap
         bootstrap = self.cluster.api.get_builder('bootstrap')
-        bootstrap_build = self.cluster.api.get_finished_build('bootstrap')
+        bootstrap_build = self.cluster.api.get_finished_build(
+            'bootstrap', timeout=180)
         self.assertEqual(bootstrap_build['results'], SUCCESS)
         bootstrap_steps = self.cluster.api.get_build_steps(bootstrap_build)
         step_names_and_descriptions = [(step['name'], step['state_string'])

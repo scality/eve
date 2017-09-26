@@ -24,7 +24,7 @@ from tests.util.crossbar import Crossbar
 
 
 class DockerizedCrossbar(Crossbar):
-    _post_start_delay = 1
+    _post_start_delay = 10
     _stop_cmd = 'docker rm -f {name}'
 
     def pre_start_hook(self):

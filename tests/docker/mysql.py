@@ -26,7 +26,7 @@ MYSQL_PASSWORD = '4m4zing'
 
 
 class DockerizedMySQL(Daemon):
-    _post_start_delay = 1
+    _post_start_delay = 10
     _start_wait = 120
     start_success_msg = 'MySQL init process done. Ready for start up.'
     _stop_cmd = 'docker rm -f {name}'
