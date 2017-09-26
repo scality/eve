@@ -80,6 +80,9 @@ def docker(command):
         cmd = command_factory(command)
     except Exception:
         traceback.print_exc()
+        app.logger.error(
+            'exception occured while looking up: {cmd}'.format(
+                cmd=cmd))
         return bad_request(403, traceback.format_exc())
 
     original_cmd = json.loads(request.form['command'])
@@ -87,6 +90,10 @@ def docker(command):
     try:
         target_cmd = cmd.convert(original_cmd, stdin, request.files)
     except Exception:
+        traceback.print_exc()
+        app.logger.error(
+            'exception occured while converting:\n{ori}'.format(
+                ori=' '.join(original_cmd)))
         return bad_request(500, traceback.format_exc())
 
     task = call.delay(target_cmd)

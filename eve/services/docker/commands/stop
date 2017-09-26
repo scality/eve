@@ -2,6 +2,7 @@
 
 container="$(echo ${1//___/-})"
 job_name="${container%-*}"
+grace_period="${2:-10}"
 blocking=false
 
 inverted_retry() {
@@ -22,7 +23,7 @@ inverted_retry() {
 }
 
 kubectl delete job \
-        --grace-period=10 \
+        --grace-period=${grace_period} \
         ${job_name} >/dev/null 2>&1
 test ! $? -eq 0 && exit 1
 

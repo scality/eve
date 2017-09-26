@@ -1,7 +1,6 @@
 import argparse
 import os
 import re
-import socket
 from uuid import uuid4
 
 from jinja2 import Environment, FileSystemLoader
@@ -189,7 +188,7 @@ class Kill(BaseCommand):
         parser.add_argument('container')
 
     def adapt_args(self, namespace, stdin, files):
-        return ['-'.join(namespace.container.split('-')[:-1])]
+        return [namespace.container]
 
 
 class Ps(BaseCommand):
@@ -197,8 +196,12 @@ class Ps(BaseCommand):
 
     def register_args(self, parser):
         def dictify_equal(arg):
-            filter, name, value = arg.split('=')
-            return {'filter': filter, 'name': name, 'value': value}
+            try:
+                filter_, name, value = arg.split('=')
+            except ValueError:
+                filter_, value = arg.split('=')
+                name = None
+            return {'filter': filter_, 'name': name, 'value': value}
 
         parser.add_argument('--filter', '-f', action='append',
                             default=[], type=dictify_equal)
@@ -210,12 +213,22 @@ class Ps(BaseCommand):
         if namespace.all:
             args.append('--show-all')
 
-        for filter in namespace.filter:
-            if filter['filter'] == 'label':
-                args.append('--selector')
-                args.append('%s=%s' % (filter['name'], filter['value']))
+        filters = []
+        for filter_ in namespace.filter:
+            if filter_['filter'] == 'label':
+                filters.append('--selector')
+                filters.append('%s=%s' % (filter_['name'], filter_['value']))
+            elif filter_['filter'] == 'status':
+                # deliberatly choose to ignore filter for now
+                pass
+            elif filter_['filter'] == 'id':
+                # id is not compatible with selectors
+                args.append(filter_['value'].replace('___', '-'))
+                filters = []
+                break
             else:
                 raise NotImplementedError()
+        args.extend(filters)
 
         return args
 
@@ -248,11 +261,27 @@ class Run(BaseCommand):
             values = arg.split(':')
             if len(values) == 1:
                 return {
+                    'type': 'emptyDir',
                     'name': 'volume-' + str(uuid4())[:13],
                     'mountpath': values[0],
                     'readonly': False
                 }
-            # ignore unsupported volume specification
+            elif len(values) == 2:
+                return {
+                    'type': 'hostPath',
+                    'name': 'volume-' + str(uuid4())[:13],
+                    'hostpath': values[0],
+                    'mountpath': values[1],
+                    'readonly': False
+                }
+            elif len(values) == 3:
+                return {
+                    'type': 'hostPath',
+                    'name': 'volume-' + str(uuid4())[:13],
+                    'hostpath': values[0],
+                    'mountpath': values[1],
+                    'readonly': True if values[2] == 'ro' else False
+                }
             return None
 
         parser.add_argument('--cpu-quota')
@@ -296,10 +325,18 @@ class Run(BaseCommand):
             if label['name'] == 'buildnumber':
                 buildnumber = label['value']
 
+        if namespace.docker_hook_sidecar:
+            # ensure we don't attach doker volumes twice
+            for index, volume in enumerate(namespace.volume):
+                if (volume
+                    and 'hostpath' in volume
+                    and volume['hostpath'] in [
+                        '/var/run/docker.sock', '/var/lib/docker']):
+                    vars(namespace)['volume'][index] = None
+
         # unique random name
         if namespace.name is None:
-            vars(namespace)['name'] = '%s-worker-%s-%s' % (
-                socket.gethostname(),
+            vars(namespace)['name'] = 'eve-worker-%s-%s' % (
                 buildnumber,
                 str(uuid4())[:5]
             )
@@ -310,6 +347,20 @@ class Run(BaseCommand):
         return namespace.name
 
 
+class Stop(BaseCommand):
+    operation = 'stop'
+
+    def register_args(self, parser):
+        parser.add_argument('--time', '-t', default='10')
+        parser.add_argument('container')
+
+    def adapt_args(self, namespace, stdin, files):
+        return [
+            namespace.container,
+            namespace.time
+        ]
+
+
 OPERATIONS = {
     'build': Build,
     'exec': Exec,
@@ -318,6 +369,6 @@ OPERATIONS = {
     'ps': Ps,
     'rm': Ignore,
     'run': Run,
-    'stop': Kill,
+    'stop': Stop,
     'wait': Ignore,
 }

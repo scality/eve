@@ -117,7 +117,13 @@ spec:
         {% endif %}
         {% for v in volume %}
         {% if v %}
+        {% if v.type == 'emptyDir' %}
         - name: "{{ v.name }}"
           emptyDir: {}
+        {% else %}
+        - name: "{{ v.name }}"
+          hostPath:
+            path: "{{ v.hostpath }}"
+        {% endif %}
         {% endif %}
         {% endfor %}

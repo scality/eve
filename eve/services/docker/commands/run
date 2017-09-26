@@ -1,11 +1,20 @@
-#!/bin/sh
+#!/bin/bash
 
 job_name="${1}"
 template="/resource/${job_name}"
 pod_name=""
 
+error(){
+    JOB=$(kubectl delete -f ${template})
+    exit 1
+}
+cleanup() {
+    rm -f ${template}
+}
+trap cleanup EXIT
+
 with_retry() {
-    local max_attempts=${ATTEMPTS-10}
+    local max_attempts=${ATTEMPTS-20}
     local delay=${DELAY-10}
     local attempt=0
     local exitCode=1
@@ -42,14 +51,12 @@ JOB=$(kubectl create \
       --no-headers \
       --output=custom-columns=NAME:.metadata.name \
       -f ${template})
-test ! $? -eq 0 && exit 1
+test ! $? -eq 0 && error
 
 # wait for pod
 with_retry get_pod
-
-# cleanup input file
-rm -f ${template}
+test ! $? -eq 0 && error
 
 # return pod name
-test -z "${pod_name}" && exit 1
-echo ${pod_name}
+test -z "${pod_name}" && error
+echo "${pod_name//-/___}"
