@@ -334,6 +334,15 @@ class Run(BaseCommand):
                         '/var/run/docker.sock', '/var/lib/docker']):
                     vars(namespace)['volume'][index] = None
 
+        vars(namespace)['cpu_limit'] = os.environ.get(
+            'WORKER_CPU_REQUEST', '1')
+        vars(namespace)['memory_limit'] = os.environ.get(
+            'WORKER_MEMORY_REQUEST', '1Gi')
+        vars(namespace)['cpu_request'] = os.environ.get(
+            'WORKER_CPU_REQUEST', '1')
+        vars(namespace)['memory_request'] = os.environ.get(
+            'WORKER_MEMORY_REQUEST', '1Gi')
+
         # unique random name
         if namespace.name is None:
             vars(namespace)['name'] = 'eve-worker-%s-%s' % (
