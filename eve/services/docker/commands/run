@@ -14,7 +14,7 @@ cleanup() {
 trap cleanup EXIT
 
 with_retry() {
-    local max_attempts=${ATTEMPTS-20}
+    local max_attempts=${ATTEMPTS-360}
     local delay=${DELAY-10}
     local attempt=0
     local exitCode=1

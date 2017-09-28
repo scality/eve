@@ -67,14 +67,12 @@ def get_build_context(cmd):
 
 def handle_remote(cmd):
     files = None
-    timeout = 300
 
     if cmd == 'build':
         context_path = get_build_context(sys.argv)
         archive_name = str(uuid4())[:13] + '_context.tar.gz'
         archive = create_archive(root=context_path, gzip=True)
         files = {'docker_context': (archive_name, archive)}
-        timeout = 3600
 
     stdin = []
     if cmd == 'exec' and '--interactive' in sys.argv or '-i' in sys.argv:
@@ -105,16 +103,19 @@ def handle_remote(cmd):
     task_url = response.headers['Location']
 
     sleep(0.5)
-    for _ in range(timeout):
+    TIMEOUT = 3600
+    DELAY = 3
+    for _ in range(TIMEOUT/DELAY):
         response = requests.get(task_url)
         response.raise_for_status()
-        state = response.json()['state']
-        if state == 'SUCCESS':
-            print(response.json()['output'].rstrip('\n'))
-            sys.exit(int(response.json()['retcode']))
-        elif state == 'FAILURE':
-            sys.exit('internal error')
-        sleep(1)
+        if response.status_code == 200:
+            state = response.json()['state']
+            if state == 'SUCCESS':
+                print(response.json()['output'].rstrip('\n'))
+                sys.exit(int(response.json()['retcode']))
+            elif state == 'FAILURE':
+                sys.exit('internal error')
+        sleep(DELAY)
 
     sys.exit('command timeout')
 
