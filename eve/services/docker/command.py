@@ -356,6 +356,16 @@ class Run(BaseCommand):
         return namespace.name
 
 
+class Rm(BaseCommand):
+    operation = 'rm'
+
+    def register_args(self, parser):
+        parser.add_argument('container')
+
+    def adapt_args(self, namespace, stdin, files):
+        return [namespace.container]
+
+
 class Stop(BaseCommand):
     operation = 'stop'
 
@@ -376,7 +386,7 @@ OPERATIONS = {
     'inspect': Inspect,
     'kill': Kill,
     'ps': Ps,
-    'rm': Ignore,
+    'rm': Rm,
     'run': Run,
     'stop': Stop,
     'wait': Ignore,
