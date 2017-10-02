@@ -2,12 +2,20 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
+  labels:
+    app: "eve"
+    service: "worker"
+    name: "{{ name }}"
+    {% for l in label %}
+    {{ l.name }}: "{{ l.value }}"
+    {% endfor %}
   name: "{{ name }}"
 spec:
   template:
     metadata:
       labels:
-        k8s-app: "eve-worker"
+        app: "eve"
+        service: "worker"
         name: "{{ name }}"
         {% for l in label %}
         {{ l.name }}: "{{ l.value }}"
