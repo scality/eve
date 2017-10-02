@@ -45,6 +45,8 @@ def triggerable_builder(builder_name, workers):
                     'git config --global '
                     'url.http://gitcache/git/mock/.insteadOf git@mock: && '
                     'git config --global '
+                    'lfs.activitytimeout 60 && '
+                    'git config --global '
                     'lfs.url '
                     '"http://gitcache:81/'
                     '%(githost)s/%(gitowner)s/%(gitslug)s.git/info/lfs"' % {
