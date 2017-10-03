@@ -111,7 +111,7 @@ def handle_remote(cmd):
         if response.status_code == 200:
             state = response.json()['state']
             if state == 'SUCCESS':
-                print(response.json()['output'].rstrip('\n'))
+                print(response.json()['output'].rstrip('\n').encode('utf-8'))
                 sys.exit(int(response.json()['retcode']))
             elif state == 'FAILURE':
                 sys.exit('internal error')

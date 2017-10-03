@@ -48,7 +48,7 @@ def call(target_cmd):
         ret = excp.output
         retcode = 1
 
-    return {'output': ret,
+    return {'output': ret.decode('utf-8'),
             'retcode': retcode}
 
 
@@ -58,11 +58,11 @@ def taskstatus(task_id):
     response = {'state': task.state}
     if task.state == 'SUCCESS':
         retcode = str(task.info.get('retcode', 1))
-        output = str(task.info.get('output', ''))
-        app.logger.info('<{task}> res: {retcode}, output:\n{output}'.format(
+        output = task.info.get('output', u'')
+        app.logger.info(u'<{task}> res: {retcode}, output:\n{output}'.format(
             task=task.id,
             retcode=retcode,
-            output=output.decode('utf8')))
+            output=output))
         response['output'] = output
         response['retcode'] = retcode
     return jsonify(response)
