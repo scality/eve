@@ -77,7 +77,7 @@ class TestCluster(unittest.TestCase):
                 (u'checkout git branch', u'update'),
                 (u'cancel builds for commits that are not branch tips',
                  u'CancelNonTipBuild'),
-                (u'setting the master_builddir property', u'Set'),
+                (u'set the master_builddir property', u'Set'),
                 (u'check if any steps should currently be patched',
                  u'finished (skipped)'),
                 (u'get the product version',

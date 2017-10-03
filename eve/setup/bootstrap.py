@@ -77,7 +77,7 @@ def bootstrap_builder(workers):
 
     bootstrap_factory.addStep(
         SetProperty(
-            name='setting the master_builddir property',
+            name='set the master_builddir property',
             property='master_builddir',
             hideStepIf=util.hideStepIfSuccess,
             value=Property('builddir')))
