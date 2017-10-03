@@ -76,12 +76,13 @@ setup(
             'SetArtifactsPublicURL=eve.steps.artifacts:SetArtifactsPublicURL',
             'ShellCommandWithSecrets=eve.steps.shell_command_with_secrets:ShellCommandWithSecrets',
             'StepExtractor=eve.steps.yaml_parser:StepExtractor',
-            'StepPatcherConfig=eve.steps.step_patcher:StepPatcherConfig',
+            'PatcherConfig=eve.steps.patcher:PatcherConfig',
             'TriggerStages=eve.steps.trigger_stages:TriggerStages',
             'Upload=eve.steps.artifacts:Upload'
         ],
         'buildbot.util': [
             'BaseBuildOrder=eve.util.build_order:BaseBuildOrder',
+            'Patcher=eve.steps.patcher:Patcher',
             'env=eve.util.env:SETTINGS',
             'get_local_jobs=eve.util.local_jobs:get_local_jobs',
             'get_secrets=eve.util.env:get_secrets',

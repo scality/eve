@@ -84,9 +84,9 @@ def bootstrap_builder(workers):
 
     # Read patcher conf and populate related properties
     bootstrap_factory.addStep(
-        steps.StepPatcherConfig(
+        steps.PatcherConfig(
             conf_path=util.env.PATCHER_FILE_PATH,
-            name='check if any steps should currently be patched',
+            name='collect system-level skips for this build',
             doStepIf=bool(util.env.PATCHER_FILE_PATH),
             hideStepIf=util.hideStepIfSuccessOrSkipped))
 

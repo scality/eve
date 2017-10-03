@@ -83,7 +83,7 @@ class Tests(unittest.TestCase):
             (u'checkout git branch', u'update'),
             (u'cancel builds for commits that are not branch tips', u'CancelNonTipBuild'),  # noqa
             (u'set the master_builddir property', u'Set'),
-            (u'check if any steps should currently be patched', u'finished (skipped)'),  # noqa
+            (u'collect system-level skips for this build', u'finished (skipped)'),  # noqa
             (u'get the product version', u"property 'product_version' set"),  # noqa
             (u'read eve/main.yml', u'uploading main.yml'),
             (u'get the commit short_revision', u"property 'commit_short_revision' set"),  # noqa
@@ -136,7 +136,7 @@ class Tests(unittest.TestCase):
             (u'checkout git branch', u'update'),
             (u'cancel builds for commits that are not branch tips', u'CancelNonTipBuild'),  # noqa
             (u'set the master_builddir property', u'Set'),
-            (u'check if any steps should currently be patched', u'finished (skipped)'),  # noqa
+            (u'collect system-level skips for this build', u'finished (skipped)'),  # noqa
             (u'get the product version', u"property 'product_version' set"),
             (u'read eve/main.yml', u'uploading main.yml'),
             (u'get the commit short_revision', u"property 'commit_short_revision' set"),  # noqa
@@ -182,7 +182,7 @@ class Tests(unittest.TestCase):
             (u'checkout git branch', u'update'),
             (u'cancel builds for commits that are not branch tips', u'CancelNonTipBuild'),  # noqa
             (u'set the master_builddir property', u'Set'),
-            (u'check if any steps should currently be patched', u'finished (skipped)'),  # noqa
+            (u'collect system-level skips for this build', u'finished (skipped)'),  # noqa
             (u'get the product version', u"property 'product_version' set"),  # noqa
             (u'read eve/main.yml', u'uploading main.yml'),
             (u'get the commit short_revision', u"property 'commit_short_revision' set"),  # noqa

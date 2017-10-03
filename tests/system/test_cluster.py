@@ -78,7 +78,7 @@ class TestCluster(unittest.TestCase):
                 (u'cancel builds for commits that are not branch tips',
                  u'CancelNonTipBuild'),
                 (u'set the master_builddir property', u'Set'),
-                (u'check if any steps should currently be patched',
+                (u'collect system-level skips for this build',
                  u'finished (skipped)'),
                 (u'get the product version',
                  u"property 'product_version' set"),
