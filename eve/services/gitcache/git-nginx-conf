@@ -3,16 +3,16 @@ proxy_cache_path  /data/nginx/cache_atlassian levels=1:2 keys_zone=atlassian:8m 
 
 # GIT
 server {
-	listen 80 default_server;
-	listen [::]:80 default_server;
-	root /var/www/html;
-	index index.html index.htm index.nginx-debian.html;
+    listen 80 default_server;
+    listen [::]:80 default_server;
+    root /var/www/html;
+    index index.html index.htm index.nginx-debian.html;
 
-	server_name _;
+    server_name _;
 
-	# git static
-	location ~ ^.*\.git/objects/([0-9a-f]+/[0-9a-f]+|pack/pack-[0-9a-f]+.(pack|idx))$ {
-	    root /var/lib/git;
+    # git static
+    location ~ ^.*\.git/objects/([0-9a-f]+/[0-9a-f]+|pack/pack-[0-9a-f]+.(pack|idx))$ {
+        root /var/lib/git;
     }
 
     # git http-backend
@@ -46,7 +46,7 @@ server {
     listen [::]:81 default_server;
     server_name _;
 
-    resolver 8.8.8.8 ipv6=off
+    resolver 8.8.8.8 ipv6=off;
 
     location /bitbucket {
             rewrite /bitbucket/(.*) /$1 break;
