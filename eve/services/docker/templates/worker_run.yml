@@ -22,6 +22,33 @@ spec:
         {{ l.name }}: "{{ l.value }}"
         {% endfor %}
     spec:
+      affinity:
+        podAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            # group pods of a same build if possible
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: buildnumber
+                      operator: In
+                      values:
+                        - "{{ buildnumber }}"
+                topologyKey: kubernetes.io/hostname
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            # do not schedule workers on nodes that run eve
+            # (across all namespaces)
+            - namespaces: []
+              labelSelector:
+                matchExpressions:
+                  - key: service
+                    operator: In
+                    values:
+                      - frontend
+                      - backend
+                      - metabase
+              topologyKey: kubernetes.io/hostname
       restartPolicy: Never
       activeDeadlineSeconds: 36000
       containers:
