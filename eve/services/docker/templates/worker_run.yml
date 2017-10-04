@@ -4,8 +4,9 @@ kind: Job
 metadata:
   labels:
     app: "eve"
-    service: "worker"
+    buildnumber: "{{ buildnumber }}"
     name: "{{ name }}"
+    service: "worker"
     {% for l in label %}
     {{ l.name }}: "{{ l.value }}"
     {% endfor %}
@@ -119,6 +120,8 @@ spec:
               value: '{{ cpu_request }}'
             - name: WORKER_MEMORY_REQUEST
               value: '{{ memory_request }}'
+            - name: BUILDNUMBER
+              value: '{{ buildnumber }}'
         {% endif %}
       volumes:
         - name: gitconfig
