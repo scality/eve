@@ -304,7 +304,7 @@ class Run(BaseCommand):
 
     def adapt_args(self, namespace, stdin, files):
         vars(namespace)['docker_hook_sidecar'] = False
-        buildnumber = 0
+        vars(namespace)['buildnumber'] = os.environ.get('BUILDNUMBER', '0')
 
         if namespace.image.startswith('sha256:'):
             vars(namespace)['image'] = \
@@ -323,7 +323,7 @@ class Run(BaseCommand):
                 )
                 break
             if label['name'] == 'buildnumber':
-                buildnumber = label['value']
+                vars(namespace)['buildnumber'] = label['value']
 
         if namespace.docker_hook_sidecar:
             # ensure we don't attach doker volumes twice
@@ -346,7 +346,7 @@ class Run(BaseCommand):
         # unique random name
         if namespace.name is None:
             vars(namespace)['name'] = 'eve-worker-%s-%s' % (
-                buildnumber,
+                namespace.buildnumber,
                 str(uuid4())[:5]
             )
 
