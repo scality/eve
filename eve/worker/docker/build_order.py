@@ -64,8 +64,7 @@ class DockerBuildOrder(util.BaseBuildOrder):
             if not use_registry:
                 # No docker registry, always build
                 return True
-            properties = step.build.getProperties()
-            image_exists = properties.getProperty(
+            image_exists = step.getProperty(
                 'exists_' + basename, False)
             return not image_exists
 
@@ -129,8 +128,7 @@ class DockerBuildOrder(util.BaseBuildOrder):
         # In all cases, try again once and ignore cached images (nocache)
 
         def is_prev_build_failed(step):
-            properties = step.build.getProperties()
-            prec_failed_image = properties.getProperty('DockerBuildFailed', '')
+            prec_failed_image = step.getProperty('DockerBuildFailed', '')
             return prec_failed_image == step.image
 
         self.preliminary_steps.append(steps.DockerBuild(

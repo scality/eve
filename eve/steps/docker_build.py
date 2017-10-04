@@ -87,8 +87,7 @@ class DockerBuild(MasterShellCommand):
     def run(self):
         result = yield super(DockerBuild, self).run()
         if result == FAILURE:
-            properties = self.build.getProperties()
-            properties.setProperty(
+            self.setProperty(
                 'DockerBuildFailed', self.image, self.name, runtime=True)
         defer.returnValue(result)
 
@@ -134,8 +133,7 @@ class DockerCheckLocalImage(MasterShellCommand):
     @defer.inlineCallbacks
     def run(self):
         result = yield super(DockerCheckLocalImage, self).run()
-        properties = self.build.getProperties()
-        properties.setProperty(
+        self.setProperty(
             'exists_{0}'.format(self.label),
             result == SUCCESS,
             'DockerCheckLocalImage',
@@ -178,8 +176,7 @@ class DockerComputeImageFingerprint(MasterShellCommand):
     def run(self):
         result = yield super(DockerComputeImageFingerprint, self).run()
         fingerprint = self.observer.getStdout().splitlines()[0]
-        properties = self.build.getProperties()
-        properties.setProperty(
+        self.setProperty(
             'fingerprint_{0}'.format(self.label),
             fingerprint,
             'DockerComputeImageFingerprint',
@@ -219,8 +216,7 @@ class DockerPull(MasterShellCommand):
     @defer.inlineCallbacks
     def run(self):
         result = yield super(DockerPull, self).run()
-        properties = self.build.getProperties()
-        properties.setProperty(
+        self.setProperty(
             'exists_{0}'.format(self.label),
             result == SUCCESS,
             'DockerPull',
