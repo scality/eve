@@ -57,7 +57,7 @@ def taskstatus(task_id):
     task = call.AsyncResult(task_id)
     response = {'state': task.state}
     if task.state == 'SUCCESS':
-        retcode = str(task.info.get('retcode', 1))
+        retcode = task.info.get('retcode', 1)
         output = task.info.get('output', u'')
         app.logger.info(u'<{task}> res: {retcode}, output:\n{output}'.format(
             task=task.id,

@@ -23,7 +23,10 @@ fi
 docker pull ${tag} >/dev/null 2>&1
 if [ ! $? -eq 0 ]; then
     out=$(eval "$build_cmd ${extracted_path}")
+    retcode=$?
     docker push ${tag} >/dev/null 2>&1
+else
+    retcode=0
 fi
 
 rm "${archive}"
@@ -34,3 +37,4 @@ if [[ "${build_cmd}" == *"quiet"* ]]; then
 else
     echo -e "${out}"
 fi
+exit $retcode
