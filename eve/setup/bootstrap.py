@@ -57,16 +57,16 @@ def bootstrap_builder(workers):
 
     bootstrap_factory.addStep(
         SetProperty(
-            name='setting the master_builddir property',
+            name='set the master_builddir property',
             property='master_builddir',
             hideStepIf=util.hideStepIfSuccess,
             value=Property('builddir')))
 
     # Read patcher conf and populate related properties
     bootstrap_factory.addStep(
-        steps.StepPatcherConfig(
+        steps.PatcherConfig(
             conf_path=util.env.PATCHER_FILE_PATH,
-            name='check if any steps should currently be patched',
+            name='collect system-level skips for this build',
             doStepIf=bool(util.env.PATCHER_FILE_PATH),
             hideStepIf=util.hideStepIfSuccessOrSkipped))
 
