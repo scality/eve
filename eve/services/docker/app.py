@@ -105,3 +105,8 @@ def docker(command):
 
     return jsonify({}), 202, {
         'location': url_for('taskstatus', task_id=task.id)}
+
+
+@app.route("/healthz", methods=['GET'])
+def healthz():
+    return 'OK!'
