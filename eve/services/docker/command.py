@@ -339,7 +339,7 @@ class Run(BaseCommand):
         vars(namespace)['memory_limit'] = os.environ.get(
             'WORKER_MEMORY_LIMIT', '1Gi')
         vars(namespace)['cpu_request'] = os.environ.get(
-            'WORKER_CPU_REQUEST', '1')
+            'WORKER_CPU_REQUEST', '100m')
         vars(namespace)['memory_request'] = os.environ.get(
             'WORKER_MEMORY_REQUEST', '1Gi')
 
