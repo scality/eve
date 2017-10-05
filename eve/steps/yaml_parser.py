@@ -162,6 +162,15 @@ class ReadConfFromYaml(FileUpload):
                 steps.SetArtifactsPublicURL(),
             ])
 
+        # Read patcher conf and populate related properties
+        self.build.addStepsAfterCurrentStep([
+            steps.PatcherConfig(
+                conf_path=util.env.PATCHER_FILE_PATH,
+                stage=stage_name,
+                name='collect system-level skips for this build',
+                doStepIf=bool(util.env.PATCHER_FILE_PATH),
+                hideStepIf=util.hideStepIfSuccessOrSkipped)])
+
         defer.returnValue(SUCCESS)
 
 
@@ -182,15 +191,6 @@ class StepExtractor(BuildStep):
         patcher = util.Patcher(patcher_config)
 
         stage_name = self.getProperty('stage_name')
-        if patcher.is_stage_skipped(stage_name):
-            self.descriptionDone = 'Stage temporarily disabled'
-            return defer.succeed(CANCELLED)
-
-        branch = self.getProperty('branch')
-        if patcher.is_branch_skipped(branch):
-            self.descriptionDone = 'Branch temporarily disabled'
-            return defer.succeed(CANCELLED)
-
         stage_conf = conf['stages'][stage_name]
         for step in stage_conf['steps']:
             step_type, params = next(step.iteritems())

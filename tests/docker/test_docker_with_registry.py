@@ -83,9 +83,9 @@ class Tests(unittest.TestCase):
             (u'checkout git branch', u'update'),
             (u'cancel builds for commits that are not branch tips', u'CancelNonTipBuild'),  # noqa
             (u'set the master_builddir property', u'Set'),
-            (u'collect system-level skips for this build', u'finished (skipped)'),  # noqa
             (u'get the product version', u"property 'product_version' set"),  # noqa
             (u'read eve/main.yml', u'uploading main.yml'),
+            (u'collect system-level skips for this build', u'finished (skipped)'),  # noqa
             (u'get the commit short_revision', u"property 'commit_short_revision' set"),  # noqa
             (u'get the commit timestamp', u"property 'commit_timestamp' set"),
             (u'set the artifacts name', u"property 'artifacts_name' set"),
@@ -136,9 +136,9 @@ class Tests(unittest.TestCase):
             (u'checkout git branch', u'update'),
             (u'cancel builds for commits that are not branch tips', u'CancelNonTipBuild'),  # noqa
             (u'set the master_builddir property', u'Set'),
-            (u'collect system-level skips for this build', u'finished (skipped)'),  # noqa
             (u'get the product version', u"property 'product_version' set"),
             (u'read eve/main.yml', u'uploading main.yml'),
+            (u'collect system-level skips for this build', u'finished (skipped)'),  # noqa
             (u'get the commit short_revision', u"property 'commit_short_revision' set"),  # noqa
             (u'get the commit timestamp', u"property 'commit_timestamp' set"),
             (u'set the artifacts name', u"property 'artifacts_name' set"),
@@ -182,9 +182,9 @@ class Tests(unittest.TestCase):
             (u'checkout git branch', u'update'),
             (u'cancel builds for commits that are not branch tips', u'CancelNonTipBuild'),  # noqa
             (u'set the master_builddir property', u'Set'),
-            (u'collect system-level skips for this build', u'finished (skipped)'),  # noqa
             (u'get the product version', u"property 'product_version' set"),  # noqa
             (u'read eve/main.yml', u'uploading main.yml'),
+            (u'collect system-level skips for this build', u'finished (skipped)'),  # noqa
             (u'get the commit short_revision', u"property 'commit_short_revision' set"),  # noqa
             (u'get the commit timestamp', u"property 'commit_timestamp' set"),  # noqa
             (u'set the artifacts name', u"property 'artifacts_name' set"),
