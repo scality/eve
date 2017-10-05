@@ -44,6 +44,13 @@ class TestPatcher(unittest.TestCase):
         self.assertTrue(patcher.is_branch_skipped('my_branch/no_match'))
         self.assertTrue(patcher.is_branch_skipped('a_branch'))
 
+    def test_stage_skip_list(self):
+        config = {'skip_stages': ['stage1', 'stage2']}
+        patcher = Patcher(config)
+        self.assertFalse(patcher.is_stage_skipped('stage3'))
+        self.assertTrue(patcher.is_stage_skipped('stage1'))
+        self.assertTrue(patcher.is_stage_skipped('stage1-bacon'))
+
     def test_step_skip(self):
         config = {'skip_steps': ['test step', 'other step']}
         patcher = Patcher(config)

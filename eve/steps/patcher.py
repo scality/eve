@@ -75,6 +75,8 @@ class Patcher(object):
 
         self.steps_regexp = self._parse_config(
             config.get('skip_steps', []))
+        self.stages_regexp = self._parse_config(
+            config.get('skip_stages', []))
         self.branches_regexp = self._parse_config(
             config.get('skip_branches', []))
 
@@ -126,6 +128,17 @@ class Patcher(object):
         self.logger.info("branch: {branch} regexp: {regexp}", branch=branch,
                          regexp=self.branches_regexp)
         if branch and self.branches_regexp.match(branch):
+            return True
+
+        return False
+
+    def is_stage_skipped(self, stage):
+        if not self.stages_regexp:
+            return False
+
+        self.logger.info("stage: {stage} regexp: {regexp}", stage=stage,
+                         regexp=self.stages_regexp)
+        if stage and self.stages_regexp.match(stage):
             return True
 
         return False

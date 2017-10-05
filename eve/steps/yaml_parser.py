@@ -181,12 +181,16 @@ class StepExtractor(BuildStep):
         patcher_config = self.getProperty('patcher_config')
         patcher = util.Patcher(patcher_config)
 
+        stage_name = self.getProperty('stage_name')
+        if patcher.is_stage_skipped(stage_name):
+            self.descriptionDone = 'Stage temporarily disabled'
+            return defer.succeed(CANCELLED)
+
         branch = self.getProperty('branch')
         if patcher.is_branch_skipped(branch):
             self.descriptionDone = 'Branch temporarily disabled'
             return defer.succeed(CANCELLED)
 
-        stage_name = self.getProperty('stage_name')
         stage_conf = conf['stages'][stage_name]
         for step in stage_conf['steps']:
             step_type, params = next(step.iteritems())
