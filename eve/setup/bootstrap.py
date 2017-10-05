@@ -62,14 +62,6 @@ def bootstrap_builder(workers):
             hideStepIf=util.hideStepIfSuccess,
             value=Property('builddir')))
 
-    # Read patcher conf and populate related properties
-    bootstrap_factory.addStep(
-        steps.PatcherConfig(
-            conf_path=util.env.PATCHER_FILE_PATH,
-            name='collect system-level skips for this build',
-            doStepIf=bool(util.env.PATCHER_FILE_PATH),
-            hideStepIf=util.hideStepIfSuccessOrSkipped))
-
     yaml_dirpath = dirname(util.env.PROJECT_YAML)
     bootstrap_factory.addStep(SetPropertyFromCommand(
         name='get the product version',

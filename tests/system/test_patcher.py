@@ -25,6 +25,33 @@ from tests.util.yaml_factory import PreMerge, SingleCommandYaml
 
 
 class TestPatcher(unittest.TestCase):
+    def test_patcher_stage_match(self):
+        """Test that a stage skip is taken into account."""
+
+        PATCHER_DATA = {
+            'skip_stages': [
+                'pre-merge',
+            ],
+        }
+        conf = {'PATCHER_FILE_PATH': 'patcher.yml'}
+        with Cluster(extra_conf=conf) as cluster:
+
+            for master in cluster._masters.values():
+                master.add_conf_file(
+                    yaml_data=PATCHER_DATA,
+                    filename=os.path.join(master._base_path, 'patcher.yml')
+                )
+
+            repo = cluster.clone()
+
+            repo.push(branch='other-branch', yaml=PreMerge(steps=[
+                {'ShellCommand': {'name': 'step1', 'command': 'exit 0'}},
+            ]))
+            buildset = cluster.api.force(branch=repo.branch)
+            self.assertEqual(buildset.result, 'cancelled')
+
+            cluster.sanity_check()
+
     def test_patcher_branch_match(self):
         """Test that a branch skip is taken into account."""
 
@@ -62,6 +89,9 @@ class TestPatcher(unittest.TestCase):
             'skip_steps': [
                 'step1',
                 'step3',
+            ],
+            'skip_stages': [
+                'bacon',
             ],
         }
         conf = {'PATCHER_FILE_PATH': 'patcher.yml'}

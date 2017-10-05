@@ -21,7 +21,7 @@ import re
 
 import yaml
 from buildbot.process.buildstep import BuildStep
-from buildbot.process.results import SKIPPED, SUCCESS, WARNINGS
+from buildbot.process.results import CANCELLED, SKIPPED, SUCCESS, WARNINGS
 from twisted.internet import defer
 from twisted.logger import Logger
 
@@ -38,10 +38,11 @@ class PatcherConfig(BuildStep):
     name = 'read patcher config'
     logger = Logger('eve.steps.PatcherConfig')
 
-    def __init__(self, conf_path=None, **kwargs):
+    def __init__(self, stage, conf_path, **kwargs):
         kwargs.setdefault('haltOnFailure', False)
         super(PatcherConfig, self).__init__(**kwargs)
         self.conf_path = conf_path
+        self.stage = stage
 
     def run(self):
         prop = 'patcher_config'
@@ -60,6 +61,17 @@ class PatcherConfig(BuildStep):
         if not config:
             return defer.succeed(SUCCESS)
 
+        patcher = Patcher(config)
+
+        if patcher.is_stage_skipped(self.stage):
+            self.descriptionDone = 'Stage temporarily disabled'
+            return defer.succeed(CANCELLED)
+
+        branch = self.getProperty('branch')
+        if patcher.is_branch_skipped(branch):
+            self.descriptionDone = 'Branch temporarily disabled'
+            return defer.succeed(CANCELLED)
+
         self.logger.info("Setting patching config: {conf}", conf=config)
         return defer.succeed(WARNINGS)
 
@@ -75,6 +87,8 @@ class Patcher(object):
 
         self.steps_regexp = self._parse_config(
             config.get('skip_steps', []))
+        self.stages_regexp = self._parse_config(
+            config.get('skip_stages', []))
         self.branches_regexp = self._parse_config(
             config.get('skip_branches', []))
 
@@ -126,6 +140,17 @@ class Patcher(object):
         self.logger.info("branch: {branch} regexp: {regexp}", branch=branch,
                          regexp=self.branches_regexp)
         if branch and self.branches_regexp.match(branch):
+            return True
+
+        return False
+
+    def is_stage_skipped(self, stage):
+        if not self.stages_regexp:
+            return False
+
+        self.logger.info("stage: {stage} regexp: {regexp}", stage=stage,
+                         regexp=self.stages_regexp)
+        if stage and self.stages_regexp.match(stage):
             return True
 
         return False
