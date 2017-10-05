@@ -23,6 +23,7 @@ from time import time
 import buildbot
 from buildbot.plugins import steps, util
 from buildbot.process.properties import Interpolate
+from twisted.internet import defer
 
 
 class DockerBuildOrder(util.BaseBuildOrder):
@@ -68,8 +69,7 @@ class DockerBuildOrder(util.BaseBuildOrder):
             if not use_registry:
                 # No docker registry, always build
                 return True
-            properties = step.build.getProperties()
-            image_exists = properties.getProperty(
+            image_exists = step.getProperty(
                 'exists_' + basename, False)
             return not image_exists
 
@@ -132,10 +132,11 @@ class DockerBuildOrder(util.BaseBuildOrder):
         #   is not reliable
         # In all cases, try again once and ignore cached images (nocache)
 
+        @defer.inlineCallbacks
         def is_prev_build_failed(step):
-            properties = step.build.getProperties()
-            prec_failed_image = properties.getProperty('DockerBuildFailed', '')
-            return prec_failed_image == step.image
+            prec_failed_image = step.getProperty('DockerBuildFailed', '')
+            current_image = yield step.build.render(step.image)
+            defer.returnValue(prec_failed_image == current_image)
 
         self.preliminary_steps.append(steps.DockerBuild(
             name='[{0}] build retry'.format(basename)[0:49],
