@@ -1,5 +1,19 @@
 #!bin/bash
 
+# refuse to run if kubectl client version does not match server
+client=$(kubectl version --short | \
+         sed -n 's/Client Version: v*\([0-9]\.[0-9]\.[0-9]\).*/\1/p')
+server=$(kubectl version --short | \
+         sed -n 's/Server Version: v*\([0-9]\.[0-9]\.[0-9]\).*/\1/p')
+echo "kubectl client version: $client"
+echo "kubectl server version: $server"
+test -z "$client" && \
+    echo "could not parse kubectl version" && \
+    exit 1
+test ! "$client" = "$server" && \
+    echo "kubectl version mismatch" && \
+    exit 1
+
 while true; do
     RES=$(docker login \
             -u oauth2accesstoken \
