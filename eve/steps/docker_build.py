@@ -179,7 +179,10 @@ class DockerComputeImageFingerprint(MasterShellCommand):
     @defer.inlineCallbacks
     def run(self):
         result = yield super(DockerComputeImageFingerprint, self).run()
-        fingerprint = self.observer.getStdout().splitlines()[0]
+        try:
+            fingerprint = self.observer.getStdout().splitlines()[0]
+        except IndexError:
+            defer.returnValue(FAILURE)
         self.setProperty(
             'fingerprint_{0}'.format(self.label),
             fingerprint,
