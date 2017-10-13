@@ -4,9 +4,10 @@ import json
 import subprocess
 import traceback
 
+from flask import Flask, jsonify, request, url_for
+
 from celery import Celery
 from command import command_factory
-from flask import Flask, jsonify, request, url_for
 
 app = Flask(__name__)
 app.config.update(
