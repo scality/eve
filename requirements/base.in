@@ -6,18 +6,20 @@
 #
 -c constraints.txt
 
-MySQL-python        # used in production with a mysql database
-PyYAML              # used by yaml_parser
-buildbot-worker     # used in workers setup
-buildbot-www        # used in www setup
-buildbot[tls]       # core technology
-lz4                 # used by buildbot to compress logs
-netifaces           # used by bootstrap job
-packaging           # used by artifacts and YAMLParser
-python-heatclient   # used by HeatOpenStackLatentWorker
-raven               # used by sentry
-requests[security]  # used by step_factory
-six                 # used by CodecovIOPublication
-treq                # used by buildbot for the HTTP service
-xunitparser         # used by JunitShellCommand
-zope.interface      # used by sentry
+MySQL-python                # used in production with a mysql database
+PyYAML                      # used by yaml_parser
+buildbot-worker             # used in workers setup
+buildbot_wsgi_dashboards    # used in www dashboards
+buildbot-www                # used in www setup
+buildbot[tls]               # core technology
+flask                       # used in www dashboards
+lz4                         # used by buildbot to compress logs
+netifaces                   # used by bootstrap job
+packaging                   # used by artifacts and YAMLParser
+python-heatclient           # used by HeatOpenStackLatentWorker
+raven                       # used by sentry
+requests[security]          # used by step_factory
+six                         # used by CodecovIOPublication
+treq                        # used by buildbot for the HTTP service
+xunitparser                 # used by JunitShellCommand
+zope.interface              # used by sentry

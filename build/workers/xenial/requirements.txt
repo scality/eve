@@ -17,6 +17,7 @@ backports.functools-lru-cache==1.4
 bitstring==3.1.5
 buildbot==0.9.7
 buildbot-worker==0.9.7
+buildbot-wsgi-dashboards==0.9.7
 buildbot-www==0.9.7
 cbor==1.0.0
 cffi==1.10.0
@@ -34,6 +35,7 @@ decorator==4.0.11
 enum34==1.1.6
 execnet==1.4.1
 flake8==3.3.0
+flask==0.12.2
 funcsigs==1.0.2
 future==0.16.0
 futures==3.1.1
@@ -46,6 +48,7 @@ incremental==17.5.0
 ipaddress==1.0.18
 iso8601==0.1.11
 isort==4.2.15
+itsdangerous==0.24
 jinja2==2.9.6
 keystoneauth1==2.21.0
 lazy-object-proxy==1.3.1
@@ -124,6 +127,7 @@ u-msgpack-python==2.4.1
 unicodecsv==0.14.1
 virtualenv==15.1.0
 watchdog==0.8.3
+werkzeug==0.12.2
 wrapt==1.10.10
 xunitparser==1.3.3
 zope.interface==4.4.2

@@ -1,10 +1,11 @@
 # CONSTRAINTS for all installs
 
 # fix version of buildbot
-buildbot==0.9.7
-buildbot-worker==0.9.7
 buildbot-pkg==0.9.7
+buildbot-worker==0.9.7
 buildbot-www==0.9.7
+buildbot==0.9.7
+buildbot_wsgi_dashboards==0.9.7
 
 # docker-compose     depends  requests==2.11.1
 # and, with requests 2.13.0, buildbot plugins trigger:

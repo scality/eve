@@ -10,9 +10,11 @@ automat==0.6.0
 babel==2.3.4
 buildbot==0.9.7
 buildbot-worker==0.9.7
+buildbot-wsgi-dashboards==0.9.7
 buildbot-www==0.9.7
 cffi==1.10.0
 cliff==2.7.0
+click==6.7
 cmd2==0.7.3
 constantly==15.1.0
 contextlib2==0.5.5
@@ -20,6 +22,7 @@ cryptography==1.9
 debtcollector==1.16.0
 decorator==4.0.11
 enum34==1.1.6
+flask==0.12.2
 funcsigs==1.0.2
 future==0.16.0
 futures==3.1.1
@@ -28,6 +31,7 @@ idna==2.5
 incremental==17.5.0
 ipaddress==1.0.18
 iso8601==0.1.11
+itsdangerous==0.24
 jinja2==2.9.6
 keystoneauth1==2.21.0
 lz4==0.10.1
@@ -74,6 +78,7 @@ treq==17.3.1
 twisted==17.5.0
 txaio==2.8.0
 unicodecsv==0.14.1
+werkzeug==0.12.2
 wrapt==1.10.10
 xunitparser==1.3.3
 zope.interface==4.4.2
