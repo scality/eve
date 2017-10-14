@@ -3,10 +3,9 @@
 # Frozen requirements for "requirements/compose.in"
 
 backports.ssl-match-hostname==3.5.0.1
-cached-property==1.3.0
-colorama==0.3.9
-docker==2.4.2
-docker-compose==1.14.0
+cached-property==1.3.1
+docker==2.5.1
+docker-compose==1.16.1
 docker-pycreds==0.2.1
 dockerpty==0.4.1
 docopt==0.6.2
@@ -16,7 +15,7 @@ ipaddress==1.0.18
 jsonschema==2.6.0
 pyyaml==3.12
 requests==2.11.1
-six==1.10.0
-texttable==0.8.8
+six==1.11.0
+texttable==0.9.1
 websocket-client==0.44.0
 

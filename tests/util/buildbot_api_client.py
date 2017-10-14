@@ -30,15 +30,16 @@ import json
 import time
 
 import requests
+import urllib3
 from requests.exceptions import ConnectionError
-from requests.packages.urllib3.exceptions import InsecureRequestWarning
+from urllib3.exceptions import InsecureRequestWarning
 
 RESULT_CODES = [
     'success', 'warnings', 'failure', 'skipped', 'exception', 'retry',
     'cancelled'
 ]
 # Hack to remove a lot of warnings in stdout while testing
-requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+urllib3.disable_warnings(InsecureRequestWarning)
 
 
 class BuildbotDataAPI(object):

@@ -7,19 +7,11 @@ buildbot-www==0.9.7
 buildbot==0.9.7
 buildbot_wsgi_dashboards==0.9.7
 
-# docker-compose     depends  requests==2.11.1
-# and, with requests 2.13.0, buildbot plugins trigger:
-#  (requests 2.13.0, Requirement.parse('requests!=2.12.2,!=2.13.0,>=2.10.0'), set(['keystoneauth1']))
-requests==2.11.1
+# Force a common version for components that are installed
+# by different requirements files in different versions
+idna==2.5
+pyflakes>=1.6.0
 
-# older version of pylint crash on zope.interface import
-pylint==1.6.5
-
-# python-novaclient 8.0.0 not compatible with current Eve code
-python-novaclient==7.1.0
-
-# oslo 3.15.1 dependencies are broken
-# >>> from buildbot.plugins import util
-# >>> util.load_env
-# *** PluginDBError: Requirements are not satisfied for buildbot.util:load_env: (Babel 2.4.0 (/root/bitbucket/scality/ring/venv/lib/python2.7/site-packages), Requirement.parse('Babel!=2.4.0,>=2.3.4'), set(['oslo.i18n']))
-Babel!=2.4.0,>=2.3.4
+# pydocstyle 2.1.1 raises new errors
+# we will need a proper integration of the new version
+pydocstyle==2.0.0

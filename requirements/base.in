@@ -17,6 +17,7 @@ lz4                         # used by buildbot to compress logs
 netifaces                   # used by bootstrap job
 packaging                   # used by artifacts and YAMLParser
 python-heatclient           # used by HeatOpenStackLatentWorker
+python-openstackclient      # required to get heatclient 1.11.0 deps to work
 raven                       # used by sentry
 requests[security]          # used by step_factory
 six                         # used by CodecovIOPublication
