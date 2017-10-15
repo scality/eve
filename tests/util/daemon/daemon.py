@@ -95,7 +95,14 @@ class Daemon(object):
             # self.wait_for_it()
         else:
             self._process.terminate()
-        self._process.wait()
+        for _ in range(30):
+            if self._process.poll() is not None:
+                time.sleep(1)  # allow logs to flush to disk
+                return
+            print('process still here, retry in 1s')
+            time.sleep(1)
+        raise Exception(
+            '{} never stopped {}'.format(self._name, self._process.pid))
 
     @property
     def loglines(self):
