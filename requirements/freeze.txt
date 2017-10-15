@@ -2,7 +2,7 @@
 
 # Frozen requirements for "requirements/freeze.in"
 
-buildbot-pkg==0.9.7
+buildbot-pkg==0.9.12
 click==6.7
 freeze-requirements==0.5.3
 funcsigs==1.0.2

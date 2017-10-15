@@ -8,10 +8,10 @@ attrs==17.2.0
 autobahn==17.9.3
 automat==0.6.0
 babel==2.5.1
-buildbot==0.9.7
-buildbot-worker==0.9.7
-buildbot-wsgi-dashboards==0.9.7
-buildbot-www==0.9.7
+buildbot==0.9.12
+buildbot-worker==0.9.12
+buildbot-wsgi-dashboards==0.9.12
+buildbot-www==0.9.12
 certifi==2017.7.27.1
 cffi==1.11.2
 chardet==3.0.4

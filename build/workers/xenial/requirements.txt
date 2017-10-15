@@ -15,10 +15,10 @@ autopep8==1.3.3
 babel==2.5.1
 backports.functools-lru-cache==1.4
 bitstring==3.1.5
-buildbot==0.9.7
-buildbot-worker==0.9.7
-buildbot-wsgi-dashboards==0.9.7
-buildbot-www==0.9.7
+buildbot==0.9.12
+buildbot-worker==0.9.12
+buildbot-wsgi-dashboards==0.9.12
+buildbot-www==0.9.12
 cbor==1.0.0
 certifi==2017.7.27.1
 cffi==1.11.2
