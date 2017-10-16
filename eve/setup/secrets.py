@@ -16,8 +16,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor,
 # Boston, MA  02110-1301, USA.
 
-from buildbot.plugins import secrets
-from buildbot.plugins import util
+from buildbot.plugins import secrets, util
 
 
 def secrets_providers():
