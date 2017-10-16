@@ -31,7 +31,7 @@ from tests.util.daemon import Daemon
 class BuildbotMaster(Daemon):
     _start_wait = 600
     _log = 'twistd.log'
-    _start_cmd = ['buildbot', 'start', '--nodaemon', '.']
+    _start_cmd = ['buildbot', 'start', '.']
     _stop_cmd = 'buildbot stop --no-wait .'
     _env = None
 
