@@ -16,12 +16,12 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor,
 # Boston, MA  02110-1301, USA.
 
+from buildbot.plugins import secrets
 from buildbot.plugins import util
-from buildbot.secrets.providers.vault import HashiCorpVaultSecretProvider
 
 
-def secrets():
-    return [HashiCorpVaultSecretProvider(
+def secrets_providers():
+    return [secrets.HashiCorpVaultSecretProvider(
         vaultToken=util.env.VAULT_TOKEN,
         vaultServer=util.env.VAULT_URL
     )]
