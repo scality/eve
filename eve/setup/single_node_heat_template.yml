@@ -104,7 +104,7 @@ resources:
                 if [ -s /tmp/worker_init_script.sh ] && [ ! -s /tmp/worker_requirements_script.sh ]
                 then
                   # run init.sh
-                  /tmp/worker_init_script.sh 0.9.3 # init.sh used to be called with 0.9.3 in previous implementation
+                  /tmp/worker_init_script.sh $worker_version
                 else
                   # configure user eve and twisted version
                   if [ -f /etc/redhat-release ]

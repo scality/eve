@@ -18,6 +18,7 @@
 
 from os.path import abspath, dirname, join
 
+from buildbot import version
 from buildbot.plugins import util, worker
 from buildbot.process.properties import Interpolate, Property
 from buildbot.worker.local import LocalWorker
@@ -95,7 +96,7 @@ def openstack_heat_workers():
                     'public_network': util.env.OS_NETWORK_PUBLIC,
                     'service_network': util.env.OS_NETWORK_SERVICE,
                     'private_network': util.env.OS_NETWORK_PRIVATE,
-                    'worker_version': '0.9.7',
+                    'worker_version': version,
                     'worker_init_script': Property('init_script'),
                     'worker_requirements_script': Property(
                         'requirements_script'),
