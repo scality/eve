@@ -18,11 +18,11 @@
 
 import json
 
-from buildbot.www.hooks import bitbucket
+from buildbot.www.hooks.bitbucket import BitBucketHandler
 from twisted.python import log
 
 
-def getChanges(request, _options=None):
+def getChanges(self, request):
     """Catch a POST request from BitBucket and start a build process.
 
     Check the URL below if you require more information about payload
@@ -30,7 +30,6 @@ def getChanges(request, _options=None):
 
     Args:
         request: The http request Twisted object.
-        _options: Additional options.
 
     """
     log.msg('Processing changes from bitbucket')
@@ -75,4 +74,4 @@ def getChanges(request, _options=None):
 
 
 def patch():
-    bitbucket.getChanges = getChanges
+    BitBucketHandler.getChanges = getChanges

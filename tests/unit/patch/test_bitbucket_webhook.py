@@ -8,7 +8,7 @@ Here are the tested components :
 
 """
 
-from buildbot.www.hooks import bitbucket as bb_hooks
+from buildbot.www.hooks.bitbucket import BitBucketHandler
 from twisted.trial import unittest
 
 from eve.patch.bitbucket_webhook import getChanges, patch
@@ -24,4 +24,4 @@ class TestBitbucketWebhook(unittest.TestCase):
 
         """
         patch()
-        self.assertEquals(bb_hooks.getChanges, getChanges)
+        self.assertEquals(BitBucketHandler.getChanges.im_func, getChanges)
