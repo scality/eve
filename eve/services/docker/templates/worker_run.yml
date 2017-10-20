@@ -6,6 +6,7 @@ metadata:
     app: "eve"
     buildnumber: "{{ buildnumber }}"
     name: "{{ name }}"
+    project: "{{ namespace }}"
     service: "worker"
     {% for l in label %}
     {{ l.name }}: "{{ l.value }}"
@@ -16,8 +17,10 @@ spec:
     metadata:
       labels:
         app: "eve"
-        service: "worker"
+        buildnumber: "{{ buildnumber }}"
         name: "{{ name }}"
+        project: "{{ namespace }}"
+        service: "worker"
         {% for l in label %}
         {{ l.name }}: "{{ l.value }}"
         {% endfor %}
@@ -152,6 +155,8 @@ spec:
           env:
             - name: DOCKER_API_VERSION
               value: "1.23"
+            - name: NAMESPACE
+              value: {{ namespace }}
             - name: REGISTRY
               value: {{ registry }}
             - name: WORKER_CPU_LIMIT

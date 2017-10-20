@@ -343,6 +343,9 @@ class Run(BaseCommand):
         vars(namespace)['memory_request'] = os.environ.get(
             'WORKER_MEMORY_REQUEST', '1Gi')
 
+        vars(namespace)['namespace'] = os.environ.get(
+            'NAMESPACE', 'unknown')
+
         # unique random name
         if namespace.name is None:
             vars(namespace)['name'] = 'eve-worker-%s-%s' % (
