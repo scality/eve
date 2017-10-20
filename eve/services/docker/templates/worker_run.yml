@@ -109,6 +109,8 @@ spec:
             - name: "{{ e.name }}"
               value: "{{ e.value }}"
             {% endfor %}
+            - name: ODR_MAX_WORKERS
+              value: "128"
             {% if docker_hook_sidecar %}
             - name: DOCKER_API_VERSION
               value: "1.23"
