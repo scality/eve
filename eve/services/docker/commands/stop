@@ -5,16 +5,18 @@ job_name="${container%-*}"
 grace_period="${2:-10}"
 blocking=false
 
-inverted_retry() {
+retry() {
     local max_attempts=${ATTEMPTS-50}
     local delay=${DELAY-10}
     local attempt=0
-    local exitCode=0
+    local expectedExitCode=$1
+    shift
+    local exitCode=$expectedExitCode
 
     while [ $attempt -lt $max_attempts ]; do
         "$@" >/dev/null 2>&1
         exitCode=$?
-        test $exitCode -eq 1 && break
+        test $exitCode -eq $expectedExitCode && break
         sleep $delay
         attempt=$(( attempt + 1 ))
     done
@@ -22,15 +24,26 @@ inverted_retry() {
     return $exitCode
 }
 
-kubectl delete job \
-        --grace-period=${grace_period} \
-        ${job_name} >/dev/null 2>&1
-test ! $? -eq 0 && exit 1
+with_retry() {
+    retry 0 "$@"
+}
+with_inverted_retry() {
+    retry 1 "$@"
+}
 
 # block until resource gone (slow)
 if ${blocking}; then
-    inverted_retry kubectl get pod ${container}
+    ATTEMPTS=3 DELAY=60 with_retry kubectl delete job \
+            --grace-period=${grace_period} \
+            ${job_name} >/dev/null 2>&1
+    test ! $? -eq 0 && exit 1
+
+    ATTEMPTS=50 DELAY=10 with_inverted_retry kubectl get pod ${container}
     test ! $? -eq 1 && exit 1
+else
+    ATTEMPTS=3 DELAY=60 with_retry kubectl delete job \
+            --grace-period=${grace_period} \
+            ${job_name} >/dev/null 2>&1 &
 fi
 
 echo ${1}
