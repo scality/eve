@@ -60,7 +60,7 @@ class GetArtifactsFromStage(SetPropertyFromCommand):
 
     def __init__(self, stage, **kwargs):
         assert 'command' not in kwargs
-        name = kwargs.pop('name', 'Get artifacts name from another stage')
+        name = kwargs.pop('name', 'get artifacts name from stage: %s' % stage)
         SetPropertyFromCommand.__init__(
             self,
             name=name,
@@ -80,15 +80,17 @@ class GetArtifactsFromStage(SetPropertyFromCommand):
             return
 
         # parse the response headers to get the container from redirection
+        artifacts_name = 'fatal: unable to parse artifacts name'
         lines = self.observer.getStdout().splitlines()
         for line in lines:
-            reg = re.search('^Location: (https?://[^/]+|)/builds/(.*)$', line)
+            reg = re.search('^Location: (https?://.*?)/builds/(.*)$', line)
             if reg:
                 artifacts_name = reg.group(2)
-                self.setProperty(self.property, str(artifacts_name),
-                                 "GetArtifactsFromStage")
-                self.property_changes[self.property] = artifacts_name
                 break
+
+        self.setProperty(self.property, str(artifacts_name),
+                         "GetArtifactsFromStage")
+        self.property_changes[self.property] = artifacts_name
 
 
 class SetArtifactsName(SetPropertyFromCommand):
