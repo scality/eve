@@ -345,7 +345,7 @@ class Run(BaseCommand):
 
         # unique random name
         if namespace.name is None:
-            vars(namespace)['name'] = 'eve-worker-%s-%s' % (
+            vars(namespace)['name'] = 'worker-%s-%s' % (
                 namespace.buildnumber,
                 str(uuid4())[:5]
             )
