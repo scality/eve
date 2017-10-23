@@ -45,8 +45,9 @@ spec:
                   - key: service
                     operator: In
                     values:
-                      - frontend
                       - backend
+                      - crossbar
+                      - frontend
                       - metabase
               topologyKey: kubernetes.io/hostname
       restartPolicy: Never
