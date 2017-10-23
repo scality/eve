@@ -13,6 +13,7 @@ metadata:
     {% endfor %}
   name: "{{ name }}"
 spec:
+  activeDeadlineSeconds: 36000
   template:
     metadata:
       labels:
@@ -53,7 +54,6 @@ spec:
                       - metabase
               topologyKey: kubernetes.io/hostname
       restartPolicy: Never
-      activeDeadlineSeconds: 36000
       containers:
         - name: "{{ name }}"
           image: "{{ image }}"
