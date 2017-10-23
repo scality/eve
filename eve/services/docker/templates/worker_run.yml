@@ -6,18 +6,22 @@ metadata:
     app: "eve"
     buildnumber: "{{ buildnumber }}"
     name: "{{ name }}"
+    project: "{{ namespace }}"
     service: "worker"
     {% for l in label %}
     {{ l.name }}: "{{ l.value }}"
     {% endfor %}
   name: "{{ name }}"
 spec:
+  activeDeadlineSeconds: 36000
   template:
     metadata:
       labels:
         app: "eve"
-        service: "worker"
+        buildnumber: "{{ buildnumber }}"
         name: "{{ name }}"
+        project: "{{ namespace }}"
+        service: "worker"
         {% for l in label %}
         {{ l.name }}: "{{ l.value }}"
         {% endfor %}
@@ -51,7 +55,6 @@ spec:
                       - metabase
               topologyKey: kubernetes.io/hostname
       restartPolicy: Never
-      activeDeadlineSeconds: 36000
       containers:
         - name: "{{ name }}"
           image: "{{ image }}"
@@ -107,6 +110,8 @@ spec:
             - name: "{{ e.name }}"
               value: "{{ e.value }}"
             {% endfor %}
+            - name: ODR_MAX_WORKERS
+              value: "128"
             {% if docker_hook_sidecar %}
             - name: DOCKER_API_VERSION
               value: "1.23"
@@ -123,6 +128,13 @@ spec:
         - name: docker-hook
           image: "{{ docker_hook_image }}"
           imagePullPolicy: Always
+          resources:
+            limits:
+              cpu: 2
+              memory: 4Gi
+            requests:
+              cpu: 1
+              memory: 2Gi
           livenessProbe:
             httpGet:
               path: /healthz
@@ -146,6 +158,8 @@ spec:
           env:
             - name: DOCKER_API_VERSION
               value: "1.23"
+            - name: NAMESPACE
+              value: {{ namespace }}
             - name: REGISTRY
               value: {{ registry }}
             - name: WORKER_CPU_LIMIT
