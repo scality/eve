@@ -1,11 +1,10 @@
 #!/bin/bash
 
-job_name="${1}"
-template="/resource/${job_name}"
-pod_name=""
+pod_name="${1}"
+template="/resource/${pod_name}"
 
 error(){
-    JOB=$(kubectl delete -f ${template})
+    POD=$(kubectl delete -f ${template})
     exit 1
 }
 cleanup() {
@@ -32,7 +31,7 @@ with_retry() {
 
 get_pod() {
     local name=$(kubectl get pod \
-                 --selector name=${job_name} \
+                 --selector name=${pod_name} \
                  --no-headers \
                  --output=custom-columns=ADDRESS:.metadata.name)
     test -z "${name}" && return 1
@@ -46,8 +45,8 @@ get_pod() {
     pod_name="${name}"
 }
 
-# spawn job
-JOB=$(kubectl create \
+# spawn pod
+POD=$(kubectl create \
       --no-headers \
       --output=custom-columns=NAME:.metadata.name \
       -f ${template})

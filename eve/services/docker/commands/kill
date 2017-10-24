@@ -1,7 +1,6 @@
 #!/bin/bash
 
-container="$(echo ${1//___/-})"
-job_name="${container%-*}"
+pod_name="$(echo ${1//___/-})"
 blocking=false
 
 retry() {
@@ -32,15 +31,15 @@ with_inverted_retry() {
 
 # block until resource gone (slow)
 if ${blocking}; then
-    ATTEMPTS=3 DELAY=60 with_retry kubectl delete job \
-            ${job_name} >/dev/null 2>&1
+    ATTEMPTS=3 DELAY=60 with_retry kubectl delete pod \
+            ${pod_name} >/dev/null 2>&1
     test ! $? -eq 0 && exit 1
 
-    ATTEMPTS=50 DELAY=10 with_inverted_retry kubectl get pod ${container}
+    ATTEMPTS=50 DELAY=10 with_inverted_retry kubectl get pod ${pod_name}
     test ! $? -eq 1 && exit 1
 else
-    ATTEMPTS=3 DELAY=60 with_retry kubectl delete job \
-            ${job_name} >/dev/null 2>&1 &
+    ATTEMPTS=3 DELAY=60 with_retry kubectl delete pod \
+            ${pod_name} >/dev/null 2>&1 &
 fi
 
 echo ${1}
