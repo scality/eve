@@ -353,7 +353,7 @@ class Run(BaseCommand):
         if namespace.name is None:
             vars(namespace)['name'] = 'worker-%s-%s' % (
                 namespace.buildnumber,
-                str(uuid4())[:5]
+                str(uuid4())[:8]
             )
 
         return [namespace.name]
