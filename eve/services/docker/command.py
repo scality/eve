@@ -346,6 +346,9 @@ class Run(BaseCommand):
         vars(namespace)['namespace'] = os.environ.get(
             'NAMESPACE', 'unknown')
 
+        vars(namespace)['deadline'] = os.environ.get(
+            'WORKER_DEADLINE', 3600)
+
         # unique random name
         if namespace.name is None:
             vars(namespace)['name'] = 'worker-%s-%s' % (

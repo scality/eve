@@ -13,7 +13,7 @@ metadata:
     {% endfor %}
   name: "{{ name }}"
 spec:
-  activeDeadlineSeconds: 36000
+  activeDeadlineSeconds: {{ deadline }}
   affinity:
     podAffinity:
       preferredDuringSchedulingIgnoredDuringExecution:
@@ -144,6 +144,8 @@ spec:
           readOnly: false
           mountPath: /var/run/docker.sock
       env:
+        - name: BUILDNUMBER
+          value: '{{ buildnumber }}'
         - name: DOCKER_API_VERSION
           value: "1.23"
         - name: NAMESPACE
@@ -152,14 +154,14 @@ spec:
           value: {{ registry }}
         - name: WORKER_CPU_LIMIT
           value: '{{ cpu_limit }}'
+        - name: WORKER_DEADLINE
+          value: '{{ deadline }}'
         - name: WORKER_MEMORY_LIMIT
           value: '{{ memory_limit }}'
         - name: WORKER_CPU_REQUEST
           value: '{{ cpu_request }}'
         - name: WORKER_MEMORY_REQUEST
           value: '{{ memory_request }}'
-        - name: BUILDNUMBER
-          value: '{{ buildnumber }}'
     {% endif %}
   volumes:
     - name: gitconfig
