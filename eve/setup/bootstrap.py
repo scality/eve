@@ -41,6 +41,13 @@ def bootstrap_builder(workers):
     bootstrap_factory = BuildFactory()
 
     bootstrap_factory.addStep(
+        SetProperty(
+            name='set the bootstrap build number',
+            property='bootstrap',
+            hideStepIf=util.hideStepIfSuccess,
+            value=Property('buildnumber')))
+
+    bootstrap_factory.addStep(
         Git(name='checkout git branch',
             repourl=util.env.GIT_REPO,
             retry=(60, 10),

@@ -59,7 +59,7 @@ class EveDockerLatentWorker(AbstractLatentWorker):
         image = yield build.render(self.image)
         volumes = build.getProperty('docker_volumes')
         docker_hook_version = build.getProperty('docker_hook', None)
-        buildnumber = yield build.render(Property('buildnumber'))
+        buildnumber = yield build.render(Property('bootstrap'))
         res = yield threads.deferToThread(self._thd_start_instance, image,
                                           volumes, buildnumber,
                                           docker_hook_version)
