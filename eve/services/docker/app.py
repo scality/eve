@@ -111,3 +111,10 @@ def docker(command):
 @app.route("/healthz", methods=['GET'])
 def healthz():
     return 'OK!'
+
+
+@app.route("/quit", methods=['GET'])
+def quit():
+    func = request.environ.get('werkzeug.server.shutdown')
+    func()
+    return 'Server shutting down'
