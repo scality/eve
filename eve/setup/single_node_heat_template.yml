@@ -137,7 +137,7 @@ resources:
                   fi
 
                   # install twisted and buildbot
-                  retry sudo pip install --upgrade pip
+                  retry sudo pip install --index-url=https://pypi.python.org/simple/ --upgrade pip
                   retry sudo pip install twisted==$twisted_version
                   retry sudo pip install buildbot-worker==$worker_version
 
