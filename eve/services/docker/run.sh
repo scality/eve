@@ -11,8 +11,7 @@ test -z "$client" && \
     echo "could not parse kubectl version" && \
     exit 1
 test ! "$client" = "$server" && \
-    echo "kubectl version mismatch" && \
-    exit 1
+    echo "warning: kubectl version mismatch"
 
 while true; do
     RES=$(docker login \
