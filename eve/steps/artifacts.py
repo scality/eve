@@ -141,7 +141,7 @@ class Upload(ShellCommand):
 
     _links = []
 
-    UPLOAD_MAX_TIME = 900
+    UPLOAD_MAX_TIME = 3600
     """Maximum upload time, in seconds."""
 
     def __init__(self, source, urls=None, **kwargs):
