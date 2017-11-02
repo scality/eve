@@ -141,7 +141,7 @@ class Upload(ShellCommand):
 
     _links = []
 
-    UPLOAD_MAX_TIME = 3600
+    DEFAULT_UPLOAD_MAX_TIME = 3600
     """Maximum upload time, in seconds."""
 
     def __init__(self, source, urls=None, **kwargs):
@@ -150,13 +150,15 @@ class Upload(ShellCommand):
         self._source = source
         self._kwargs = kwargs
         self._urls = urls
+        self._upload_max_time = kwargs.get(
+            'maxTime', self.DEFAULT_UPLOAD_MAX_TIME)
 
         kwargs['workdir'] = kwargs.get('workdir', 'build/' + source)
         super(Upload, self).__init__(
             name=name,
             haltOnFailure=True,
             command=util.Transform(self.set_command, urls),
-            maxTime=self.UPLOAD_MAX_TIME + 10,
+            maxTime=self._upload_max_time + 10,
             **kwargs
         )
         self.observer = logobserver.BufferLogObserver(wantStdout=True,
@@ -179,7 +181,7 @@ class Upload(ShellCommand):
             'echo tar successful. Calling curl... ',
             ('curl --verbose --max-time {} -s -T ../artifacts.tar.gz -X PUT '
              'http://{}/upload/{}').format(
-                self.UPLOAD_MAX_TIME,
+                self._upload_max_time,
                 get_artifacts_proxy(self.build.builder),
                 self.get_container())]
 
