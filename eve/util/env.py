@@ -62,7 +62,7 @@ class Settings(dict):
 def filter_secrets():
     for key in dict(environ):
         if key.startswith('SECRET_'):
-            SECRETS[key.lstrip('SECRET_')] = environ.pop(key)
+            SECRETS[key[7:]] = environ.pop(key)
 
 
 def get_secrets():
