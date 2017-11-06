@@ -8,6 +8,7 @@ RUN         apt-get update && \
                 libffi-dev \
                 libmysqlclient-dev \
                 libssl-dev \
+                lsof \
                 mysql-client \
                 python-dev \
                 python-pip \
