@@ -42,7 +42,7 @@ if ${blocking}; then
 else
     ATTEMPTS=3 DELAY=60 with_retry kubectl delete pod \
             --grace-period=${grace_period} \
-            ${pod_name} >/dev/null 2>&1 &
+            ${pod_name} >/dev/null 2>&1
 fi
 
 echo ${1}

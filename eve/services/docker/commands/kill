@@ -39,7 +39,7 @@ if ${blocking}; then
     test ! $? -eq 1 && exit 1
 else
     ATTEMPTS=3 DELAY=60 with_retry kubectl delete pod \
-            ${pod_name} >/dev/null 2>&1 &
+            ${pod_name} >/dev/null 2>&1
 fi
 
 echo ${1}
