@@ -30,6 +30,7 @@ class TestBootstrap(unittest.TestCase):
             ('GIT_CACHE_PORT', '11111', int),
             ('GIT_REPO', 'foo/bar.git'),
             ('MASTER_START_TIME', '9999'),
+            ('MAX_STEP_DURATION', '1234'),
             ('MICROSERVICE_ARTIFACTS_IN_USE', '0', int),
             ('MICROSERVICE_GITCACHE_IN_USE', '0', int),
             ('PATCHER_FILE_PATH', ''),
