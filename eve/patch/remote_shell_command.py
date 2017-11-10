@@ -67,10 +67,10 @@ def update_timeouts(func):
 
         timeout = int(timeout)
 
-        if timeout > maxTime:
+        if timeout > util.env.MAX_STEP_DURATION:
             raise ValueError('specified timeout is larger than '
-                             'maxTime for this step (%ss > %ss)' %
-                             (timeout, maxTime))
+                             'authorized maximum on this project (%ss > %ss)' %
+                             (maxTime, util.env.MAX_STEP_DURATION))
 
         return func(
             self, workdir, command, env=env,
