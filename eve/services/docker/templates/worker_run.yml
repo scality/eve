@@ -15,33 +15,14 @@ metadata:
 spec:
   activeDeadlineSeconds: {{ deadline }}
   affinity:
-    podAffinity:
-      preferredDuringSchedulingIgnoredDuringExecution:
-        # group pods of a same build if possible
-        - weight: 100
-          podAffinityTerm:
-            labelSelector:
-              matchExpressions:
-                - key: buildnumber
-                  operator: In
-                  values:
-                    - "{{ buildnumber }}"
-            topologyKey: kubernetes.io/hostname
-    podAntiAffinity:
+    nodeAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
-        # do not schedule workers on nodes that run eve
-        # (across all namespaces)
-        - namespaces: []
-          labelSelector:
-            matchExpressions:
-              - key: service
-                operator: In
-                values:
-                  - backend
-                  - crossbar
-                  - frontend
-                  - metabase
-          topologyKey: kubernetes.io/hostname
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: pool
+            operator: In
+            values:
+            - worker
   restartPolicy: Never
   containers:
     - name: "{{ name }}"
