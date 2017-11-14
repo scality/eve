@@ -103,9 +103,6 @@ spec:
       image: "{{ docker_hook_image }}"
       imagePullPolicy: Always
       resources:
-        limits:
-          cpu: 2
-          memory: 4Gi
         requests:
           cpu: 1
           memory: 2Gi
