@@ -11,6 +11,7 @@ class TestSetupReporters(unittest.TestCase):
     def test_hipchat_reporter(self):
         util.env = util.load_env([
             ('DOCKER_BUILDER_NAME', 'foo'),
+            ('HIPCHAT_REPORTER_STAGE_FILTER', 'pre-merge'),
             ('HIPCHAT_ROOM', 'foo'),
             ('HIPCHAT_TOKEN', 'bar'),
             ('OPENSTACK_BUILDER_NAME', 'bar')
@@ -20,6 +21,7 @@ class TestSetupReporters(unittest.TestCase):
     def test_github_reporter(self):
         util.env = util.load_env([
             ('DOCKER_BUILDER_NAME', 'foo'),
+            ('GIT_HOST_REPORTER_STAGE_FILTER', ''),
             ('GITHUB_TOKEN', 'foo'),
             ('OPENSTACK_BUILDER_NAME', 'bar')
         ])
@@ -30,6 +32,7 @@ class TestSetupReporters(unittest.TestCase):
             ('DOCKER_BUILDER_NAME', 'foo'),
             ('EVE_GITHOST_LOGIN', 'foo'),
             ('EVE_GITHOST_PWD', 'bar'),
+            ('GIT_HOST_REPORTER_STAGE_FILTER', 'pre-merge;post-merge'),
             ('OPENSTACK_BUILDER_NAME', 'bar')
         ])
         self.assertIsNotNone(eve.setup.reporters.bitbucket_reporter())

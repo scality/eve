@@ -150,6 +150,12 @@ class BaseBuildStatusPush(HttpStatusPushBase):
 class BuildStatusPushMixin(object):
     # pylint: disable=too-few-public-methods
     def _filterBuilds(self, filter_build, build):
+        if not self.stages:
+            self.logger.debug(
+                '_filterBuilds: no filter defined, '
+                '-> pass build status decision to parent')
+            return filter_build(build)
+
         try:
             key = build['properties']['stage_name'][0]
         except (KeyError, IndexError):
