@@ -28,8 +28,13 @@ def hipchat_reporter():
         util.env.OPENSTACK_BUILDER_NAME
     ]
 
+    if util.env.HIPCHAT_REPORTER_STAGE_FILTER:
+        stage_filter = util.env.HIPCHAT_REPORTER_STAGE_FILTER.split(';')
+    else:
+        stage_filter = []
+
     return reporters.HipChatBuildStatusPush(
-        'post-merge',
+        stage_filter,
         util.env.HIPCHAT_ROOM,
         util.env.HIPCHAT_TOKEN,
         builders=builders
@@ -44,8 +49,13 @@ def github_reporter():
         util.env.OPENSTACK_BUILDER_NAME
     ]
 
+    if util.env.GIT_HOST_REPORTER_STAGE_FILTER:
+        stage_filter = util.env.GIT_HOST_REPORTER_STAGE_FILTER.split(';')
+    else:
+        stage_filter = []
+
     return reporters.GithubBuildStatusPush(
-        ['pre-merge', 'post-merge'],
+        stage_filter,
         util.env.GITHUB_TOKEN,
         builders=builders
     )
@@ -60,8 +70,13 @@ def bitbucket_reporter():
         util.env.OPENSTACK_BUILDER_NAME
     ]
 
+    if util.env.GIT_HOST_REPORTER_STAGE_FILTER:
+        stage_filter = util.env.GIT_HOST_REPORTER_STAGE_FILTER.split(';')
+    else:
+        stage_filter = []
+
     return reporters.BitbucketBuildStatusPush(
-        ['pre-merge', 'post-merge'],
+        stage_filter,
         util.env.EVE_GITHOST_LOGIN,
         util.env.EVE_GITHOST_PWD,
         builders=builders
