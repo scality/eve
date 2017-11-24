@@ -28,7 +28,9 @@ spec:
             values:
             - worker
   restartPolicy: Never
+  {% if docker_hook_sidecar %}
   terminationGracePeriodSeconds: 600
+  {% endif %}
   containers:
     - name: "{{ name }}"
       image: "{{ image }}"
