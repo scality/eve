@@ -8,6 +8,10 @@ metadata:
     name: "{{ name }}"
     project: "{{ namespace }}"
     service: "worker"
+    dh_group_id: "{{ dh_group_id }}"
+    {% if docker_hook_sidecar %}
+    dh_children_group_id: "{{ dh_children_group_id }}"
+    {% endif %}
     {% for l in label %}
     {{ l.name }}: "{{ l.value }}"
     {% endfor %}
@@ -24,6 +28,7 @@ spec:
             values:
             - worker
   restartPolicy: Never
+  terminationGracePeriodSeconds: 600
   containers:
     - name: "{{ name }}"
       image: "{{ image }}"
@@ -49,11 +54,6 @@ spec:
               - >
                 sudo chmod 755 /usr/local/bin/docker || chmod 755 /usr/local/bin/docker;
                 sudo chmod 666 /var/run/docker.sock || chmod 666 /var/run/docker.sock;
-        preStop:
-          exec:
-            command:
-              - "curl"
-              - "http://localhost:5000/quit"
       {% endif %}
       volumeMounts:
         - name: gitconfig
@@ -116,6 +116,16 @@ spec:
         failureThreshold: 1
       securityContext:
         privileged: true
+      lifecycle:
+        preStop:
+          exec:
+            command:
+              - "/bin/sh"
+              - "-c"
+              - >
+                kubectl delete pod -l service=worker
+                -l dh_group_id='{{ dh_children_group_id }}';
+                curl http://localhost:5000/quit
       volumeMounts:
         - name: creds
           readOnly: true
@@ -131,6 +141,8 @@ spec:
           value: '{{ buildnumber }}'
         - name: DOCKER_API_VERSION
           value: "1.23"
+        - name: DH_GROUP_ID
+          value: {{ dh_children_group_id }}
         - name: NAMESPACE
           value: {{ namespace }}
         - name: REGISTRY
