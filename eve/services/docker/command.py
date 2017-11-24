@@ -349,6 +349,11 @@ class Run(BaseCommand):
         vars(namespace)['deadline'] = os.environ.get(
             'WORKER_DEADLINE', 3600)
 
+        vars(namespace)['dh_group_id'] = os.environ.get(
+            'DH_GROUP_ID', str(uuid4()))
+
+        vars(namespace)['dh_children_group_id'] = str(uuid4())
+
         # unique random name
         if namespace.name is None:
             vars(namespace)['name'] = 'worker-%s-%s' % (
