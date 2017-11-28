@@ -53,7 +53,8 @@ def bootstrap_builder(workers):
             retry=(60, 10),
             submodules=True,
             branch=Property('branch'),
-            mode='incremental',
+            mode='full',
+            method='fresh',
             hideStepIf=util.hideStepIfSuccess,
             haltOnFailure=True,
             logEnviron=False))
