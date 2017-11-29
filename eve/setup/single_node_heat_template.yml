@@ -110,7 +110,12 @@ resources:
                   if [ -f /etc/redhat-release ]
                   then
                     echo "CentOS/RedHat";
+
                     retry yum -y distro-sync
+
+                    localedef -v -c -i en_US -f UTF-8 en_US.UTF-8 || true
+                    export LANG=en_US.utf8
+
                     retry yum -y install git gcc python-devel python-setuptools libffi-devel openssl-devel
                     retry easy_install pip
 
@@ -125,8 +130,15 @@ resources:
                     fi
                   elif [ -f /etc/debian_version ]
                   then
+                    echo "Ubuntu/Debian"
+
                     retry apt-get update
+
+                    locale-gen en_US.UTF-8
+                    export LANG=en_US.utf8
+
                     retry apt-get install --yes git gcc python-dev python-setuptools libffi-dev python-pip
+
                     adduser -u 1042 --home /home/eve --disabled-password --gecos "" eve
                     adduser eve sudo
                     echo "%sudo ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
