@@ -60,7 +60,8 @@ class GetArtifactsFromStage(SetPropertyFromCommand):
 
     def __init__(self, stage, **kwargs):
         assert 'command' not in kwargs
-        name = kwargs.pop('name', 'get artifacts name from stage: %s' % stage)
+        name = kwargs.pop(
+            'name', 'get artifacts name from stage: %s' % str(stage))
         SetPropertyFromCommand.__init__(
             self,
             name=name,
