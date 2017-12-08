@@ -148,3 +148,24 @@ class TestBitbucketBuildStatusPush(unittest.TestCase):
         url = build_status.forge_url(SUCCEEDED_PREMERGE_BUILD)
         self.assertEquals(url, ('https://localhost:12345/2.0/repositories/'
                                 'scality/ring/commit/cafebabe/statuses/build'))
+
+
+class TestUltronBuildStatusPush(unittest.TestCase):
+    def test_constructor(self):
+        build_status = base.UltronBuildStatusPush(
+            stages=['pre-merge', 'post-merge'],
+            req_login='foo', req_password='bar',
+            req_url='http://ultron.foo.baz/')
+        self.assertIsNotNone(build_status)
+
+    @defer.inlineCallbacks
+    def test_send(self):
+        ctx = base.UltronBuildStatusPush(stages='post-merge',
+                                         req_login='foo',
+                                         req_password='bar',
+                                         req_url='http://ultron.foo.baz/')
+        with self.assertRaises(AttributeError):
+            yield ctx.send(SUCCEEDED_POSTMERGE_BUILD)
+
+        with self.assertRaises(AttributeError):
+            yield ctx.send(FAILED_BUILD)
