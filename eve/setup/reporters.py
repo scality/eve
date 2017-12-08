@@ -81,3 +81,25 @@ def bitbucket_reporter():
         util.env.EVE_GITHOST_PWD,
         builders=builders
     )
+
+
+def ultron_reporter():
+    assert util.env.ULTRON_REPORTER_URL
+
+    builders = [
+        util.env.DOCKER_BUILDER_NAME,
+        util.env.OPENSTACK_BUILDER_NAME
+    ]
+
+    if util.env.ULTRON_REPORTER_STAGE_FILTER:
+        stage_filter = util.env.ULTRON_REPORTER_STAGE_FILTER.split(';')
+    else:
+        stage_filter = []
+
+    return reporters.UltronBuildStatusPush(
+        stage_filter,
+        util.env.ULTRON_REPORTER_LOGIN,
+        util.env.ULTRON_REPORTER_PWD,
+        util.env.ULTRON_REPORTER_URL,
+        builders=builders
+    )

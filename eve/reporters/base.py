@@ -361,3 +361,56 @@ class GithubBuildStatusPush(GitHubStatusPush, BuildStatusPushMixin):
         key = build['properties']['stage_name'][0]
         self.context = key  # pylint: disable=attribute-defined-outside-init
         yield super(GithubBuildStatusPush, self).send(build)
+
+
+class UltronBuildStatusPush(BaseBuildStatusPush, BuildStatusPushMixin):
+    """Send build result to Scality Ultron status API."""
+
+    name = 'UltronBuildStatusPush'
+    logger = Logger('eve.steps.HttpBuildStatusPush')
+
+    def __init__(self, stages, req_login, req_password, req_url, **kwargs):
+        self.stages = [stages] if isinstance(stages, basestring) else stages
+        self.req_login = req_login
+        self.req_password = req_password
+        self.req_url = req_url
+        super(UltronBuildStatusPush, self).__init__(**kwargs)
+
+    def filterBuilds(self, build):
+        return self._filterBuilds(
+            super(UltronBuildStatusPush, self).filterBuilds, build)
+
+    @defer.inlineCallbacks
+    def send(self, build):
+        """Send build status to Ultron."""
+
+        if build['results'] in ('SUCCESSFUL', 'WARNINGS'):
+            result = 'success'
+        elif build['results'] == 'RETRY':
+            result = 'timedout'
+        else:
+            result = 'failed'
+
+        if self.req_login:
+            auth = (self.req_login, self.req_password)
+        else:
+            auth = None
+        url = self.req_url
+        data = {
+            'payload': {
+                'build_url': build['url'],
+                'outcome': result,
+            }
+        }
+
+        http_service = yield HTTPClientService.getService(
+            self.master, url, auth=auth)
+        response = yield http_service.post('', json=data)
+
+        if response.code != 200:
+            raise Exception(
+                "{response.code}: unable to send status: "
+                "{url}\nRequest:\n{request}\nResponse:\n{response.content}".
+                format(request=data, response=response, url=url))
+
+        self.logger.info('Ultron status sent (%s on %s)' % (result, url))
