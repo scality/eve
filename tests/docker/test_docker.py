@@ -455,3 +455,23 @@ class TestDockerCluster(unittest.TestCase):
             self.assertEqual(child_build.result, 'success')
             self.assertTrue('docker_hook' not in child_build.properties)
             cluster.sanity_check()
+
+    def test_docker_invalid_image_name(self):
+        """Test a docker build with a non existent docker image.
+
+        Steps:
+            - Set a bad docker image.
+            - Force a build.
+            - Ensure that the build status is on 'exception'.
+
+        """
+        with Cluster() as cluster:
+            local_repo = cluster.clone()
+            local_repo.push(
+                yaml=SingleCommandYaml(
+                    'exit 0',
+                    worker={'type': 'docker',
+                            'image': 'bad-docker-image'})
+            )
+            buildset = cluster.api.force(branch=local_repo.branch)
+            self.assertEqual(buildset.result, 'exception')
