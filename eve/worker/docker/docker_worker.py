@@ -20,6 +20,8 @@
 import time
 from subprocess import STDOUT, CalledProcessError, check_output
 
+from buildbot.interfaces import (LatentWorkerCannotSubstantiate,
+                                 LatentWorkerFailedToSubstantiate)
 from buildbot.process.properties import Property
 from buildbot.worker.latent import AbstractLatentWorker
 from twisted.internet import defer, threads
@@ -65,8 +67,21 @@ class EveDockerLatentWorker(AbstractLatentWorker):
                                           docker_hook_version)
         defer.returnValue(res)
 
+    def _image_exists(self, image):
+        """Check if docker image exist on host."""
+        cmd = ['images', '--format', '{{.Repository}}', image]
+        return self.docker_invoke(*cmd).strip() != ''
+
     def _thd_start_instance(self, image, volumes, buildnumber,
                             docker_hook_version):
+
+        self.logger.info('Checking if %r docker image exist.' % image)
+        if not self._image_exists(image):
+            self.logger.error('%r image not found.' % image)
+            raise LatentWorkerCannotSubstantiate(
+                'Image %s not found on docker host' % image
+            )
+
         cmd = [
             'run',
             '--privileged',
@@ -127,7 +142,7 @@ class EveDockerLatentWorker(AbstractLatentWorker):
             return res
         except CalledProcessError as exception:
             time.sleep(5)  # avoid a fast loop in case of failure
-            raise RuntimeError('CalledProcessError: {} *** OUTPUT: {}'.format(
-                cmd_shell,
-                exception.output
-            ))
+            raise LatentWorkerFailedToSubstantiate(
+                'CalledProcessError: {} *** OUTPUT: {}'
+                .format(cmd_shell, exception.output)
+            )
