@@ -65,6 +65,7 @@ class TestCluster(unittest.TestCase):
         with Cluster() as cluster:
             local_repo = cluster.clone()
             local_repo.push()
+            import pdb; pdb.set_trace()
             cluster.api.force(branch=local_repo.branch)
 
             # Check bootstrap
