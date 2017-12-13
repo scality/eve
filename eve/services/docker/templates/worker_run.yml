@@ -182,8 +182,7 @@ spec:
     {% if v %}
     {% if v.type == 'emptyDir' %}
     - name: "{{ v.name }}"
-      emptyDir:
-         medium: Memory
+      emptyDir: {}
     {% else %}
     - name: "{{ v.name }}"
       hostPath:
