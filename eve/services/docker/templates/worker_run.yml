@@ -54,11 +54,11 @@ spec:
               - "-c"
               - >
                 . /usr/local/bin/update-git-config;
-                {% if docker_hook_sidecar -%}
+                {% if docker_hook_sidecar %}
                 {# handle both cases where active user may be privileged or not #}
                 sudo chmod 755 /usr/local/bin/docker || chmod 755 /usr/local/bin/docker;
                 sudo chmod 666 /var/run/docker.sock || chmod 666 /var/run/docker.sock;
-                {%- endif %}
+                {% endif %}
       volumeMounts:
         - name: update-git-config
           readOnly: false
