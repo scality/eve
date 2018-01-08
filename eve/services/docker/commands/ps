@@ -7,5 +7,5 @@ containers=$(kubectl get pod \
                      "$@" | xargs)
 
 for container in ${containers}; do
-    echo "${container//-/___}"
+    echo "${container//-/+}"
 done

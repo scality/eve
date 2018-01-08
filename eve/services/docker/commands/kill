@@ -1,6 +1,6 @@
 #!/bin/bash
 
-pod_name="$(echo ${1//___/-})"
+pod_name="$(echo ${1//+/-})"
 blocking=false
 
 retry() {

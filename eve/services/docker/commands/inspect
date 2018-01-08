@@ -1,7 +1,7 @@
 #!/bin/bash
 
 format="$1"
-container="$(echo ${2//___/-})"
+container="$(echo ${2//+/-})"
 
 if [ "${format}" = "" ]; then
     kubectl describe pod ${container}
@@ -21,7 +21,7 @@ if [ "${format}" = '{ "machine" : "{{.Config.Labels.machine}}", "reqid" : "{{.Co
           --output=jsonpath='{.metadata.labels.machine} {.metadata.labels.reqid} {.metadata.name}' \
           ${container})
     stringarray=($out)
-    echo "{ \"machine\" : \"${stringarray[0]}\", \"reqid\" : \"${stringarray[1]}\", \"instance_id\" : \"${stringarray[2]//-/___}\" }"
+    echo "{ \"machine\" : \"${stringarray[0]}\", \"reqid\" : \"${stringarray[1]}\", \"instance_id\" : \"${stringarray[2]//-/+}\" }"
     exit 0
 fi
 

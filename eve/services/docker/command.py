@@ -223,7 +223,7 @@ class Ps(BaseCommand):
                 pass
             elif filter_['filter'] == 'id':
                 # id is not compatible with selectors
-                args.append(filter_['value'].replace('___', '-'))
+                args.append(filter_['value'].replace('+', '-'))
                 filters = []
                 break
             else:

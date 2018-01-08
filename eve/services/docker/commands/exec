@@ -1,7 +1,7 @@
 #!/bin/bash
 
 options=$1
-container="$(echo ${2//___/-})"
+container="$(echo ${2//+/-})"
 cmd=$3
 args=$4
 stdin=$5
