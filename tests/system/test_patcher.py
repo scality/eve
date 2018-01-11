@@ -20,6 +20,7 @@
 import os
 import unittest
 
+from buildbot.process.results import CANCELLED, SUCCESS
 from tests.util.cluster import Cluster
 from tests.util.yaml_factory import PreMerge, SingleCommandYaml
 
@@ -47,8 +48,17 @@ class TestPatcher(unittest.TestCase):
             repo.push(branch='other-branch', yaml=PreMerge(steps=[
                 {'ShellCommand': {'name': 'step1', 'command': 'exit 0'}},
             ]))
+
+            cluster.api.webhook(repo)
+            cluster.api.getw(
+                '/buildsets',
+                get_params={
+                    'limit': 1,
+                    'results': CANCELLED,
+                })
+
             buildset = cluster.api.force(branch=repo.branch)
-            self.assertEqual(buildset.result, 'cancelled')
+            self.assertEqual(buildset.result, 'success')
 
             cluster.sanity_check()
 
@@ -73,8 +83,17 @@ class TestPatcher(unittest.TestCase):
             repo = cluster.clone()
 
             repo.push(branch='spam-branch', yaml=SingleCommandYaml('exit 0'))
+
+            cluster.api.webhook(repo)
+            cluster.api.getw(
+                '/buildsets',
+                get_params={
+                    'limit': 1,
+                    'results': CANCELLED,
+                })
+
             buildset = cluster.api.force(branch=repo.branch)
-            self.assertEqual(buildset.result, 'cancelled')
+            self.assertEqual(buildset.result, 'success')
 
             cluster.sanity_check()
 
@@ -110,6 +129,14 @@ class TestPatcher(unittest.TestCase):
                 {'ShellCommand': {'name': 'step2', 'command': 'exit 0'}},
                 {'ShellCommand': {'name': 'step3', 'command': 'exit 0'}},
             ]))
+
+            cluster.api.webhook(repo)
+            cluster.api.getw(
+                '/buildsets',
+                get_params={
+                    'limit': 1,
+                    'results': SUCCESS,
+                })
 
             buildset = cluster.api.force(branch=repo.branch)
             self.assertEqual(buildset.result, 'success')

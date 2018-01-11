@@ -188,7 +188,7 @@ class BuildbotDataAPI(object):
             raise Exception('unable to find build step with this name')
         return step[0]
 
-    def webhook(self, git_repo, revision=None):
+    def webhook(self, git_repo, revision=''):
         """Notify Eve's bitbucket hook of a new change."""
         commits = []
         for line in git_repo.loglines:

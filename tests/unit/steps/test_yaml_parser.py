@@ -21,6 +21,7 @@ class TestReadConfFromYamlExecution(steps.BuildStepMixin, unittest.TestCase):
             ('ARTIFACTS_PREFIX', 'prefix'),
             ('ARTIFACTS_PUBLIC_URL', 'foo.bar.baz'),
             ('DOCKER_SCHEDULER_NAME', 'local_scheduler'),
+            ('FORCE_SCHEDULER_NAME', 'forcescheduler'),
             ('GIT_SLUG', 'git_slug'),
             ('HIDE_INTERNAL_STEPS', '1'),
             ('LOCAL_SCHEDULER_NAME', 'docker_scheduler'),

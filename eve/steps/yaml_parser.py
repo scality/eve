@@ -163,13 +163,15 @@ class ReadConfFromYaml(FileUpload):
             ])
 
         # Read patcher conf and populate related properties
-        self.build.addStepsAfterCurrentStep([
-            steps.PatcherConfig(
-                conf_path=util.env.PATCHER_FILE_PATH,
-                stage=stage_name,
-                name='collect system-level skips for this build',
-                doStepIf=bool(util.env.PATCHER_FILE_PATH),
-                hideStepIf=util.hideStepIfSuccessOrSkipped)])
+        scheduler = self.getProperty('scheduler')
+        if scheduler != util.env.FORCE_SCHEDULER_NAME:
+            self.build.addStepsAfterCurrentStep([
+                steps.PatcherConfig(
+                    conf_path=util.env.PATCHER_FILE_PATH,
+                    stage=stage_name,
+                    name='collect system-level skips for this build',
+                    doStepIf=bool(util.env.PATCHER_FILE_PATH),
+                    hideStepIf=util.hideStepIfSuccessOrSkipped)])
 
         defer.returnValue(SUCCESS)
 
