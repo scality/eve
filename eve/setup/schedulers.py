@@ -34,6 +34,10 @@ def any_branch_scheduler():
 def force_scheduler():
     default_project = "%s/%s" % (
         util.env.GIT_OWNER, util.env.GIT_SLUG)
+    properties = [util.StringParameter(name='force_stage',
+                                       label='Stage:')]
+    properties.extend(util.AnyPropertyParameter(name='prop%02d' % i)
+                      for i in range(util.env.FORCE_BUILD_PARAM_COUNT))
     return schedulers.EveForceScheduler(
         name=util.env.FORCE_SCHEDULER_NAME,
         builderNames=[util.env.BOOTSTRAP_BUILDER_NAME],
@@ -41,8 +45,7 @@ def force_scheduler():
                                     label='Reason:',
                                     default='force build',
                                     size=20),
-        properties=[util.AnyPropertyParameter(name='prop%02d' % i)
-                    for i in range(util.env.FORCE_BUILD_PARAM_COUNT)],
+        properties=properties,
         codebases=[
             util.CodebaseParameter(
                 '',

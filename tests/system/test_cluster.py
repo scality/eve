@@ -20,7 +20,7 @@ import unittest
 
 from buildbot.process.results import CANCELLED, SUCCESS
 from tests.util.cluster import Cluster
-from tests.util.yaml_factory import SingleCommandYaml
+from tests.util.yaml_factory import SingleCommandYaml, YamlFactory
 
 
 class TestCluster(unittest.TestCase):
@@ -166,6 +166,41 @@ class TestCluster(unittest.TestCase):
                 0].buildrequest.build
             step = child_build.steps[-1]
             self.assertIn('The yellow submarine', step.rawlog('stdio'))
+
+    def test_force_stage_build(self):
+        """Test forced build with forced stage.
+
+        Steps:
+            - Spawn cluster with a force build scheduler.
+            - Force a build with a given stage name.
+            - Check that the correct stage is triggered.
+
+        """
+        with Cluster() as cluster:
+            local_repo = cluster.clone()
+            local_repo.push(yaml=YamlFactory(
+                branches={
+                    'default': {'stage': 'default_stage'},
+                },
+                stages={
+                    'default_stage': {
+                        'worker': {'type': 'local'},
+                        'steps': [{'ShellCommand': {'command': 'exit 1'}}],
+                    },
+                    'another_stage': {
+                        'worker': {'type': 'local'},
+                        'steps': [{'ShellCommand': {'command': 'echo "egg"'}}],
+                    },
+                }))
+            buildset = cluster.api.force(
+                branch=local_repo.branch,
+                force_stage='another_stage')
+
+            self.assertEqual(buildset.result, 'success')
+            child_build = buildset.buildrequest.build.children[
+                0].buildrequest.build
+            step = child_build.steps[-1]
+            self.assertIn('egg', step.rawlog('stdio'))
 
     def test_cancel_non_tip_build(self):
         with Cluster() as cluster:
