@@ -34,20 +34,38 @@ def any_branch_scheduler():
 def force_scheduler():
     default_project = "%s/%s" % (
         util.env.GIT_OWNER, util.env.GIT_SLUG)
+
+    yaml_options = util.NestedParameter(
+        name=None,
+        label='Eve',
+        fields=[util.StringParameter(name='force_stage',
+                                     label='Override stage (optional)')])
+
+    extra_props = util.NestedParameter(
+        name=None,
+        label='Extra properties',
+        fields=[util.AnyPropertyParameter(name='prop%02d' % i)
+                for i in range(util.env.FORCE_BUILD_PARAM_COUNT)])
+
+    # Hack to remove ugly ':' from extra properties
+    for prop in extra_props.fields:
+        prop.fields[0].label = 'Name'
+        prop.fields[1].label = 'Value'
+
     return schedulers.EveForceScheduler(
         name=util.env.FORCE_SCHEDULER_NAME,
         builderNames=[util.env.BOOTSTRAP_BUILDER_NAME],
         reason=util.StringParameter(name='reason',
-                                    label='Reason:',
+                                    label='Reason',
                                     default='force build',
                                     size=20),
-        properties=[util.AnyPropertyParameter(name='prop%02d' % i)
-                    for i in range(util.env.FORCE_BUILD_PARAM_COUNT)],
+        properties=[yaml_options] + [extra_props],
         codebases=[
             util.CodebaseParameter(
                 '',
+                label='Repository',
                 branch=util.StringParameter(name='branch',
-                                            label='Branch:',
+                                            label='Branch',
                                             required=True),
                 revision=util.FixedParameter(name='revision',
                                              default=''),

@@ -122,26 +122,35 @@ class ReadConfFromYaml(FileUpload):
         self.setProperty('conf', conf, 'ReadConfFromYaml')
         self.setProperty('start_time', str(time.time()))
 
-        # Find the stage name from the branch name
+        # Use the given stage if any (forced build)
+        stage_name = self.getProperty('force_stage')
         branch = self.getProperty('branch')
         if branch is None:
             branch = 'default'
-        for branch_pattern, branch_conf in conf['branches'].items():
-            self.logger.debug('Checking if <{branch}> matches <{pattern}>',
-                              branch=branch, pattern=branch_pattern)
-            if fnmatch(branch, branch_pattern):
-                stage_name = branch_conf['stage']
-                self.logger.debug('<{branch}> matched <{branch_pattern}>',
-                                  branch=branch, branch_pattern=branch_pattern)
-                break
+        if stage_name:
+            self.logger.debug('Stage forced by user to <{stage}',
+                              stage=stage_name)
         else:
-            self.logger.debug('No branch match. Using default branch config.')
-            try:
-                stage_name = conf['branches']['default']['stage']
-            except KeyError:
-                self.addCompleteLog(
-                    'stderr', 'Branch <%s> not covered by yaml file' % branch)
-                defer.returnValue(CANCELLED)
+            # Else find the stage name from the branch name
+            for branch_pattern, branch_conf in conf['branches'].items():
+                self.logger.debug('Checking if <{branch}> matches <{pattern}>',
+                                  branch=branch, pattern=branch_pattern)
+                if fnmatch(branch, branch_pattern):
+                    stage_name = branch_conf['stage']
+                    self.logger.debug('<{branch}> matched <{branch_pattern}>',
+                                      branch=branch,
+                                      branch_pattern=branch_pattern)
+                    break
+            else:
+                self.logger.debug('No branch match. '
+                                  'Using default branch config.')
+                try:
+                    stage_name = conf['branches']['default']['stage']
+                except KeyError:
+                    self.addCompleteLog(
+                        'stderr',
+                        'Branch <%s> not covered by yaml file' % branch)
+                    defer.returnValue(CANCELLED)
 
         self.build.addStepsAfterCurrentStep([
             GetApiVersion(eve_api_version=eve_api_version),

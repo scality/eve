@@ -67,6 +67,7 @@ class GetArtifactsFromStage(SetPropertyFromCommand):
             name=name,
             command=[
                 'curl',
+                '-L',
                 '--fail',
                 '-I',
                 Interpolate('http://artifacts/last_success/{}.{}'.format(
