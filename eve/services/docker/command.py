@@ -5,6 +5,10 @@ from uuid import uuid4
 
 from jinja2 import Environment, FileSystemLoader
 
+# EVE-811 Workaround for skari, replacing labels value containing
+# the '+' character which is not authorized by Kubernetes.
+LABEL_REPLACE = 'a___a'
+
 
 def command_factory(cmd):
     """Return a BaseCommand instance selected by input operation."""
@@ -60,11 +64,9 @@ class BaseCommand():
 
     def register_args(self, parser):
         """Register docker command specific args."""
-        pass
 
     def adapt_args(self, namespace, stdin, files):
         """Post process given arguments and return new args."""
-        pass
 
     def get_new_args(self, namespace, files):
         return []
@@ -115,6 +117,7 @@ class Build(BaseCommand):
 
         for arg in namespace.label:
             build_cmd.append('--label')
+            arg['value'] = arg['value'].replace('+', LABEL_REPLACE)
             build_cmd.append('%s=%s' % (arg['name'], arg['value']))
 
         return [
@@ -217,6 +220,7 @@ class Ps(BaseCommand):
         for filter_ in namespace.filter:
             if filter_['filter'] == 'label':
                 filters.append('--selector')
+                filter_['value'] = filter_['value'].replace('+', LABEL_REPLACE)
                 filters.append('%s=%s' % (filter_['name'], filter_['value']))
             elif filter_['filter'] == 'status':
                 # deliberatly choose to ignore filter for now
@@ -324,6 +328,8 @@ class Run(BaseCommand):
                 break
             if label['name'] == 'buildnumber':
                 vars(namespace)['buildnumber'] = label['value']
+            else:
+                label['value'] = label['value'].replace('+', LABEL_REPLACE)
 
         if namespace.docker_hook_sidecar:
             # ensure we don't attach doker volumes twice
