@@ -64,9 +64,11 @@ class BaseCommand():
 
     def register_args(self, parser):
         """Register docker command specific args."""
+        pass
 
     def adapt_args(self, namespace, stdin, files):
         """Post process given arguments and return new args."""
+        pass
 
     def get_new_args(self, namespace, files):
         return []
