@@ -82,16 +82,24 @@ def handle_remote(cmd):
         except EOFError:
             pass
 
-    try:
-        response = requests.put(
-            'http://localhost:5000/{cmd}'.format(cmd=cmd),
-            data={
-                'command': json.dumps(sys.argv),
-                'stdin': json.dumps(stdin),
-            },
-            files=files
-        )
-    except requests.ConnectionError:
+    attempt = 0
+    while attempt < 16:
+        try:
+            response = requests.put(
+                'http://localhost:5000/{cmd}'.format(cmd=cmd),
+                data={
+                    'command': json.dumps(sys.argv),
+                    'stdin': json.dumps(stdin),
+                },
+                files=files
+            )
+        except requests.ConnectionError:
+            pass
+        else:
+            break
+        attempt += 1
+        sleep(attempt*2)
+    else:
         sys.exit('The Docker service is currently unavailable.')
 
     if response.status_code != 202:
