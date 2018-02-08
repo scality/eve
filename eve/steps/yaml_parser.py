@@ -25,12 +25,12 @@ import yaml
 from buildbot.plugins import steps, util
 from buildbot.process.buildstep import BuildStep
 from buildbot.process.results import CANCELLED, FAILURE, SUCCESS
-from buildbot.steps.master import SetProperty
-from buildbot.steps.shell import SetPropertyFromCommand
 from buildbot.steps.transfer import FileUpload
 from packaging import version
 from twisted.internet import defer
 from twisted.logger import Logger
+
+from .property import EveProperty, EvePropertyFromCommand
 
 
 class ReadConfFromYaml(FileUpload):
@@ -213,7 +213,7 @@ class StepExtractor(BuildStep):
         return defer.succeed(SUCCESS)
 
 
-class GetCommitShortVersion(SetPropertyFromCommand):
+class GetCommitShortVersion(EvePropertyFromCommand):
     def __init__(self, branch):
         super(GetCommitShortVersion, self).__init__(
             name='get the commit short_revision',
@@ -230,7 +230,7 @@ class GetCommitShortVersion(SetPropertyFromCommand):
             logEnviron=False)
 
 
-class GetCommitTimestamp(SetPropertyFromCommand):
+class GetCommitTimestamp(EvePropertyFromCommand):
     def __init__(self):
         super(GetCommitTimestamp, self).__init__(
             name='get the commit timestamp',
@@ -247,7 +247,7 @@ class GetCommitTimestamp(SetPropertyFromCommand):
             logEnviron=False)
 
 
-class GetApiVersion(SetProperty):
+class GetApiVersion(EveProperty):
     def __init__(self, eve_api_version):
         super(GetApiVersion, self).__init__(
             name='get the API version',

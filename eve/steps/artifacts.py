@@ -24,9 +24,11 @@ from buildbot.plugins import util
 from buildbot.process import logobserver
 from buildbot.process.properties import Interpolate
 from buildbot.process.results import FAILURE, SKIPPED, SUCCESS
-from buildbot.steps.shell import SetPropertyFromCommand, ShellCommand
+from buildbot.steps.shell import ShellCommand
 from packaging import version
 from twisted.internet import defer, reactor
+
+from .property import EvePropertyFromCommand
 
 
 def get_artifacts_base_name():
@@ -55,15 +57,14 @@ def get_artifacts_proxy(builder):
     return 'artifacts'
 
 
-class GetArtifactsFromStage(SetPropertyFromCommand):
+class GetArtifactsFromStage(EvePropertyFromCommand):
     """Get artifacts from another stage and store it in a property."""
 
     def __init__(self, stage, **kwargs):
         assert 'command' not in kwargs
         name = kwargs.pop(
             'name', 'get artifacts name from stage: %s' % str(stage))
-        SetPropertyFromCommand.__init__(
-            self,
+        super(GetArtifactsFromStage, self).__init__(
             name=name,
             command=[
                 'curl',
@@ -91,11 +92,11 @@ class GetArtifactsFromStage(SetPropertyFromCommand):
                 break
 
         self.setProperty(self.property, str(artifacts_name),
-                         "GetArtifactsFromStage")
+                         'GetArtifactsFromStage')
         self.property_changes[self.property] = artifacts_name
 
 
-class SetArtifactsName(SetPropertyFromCommand):
+class SetArtifactsName(EvePropertyFromCommand):
     def __init__(self, buildnumber, stage_name):
         super(SetArtifactsName, self).__init__(
             name='set the artifacts name',
@@ -108,7 +109,7 @@ class SetArtifactsName(SetPropertyFromCommand):
             logEnviron=False)
 
 
-class SetArtifactsPublicURL(SetPropertyFromCommand):
+class SetArtifactsPublicURL(EvePropertyFromCommand):
     def __init__(self):
         super(SetArtifactsPublicURL, self).__init__(
             name='set the artifacts public url',
@@ -122,7 +123,7 @@ class SetArtifactsPublicURL(SetPropertyFromCommand):
             logEnviron=False)
 
 
-class SetArtifactsPrivateURL(SetPropertyFromCommand):
+class SetArtifactsPrivateURL(EvePropertyFromCommand):
     def __init__(self, is_vm):
         super(SetArtifactsPrivateURL, self).__init__(
             name='set the artifacts private url',

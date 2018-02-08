@@ -68,6 +68,8 @@ setup(
             'DockerComputeImageFingerprint=eve.steps.docker_build:DockerComputeImageFingerprint',
             'DockerPull=eve.steps.docker_build:DockerPull',
             'DockerPush=eve.steps.docker_build:DockerPush',
+            'EveProperty=eve.steps.property:EveProperty',
+            'EvePropertyFromCommand=eve.steps.property:EvePropertyFromCommand',
             'GetArtifactsFromStage=eve.steps.artifacts:GetArtifactsFromStage',
             'JUnitShellCommand=eve.steps.junit:JUnitShellCommand',
             'PublishCoverageReport=eve.steps.publish_coverage_report:PublishCoverageReport',

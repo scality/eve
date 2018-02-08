@@ -22,8 +22,6 @@ from buildbot.config import BuilderConfig
 from buildbot.plugins import steps, util
 from buildbot.process.factory import BuildFactory
 from buildbot.process.properties import Property
-from buildbot.steps.master import SetProperty
-from buildbot.steps.shell import SetPropertyFromCommand
 from buildbot.steps.source.git import Git
 from twisted.internet import defer
 
@@ -41,7 +39,7 @@ def bootstrap_builder(workers):
     bootstrap_factory = BuildFactory()
 
     bootstrap_factory.addStep(
-        SetProperty(
+        steps.EveProperty(
             name='set the bootstrap build number',
             property='bootstrap',
             hideStepIf=util.hideStepIfSuccess,
@@ -64,14 +62,14 @@ def bootstrap_builder(workers):
         logEnviron=False))
 
     bootstrap_factory.addStep(
-        SetProperty(
+        steps.EveProperty(
             name='set the master_builddir property',
             property='master_builddir',
             hideStepIf=util.hideStepIfSuccess,
             value=Property('builddir')))
 
     yaml_dirpath = dirname(util.env.PROJECT_YAML)
-    bootstrap_factory.addStep(SetPropertyFromCommand(
+    bootstrap_factory.addStep(steps.EvePropertyFromCommand(
         name='get the product version',
         command=('./{}/get_product_version.sh 2> /dev/null'
                  ' || echo 0.0.0'.format(yaml_dirpath)),
