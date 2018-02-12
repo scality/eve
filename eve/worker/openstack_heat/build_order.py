@@ -40,11 +40,11 @@ class HeatOpenStackBuildOrder(util.BaseBuildOrder):
 
         if worker_path:
             init_script = "%s/build/%s/init.sh" % (
-                self.properties['master_builddir'],
+                self.properties['master_builddir'][0],
                 self._worker['path'])
 
             requirements_script = "%s/build/%s/requirements.sh" % (
-                self.properties['master_builddir'],
+                self.properties['master_builddir'][0],
                 self._worker['path'])
 
             if os.path.isfile(init_script):
@@ -54,9 +54,13 @@ class HeatOpenStackBuildOrder(util.BaseBuildOrder):
                 requirements_script_contents = open(requirements_script).read()
 
         self.properties.update({
-            'worker_path': worker_path,
-            'init_script': init_script_contents,
-            'requirements_script': requirements_script_contents,
-            'openstack_image': self._worker.get('image', self.DEFAULT_IMAGE),
-            'openstack_flavor': self._worker.get('flavor', self.DEFAULT_FLAVOR)
+            'worker_path': (worker_path, 'OpenstackBuildOrder'),
+            'init_script': (init_script_contents, 'OpenstackBuildOrder'),
+            'requirements_script': (requirements_script_contents,
+                                    'OpenstackBuildOrder'),
+            'openstack_image': (self._worker.get('image', self.DEFAULT_IMAGE),
+                                'OpenstackBuildOrder'),
+            'openstack_flavor': (self._worker.get('flavor',
+                                                  self.DEFAULT_FLAVOR),
+                                 'OpenstackBuildOrder'),
         })
