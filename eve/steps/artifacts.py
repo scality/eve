@@ -180,8 +180,8 @@ class Upload(ShellCommand):
         command = [
             ('if [ ! -n "$(find -L . -type f | head -1)" ]; then '
              'echo "No files here. Nothing to do."; exit 0; fi'),
-            'tar -chvzf ../artifacts.tar.gz . ',
-            'echo tar successful. Calling curl... ',
+            'tar -chvzf ../artifacts.tar.gz .',
+            'echo tar successful. Calling curl...',
             ('curl --verbose --max-time {} -s -T ../artifacts.tar.gz -X PUT '
              'http://{}/upload/{}').format(
                 self._upload_max_time,
