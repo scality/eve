@@ -20,6 +20,7 @@ from collections import OrderedDict
 
 from buildbot.plugins import util
 from buildbot.process.buildstep import BuildStep
+from buildbot.process.properties import Properties
 from buildbot.process.results import FAILURE, SUCCESS
 from buildbot.steps.trigger import Trigger
 from twisted.internet import defer
@@ -107,15 +108,18 @@ class ExecuteTriggerStages(Trigger):
     def getSchedulersAndProperties(self):
         scheds_and_props = []
 
-        def set_property(result, build_order, propname):
-            build_order.properties[propname] = result
+        def set_property(value, build_order, name, source):
+            build_order.properties[name] = (value, source)
 
         for build_order in self._build_orders:
             # wait for properties from preliminary steps
             setprop_defers = []
-            for propname, propvalue in build_order.properties.iteritems():
-                setprop_defer = self.build.render(propvalue)
-                setprop_defer.addCallback(set_property, build_order, propname)
+            for name, (value, source) in build_order.properties.iteritems():
+                setprop_defer = self.build.render(value)
+                setprop_defer.addCallback(set_property,
+                                          build_order,
+                                          name,
+                                          source)
                 setprop_defers.append(setprop_defer)
 
             yield defer.gatherResults(setprop_defers)
@@ -131,4 +135,8 @@ class ExecuteTriggerStages(Trigger):
         if not self.triggeredNames:
             return {u'step': u'running'}
         return {u'step': u'triggered %s' % (
-            u', '.join(bo.properties['reason'] for bo in self._build_orders))}
+            u', '.join(bo.properties['reason'][0]
+                       for bo in self._build_orders))}
+
+    def createTriggerProperties(self, properties):
+        return Properties.fromDict(properties)

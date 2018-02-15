@@ -36,27 +36,30 @@ class DockerBuildOrder(util.BaseBuildOrder):
     def setup_properties(self):
         super(DockerBuildOrder, self).setup_properties()
 
-        self.properties['docker_volumes'] = self._worker.get('volumes', []) + [
-            '{0}:{0}'.format('/var/run/docker.sock')
-        ]
+        volumes = (self._worker.get('volumes', []) +
+                   ['{0}:{0}'.format('/var/run/docker.sock')])
+        self.properties['docker_volumes'] = (volumes, 'DockerBuildOrder')
 
         # handle case of externally-supplied image
         if self._worker.get('image', False):
-            self.properties['docker_image'] = Interpolate(
-                self._worker['image'])
+            self.properties['docker_image'] = (
+                Interpolate(self._worker['image']),
+                'DockerBuildOrder')
             return
 
         worker_path = self._worker.get('path', None)
-        self.properties['worker_path'] = worker_path
+        self.properties['worker_path'] = (worker_path, 'DockerBuildOrder')
 
         full_docker_path = '%s/build/%s' % (
-            self.properties['master_builddir'],
+            self.properties['master_builddir'][0],
             worker_path,
         )
 
         if util.env.DOCKER_HOOK_IN_USE:
             if worker_path in util.env.DOCKER_HOOK_WORKERS.split(';'):
-                self.properties['docker_hook'] = util.env.DOCKER_HOOK_VERSION
+                self.properties['docker_hook'] = (
+                    util.env.DOCKER_HOOK_VERSION,
+                    'DockerBuildOrder')
 
         # image name is last dir name + hash of path to avoid collisions
         basename = "{0}_{1}".format(
@@ -97,11 +100,11 @@ class DockerBuildOrder(util.BaseBuildOrder):
             ))
         else:
             image = '%s-%06d' % (
-                self.properties['worker_path'],
-                self.properties['buildnumber'],
+                self.properties['worker_path'][0],
+                self.properties['buildnumber'][0],
             )
 
-        self.properties['docker_image'] = image
+        self.properties['docker_image'] = (image, 'DockerBuildOrder')
 
         common_args = {
             'label': basename,
