@@ -31,29 +31,37 @@ from eve.steps.artifacts import GetArtifactsFromStage, Upload
 class TestUpload(steps.BuildStepMixin, unittest.TestCase,
                  config.ConfigErrorsMixin):
     def setUp(self):
+        util.env = util.load_env([
+            ('OPENSTACK_BUILDER_NAME', 'openstack'),
+        ])
         return self.setUpBuildStep()
 
     def tearDown(self):
         return self.tearDownBuildStep()
 
-    def test_init_args_validity(self):
-        """Test that an exception is raised for invalid argument."""
-        self.assertRaisesConfigError(
-            "Invalid argument(s) passed to RemoteShellCommand: ",
-            lambda: Upload(source='ok', url=[], wrongArg1=1, wrongArg2='two'))
+    def setupStep(self, *args, **kwargs):
+        res = super(TestUpload, self).setupStep(*args, **kwargs)
+        self.properties.setProperty('eve_api_version', '0.2', 'setUp')
+        self.properties.setProperty('artifacts_name', 'my_artifacts', 'setUp')
+        return res
 
-    def test_init_args(self):
-        """Test that the constructor args are stored in the class."""
-        upload_step = Upload('tmp', ['link1', 'link2'])
-        self.assertEqual(upload_step._retry, (0, 1))
-        self.assertEqual(upload_step._source, 'tmp')
-        self.assertEqual(upload_step._urls, ['link1', 'link2'])
-        self.assertEqual(upload_step.workdir, 'build/tmp')
-
-    def test_retry_arg(self):
-        """Test that the retry constructor arg is stored in the class."""
-        upload_step = Upload('/tmp', ['link1', 'link2'], retry=(1, 2))
-        self.assertEqual(upload_step._retry, (1, 2))
+    def test_absolute_source(self):
+        self.setupStep(Upload(name='Upload',
+                              source='/absolute/path'))
+        self.expectCommands(
+            ExpectShell(
+                workdir='/absolute/path',
+                maxTime=3610,
+                command='if [ ! -n "$(find -L . -type f | head -1)" ]; then '
+                'echo "No files here. Nothing to do."; exit 0; fi && '
+                'tar -chvzf ../artifacts.tar.gz . && '
+                'echo tar successful. Calling curl... && '
+                'curl --verbose --max-time 3600 -s -T ../artifacts.tar.gz -X '
+                'PUT http://artifacts/upload/my_artifacts')
+            + ExpectShell.log('stdio', stdout='Response Status: 201 Created')
+            + 0)
+        self.expectOutcome(result=SUCCESS)
+        return self.runStep()
 
 
 class TestGetArtifactsFromStage(steps.BuildStepMixin, unittest.TestCase):

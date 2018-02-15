@@ -17,6 +17,7 @@
 # Boston, MA  02110-1301, USA.
 """Steps allowing eve to interact with artifacts."""
 
+import os
 import re
 from collections import defaultdict
 
@@ -156,7 +157,8 @@ class Upload(ShellCommand):
         self._upload_max_time = kwargs.get(
             'maxTime', self.DEFAULT_UPLOAD_MAX_TIME)
 
-        kwargs['workdir'] = kwargs.get('workdir', 'build/' + source)
+        kwargs['workdir'] = kwargs.get('workdir',
+                                       os.path.join('build', source))
         super(Upload, self).__init__(
             name=name,
             haltOnFailure=True,
