@@ -20,6 +20,7 @@
 from __future__ import absolute_import
 
 from buildbot.plugins import util
+from buildbot.process.properties import Interpolate
 from buildbot.process.results import SKIPPED, SUCCESS
 from buildbot.test.fake.remotecommand import ExpectShell
 from buildbot.test.util import config, steps
@@ -44,6 +45,24 @@ class TestUpload(steps.BuildStepMixin, unittest.TestCase,
         self.properties.setProperty('eve_api_version', '0.2', 'setUp')
         self.properties.setProperty('artifacts_name', 'my_artifacts', 'setUp')
         return res
+
+    def test_arg_interpolate(self):
+        self.setupStep(Upload(name='Upload',
+                              source=Interpolate('%(kw:foo)s', foo='bar')))
+        self.expectCommands(
+            ExpectShell(
+                workdir='build/bar',
+                maxTime=3610,
+                command='if [ ! -n "$(find -L . -type f | head -1)" ]; then '
+                'echo "No files here. Nothing to do."; exit 0; fi && '
+                'tar -chvzf ../artifacts.tar.gz . && '
+                'echo tar successful. Calling curl... && '
+                'curl --verbose --max-time 3600 -s -T ../artifacts.tar.gz -X '
+                'PUT http://artifacts/upload/my_artifacts')
+            + ExpectShell.log('stdio', stdout='Response Status: 201 Created')
+            + 0)
+        self.expectOutcome(result=SUCCESS)
+        return self.runStep()
 
     def test_absolute_source(self):
         self.setupStep(Upload(name='Upload',

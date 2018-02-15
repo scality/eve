@@ -143,6 +143,9 @@ class SetArtifactsPrivateURL(EvePropertyFromCommand):
 class Upload(ShellCommand):
     """Upload files to rackspace."""
 
+    renderables = [
+        'source',
+    ]
     _links = []
 
     DEFAULT_UPLOAD_MAX_TIME = 3600
@@ -151,14 +154,16 @@ class Upload(ShellCommand):
     def __init__(self, source, urls=None, **kwargs):
         name = kwargs.pop('name', 'send artifacts to artifact repository')
         self._retry = kwargs.pop('retry', (0, 1))
-        self._source = source
+        self.source = source
         self._kwargs = kwargs
         self._urls = urls
         self._upload_max_time = kwargs.get(
             'maxTime', self.DEFAULT_UPLOAD_MAX_TIME)
 
         kwargs['workdir'] = kwargs.get('workdir',
-                                       os.path.join('build', source))
+                                       util.Transform(os.path.join,
+                                                      'build',
+                                                      source))
         super(Upload, self).__init__(
             name=name,
             haltOnFailure=True,
@@ -227,7 +232,7 @@ class Upload(ShellCommand):
 
                 # Schedule a retry after this step
                 self.build.addStepsAfterCurrentStep([self.__class__(
-                    source=self._source,
+                    source=self.source,
                     urls=self._urls,
                     retry=(delay, repeats - 1),
                     **self._kwargs)])
