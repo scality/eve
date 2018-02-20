@@ -65,6 +65,33 @@ def get_build_context(cmd):
     return build_context
 
 
+def body_generator(data, files, boundary):
+    if data:
+        for key in data:
+            arg = key
+            value = data[key]
+            yield('--{}\r\n'.format(boundary))
+            yield('Content-Disposition: form-data; name="{}"\r\n\r\n'.format(arg))
+            yield('{}\r\n'.format(value))
+    if files:
+        for key in files:
+            arg = key
+            (filename, fileobj) = files[key]
+            fileobj.seek(0)
+            yield('--{}\r\n'.format(boundary))
+            yield('Content-Disposition: form-data; name="{}"; filename="{}"\r\n'.format(
+                   arg, filename))
+            yield('Content-Type: application/octet-stream\r\n\r\n')
+            while True:
+                chunk = fileobj.read(16384)
+                if not chunk:
+                    yield('\r\n')
+                    break
+                yield (chunk)
+    if data or files:
+        yield('--{}--\r\n'.format(boundary))
+
+
 def handle_remote(cmd):
     files = None
 
@@ -82,16 +109,15 @@ def handle_remote(cmd):
         except EOFError:
             pass
 
+    data = {'command': json.dumps(sys.argv), 'stdin': json.dumps(stdin)}
     attempt = 0
+    boundary = "98215567712697562581705625561"
     while attempt < 16:
         try:
             response = requests.put(
                 'http://localhost:5000/{cmd}'.format(cmd=cmd),
-                data={
-                    'command': json.dumps(sys.argv),
-                    'stdin': json.dumps(stdin),
-                },
-                files=files
+                data=body_generator(data, files, boundary),
+                headers={'Content-Type': 'multipart/form-data; boundary={}'.format(boundary)}
             )
         except requests.ConnectionError:
             pass
