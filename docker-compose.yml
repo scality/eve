@@ -21,7 +21,6 @@ services:
     depends_on:
       - db
       - crossbar
-      - gitcache
     env_file: "${ENV_FILE-env}"
     environment:
       MASTER_MODE: backend
@@ -45,7 +44,3 @@ services:
     restart: always
     volumes:
       - ./tests/util/crossbar/crossbar.json:/node/.crossbar/config.json
-
-  gitcache:
-    build: eve/services/gitcache
-    env_file: "${ENV_FILE-env}"

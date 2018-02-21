@@ -1,5 +1,0 @@
-#!/bin/bash
-
-set -e
-
-timeout 600 sh -c "python /usr/lib/git-core/git_proxy_cache.py && /usr/lib/git-core/git-http-backend $@"
