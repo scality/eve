@@ -36,6 +36,9 @@ class DockerBuildOrder(util.BaseBuildOrder):
     def setup_properties(self):
         super(DockerBuildOrder, self).setup_properties()
 
+        memory = (self._worker.get('memory', None))
+        self.properties['docker_memory'] = (memory, 'DockerBuildOrder')
+
         volumes = (self._worker.get('volumes', []) +
                    ['{0}:{0}'.format('/var/run/docker.sock')])
         self.properties['docker_volumes'] = (volumes, 'DockerBuildOrder')

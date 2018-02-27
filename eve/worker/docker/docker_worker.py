@@ -43,12 +43,11 @@ class EveDockerLatentWorker(AbstractLatentWorker):
     instance = None
 
     def __init__(self, name, password, image, master_fqdn, pb_port,
-                 max_memory, max_cpus, **kwargs):
+                 max_cpus, **kwargs):
         # pylint: disable=too-many-arguments
         self.image = image
         self.master_fqdn = master_fqdn,
         self.pb_port = pb_port
-        self.max_memory = max_memory
         self.max_cpus = max_cpus
         kwargs.setdefault('build_wait_timeout', 0)
         kwargs.setdefault('keepalive_interval', None)
@@ -59,11 +58,12 @@ class EveDockerLatentWorker(AbstractLatentWorker):
         if self.instance is not None:
             raise ValueError('instance active')
         image = yield build.render(self.image)
+        memory = build.getProperty('docker_memory')
         volumes = build.getProperty('docker_volumes')
         docker_hook_version = build.getProperty('docker_hook', None)
         buildnumber = yield build.render(Property('bootstrap'))
         res = yield threads.deferToThread(self._thd_start_instance, image,
-                                          volumes, buildnumber,
+                                          memory, volumes, buildnumber,
                                           docker_hook_version)
         defer.returnValue(res)
 
@@ -72,7 +72,7 @@ class EveDockerLatentWorker(AbstractLatentWorker):
         cmd = ['images', '--format', '{{.Repository}}', image]
         return self.docker_invoke(*cmd).strip() != ''
 
-    def _thd_start_instance(self, image, volumes, buildnumber,
+    def _thd_start_instance(self, image, memory, volumes, buildnumber,
                             docker_hook_version):
 
         self.logger.info('Checking if %r docker image exist.' % image)
@@ -91,9 +91,11 @@ class EveDockerLatentWorker(AbstractLatentWorker):
             '--env', 'WORKERPASS=%s' % self.password,
             '--label', 'buildnumber=%s' % buildnumber,
             '--detach',
-            '--memory=%s' % self.max_memory,
             '--cpus=%s' % self.max_cpus
         ]
+
+        if memory:
+            cmd.append('--memory=%s' % memory)
 
         cmd.extend(['--volume=%s' % volume for volume in volumes])
 
