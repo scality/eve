@@ -17,6 +17,7 @@
 # Boston, MA  02110-1301, USA.
 """Allow eve to use docker workers."""
 
+import re
 import time
 from subprocess import STDOUT, CalledProcessError, check_output
 
@@ -26,6 +27,25 @@ from buildbot.process.properties import Property
 from buildbot.worker.latent import AbstractLatentWorker
 from twisted.internet import defer, threads
 from twisted.logger import Logger
+
+
+def convert_to_bytes(size):
+    size = size.upper()
+
+    m = re.search('^([0-9]+)([BKMG])$', size)
+    if not m:
+        raise ValueError('size could not be parsed')
+
+    size_digits = m.group(1)
+    size_unit = m.group(2)
+
+    size_bytes = int(size_digits)
+    for unit in ['B', 'K', 'M', 'G']:
+        if size_unit == unit:
+            break
+        size_bytes = 1024 * size_bytes
+
+    return size_bytes
 
 
 class EveDockerLatentWorker(AbstractLatentWorker):
@@ -43,11 +63,12 @@ class EveDockerLatentWorker(AbstractLatentWorker):
     instance = None
 
     def __init__(self, name, password, image, master_fqdn, pb_port,
-                 max_cpus, **kwargs):
+                 max_memory, max_cpus, **kwargs):
         # pylint: disable=too-many-arguments
         self.image = image
         self.master_fqdn = master_fqdn,
         self.pb_port = pb_port
+        self.max_memory = max_memory
         self.max_cpus = max_cpus
         kwargs.setdefault('build_wait_timeout', 0)
         kwargs.setdefault('keepalive_interval', None)
@@ -95,6 +116,13 @@ class EveDockerLatentWorker(AbstractLatentWorker):
         ]
 
         if memory:
+            if convert_to_bytes(memory) > convert_to_bytes(self.max_memory):
+                self.logger.error('Can not request %s RAM (max allowed %s).' %
+                                  (memory, self.max_memory))
+                raise LatentWorkerCannotSubstantiate(
+                    'Can not request %s RAM (max allowed is %s).' %
+                    (memory, self.max_memory)
+                )
             cmd.append('--memory=%s' % memory)
 
         cmd.extend(['--volume=%s' % volume for volume in volumes])

@@ -22,6 +22,7 @@ class TestSetupWorkers(unittest.TestCase):
             ('ARTIFACTS_PREFIX', 'foo_'),
             ('ARTIFACTS_PUBLIC_URL', 'foo.bar.baz'),
             ('DOCKER_CONTAINER_MAX_CPU', 4),
+            ('DOCKER_CONTAINER_MAX_MEMORY', 8192),
             ('EXTERNAL_PB_PORT', '12345'),
             ('GIT_SLUG', 'slug'),
             ('MASTER_FQDN', 'foo'),
