@@ -30,8 +30,12 @@ from twisted.logger import Logger
 
 
 def convert_to_bytes(size):
-    size = size.upper()
+    try:
+        return int(size)
+    except ValueError:
+        pass
 
+    size = size.upper()
     m = re.search('^([0-9]+)([BKMG])$', size)
     if not m:
         raise ValueError('size could not be parsed')

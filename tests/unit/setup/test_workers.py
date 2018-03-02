@@ -3,11 +3,32 @@
 import unittest
 
 from buildbot.plugins import util
+from eve.worker.docker.docker_worker import convert_to_bytes
 
 import eve.setup.workers
 
 
 class TestSetupWorkers(unittest.TestCase):
+    def test_convert_to_bytes(self):
+        size = convert_to_bytes('1234')
+        self.assertEquals(size, 1234)
+        size = convert_to_bytes('1B')
+        self.assertEquals(size, 1)
+        size = convert_to_bytes('1b')
+        self.assertEquals(size, 1)
+        size = convert_to_bytes('2K')
+        self.assertEquals(size, 2048)
+        size = convert_to_bytes('2k')
+        self.assertEquals(size, 2048)
+        size = convert_to_bytes('4M')
+        self.assertEquals(size, 4194304)
+        size = convert_to_bytes('4m')
+        self.assertEquals(size, 4194304)
+        size = convert_to_bytes('8G')
+        self.assertEquals(size, 8589934592)
+        size = convert_to_bytes('8g')
+        self.assertEquals(size, 8589934592)
+
     def test_local_workers(self):
         util.env = util.load_env([
             ('GIT_SLUG', 'slug'),
