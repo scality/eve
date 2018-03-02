@@ -128,6 +128,8 @@ class EveDockerLatentWorker(AbstractLatentWorker):
                     (memory, self.max_memory)
                 )
             cmd.append('--memory=%s' % memory)
+        else:
+            cmd.append('--memory=%s' % self.max_memory)
 
         cmd.extend(['--volume=%s' % volume for volume in volumes])
 
