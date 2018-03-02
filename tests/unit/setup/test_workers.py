@@ -3,9 +3,9 @@
 import unittest
 
 from buildbot.plugins import util
-from eve.worker.docker.docker_worker import convert_to_bytes
 
 import eve.setup.workers
+from eve.worker.docker.docker_worker import convert_to_bytes
 
 
 class TestSetupWorkers(unittest.TestCase):
