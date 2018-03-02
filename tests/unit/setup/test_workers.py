@@ -10,6 +10,8 @@ import eve.setup.workers
 
 class TestSetupWorkers(unittest.TestCase):
     def test_convert_to_bytes(self):
+        with self.assertRaises(ValueError):
+            size = convert_to_bytes('notanumber')
         size = convert_to_bytes('1234')
         self.assertEquals(size, 1234)
         size = convert_to_bytes('1B')
