@@ -30,6 +30,10 @@ class TestSetupWorkers(unittest.TestCase):
         self.assertEquals(size, 8589934592)
         size = convert_to_bytes('8g')
         self.assertEquals(size, 8589934592)
+        size = convert_to_bytes('8gi')
+        self.assertEquals(size, 8589934592)
+        size = convert_to_bytes('8gb')
+        self.assertEquals(size, 8589934592)
 
     def test_local_workers(self):
         util.env = util.load_env([

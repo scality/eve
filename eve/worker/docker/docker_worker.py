@@ -36,7 +36,7 @@ def convert_to_bytes(size):
         pass
 
     size = size.upper()
-    m = re.search('^([0-9]+)([BKMG])$', size)
+    m = re.search('^([0-9]+)([BKMG])[BI]?$', size)
     if not m:
         raise ValueError('size could not be parsed')
 
