@@ -52,10 +52,10 @@ setup(
             'eve=eve.scripts.runner:main'
         ],
         'buildbot.reporters': [
-            'BitbucketBuildStatusPush=eve.reporters.base:BitbucketBuildStatusPush',
-            'GithubBuildStatusPush=eve.reporters.base:GithubBuildStatusPush',
-            'HipChatBuildStatusPush=eve.reporters.base:HipChatBuildStatusPush',
-            'UltronBuildStatusPush=eve.reporters.base:UltronBuildStatusPush',
+            'BitbucketBuildStatusPush=eve.reporters.bitbucket:BitbucketBuildStatusPush',
+            'GithubBuildStatusPush=eve.reporters.github:GithubBuildStatusPush',
+            'HipChatBuildStatusPush=eve.reporters.hipchat:HipChatBuildStatusPush',
+            'UltronBuildStatusPush=eve.reporters.ultron:UltronBuildStatusPush',
         ],
         'buildbot.schedulers': [
             'EveForceScheduler=eve.schedulers.force:EveForceScheduler'
