@@ -16,6 +16,8 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor,
 # Boston, MA  02110-1301, USA.
 
+from buildbot.process.results import (CANCELLED, EXCEPTION, FAILURE, RETRY,
+                                      SKIPPED, SUCCESS, WARNINGS)
 from buildbot.util.httpclientservice import HTTPClientService
 from twisted.internet import defer
 from twisted.logger import Logger
@@ -44,12 +46,16 @@ class UltronBuildStatusPush(BaseBuildStatusPush, BuildStatusPushMixin):
     def send(self, build):
         """Send build status to Ultron."""
 
-        if build['results'] in ('SUCCESSFUL', 'WARNINGS'):
-            result = 'success'
-        elif build['results'] == 'RETRY':
-            result = 'timedout'
-        else:
-            result = 'failed'
+        result = {
+            SUCCESS: 'success',
+            WARNINGS: 'success',
+            FAILURE: 'failed',
+            SKIPPED: 'failed',
+            EXCEPTION: 'failed',
+            CANCELLED: 'failed',
+            RETRY: 'failed',
+            None: 'running',
+        }[build['results']]
 
         if self.req_login:
             auth = (self.req_login, self.req_password)
