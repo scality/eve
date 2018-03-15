@@ -16,6 +16,8 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor,
 # Boston, MA  02110-1301, USA.
 
+from urlparse import urlparse, urlunparse
+
 from buildbot.process.results import (CANCELLED, EXCEPTION, FAILURE, RETRY,
                                       SKIPPED, SUCCESS, WARNINGS)
 from buildbot.util.httpclientservice import HTTPClientService
@@ -62,9 +64,11 @@ class UltronBuildStatusPush(BaseBuildStatusPush, BuildStatusPushMixin):
         else:
             auth = None
         url = self.req_url
+        root_buildrequest_url = yield self._get_root_buildrequest_url_for(
+            build)
         data = {
             'payload': {
-                'build_url': build['url'],
+                'build_url': root_buildrequest_url,
                 'outcome': result,
             }
         }
@@ -80,3 +84,28 @@ class UltronBuildStatusPush(BaseBuildStatusPush, BuildStatusPushMixin):
                 format(request=data, response=response, url=url))
 
         self.logger.info('Ultron status sent (%s on %s)' % (result, url))
+
+    @defer.inlineCallbacks
+    def _get_root_buildrequest_url_for(self, build):
+        base_url = urlparse(build['url'])[:-1]
+        buildrequest = yield self.master.data.get(
+            ('buildrequests', build['buildrequestid'])
+        )
+        buildset = yield self.master.data.get(
+            ('buildsets', buildrequest['buildsetid'])
+        )
+
+        while buildset['parent_buildid'] is not None:
+            build = yield self.master.data.get(
+                ('builds', buildset['parent_buildid'])
+            )
+            buildrequest = yield self.master.data.get(
+                ('buildrequests', build['buildrequestid'])
+            )
+            buildset = yield self.master.data.get(
+                ('buildsets', buildrequest['buildsetid'])
+            )
+
+        br_path = ('/buildrequests/%d?redirect_to_build=true' %
+                   buildrequest['buildrequestid'])
+        defer.returnValue(urlunparse(base_url + (br_path,)))
