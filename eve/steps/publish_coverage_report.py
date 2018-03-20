@@ -400,7 +400,7 @@ class _UploadCoverageReportsMixin(object):
         self.cmd = cmd
         try:
             yield self.runCommand(cmd)
-        except:
+        except Exception:
             file_writer.cancel()
             raise
         finally:
