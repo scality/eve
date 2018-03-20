@@ -1,2 +1,3 @@
+include eve/setup/single_node_heat_template.yml
 include requirements.txt
 recursive-include requirements *.in *.txt
