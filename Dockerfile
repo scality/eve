@@ -37,7 +37,7 @@ COPY requirements/base.txt /tmp/requirements.txt
 RUN pip install -r /tmp/requirements.txt
 
 COPY . /opt/eve
-RUN pip install /opt/eve
+RUN pip install --no-deps /opt/eve
 
 COPY eve/etc/master.cfg /root/eve
 COPY buildbot.tac /root/eve
