@@ -1,14 +1,16 @@
 # This file has been automatically generated, DO NOT EDIT!
 
-# Frozen requirements for "requirements/unit.in"
+# Frozen requirements for "./unit.in"
 
-coverage==4.4.1
+attrs==17.4.0
+coverage==4.5.1
 funcsigs==1.0.2
 mock==2.0.0
 pbr==3.1.1
-py==1.4.34
-pytest==3.2.3
+pluggy==0.6.0
+py==1.5.2
+pytest==3.4.2
 pytest-cov==2.5.1
-setuptools==36.6.0
+setuptools==39.0.1
 six==1.11.0
 

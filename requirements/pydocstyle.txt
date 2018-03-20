@@ -1,6 +1,6 @@
 # This file has been automatically generated, DO NOT EDIT!
 
-# Frozen requirements for "requirements/pydocstyle.in"
+# Frozen requirements for "./pydocstyle.in"
 
 pydocstyle==2.0.0
 six==1.11.0

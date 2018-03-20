@@ -2,6 +2,7 @@
 #
 # to recreate frozen requirements:
 #
+#    $ pip install -U -r requirements.txt
 #    $ tox -e freeze-requirements
 #
 -c constraints.txt
@@ -24,3 +25,21 @@ six                         # used by CodecovIOPublication
 treq                        # used by buildbot for the HTTP service
 xunitparser                 # used by JunitShellCommand
 zope.interface              # used by sentry
+
+# Work around setuptool issues!
+#
+# -> add some development-only libs or sub-dependency packages below.
+# This is a dirty fix required since pip>=9.0.2/setuptools>39
+#
+# Those packages appear in constraints.txt, and were installed by mistake
+# in the base image by the previous versions of pip, even though not used
+# at all.
+#
+# The latest pip/setuptools fixed that (the constrained libs
+# are not installed anymore if not present in the `base.in` file)...
+#
+# ... unfortunately, now eve complains that the libraries are missing
+# upon boot! The truth is out there.
+buildbot-pkg
+pydocstyle
+pyflakes
