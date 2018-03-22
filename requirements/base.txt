@@ -82,7 +82,6 @@ python-openstackclient==3.14.0
 python-swiftclient==3.5.0
 pytz==2018.3
 pyyaml==3.12
-raven==6.6.0
 requests==2.18.4
 requestsexceptions==1.4.0
 rfc3986==1.1.0

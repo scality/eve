@@ -92,7 +92,6 @@ setup(
             'hideStepIfSkipped=eve.util.step:hideStepIfSkipped',
             'hideStepIfSuccess=eve.util.step:hideStepIfSuccess',
             'hideStepIfSuccessOrSkipped=eve.util.step:hideStepIfSuccessOrSkipped',
-            'init_sentry_logging=eve.util.sentry:init_sentry_logging',
             'load_env=eve.util.env:load_env',
             'nextBootstrapBuild=eve.util.next_bootstrap_build:nextBootstrapBuild',
             'password_generator=eve.util.password_generator:password_generator',
