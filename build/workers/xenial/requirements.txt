@@ -91,7 +91,6 @@ python-swiftclient==3.3.0
 pytrie==0.3
 pytz==2017.2
 pyyaml==3.12
-raven==6.1.0
 requests==2.11.1
 requestsexceptions==1.2.0
 sdnotify==0.3.1

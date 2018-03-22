@@ -56,7 +56,6 @@ python-heatclient==1.10.0
 python-swiftclient==3.3.0
 pytz==2017.2
 pyyaml==3.12
-raven==6.1.0
 requests==2.11.1
 requestsexceptions==1.2.0
 service-identity==17.0.0

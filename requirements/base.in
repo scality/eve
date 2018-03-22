@@ -15,9 +15,7 @@ lz4                 # used by buildbot to compress logs
 netifaces           # used by bootstrap job
 packaging           # used by artifacts and YAMLParser
 python-heatclient   # used by HeatOpenStackLatentWorker
-raven               # used by sentry
 requests[security]  # used by step_factory
 six                 # used by CodecovIOPublication
 treq                # used by buildbot for the HTTP service
 xunitparser         # used by JunitShellCommand
-zope.interface      # used by sentry
