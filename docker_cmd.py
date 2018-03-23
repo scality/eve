@@ -61,8 +61,6 @@ else:
 
 _print("checking cloud key mode...")
 openstack_key =  os.environ.get('OS_SSH_KEY', False)
-if openstack_key:
-    subprocess.check_call('chmod 600 $OS_SSH_KEY', shell=True)
 
 if os.environ.get('DEBUG_MODE', '0') in ['true', 'True', '1', 'y', 'yes']:
     _print("starting in debug mode...")
