@@ -205,6 +205,14 @@ class TestCluster(unittest.TestCase):
             self.assertIn('egg', step.rawlog('stdio'))
 
     def test_cancel_non_tip_build(self):
+        """Check that commits that are not on tip of branch are cancelled.
+
+        Steps:
+        - commit twice on a branch
+        - send a webhook to notify the first commit
+        - verify that a build is launched and cancelled immediately
+
+        """
         with Cluster() as cluster:
             repo = cluster.clone()
             repo.push(branch='spam', yaml=SingleCommandYaml('exit 0'))
