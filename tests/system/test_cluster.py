@@ -109,12 +109,16 @@ class TestCluster(unittest.TestCase):
                 (u'shell', u"'exit 0'")])
 
             # Check build properties
-            bootstrap_properties = cluster.api.getw(
+            properties = cluster.api.getw(
                 '/builds/{}'.format(bootstrap_build['buildid']),
                 get_params={'property': '*'})
             from pprint import pprint
-            pprint(bootstrap_properties)
+            pprint(properties)
             # TODO: imagine useful tests with build properties
+            self.assertEqual(properties['properties']['reason'][0],
+                             'force build')
+            self.assertEqual(properties['properties']['reason'][1],
+                             'Force Build Form')
 
     def test_worker_environ(self):
         """Test worker environment.
@@ -210,3 +214,44 @@ class TestCluster(unittest.TestCase):
 
             build = cluster.api.get_finished_build()
             self.assertEqual(build['results'], CANCELLED)
+
+    def test_bootstrap_properties(self):
+        """Check the properties on bootstrap build.
+
+        Steps:
+        - submit a build via webhook
+        - verify that the build runs correctly
+        - check the expected properties are set
+
+        """
+        with Cluster() as cluster:
+            repo = cluster.clone()
+            repo.push(branch='spam', yaml=SingleCommandYaml('exit 0'))
+            cluster.webhook(repo, repo.revision)
+
+            build = cluster.api.get_finished_build()
+            self.assertEqual(build['results'], SUCCESS)
+
+            properties = cluster.api.get_build_properties(build)
+
+            def check_prop(name, value, source=None):
+                self.assertTrue(name in properties)
+                self.assertEqual(properties[name][0], value)
+                if source:
+                    self.assertEqual(properties[name][1], source)
+
+            check_prop('bootstrap', 1, 'set the bootstrap build number')
+            check_prop('branch', 'spam', 'Build')
+            check_prop('buildbot_version', '0.9.12')
+            check_prop('buildername', 'bootstrap', 'Builder')
+            check_prop('buildnumber', 1, 'Build')
+            check_prop('git_host', 'mock', 'Builder')
+            check_prop('git_owner', 'repo_owner', 'Builder')
+            check_prop('git_slug', 'test', 'Builder')
+            check_prop('got_revision', repo.revision, 'Git')
+            check_prop('max_step_duration', 14400, 'Builder')
+            check_prop('project', 'TEST', 'Build')
+            check_prop('repository', 'http://www.example.com/', 'Build')
+            check_prop('revision', repo.revision, 'Build')
+            check_prop('scheduler', 'bootstrap-scheduler', 'Scheduler')
+            check_prop('reason', 'branch updated', 'Scheduler')

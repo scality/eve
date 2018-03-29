@@ -28,7 +28,9 @@ def any_branch_scheduler():
         name=util.env.BOOTSTRAP_SCHEDULER_NAME,
         treeStableTimer=5,
         change_filter=ChangeFilter(branch_re='.+'),  # build only branches
-        builderNames=[util.env.BOOTSTRAP_BUILDER_NAME])
+        builderNames=[util.env.BOOTSTRAP_BUILDER_NAME],
+        reason='branch updated',
+        properties={'reason': 'branch updated'})
 
 
 def force_scheduler():
