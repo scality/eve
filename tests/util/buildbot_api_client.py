@@ -175,6 +175,10 @@ class BuildbotDataAPI(object):
             raise Exception('Timeout while waiting for build to finish')
         return build
 
+    def get_build_properties(self, build):
+        """Return properties from specified build."""
+        return self.get('/builds/%d/properties' % build['number'])[0]
+
     def get_build_steps(self, build):
         """Return steps from specified build."""
         return self.get('/builders/%d/builds/%d/steps' %
