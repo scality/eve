@@ -53,7 +53,7 @@ def convert_to_bytes(size):
 
 
 class EveDockerLatentWorker(AbstractLatentWorker):
-    """Eve version on the DockerLetentWorker.
+    """Eve version on the DockerLatentWorker.
 
     Improved version of DockerLatentWorker using the docker command line client
     instead of docker-py which was the cause of multiple dead locks.
@@ -70,7 +70,7 @@ class EveDockerLatentWorker(AbstractLatentWorker):
                  max_memory, max_cpus, **kwargs):
         # pylint: disable=too-many-arguments
         self.image = image
-        self.master_fqdn = master_fqdn,
+        self.master_fqdn = master_fqdn
         self.pb_port = pb_port
         self.max_memory = max_memory
         self.max_cpus = max_cpus
