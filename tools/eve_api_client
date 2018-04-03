@@ -198,6 +198,10 @@ if __name__ == '__main__':
     parser.add_argument('endpoint',
                         help='api endpoint',
                         metavar='ENDPOINT')
+    parser.add_argument('--dry-run', '-d',
+                        help='Do not really do anything',
+                        default=False,
+                        action='store_true')
     args = parser.parse_args(sys.argv[1:])
 
     githost = 'github' if 'github' in args.base_url else 'bitbucket'
@@ -208,6 +212,9 @@ if __name__ == '__main__':
         token = get_access_token(
             args.username, args.password, args.consumer_key)
 
+    if args.dry_run:
+        pprint.pprint('Dry run activated, the request was not executed')
+        sys.exit(0)
     req = request(
         token,
         args.base_url,
