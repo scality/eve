@@ -4,15 +4,24 @@ command line. To look for help run please run:
 
     eve_api_client --help
 
-A bitbucket OAuth consumer key is required. It can be obtained
-from https://bitbucket.org/account/user/your_username/api, where
-you create a new consumer with the following settings:
-- permissions ->
+An OAuth consumer key is required. It can be obtained from
+the Git host provider:
+
+Bitbucket:
+Go to https://bitbucket.org/account/user/<your_username>/api
+and create a new consumer with the following settings:
+- permissions:
     - account: READ access
     - team membership: READ access
-- callback URL -> address of eve
+- callback URL: address of eve (it does not really matter)
 
-You will be asked to authorize the consumer on the first call.
+Github:
+Go to https://github.com/settings/tokens
+and create a new token with the following settings:
+- description: eve-api-client
+- scopes: user (read:user, user:email and user:follow)
+
+You will be asked to authorize the new consumer on the first call.
 
 Examples:
 
@@ -74,7 +83,7 @@ class AuthCodeRedirectHandler(urllib2.HTTPRedirectHandler):
 
 
 def get_access_token(username, password, consumer):
-    """Get an access token from bitbucket using simple http connection.
+    """Get an access token from Bitbucket.
 
     Args:
         username (str): username of the bitbucket account.
@@ -191,7 +200,13 @@ if __name__ == '__main__':
                         metavar='ENDPOINT')
     args = parser.parse_args(sys.argv[1:])
 
-    token = get_access_token(args.username, args.password, args.consumer_key)
+    githost = 'github' if 'github' in args.base_url else 'bitbucket'
+
+    if githost == 'github':
+        token = args.consumer_key
+    else:
+        token = get_access_token(
+            args.username, args.password, args.consumer_key)
 
     req = request(
         token,
