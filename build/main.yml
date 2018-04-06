@@ -95,6 +95,10 @@ stages:
           name: run docker tests
           command: HOME=/home/eve tox -e docker
           haltOnFailure: True
+      - ShellCommand:
+          name: run kube tests
+          command: HOME=/home/eve tox -e kube
+          haltOnFailure: True
       - Upload:
           source: .htmlcov
           urls:

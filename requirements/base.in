@@ -14,6 +14,8 @@ buildbot_wsgi_dashboards    # used in www dashboards
 buildbot-www                # used in www setup
 buildbot[tls]               # core technology
 flask                       # used in www dashboards
+jinja2                      # used by KubeLatentWorker
+kubernetes                  # used by KubeLatentWorker
 lz4                         # used by buildbot to compress logs
 netifaces                   # used by bootstrap job
 packaging                   # used by artifacts and YAMLParser

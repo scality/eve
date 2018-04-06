@@ -21,12 +21,13 @@ from collections import OrderedDict
 from buildbot.plugins import util
 from buildbot.process.buildstep import BuildStep
 from buildbot.process.properties import Properties
-from buildbot.process.results import FAILURE, SUCCESS
+from buildbot.process.results import SUCCESS
 from buildbot.steps.trigger import Trigger
 from twisted.internet import defer
 
 from ..util.build_order import BaseBuildOrder
 from ..worker.docker.build_order import DockerBuildOrder
+from ..worker.kubernetes.build_order import KubernetesPodBuildOrder
 from ..worker.openstack_heat.build_order import HeatOpenStackBuildOrder
 
 
@@ -35,10 +36,18 @@ class TriggerStages(BuildStep):
 
     def __init__(self, stage_names, **kwargs_for_exec_trigger_stages):
         self.workers = {
-            'local': (BaseBuildOrder, util.env.LOCAL_SCHEDULER_NAME),
-            'docker': (DockerBuildOrder, util.env.DOCKER_SCHEDULER_NAME),
-            'openstack': (HeatOpenStackBuildOrder,
-                          util.env.OPENSTACK_SCHEDULER_NAME)
+            'local': (
+                BaseBuildOrder,
+                util.env.LOCAL_SCHEDULER_NAME),
+            'docker': (
+                DockerBuildOrder,
+                util.env.DOCKER_SCHEDULER_NAME),
+            'kube_pod': (
+                KubernetesPodBuildOrder,
+                util.env.KUBE_POD_SCHEDULER_NAME),
+            'openstack': (
+                HeatOpenStackBuildOrder,
+                util.env.OPENSTACK_SCHEDULER_NAME),
         }
 
         self.stage_names = stage_names
@@ -63,11 +72,12 @@ class TriggerStages(BuildStep):
             stage = conf['stages'][stage_name]
             worker = stage['worker']
 
-            build_order_class, scheduler_name = self.workers.get(
-                worker['type'])
-
-            if build_order_class is None:
-                return FAILURE
+            try:
+                build_order_class, scheduler_name = self.workers.get(
+                    worker['type'])
+            except TypeError:
+                raise ValueError('%r is not a supported worker type' %
+                                 worker['type'])
 
             build_order = build_order_class(
                 scheduler_name, util.env.GIT_REPO,

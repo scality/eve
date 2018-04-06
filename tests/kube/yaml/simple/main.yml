@@ -1,0 +1,34 @@
+---
+version: '0.2'
+
+branches:
+  default:
+    stage: simple-stage
+
+stages:
+  simple-stage:
+    worker:
+      type: kube_pod
+      path: simple/simple.yaml
+      images:
+        test_worker: simple/buildbot-worker
+      vars:
+        a_string: "test string"
+        a_list:
+          - "test list value 1"
+          - "test list value 2"
+        a_dict:
+          k1: "test dict value 1"
+          k2: "test dict value 2"
+    steps:
+      - ShellCommand:
+          name: test sidekick is reachable
+          command: ping -c 1 sidekick
+      - ShellCommand:
+          name: check templating has been applied
+          command: >
+            test ${TEST_STRING} = "test string" &&
+            test ${TEST_LIST_1} = "test list value 1" &&
+            test ${TEST_LIST_2} = "test list value 2" &&
+            test ${TEST_DICT_K1} = "test dict value 1" &&
+            test ${TEST_DICT_K2} = "test dict value 2"
