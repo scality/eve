@@ -17,43 +17,20 @@
 # Boston, MA  02110-1301, USA.
 """Allow eve to use docker workers."""
 
-import re
 import time
 from subprocess import STDOUT, CalledProcessError, check_output
 
 from buildbot.interfaces import (LatentWorkerCannotSubstantiate,
                                  LatentWorkerFailedToSubstantiate)
+from buildbot.plugins import util
 from buildbot.process.properties import Property
 from buildbot.worker.latent import AbstractLatentWorker
 from twisted.internet import defer, threads
 from twisted.logger import Logger
 
 
-def convert_to_bytes(size):
-    try:
-        return int(size)
-    except ValueError:
-        pass
-
-    size = size.upper()
-    m = re.search('^([0-9]+)([BKMG])[BI]?$', size)
-    if not m:
-        raise ValueError('size could not be parsed')
-
-    size_digits = m.group(1)
-    size_unit = m.group(2)
-
-    size_bytes = int(size_digits)
-    for unit in ['B', 'K', 'M', 'G']:
-        if size_unit == unit:
-            break
-        size_bytes = 1024 * size_bytes
-
-    return size_bytes
-
-
 class EveDockerLatentWorker(AbstractLatentWorker):
-    """Eve version on the DockerLetentWorker.
+    """Eve version on the DockerLatentWorker.
 
     Improved version of DockerLatentWorker using the docker command line client
     instead of docker-py which was the cause of multiple dead locks.
@@ -70,7 +47,7 @@ class EveDockerLatentWorker(AbstractLatentWorker):
                  max_memory, max_cpus, **kwargs):
         # pylint: disable=too-many-arguments
         self.image = image
-        self.master_fqdn = master_fqdn,
+        self.master_fqdn = master_fqdn
         self.pb_port = pb_port
         self.max_memory = max_memory
         self.max_cpus = max_cpus
@@ -120,7 +97,8 @@ class EveDockerLatentWorker(AbstractLatentWorker):
         ]
 
         if memory:
-            if convert_to_bytes(memory) > convert_to_bytes(self.max_memory):
+            if (util.convert_to_bytes(memory) >
+                    util.convert_to_bytes(self.max_memory)):
                 self.logger.error('Can not request %s RAM (max allowed %s).' %
                                   (memory, self.max_memory))
                 raise LatentWorkerCannotSubstantiate(

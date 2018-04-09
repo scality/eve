@@ -5,36 +5,9 @@ import unittest
 from buildbot.plugins import util
 
 import eve.setup.workers
-from eve.worker.docker.docker_worker import convert_to_bytes
 
 
 class TestSetupWorkers(unittest.TestCase):
-    def test_convert_to_bytes(self):
-        with self.assertRaises(ValueError):
-            size = convert_to_bytes('notanumber')
-        size = convert_to_bytes('1234')
-        self.assertEquals(size, 1234)
-        size = convert_to_bytes('1B')
-        self.assertEquals(size, 1)
-        size = convert_to_bytes('1b')
-        self.assertEquals(size, 1)
-        size = convert_to_bytes('2K')
-        self.assertEquals(size, 2048)
-        size = convert_to_bytes('2k')
-        self.assertEquals(size, 2048)
-        size = convert_to_bytes('4M')
-        self.assertEquals(size, 4194304)
-        size = convert_to_bytes('4m')
-        self.assertEquals(size, 4194304)
-        size = convert_to_bytes('8G')
-        self.assertEquals(size, 8589934592)
-        size = convert_to_bytes('8g')
-        self.assertEquals(size, 8589934592)
-        size = convert_to_bytes('8gi')
-        self.assertEquals(size, 8589934592)
-        size = convert_to_bytes('8gb')
-        self.assertEquals(size, 8589934592)
-
     def test_local_workers(self):
         util.env = util.load_env([
             ('GIT_SLUG', 'slug'),
@@ -48,7 +21,7 @@ class TestSetupWorkers(unittest.TestCase):
         util.env = util.load_env([
             ('ARTIFACTS_PREFIX', 'foo_'),
             ('ARTIFACTS_PUBLIC_URL', 'foo.bar.baz'),
-            ('DOCKER_CONTAINER_MAX_CPU', 4),
+            ('DOCKER_CONTAINER_MAX_CPU', '4'),
             ('DOCKER_CONTAINER_MAX_MEMORY', '4G'),
             ('EXTERNAL_PB_PORT', '12345'),
             ('GIT_SLUG', 'slug'),
@@ -57,6 +30,20 @@ class TestSetupWorkers(unittest.TestCase):
             ('SUFFIX', '_foo'),
         ])
         workers = eve.setup.workers.docker_workers()
+        self.assertEquals(len(workers), 3)
+
+    def test_kube_pod_workers(self):
+        util.env = util.load_env([
+            ('KUBE_POD_MAX_CPU', '4'),
+            ('KUBE_POD_MAX_MEMORY', '4G'),
+            ('KUBE_POD_NAMESPACE', 'spameggbacon'),
+            ('KUBE_POD_NODE_AFFINITY', 'pool:worker'),
+            ('EXTERNAL_PB_PORT', '12345'),
+            ('MASTER_FQDN', 'foo'),
+            ('MAX_KUBE_POD_WORKERS', 3),
+            ('SUFFIX', '_foo'),
+        ])
+        workers = eve.setup.workers.kube_pod_workers()
         self.assertEquals(len(workers), 3)
 
     def test_openstack_workers(self):

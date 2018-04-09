@@ -85,7 +85,10 @@ setup(
         ],
         'buildbot.util': [
             'BaseBuildOrder=eve.util.build_order:BaseBuildOrder',
+            'BaseDockerBuildOrder=eve.util.build_order:BaseDockerBuildOrder',
             'Patcher=eve.steps.patcher:Patcher',
+            'convert_to_bytes=eve.util.convert:convert_to_bytes',
+            'convert_to_cpus=eve.util.convert:convert_to_cpus',
             'env=eve.util.env:SETTINGS',
             'get_local_jobs=eve.util.local_jobs:get_local_jobs',
             'get_secrets=eve.util.env:get_secrets',
@@ -101,6 +104,7 @@ setup(
         'buildbot.worker': [
             'EveDockerLatentWorker=eve.worker.docker.docker_worker:EveDockerLatentWorker',
             'HeatLatentWorker=eve.worker.openstack_heat.openstack_heat_worker:HeatLatentWorker',
+            'EveKubeLatentWorker=eve.worker.kubernetes.kubernetes_worker:EveKubeLatentWorker'
         ]
     },
     zip_safe=False

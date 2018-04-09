@@ -16,6 +16,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor,
 # Boston, MA  02110-1301, USA.
 
+from collections import namedtuple
 from os.path import abspath, dirname, join
 
 from buildbot import version
@@ -49,6 +50,31 @@ def docker_workers():
                 max_memory=util.env.DOCKER_CONTAINER_MAX_MEMORY,
                 max_cpus=util.env.DOCKER_CONTAINER_MAX_CPU,
                 image=Property('docker_image'),
+                keepalive_interval=300,
+            ))
+    return workers
+
+
+def kube_pod_workers():
+    workers = []
+    NodeAffinity = namedtuple('NodeAffinity', ('key', 'value'))
+    node_affinity = None
+    if util.env.KUBE_POD_NODE_AFFINITY:
+        node_affinity = NodeAffinity(
+            *util.env.KUBE_POD_NODE_AFFINITY.split(':'))
+
+    for i in range(util.env.MAX_KUBE_POD_WORKERS):
+        workers.append(
+            worker.EveKubeLatentWorker(
+                'kw%03d-%s' % (i, util.env.SUFFIX),
+                password=util.password_generator(),
+                master_fqdn=util.env.MASTER_FQDN,
+                pb_port=util.env.EXTERNAL_PB_PORT,
+                namespace=util.env.KUBE_POD_NAMESPACE,
+                node_affinity=node_affinity,
+                max_memory=util.env.KUBE_POD_MAX_MEMORY,
+                max_cpus=util.env.KUBE_POD_MAX_CPU,
+                kube_config=None,
                 keepalive_interval=300,
             ))
     return workers

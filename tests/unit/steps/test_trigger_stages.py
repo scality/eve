@@ -26,6 +26,7 @@ class TestTriggerStages(unittest.TestCase):
         util.env = util.load_env([
             ('LOCAL_SCHEDULER_NAME', 'foo'),
             ('DOCKER_SCHEDULER_NAME', 'bar'),
+            ('KUBE_POD_SCHEDULER_NAME', 'baz'),
             ('OPENSTACK_SCHEDULER_NAME', 'foo')
         ])
 

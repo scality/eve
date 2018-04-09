@@ -16,17 +16,13 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor,
 # Boston, MA  02110-1301, USA.
 
-from hashlib import sha1
 from os import path
-from time import time
 
-import buildbot
-from buildbot.plugins import steps, util
+from buildbot.plugins import util
 from buildbot.process.properties import Interpolate
-from twisted.internet import defer
 
 
-class DockerBuildOrder(util.BaseBuildOrder):
+class DockerBuildOrder(util.BaseDockerBuildOrder):
     """Base class representing a build to trigger on a Docker container.
 
     Scheduler, properties and docker config.
@@ -53,110 +49,13 @@ class DockerBuildOrder(util.BaseBuildOrder):
         worker_path = self._worker.get('path', None)
         self.properties['worker_path'] = (worker_path, 'DockerBuildOrder')
 
-        full_docker_path = '%s/build/%s' % (
-            self.properties['master_builddir'][0],
-            worker_path,
-        )
-
         if util.env.DOCKER_HOOK_IN_USE:
             if worker_path in util.env.DOCKER_HOOK_WORKERS.split(';'):
                 self.properties['docker_hook'] = (
                     util.env.DOCKER_HOOK_VERSION,
                     'DockerBuildOrder')
 
-        # image name is last dir name + hash of path to avoid collisions
-        basename = "{0}_{1}".format(
-            path.basename(worker_path),
-            sha1(worker_path).hexdigest()[:4])
-
-        use_registry = bool(util.env.DOCKER_REGISTRY_URL)
-
-        def should_build(step):
-            if not use_registry:
-                # No docker registry, always build
-                return True
-            image_exists = step.getProperty(
-                'exists_' + basename, False)
-            return not image_exists
-
-        if use_registry:
-            self.preliminary_steps.append(steps.DockerComputeImageFingerprint(
-                label=basename,
-                context_dir=full_docker_path,
-                hideStepIf=util.hideStepIfSuccess
-            ))
-
-            image = Interpolate('{0}/{1}:%(prop:fingerprint_{1})s'.format(
-                util.env.DOCKER_REGISTRY_URL, basename))
-
-            self.preliminary_steps.append(steps.DockerCheckLocalImage(
-                label=basename,
-                image=image,
-                hideStepIf=util.hideStepIfSuccess
-            ))
-
-            self.preliminary_steps.append(steps.DockerPull(
-                label=basename,
-                image=image,
-                doStepIf=should_build,
-                hideStepIf=util.hideStepIfSuccessOrSkipped
-            ))
-        else:
-            image = '%s-%06d' % (
-                self.properties['worker_path'][0],
-                self.properties['buildnumber'][0],
-            )
-
-        self.properties['docker_image'] = (image, 'DockerBuildOrder')
-
-        common_args = {
-            'label': basename,
-            'image': image,
-            'dockerfile': self._worker.get('dockerfile'),
-            'workdir': full_docker_path,
-            'build_args': {
-                'BUILDBOT_VERSION': buildbot.version
-            },
-            'labels': {
-                'eve.build.ts': '{0:.0f}'.format(time())
-            }
-        }
-
-        self.preliminary_steps.append(steps.DockerBuild(
-            flunkOnFailure=False,
-            haltOnFailure=False,
-            hideStepIf=util.hideStepIfSuccessOrSkipped,
-            doStepIf=should_build,
-            **common_args
-        ))
-
-        # Workaround EVE-215
-        # The previous docker build could fail because:
-        # - the dockerfile is incorrect
-        # - the remote sources are unavailable
-        # - or we hit EVE-215, and the previous image in cache
-        #   is not reliable
-        # In all cases, try again once and ignore cached images (nocache)
-
-        @defer.inlineCallbacks
-        def is_prev_build_failed(step):
-            prec_failed_image = step.getProperty('DockerBuildFailed', '')
-            current_image = yield step.build.render(step.image)
-            defer.returnValue(prec_failed_image == current_image)
-
-        self.preliminary_steps.append(steps.DockerBuild(
-            name='[{0}] build retry'.format(basename)[0:49],
-            is_retry=True,
-            hideStepIf=util.hideStepIfSkipped,
-            doStepIf=is_prev_build_failed,
-            **common_args
-        ))
-        # end of workaround
-
-        if use_registry:
-            self.preliminary_steps.append(steps.DockerPush(
-                label=basename,
-                image=image,
-                doStepIf=should_build,
-                hideStepIf=util.hideStepIfSuccessOrSkipped
-            ))
+        self.properties['docker_image'] = (
+            self._build_image(path.basename(worker_path), worker_path),
+            'DockerBuildOrder',
+        )

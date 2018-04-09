@@ -26,7 +26,22 @@ from twisted.internet import defer
 DOCKER_BUILD_LOCK = MasterLock('docker_build')
 
 
-class DockerBuild(MasterShellCommand):
+class DockerStep(MasterShellCommand):
+    def __init__(self, label, image, command, **kwargs):
+        self.label = label
+        self.image = image
+        super(DockerStep, self).__init__(command, logEnviron=False, **kwargs)
+
+    def __hash__(self):
+        return hash(self.image)
+
+    def __eq__(self, other):
+        return (isinstance(other, self.__class__) and
+                self.image == other.image and
+                self.label == other.label)
+
+
+class DockerBuild(DockerStep):
     """Build a Docker image.
 
     Parameters:
@@ -51,7 +66,6 @@ class DockerBuild(MasterShellCommand):
                  labels=None, build_args=None, **kwargs):
         kwargs.setdefault('name',
                           '[{0}] build'.format(label)[0:49])
-        self.image = image
         self.is_retry = is_retry
         kwargs.setdefault('locks', []).append(
             DOCKER_BUILD_LOCK.access('exclusive')
@@ -81,7 +95,7 @@ class DockerBuild(MasterShellCommand):
 
         command += ['.']
 
-        super(DockerBuild, self).__init__(command, logEnviron=False, **kwargs)
+        super(DockerBuild, self).__init__(label, image, command, **kwargs)
 
     def isNewStyle(self):  # flake8: noqa
         # needed because we redefine `run` below
@@ -95,16 +109,12 @@ class DockerBuild(MasterShellCommand):
                 'DockerBuildFailed', self.image, self.name, runtime=True)
         defer.returnValue(result)
 
-    def __hash__(self):
-        return hash(self.image)
-
     def __eq__(self, other):
-        return (isinstance(other, DockerBuild) and
-                self.image == other.image and
-                (self.is_retry) == (other.is_retry))
+        return (super(DockerBuild, self).__eq__(other) and
+                self.is_retry == other.is_retry)
 
 
-class DockerCheckLocalImage(MasterShellCommand):
+class DockerCheckLocalImage(DockerStep):
     """Check for existence of a Docker image locally.
 
     Look up the fingerprint of given image in local images, and sets
@@ -125,10 +135,8 @@ class DockerCheckLocalImage(MasterShellCommand):
         kwargs.setdefault('locks', []).append(
             DOCKER_BUILD_LOCK.access('exclusive')
         )
-        self.label = label
         super(DockerCheckLocalImage, self).__init__(
-            ['docker', 'image', 'inspect', image],
-            logEnviron=False, **kwargs)
+            label, image, ['docker', 'image', 'inspect', image], **kwargs)
 
     def isNewStyle(self):  # flake8: noqa
         # needed because we redefine `run` below
@@ -145,7 +153,7 @@ class DockerCheckLocalImage(MasterShellCommand):
         defer.returnValue(SUCCESS)
 
 
-class DockerComputeImageFingerprint(MasterShellCommand):
+class DockerComputeImageFingerprint(DockerStep):
     """Compute the fingerprint of a docker context.
 
     This step computes the sha256 fingerprint of an image given its context
@@ -161,12 +169,12 @@ class DockerComputeImageFingerprint(MasterShellCommand):
     def __init__(self, label, context_dir, **kwargs):
         kwargs.setdefault('name',
                           '[{0}] fingerprint'.format(label)[:49])
-        self.label = label
         super(DockerComputeImageFingerprint, self).__init__(
+            label, context_dir,
             'tar -c --mtime="1990-02-11 00:00Z" --group=0 ' \
             '--owner=0 --numeric-owner --sort=name --mode=0 . ' \
             '| sha256sum | cut -f 1 -d " "',
-            workdir=context_dir, logEnviron=False, **kwargs
+            workdir=context_dir, **kwargs
         )
         self.observer = logobserver.BufferLogObserver(wantStdout=True,
                                                       wantStderr=True)
@@ -191,7 +199,7 @@ class DockerComputeImageFingerprint(MasterShellCommand):
         defer.returnValue(result)
 
 
-class DockerPull(MasterShellCommand):
+class DockerPull(DockerStep):
     """Pull an image from a registry.
 
     This step attempts to pull an image from a registry referenced in the
@@ -211,10 +219,8 @@ class DockerPull(MasterShellCommand):
         kwargs.setdefault('locks', []).append(
             DOCKER_BUILD_LOCK.access('exclusive')
         )
-        self.label = label
         super(DockerPull, self).__init__(
-            ['docker', 'pull', image],
-            logEnviron=False, **kwargs)
+            label, image, ['docker', 'pull', image], **kwargs)
 
     def isNewStyle(self):  # flake8: noqa
         # needed because we redefine `run` below
@@ -231,7 +237,7 @@ class DockerPull(MasterShellCommand):
         defer.returnValue(SUCCESS)
 
 
-class DockerPush(MasterShellCommand):
+class DockerPush(DockerStep):
     """Push a Docker image to the custom registry.
 
     This step attempts to push an image to a registry referenced in the
@@ -253,13 +259,6 @@ class DockerPush(MasterShellCommand):
         kwargs.setdefault('locks', []).append(
             DOCKER_BUILD_LOCK.access('exclusive')
         )
-        self.image = image
-        super(DockerPush, self).__init__(['docker', 'push', image],
-                                         logEnviron=False, **kwargs)
-
-    def __hash__(self):
-        return hash(self.image)
-
-    def __eq__(self, other):
-        return (isinstance(other, DockerPush) and
-                self.image == other.image)
+        super(DockerPush, self).__init__(label, image,
+                                         ['docker', 'push', image],
+                                         **kwargs)
