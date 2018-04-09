@@ -262,7 +262,7 @@ class EveKubeLatentWorker(AbstractLatentWorker):
             raise
         except Exception as excp:
             raise LatentWorkerCannotSubstantiate(
-                'Anable to validate pod config %s (%s)' % (self.template_path,
+                'Unable to validate pod config %s (%s)' % (self.template_path,
                                                            excp))
 
         res = yield threads.deferToThread(
