@@ -52,7 +52,7 @@ class EveKubeLatentWorker(AbstractLatentWorker):
 
     def checkConfig(self, name, password, master_fqdn, pb_port,
                     namespace, node_affinity, max_memory, max_cpus,
-                    kube_config, **kwargs):
+                    active_deadline, kube_config, **kwargs):
         """Ensure we have the kubernetes client available."""
         # Set build_wait_timeout to 0 if not explicitly set: Starting a
         # container is almost immediate, we can afford doing so for each build.
@@ -64,7 +64,7 @@ class EveKubeLatentWorker(AbstractLatentWorker):
 
     def reconfigService(self, name, password, master_fqdn, pb_port,
                         namespace, node_affinity, max_memory, max_cpus,
-                        kube_config, **kwargs):
+                        active_deadline, kube_config, **kwargs):
         # Set build_wait_timeout to 0 if not explicitly set: Starting a
         # container is almost immediate, we can afford doing so for each build.
         kwargs.setdefault('build_wait_timeout', 0)
@@ -76,6 +76,7 @@ class EveKubeLatentWorker(AbstractLatentWorker):
         self.pb_port = pb_port
         self.max_memory = max_memory
         self.max_cpus = max_cpus
+        self.deadline = active_deadline
         return AbstractLatentWorker.reconfigService(self, name, password,
                                                     **kwargs)
 
@@ -230,6 +231,16 @@ class EveKubeLatentWorker(AbstractLatentWorker):
                 'Total cpu limit for pod can\'t exceed %s!' %
                 self.max_cpus)
 
+    def enforce_active_deadline(self, pod):
+        """Prevent stuck pod by setting an active deadline on it."""
+        if 'activeDeadlineSeconds' in pod['spec']:
+            if pod['spec']['activeDeadlineSeconds'] > self.deadline:
+                raise LatentWorkerCannotSubstantiate(
+                    'activeDeadlineSeconds must be set to a value lower than '
+                    '%d in %s' % (self.deadline, self.template_path))
+        else:
+            pod['spec']['activeDeadlineSeconds'] = self.deadline
+
     @defer.inlineCallbacks
     def start_instance(self, build):
         if self.instance is not None:
@@ -246,6 +257,7 @@ class EveKubeLatentWorker(AbstractLatentWorker):
             self.add_common_worker_env_vars(pod, build)
             self.add_common_worker_metadata(pod, build)
             self.enforce_resource_limits(pod)
+            self.enforce_active_deadline(pod)
         except LatentWorkerCannotSubstantiate:
             raise
         except Exception as excp:

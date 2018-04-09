@@ -76,6 +76,7 @@ def kube_pod_workers():
                 max_cpus=util.env.KUBE_POD_MAX_CPU,
                 kube_config=None,
                 keepalive_interval=300,
+                active_deadline=util.env.KUBE_POD_ACTIVE_DEADLINE,
             ))
     return workers
 

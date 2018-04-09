@@ -34,6 +34,7 @@ class TestSetupWorkers(unittest.TestCase):
 
     def test_kube_pod_workers(self):
         util.env = util.load_env([
+            ('KUBE_POD_ACTIVE_DEADLINE', '3600'),
             ('KUBE_POD_MAX_CPU', '4'),
             ('KUBE_POD_MAX_MEMORY', '4G'),
             ('KUBE_POD_NAMESPACE', 'spameggbacon'),
