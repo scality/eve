@@ -52,7 +52,8 @@ class EveKubeLatentWorker(AbstractLatentWorker):
 
     def checkConfig(self, name, password, master_fqdn, pb_port,
                     namespace, node_affinity, max_memory, max_cpus,
-                    active_deadline, kube_config, **kwargs):
+                    microservice_gitcache, active_deadline, kube_config,
+                    **kwargs):
         """Ensure we have the kubernetes client available."""
         # Set build_wait_timeout to 0 if not explicitly set: Starting a
         # container is almost immediate, we can afford doing so for each build.
@@ -64,7 +65,8 @@ class EveKubeLatentWorker(AbstractLatentWorker):
 
     def reconfigService(self, name, password, master_fqdn, pb_port,
                         namespace, node_affinity, max_memory, max_cpus,
-                        active_deadline, kube_config, **kwargs):
+                        microservice_gitcache, active_deadline, kube_config,
+                        **kwargs):
         # Set build_wait_timeout to 0 if not explicitly set: Starting a
         # container is almost immediate, we can afford doing so for each build.
         kwargs.setdefault('build_wait_timeout', 0)
@@ -76,6 +78,7 @@ class EveKubeLatentWorker(AbstractLatentWorker):
         self.pb_port = pb_port
         self.max_memory = max_memory
         self.max_cpus = max_cpus
+        self.microservice_gitcache = microservice_gitcache
         self.deadline = active_deadline
         return AbstractLatentWorker.reconfigService(self, name, password,
                                                     **kwargs)
@@ -139,6 +142,19 @@ class EveKubeLatentWorker(AbstractLatentWorker):
                                 'key': self.node_affinity.key,
                                 'operator': 'In',
                                 'values': [self.node_affinity.value]}]}]}}}
+
+    def enforce_gitconfig(self, pod):
+        """Implicitly set the git config in every containers."""
+        if not self.microservice_gitcache:
+            return
+        volume = {'name': 'gitconfig', 'configMap': {'name': 'gitconfig'}}
+        volume_mount = {'name': 'gitconfig', 'mountPath': '/etc/gitconfig',
+                        'subPath': 'gitconfig'}
+        pod['spec'].setdefault('volumes', [])
+        pod['spec']['volumes'].append(volume)
+        for container in pod['spec']['containers']:
+            container.setdefault('volumeMounts', [])
+            container['volumeMounts'].append(volume_mount)
 
     def add_common_worker_env_vars(self, pod, build):
         """Set eve workers env vars in each containers of the pod."""
@@ -254,6 +270,7 @@ class EveKubeLatentWorker(AbstractLatentWorker):
             pod = self.get_pod_config(build)
             self.enforce_restart_policy(pod)
             self.enforce_affinity_policy(pod)
+            self.enforce_gitconfig(pod)
             self.add_common_worker_env_vars(pod, build)
             self.add_common_worker_metadata(pod, build)
             self.enforce_resource_limits(pod)

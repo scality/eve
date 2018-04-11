@@ -41,6 +41,7 @@ class TestSetupWorkers(unittest.TestCase):
             ('KUBE_POD_NODE_AFFINITY', 'pool:worker'),
             ('EXTERNAL_PB_PORT', '12345'),
             ('MASTER_FQDN', 'foo'),
+            ('MICROSERVICE_GITCACHE_IN_USE', '1'),
             ('MAX_KUBE_POD_WORKERS', 3),
             ('SUFFIX', '_foo'),
         ])
