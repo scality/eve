@@ -36,7 +36,7 @@ apt-get install -y \
          python-dev \
          python-pip
 
-pip install --upgrade pip
+pip install pip==9.0.1
 pip install tox==2.3.2
 
 # install tooling for kubernetes tests
