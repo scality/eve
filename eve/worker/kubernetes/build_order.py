@@ -36,8 +36,6 @@ class KubernetesPodBuildOrder(util.BaseDockerBuildOrder):
         full_worker_path = '%s/build/%s' % (
             self.properties['master_builddir'][0], worker_path)
 
-        # TODO replace open with uploadFile to make it work
-        # from all workers see yaml_parser
         with open(full_worker_path, 'r') as template:
             self.properties['worker_template'] = (
                 template.read(), 'KubernetesPodBuildOrder')
