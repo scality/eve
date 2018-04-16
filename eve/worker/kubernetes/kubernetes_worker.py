@@ -18,6 +18,7 @@
 """Allow eve to use kubernetes pods as workers."""
 
 import socket
+from time import sleep
 
 import yaml
 from buildbot import config
@@ -32,14 +33,72 @@ from twisted.logger import Logger
 try:
     from kubernetes import config as kube_config
     from kubernetes import client
+    from kubernetes.client.rest import ApiException
 except ImportError:
     client = None
+
+
+class KubePodWorkerCannotSubstantiate(LatentWorkerCannotSubstantiate):
+    """Fatal kubernetes pod substantiation error.
+
+    This Exception will put the build in `Exception` state with state_string
+    'worker cannot substantiate'.
+    It will try to display as much information as possible on this failure to
+    the end user.
+    This exception doesn't trigger a retry of the calling build.
+
+    """
+
+    def __init__(self, fmt, instance):
+        self.pod = instance.metadata.name
+        self.status = instance.status
+        self.message = '%s: %%s' % (fmt % {
+            'pod': self.pod,
+            'phase': self.status.phase,
+        })
+
+        # Try to get all information on the error
+        error = None
+        if self.status.phase != 'Running':
+            error = self.status.message or self.status.reason
+
+        if not error:
+            for container in self.status.container_statuses:
+                if container.ready:
+                    continue
+                if container.state.waiting:
+                    msg = (container.state.waiting.message or
+                           container.state.waiting.reason)
+                    if msg:
+                        error = '%s is waiting (%s)' % (container.name,
+                                                        msg)
+                elif container.state.terminated:
+                    msg = (container.state.terminated.message or
+                           container.state.terminated.reason)
+                    if msg:
+                        error = ('%s terminated with exit code \'%d\' (%s)' %
+                                 (container.name,
+                                  container.state.terminated.exit_code,
+                                  msg))
+
+                    if container.state.terminated.reason == 'Error':
+                        log = client.CoreV1Api().read_namespaced_pod_log(
+                            self.pod,
+                            instance.metadata.namespace,
+                            container=container.name,
+                            tail_lines=10,
+                        )
+                        error += '\n\n %s' % log
+
+        self.message = self.message % (error or 'Unknown error')
+        super(KubePodWorkerCannotSubstantiate, self).__init__(self.message)
 
 
 class EveKubeLatentWorker(AbstractLatentWorker):
 
     logger = Logger('eve.workers.EveKubeLatentWorker')
     instance = None
+    _poll_resolution = 2
 
     def load_config(self):
         try:
@@ -92,24 +151,24 @@ class EveKubeLatentWorker(AbstractLatentWorker):
                 images=build.getProperty('worker_images'),
                 vars=build.getProperty('worker_vars'),
             )
-        except Exception as excp:
+        except Exception as ex:
             raise LatentWorkerCannotSubstantiate(
-                'Unable to render %s (%s)' % (self.template_path, excp))
+                'Unable to render %s (%s)' % (self.template_path, ex))
 
         try:
             pod = yaml.load(rendered_body)
-        except Exception as excp:
+        except Exception as ex:
             raise LatentWorkerCannotSubstantiate(
                 'Unable to read yaml from %s (%s)' % (self.template_path,
-                                                      excp))
+                                                      ex))
 
         try:
             assert pod['kind'] == 'Pod'
             assert pod['spec']['containers']
-        except Exception as excp:
+        except Exception as ex:
             raise LatentWorkerCannotSubstantiate(
                 '%s is not a valid Kuberbetes pod '
-                'definition (%s)' % (self.template_path, excp))
+                'definition (%s)' % (self.template_path, ex))
 
         return pod
 
@@ -277,10 +336,10 @@ class EveKubeLatentWorker(AbstractLatentWorker):
             self.enforce_active_deadline(pod)
         except LatentWorkerCannotSubstantiate:
             raise
-        except Exception as excp:
+        except Exception as ex:
             raise LatentWorkerCannotSubstantiate(
                 'Unable to validate pod config %s (%s)' % (self.template_path,
-                                                           excp))
+                                                           ex))
 
         res = yield threads.deferToThread(
             self._thd_start_instance,
@@ -296,21 +355,35 @@ class EveKubeLatentWorker(AbstractLatentWorker):
         self.logger.debug('Starting pod with config:\n%s' %
                           yaml.dump(pod, default_flow_style=False))
         try:
-            self.instance = client.CoreV1Api().create_namespaced_pod(
-                namespace, pod)
-        except Exception as excp:
+            instance = client.CoreV1Api().create_namespaced_pod(namespace,
+                                                                pod)
+        except ApiException as ex:
             raise LatentWorkerCannotSubstantiate(
-                'Failed to start pod (%s)' % excp)
+                'Failed to create pod %s: %s' % (pod.metadata.name,
+                                                 ex.reason))
 
-        if self.instance is None:
-            self.logger.error('Failed to create the container')
-            raise LatentWorkerFailedToSubstantiate(
-                'Failed to start pod'
-            )
+        # Wait for pod to be running
+        duration = 0
+        while instance.status.phase in ['Pending', None]:
+            sleep(self._poll_resolution)
+            duration += self._poll_resolution
+            try:
+                instance = client.CoreV1Api().read_namespaced_pod_status(
+                    instance.metadata.name, namespace)
+            except ApiException as ex:
+                raise LatentWorkerFailedToSubstantiate(
+                    'Pod %s went missing: %s' % (instance.metadata.name,
+                                                 ex.reason))
 
+        # Ensure the pod is running
+        if instance.status.phase != 'Running':
+            raise KubePodWorkerCannotSubstantiate(
+                'Pod %(pod)s is not running (%(phase)s)', instance)
         self.logger.debug('Pod created, id: %s...' %
-                          self.instance.metadata.name)
-        return self.instance.metadata.name
+                          instance.metadata.name)
+
+        self.instance = instance
+        return instance.metadata.name
 
     def stop_instance(self, fast=False):
         assert not fast
