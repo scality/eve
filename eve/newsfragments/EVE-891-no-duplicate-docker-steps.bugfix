@@ -1,0 +1,1 @@
+No longer duplicate the docker steps launched before a TriggerStage.
