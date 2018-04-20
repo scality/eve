@@ -19,6 +19,7 @@ Welcome to Eve's documentation!
    metabase
    faq
    troubleshooting
+   relnotes
 
 
 Indices and tables

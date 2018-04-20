@@ -1,0 +1,4 @@
+[tool.towncrier]
+package = "eve"
+filename = "doc/source/relnotes.rst"
+template = "doc/source/relnotes.rst.jinja"
