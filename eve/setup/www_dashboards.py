@@ -54,19 +54,19 @@ class DashboardsConfig(object):
             yield full_data
 
 
-def metabase_dashboard(conf):
+def link_dashboard(conf):
     """Return a Buildbot WSGI dashboard.
 
-    This method creates a Flask application serving a metabase
-    dashboard inside a buildbot dashboard.
+    This method creates a Flask application serving a dashboard inside
+    a buildbot dashboard.
 
     Args:
-      conf (dict): configuration of metabase dashboard to serve,
+      conf (dict): configuration of dashboard to serve,
         with the following keys:
         - caption: label of dashboard in buildbot menu
-        - id: unique identifier of the metabase dashboard to serve
+        - id: unique identifier of the dashboard to serve
         - name: unique identifier of the buildbot dashboard
-        - site_url: address of metabase instance
+        - site_url: address of service instance
         - order (optional): order of dashboard in buildbot menu
         - icon (optional): icon to display next to label in buildbot menu
         - frameborder (optional): border of iframe in buildbot interface
@@ -90,18 +90,26 @@ def metabase_dashboard(conf):
 
     @app.route("/index.html")
     def index():
-        payload = {
-            "resource": {"dashboard": dashboard_id},
-            "params": {}
-        }
-        token = jwt.encode(payload, conf['secret_key'], algorithm="HS256")
         border = conf.get('frameborder', "0")
+        url = None
 
-        url = '{site_url}/embed/dashboard/{token}' \
-              '#bordered={bordered}&titled=false'.format(
-                  site_url=site_url,
-                  token=token,
-                  bordered='true' if border else 'false')
+        if conf['type'] == 'metabase':
+            payload = {
+                "resource": {"dashboard": dashboard_id},
+                "params": {}
+            }
+            token = jwt.encode(payload, conf['secret_key'], algorithm="HS256")
+
+            url = '{site_url}/embed/dashboard/{token}' \
+                  '#bordered={bordered}&titled=false'.format(
+                      site_url=site_url,
+                      token=token,
+                      bordered='true' if border else 'false')
+        else:
+            url = '{site_url}' \
+                  '#bordered={bordered}&titled=false'.format(
+                      site_url=site_url,
+                      bordered='true' if border else 'false')
 
         return '<iframe src="{url}" frameborder="{border}" ' \
                'width="{width}" height="{height}" ' \
@@ -128,8 +136,8 @@ def wsgi_dashboards():
     config = DashboardsConfig(util.env['DASHBOARDS_FILE_PATH'])
 
     for conf in config.iter():
-        if conf['type'] == 'metabase':
-            dashboard = metabase_dashboard(conf)
+        if conf['type'] in ('standard', 'metabase'):
+            dashboard = link_dashboard(conf)
         else:
             logger.error(
                 'Unknown dashboard type while loading dashboards '
