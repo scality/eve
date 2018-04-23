@@ -17,10 +17,12 @@
 # Boston, MA  02110-1301, USA.
 """Steps used to set overridable properties."""
 
-from buildbot.process.results import SKIPPED
+from buildbot.process.results import SKIPPED, SUCCESS
 from buildbot.steps.master import SetProperty
 from buildbot.steps.shell import SetPropertyFromCommand
 from twisted.internet import defer
+
+from eve.process.bootstrap import BootstrapMixin
 
 
 class EvePropertyMixin:
@@ -44,6 +46,29 @@ class EvePropertyMixin:
                     return cls.run(self)
             raise AttributeError("'%s' object has no attribute 'run'" %
                                  self.__class__)
+
+
+class SetBootstrapProperty(SetProperty, BootstrapMixin):
+    name = 'SetBootstrapProperty'
+
+    @defer.inlineCallbacks
+    def run(self):
+        yield self.setBootstrapProperty(self.build.buildid, self.property,
+                                        self.value, self.name)
+        defer.returnValue(SUCCESS)
+
+
+class SetBootstrapPropertyFromCommand(SetPropertyFromCommand,
+                                      BootstrapMixin):
+    name = 'SetBootstrapPropertyFromCommand'
+
+    @defer.inlineCallbacks
+    def setProperty(self, property, value, _):
+        res = yield self.setBootstrapProperty(
+            self.build.buildid, property, value,
+            self.name
+        )
+        defer.returnValue(res)
 
 
 class EveProperty(EvePropertyMixin, SetProperty):

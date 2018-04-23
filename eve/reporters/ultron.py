@@ -24,10 +24,12 @@ from buildbot.util.httpclientservice import HTTPClientService
 from twisted.internet import defer
 from twisted.logger import Logger
 
+from eve.process.bootstrap import BootstrapMixin
 from eve.reporters.base import BaseBuildStatusPush, BuildStatusPushMixin
 
 
-class UltronBuildStatusPush(BaseBuildStatusPush, BuildStatusPushMixin):
+class UltronBuildStatusPush(BaseBuildStatusPush, BuildStatusPushMixin,
+                            BootstrapMixin):
     """Send build result to Scality Ultron status API."""
 
     name = 'UltronBuildStatusPush'
@@ -88,24 +90,8 @@ class UltronBuildStatusPush(BaseBuildStatusPush, BuildStatusPushMixin):
     @defer.inlineCallbacks
     def _get_root_buildrequest_url_for(self, build):
         base_url = urlparse(build['url'])[:-1]
-        buildrequest = yield self.master.data.get(
-            ('buildrequests', build['buildrequestid'])
-        )
-        buildset = yield self.master.data.get(
-            ('buildsets', buildrequest['buildsetid'])
-        )
-
-        while buildset['parent_buildid'] is not None:
-            build = yield self.master.data.get(
-                ('builds', buildset['parent_buildid'])
-            )
-            buildrequest = yield self.master.data.get(
-                ('buildrequests', build['buildrequestid'])
-            )
-            buildset = yield self.master.data.get(
-                ('buildsets', buildrequest['buildsetid'])
-            )
-
+        bootstrap_buildrequest = \
+            yield self.getBootstrapBuildRequest(build['buildid'])
         br_path = ('/buildrequests/%d?redirect_to_build=true' %
-                   buildrequest['buildrequestid'])
+                   bootstrap_buildrequest['buildrequestid'])
         defer.returnValue(urlunparse(base_url + (br_path,)))

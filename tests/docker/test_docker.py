@@ -99,10 +99,24 @@ class TestDockerCluster(unittest.TestCase):
         with Cluster() as cluster:
             local_repo = cluster.clone()
             local_repo.push(
-                yaml=SingleCommandYaml(
-                    'exit 0',
-                    worker={'type': 'docker',
-                            'path': 'ubuntu-xenial-ctxt'}),
+                yaml=PreMerge(
+                    steps=[
+                        {
+                            'SetBootstrapProperty': {
+                                'property': 'prop',
+                                'value': 'value'
+                            }
+                        }, {
+                            'SetBootstrapPropertyFromCommand': {
+                                'property': 'cmd_prop',
+                                'command': 'echo value'
+                            }
+                        }
+                    ],
+                    worker={
+                        'type': 'docker',
+                        'path': 'ubuntu-xenial-ctxt'
+                    }),
                 dirs=[
                     abspath(
                         join(__file__, pardir, 'contexts',
@@ -111,6 +125,12 @@ class TestDockerCluster(unittest.TestCase):
             cluster.sanity_check()
             buildset = cluster.api.force(branch=local_repo.branch)
             self.assertEqual(buildset.result, 'success')
+            bootstrap_properties = buildset.buildrequest.build.properties
+            self.assertEqual(bootstrap_properties['prop'],
+                             [u'value', u'SetBootstrapProperty'])
+            self.assertEqual(bootstrap_properties['cmd_prop'],
+                             [u'value', u'SetBootstrapPropertyFromCommand'])
+
             child_build = \
                 buildset.buildrequest.build.children[0].buildrequest.build
             self.assertEqual(child_build.result, 'success')
