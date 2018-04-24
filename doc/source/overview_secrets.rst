@@ -1,5 +1,5 @@
-Dealing with secrets
-====================
+Handling secrets
+================
 
 Dealing with secrets in a CI is hard! Almost all the CI tools that we have used
 store them in environment variables and try to obfuscate them from the logs. We

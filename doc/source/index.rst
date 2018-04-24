@@ -3,28 +3,18 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Eve's documentation!
-===============================
+Eve: continuous integration builder by Scality
+==============================================
+
+.. TODO add image
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
+   :name: master_toc
    :caption: Contents:
 
-   introduction
-   innerworking
-   mainyaml
-   useeve
-   artifacts
-   secrets
-   metabase
-   faq
-   troubleshooting
+   overview
+   first_steps
+   reference
+   help
    relnotes
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
