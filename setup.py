@@ -77,6 +77,8 @@ setup(
             'SetArtifactsName=eve.steps.artifacts:SetArtifactsName',
             'SetArtifactsPrivateURL=eve.steps.artifacts:SetArtifactsPrivateURL',
             'SetArtifactsPublicURL=eve.steps.artifacts:SetArtifactsPublicURL',
+            'SetBootstrapProperty=eve.steps.property:SetBootstrapProperty',
+            'SetBootstrapPropertyFromCommand=eve.steps.property:SetBootstrapPropertyFromCommand',
             'ShellCommandWithSecrets=eve.steps.shell_command_with_secrets:ShellCommandWithSecrets',
             'StepExtractor=eve.steps.yaml_parser:StepExtractor',
             'PatcherConfig=eve.steps.patcher:PatcherConfig',

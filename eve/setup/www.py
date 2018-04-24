@@ -27,8 +27,11 @@ from buildbot.www.authz.roles import RolesFromGroups, RolesFromUsername
 from buildbot.www.oauth2 import BitbucketAuth, GitHubAuth
 from twisted.internet import defer
 
+from eve.process.bootstrap import BootstrapMixin
 
-class DenyRebuildIntermediateBuild(EndpointMatcherBase):
+
+class DenyRebuildIntermediateBuild(EndpointMatcherBase,
+                                   BootstrapMixin):
     """Build endpoint matcher class to deny rebuild on intermediate build.
 
     This class differs from `~.endpointmatchers.RebuildBuildEndpointMatcher`.
@@ -66,28 +69,18 @@ class DenyRebuildIntermediateBuild(EndpointMatcherBase):
         """
         build = yield epobject.get({}, epdict)
         buildrequest = yield self.master.data.get(
-            ('buildrequests', build['buildrequestid'])
+            ('buildrequests', build['buildid'])
         )
         buildset = yield self.master.data.get(
             ('buildsets', buildrequest['buildsetid'])
         )
-
         if buildset['parent_buildid'] is None:
             defer.returnValue(None)
 
-        while buildset['parent_buildid'] is not None:
-            build = yield self.master.data.get(
-                ('builds', buildset['parent_buildid'])
-            )
-            buildrequest = yield self.master.data.get(
-                ('buildrequests', build['buildrequestid'])
-            )
-            buildset = yield self.master.data.get(
-                ('buildsets', buildrequest['buildsetid'])
-            )
+        bootstrap_build = yield self.getBootstrapBuild(build['buildid'])
 
         builder = yield self.master.data.get(
-            ('builders', build['builderid'])
+            ('builders', bootstrap_build['builderid'])
         )
 
         if self.authz.match(builder['name'], self.root_builder_name):
