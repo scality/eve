@@ -16,3 +16,414 @@ Release Notes
     tox -e relnotes <eve-version>
 
 .. towncrier release notes start
+
+Eve 1.3.30 (2018-04-03)
+=======================
+
+
+Features
+--------
+
+- Add github support in eve-api-client. (EVE-882)
+- Add reason "branch updated" to builds triggered by a webhook (new push).
+  (EVE-875)
+
+
+Eve 1.3.29 (2018-03-23)
+=======================
+
+
+No significant changes.
+
+
+Eve 1.3.28 (2018-03-20)
+=======================
+
+
+Features
+--------
+
+- Add memory request option to docker worker in main.yml. (PIPDEP-364)
+
+
+Bugfixes
+--------
+
+- Fix Ultron reporter sending 'failed' when the build was in progress.
+  (RELENG-2469)
+- Fix Ultron not sending the correct build url in statuses. (RELENG-2469)
+
+
+Eve 1.3.27 (2018-02-26)
+=======================
+
+
+No significant changes.
+
+
+Eve 1.3.26 (2018-02-22)
+=======================
+
+
+Features
+--------
+
+- Add a docker image for eve-api-client. (PIPDEP-360)
+- Allow to use absolute path for source of `Upload` step. (EVE-833)
+- The source of `Upload` step can now use interpolable property too. (EVE-832)
+
+
+Bugfixes
+--------
+
+- Inherit properties' source as well as value in sub-stages. It also fix
+  overrideable properties. (EVE-815)
+- Fix high memory footprint of uploading context to docker-hook causing `docker
+  build` commands to be killed. (PIPDEP-391)
+
+
+Eve 1.3.25 (2018-02-09)
+=======================
+
+
+Features
+--------
+
+- All eve defined properties can now be overriden by user when doing a force
+  build (Added steps `EveProperty` and `EvePropertyFromCommand` to let the user
+  define overrideable properties too). (EVE-815)
+
+
+Eve 1.3.24 (2018-02-01)
+=======================
+
+
+Features
+--------
+
+- Retry when the docker hook is not ready. (EVE-819)
+
+
+Eve 1.3.23 (2018-01-17)
+=======================
+
+
+No significant changes.
+
+
+Eve 1.3.22 (2018-01-15)
+=======================
+
+
+Features
+--------
+
+- Allow to trigger any stage in forced build, ignoring the branch assigned
+  stage. (EVE-815)
+- Prettier force build form. (EVE-815)
+- Automatic replacement of illegal character in label provided by skari.
+  (EVE-811)
+
+
+Bugfixes
+--------
+
+- `GetArtifactsFromStage` now properly fails when no artifacts can be found.
+  (EVE-815)
+
+
+Eve 1.3.21 (2018-01-11)
+=======================
+
+
+Features
+--------
+
+- Force build now ignore skipped stage and steps. (EVE-815)
+
+
+Eve 1.3.20 (2018-01-10)
+=======================
+
+
+No significant changes.
+
+
+Eve 1.3.19 (2018-01-05)
+=======================
+
+
+Bugfixes
+--------
+
+- Fix retries crashing the backend on restart. (EVE-800)
+- Don't overwrite gitconfig in docker worker. (PIPDEP-339)
+
+
+Eve 1.3.18 (2017-12-13)
+=======================
+
+
+Features
+--------
+
+- Add Ultron reporter. (EVE-771)
+
+
+Bugfixes
+--------
+
+- Fix infinite crash loop on failed docker build during worker substantiation. (EVE-708)
+
+
+Eve 1.3.17 (2017-12-04)
+=======================
+
+
+Bugfixes
+--------
+
+- Fix an issue with unicode in step names.
+
+
+Eve 1.3.16 (2017-11-29)
+=======================
+
+
+No significant changes.
+
+
+Eve 1.3.15 (2017-11-28)
+=======================
+
+
+Bugfixes
+--------
+
+- Fix a rare bug caused by eve local git clone not being properly cleaned
+  between two builds. (EVE-805)
+
+
+Eve 1.3.14 (2017-11-24)
+=======================
+
+
+Features
+--------
+
+- Add last chance cleanup of leftover children containers when finishing
+  a docker worker stage. (PIPDEP-307)
+
+
+Bugfixes
+--------
+
+- Don't block docker hook waiting for irremediably lost workers. (EVE-801)
+
+
+Eve 1.3.13 (2017-11-20)
+=======================
+
+
+Features
+--------
+
+- Add configuration option for stage to be watched by reporters. (EVE-762)
+
+
+Eve 1.3.12 (2017-11-14)
+=======================
+
+
+No significant changes
+
+
+Eve 1.3.11 (2017-11-10)
+=======================
+
+
+Features
+--------
+
+- Increase artifacts `Upload` default timeout from 15 minutes to 1 hour.
+  (EVE-788)
+- Allow main.yml to specify a `maxTime` timeout for `Upload` step. (EVE-788)
+- Allow to access `max_step_timeout` throuhg a property. (EVE-786)
+
+
+Bugfixes
+--------
+
+- Fix incorrect `SECRET_*` env var stripping. (EVE-791)
+
+
+Eve 1.3.10 (2017-10-25)
+=======================
+
+
+Features
+--------
+
+- Add an option to customize docker worker's deadline. (EVE-752)
+
+
+Bugfixes
+--------
+
+- Avoid clashing docker worker names. (EVE-752)
+
+
+Eve 1.3.9 (2017-10-23)
+======================
+
+
+Features
+--------
+
+- Allow artifacts microservice to live on subpath. (PIPDEP-256)
+- Tag docker worker with project name. (PIPDEP-264)
+- Docker worker async delete. (PIPDEP-264)
+- Hardcode ODR max workers. (PIPDEP-264)
+
+
+Eve 1.3.8 (2017-10-17)
+======================
+
+
+Features
+--------
+
+- Upgrade to buildbot 0.9.12. (EVE-671)
+- Add metabase dashboard in Eve's UI. (EVE-687)
+
+
+Bugfixes
+--------
+
+- Fix possible crash during docker build step. (EVE-754)
+
+
+Eve 1.3.7 (2017-10-06)
+======================
+
+
+No significant changes.
+
+
+Eve 1.3.6 (2017-10-05)
+======================
+
+
+Features
+--------
+
+- Allow to skip branches or stages matching a regexp given during runtime.
+  (EVE-687)
+
+
+Bugfixes
+--------
+
+- Fix docker hook unicode handling. (EVE-746)
+- Fix docker build retry when triggering a stage. (EVE-751)
+- Fix docker hook comand return code. (EVE-750)
+
+
+Eve 1.3.5 (2017-09-26)
+======================
+
+
+Features
+--------
+
+- Add more volumes types support to docker hook. (EVE-687)
+- Add stop/kill capabilities to docker hook. (EVE-687)
+
+
+Bugfixes
+--------
+
+- Fix Github reporter. (EVE-743)
+
+
+Eve 1.3.4 (2017-09-20)
+======================
+
+
+Features
+--------
+
+- Add artifacts and gitcache microservices for VM. (EVE-715)
+- Handle all docker commands via docker hook. (EVE-414)
+- Openstack heat worker path is now optional. (EVE-738)
+- Add buildnumber to worker name and labels. (EVE-687)
+- Hide registry related steps in UI. (EVE-687)
+- Replace `HOSTALIASES` with dynamic `artifacts_private_url` property. (EVE-715)
+
+
+Bugfixes
+--------
+
+- Improve long step names cut to take interpolates into account. (EVE-698)
+- Hide env vars in bootstrap steps. (EVE-649)
+- properly mark `GetArtifactsFromStage` step as failed when the curl request
+  failed. (EVE-715)
+
+
+Eve 1.3.3 (2017-08-25)
+======================
+
+
+Features
+--------
+
+- Add bitbucket OAuth-based eve api client. (EVE-709)
+
+
+Bugfixes
+--------
+
+- Trim long step names to avoid DB insertion errors. (EVE-698)
+- Relay docker hook exceptions to eve. (EVE-687)
+
+
+Eve 1.3.2 (2017-08-08)
+======================
+
+
+Features
+--------
+
+- Add garbage collection to gitcache service. (EVE-699)
+- Allow `image` in docker steps to contains interpolable property. (EVE-703)
+
+
+Bugfixes
+--------
+
+- Avoid forking in gitcache services to be able to capture commands' output.
+  (EVE-660)
+- Fix retry logic and increase initial quarantine timeout on eve latent workers.
+  (EVE-680)
+- Fix heat worker insubstantiation error reporting. (EVE-702)
+- Fix git LFS authentication issues. (EVE-678)
+
+
+Eve 1.3.1 (2017-07-27)
+======================
+
+
+Features
+--------
+
+- Modify docker hook to run as a sidecar container. (EVE-687)
+
+
+Eve 1.3.0 (2017-07-21)
+======================
+
+
+Features
+--------
+
+- New eve infrastructure based on Kubernetes.
