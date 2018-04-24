@@ -19,11 +19,11 @@
 
 # -- Project information -----------------------------------------------------
 
-project = 'Eve'
-copyright = '2018, Releng'
-author = 'Releng'
+project = 'Eve - continuous integration builder'
+copyright = '2018, Scality Release Engineering'
+author = 'Scality Release Engineering'
 
-# The short X.Y version
+# The short X.Y version # TODO automate
 version = '1.3.30'
 # The full version, including alpha/beta/rc tags
 release = '1.3.30'
@@ -73,13 +73,12 @@ exclude_patterns = []
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
 
-
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'bizstyle'
+html_theme = 'sphinx_rtd_theme'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -134,7 +133,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
     (master_doc, 'Eve.tex', 'Eve Documentation',
-     'Releng', 'manual'),
+     'Scality Release Engineering', 'manual'),
 ]
 
 
@@ -155,7 +154,7 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
     (master_doc, 'Eve', 'Eve Documentation',
-     author, 'Eve', 'One line description of project.',
+     author, 'Eve', 'Continuous integration builder by Scality.',
      'Miscellaneous'),
 ]
 

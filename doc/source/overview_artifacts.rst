@@ -1,5 +1,5 @@
-Uploading/Downloading build artifacts
-=====================================
+Build artifacts
+===============
 
 Your builds generate a lot of data that you'll want to keep:
 

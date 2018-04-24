@@ -1,5 +1,5 @@
-The anatomy of eve/main.yml
-===========================
+Build definition file
+=====================
 
 An eve/main.yml file may look like this:
 
