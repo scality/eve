@@ -17,6 +17,32 @@ Release Notes
 
 .. towncrier release notes start
 
+Eve 1.3.31 (2018-04-25)
+=======================
+
+Features
+--------
+
+- Add dry run mode on api client. (EVE-840)
+- Add ``kube_pod`` as new worker type that can spawn a complex kubernetes pod
+  from a given spec yaml file. (EVE-891)
+- Add new steps SetBootstrapProperty and SetBootstrapPropertyFromCommand.
+  (PIPDEP-436)
+
+
+Bugfixes
+--------
+
+- No longer duplicate the docker steps launched before a TriggerStage.
+  (EVE-891)
+
+
+Improved Documentation
+----------------------
+
+- Bootstrap Eve's user doc. (EVE-839)
+
+
 Eve 1.3.30 (2018-04-03)
 =======================
 

@@ -1,1 +1,0 @@
-Add new steps SetBootstrapProperty and SetBootstrapPropertyFromCommand.
