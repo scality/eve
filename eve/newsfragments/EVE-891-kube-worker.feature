@@ -1,2 +1,2 @@
-Add ``kube_pod`` as new worker type that can spawn a arbitrarly complex pod from
-a given pod spec yaml file.
+Add ``kube_pod`` as new worker type that can spawn a complex kubernetes pod
+from a given spec yaml file.

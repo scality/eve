@@ -33,8 +33,15 @@ Eve 1.3.29 (2018-03-23)
 =======================
 
 
-No significant changes.
+Features
+--------
 
+- Drop sentry support. (EVE-840)
+
+Bugfixes
+--------
+
+- Fix adapting Eve to kubernetes upgrade. (PIPDEP-431)
 
 Eve 1.3.28 (2018-03-20)
 =======================
@@ -58,8 +65,10 @@ Eve 1.3.27 (2018-02-26)
 =======================
 
 
-No significant changes.
+Features
+--------
 
+- Move docker-hook service to an external repository. (RELENG-2456)
 
 Eve 1.3.26 (2018-02-22)
 =======================
@@ -89,7 +98,7 @@ Eve 1.3.25 (2018-02-09)
 Features
 --------
 
-- All eve defined properties can now be overriden by user when doing a force
+- All Eve defined properties can now be overriden by user when doing a force
   build (Added steps `EveProperty` and `EvePropertyFromCommand` to let the user
   define overrideable properties too). (EVE-815)
 
@@ -108,8 +117,10 @@ Eve 1.3.23 (2018-01-17)
 =======================
 
 
-No significant changes.
+Bugfixes
+--------
 
+- Fix docker-hook code that was removed during the review.
 
 Eve 1.3.22 (2018-01-15)
 =======================
@@ -139,14 +150,17 @@ Eve 1.3.21 (2018-01-11)
 Features
 --------
 
-- Force build now ignore skipped stage and steps. (EVE-815)
+- Force builds are always executed. (EVE-815)
 
 
 Eve 1.3.20 (2018-01-10)
 =======================
 
 
-No significant changes.
+Bugfixes
+--------
+
+- Fix docker separator. (EVE-811)
 
 
 Eve 1.3.19 (2018-01-05)
@@ -190,7 +204,10 @@ Eve 1.3.16 (2017-11-29)
 =======================
 
 
-No significant changes.
+Features
+--------
+
+- Set locale in cloud init before running buildbot.
 
 
 Eve 1.3.15 (2017-11-28)
@@ -200,7 +217,7 @@ Eve 1.3.15 (2017-11-28)
 Bugfixes
 --------
 
-- Fix a rare bug caused by eve local git clone not being properly cleaned
+- Fix a rare bug caused by Eve local git clone not being properly cleaned
   between two builds. (EVE-805)
 
 
@@ -235,7 +252,15 @@ Eve 1.3.12 (2017-11-14)
 =======================
 
 
-No significant changes
+Features
+--------
+
+- Using worker node pool on docker-hook. (PIPDEP-302)
+
+Bugfixes
+--------
+
+- Lift limits to avoid crashes on docker-hook. (EVE-795)
 
 
 Eve 1.3.11 (2017-11-10)
@@ -248,7 +273,7 @@ Features
 - Increase artifacts `Upload` default timeout from 15 minutes to 1 hour.
   (EVE-788)
 - Allow main.yml to specify a `maxTime` timeout for `Upload` step. (EVE-788)
-- Allow to access `max_step_timeout` throuhg a property. (EVE-786)
+- Allow access to `max_step_timeout` throuhg a property. (EVE-786)
 
 
 Bugfixes
@@ -307,7 +332,11 @@ Eve 1.3.7 (2017-10-06)
 ======================
 
 
-No significant changes.
+Features
+--------
+
+- Make sure kubectl client and server match on docker-hook. (EVE-687)
+- More robust docker kill on docker-hook. (EVE-687)
 
 
 Eve 1.3.6 (2017-10-05)
@@ -317,7 +346,7 @@ Eve 1.3.6 (2017-10-05)
 Features
 --------
 
-- Allow to skip branches or stages matching a regexp given during runtime.
+- Allow skipping branches or stages matching a regexp given during runtime.
   (EVE-687)
 
 
@@ -326,7 +355,7 @@ Bugfixes
 
 - Fix docker hook unicode handling. (EVE-746)
 - Fix docker build retry when triggering a stage. (EVE-751)
-- Fix docker hook comand return code. (EVE-750)
+- Fix docker hook command return code. (EVE-750)
 
 
 Eve 1.3.5 (2017-09-26)
@@ -366,7 +395,7 @@ Bugfixes
 
 - Improve long step names cut to take interpolates into account. (EVE-698)
 - Hide env vars in bootstrap steps. (EVE-649)
-- properly mark `GetArtifactsFromStage` step as failed when the curl request
+- Properly mark `GetArtifactsFromStage` step as failed when the curl request
   failed. (EVE-715)
 
 
@@ -377,14 +406,14 @@ Eve 1.3.3 (2017-08-25)
 Features
 --------
 
-- Add bitbucket OAuth-based eve api client. (EVE-709)
+- Add bitbucket OAuth-based Eve api client. (EVE-709)
 
 
 Bugfixes
 --------
 
 - Trim long step names to avoid DB insertion errors. (EVE-698)
-- Relay docker hook exceptions to eve. (EVE-687)
+- Relay docker hook exceptions to Eve. (EVE-687)
 
 
 Eve 1.3.2 (2017-08-08)
@@ -395,7 +424,7 @@ Features
 --------
 
 - Add garbage collection to gitcache service. (EVE-699)
-- Allow `image` in docker steps to contains interpolable property. (EVE-703)
+- Allow `image` in docker steps to contain interpolable property. (EVE-703)
 
 
 Bugfixes
@@ -403,7 +432,7 @@ Bugfixes
 
 - Avoid forking in gitcache services to be able to capture commands' output.
   (EVE-660)
-- Fix retry logic and increase initial quarantine timeout on eve latent workers.
+- Fix retry logic and increase initial quarantine timeout on Eve latent workers.
   (EVE-680)
 - Fix heat worker insubstantiation error reporting. (EVE-702)
 - Fix git LFS authentication issues. (EVE-678)
@@ -426,4 +455,4 @@ Eve 1.3.0 (2017-07-21)
 Features
 --------
 
-- New eve infrastructure based on Kubernetes.
+- New Eve infrastructure based on Kubernetes.
