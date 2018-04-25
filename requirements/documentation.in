@@ -1,0 +1,12 @@
+# requirements for successful installation of doc deps
+#
+# to recreate frozen requirements:
+#
+#    $ pip install -U -r requirements.txt
+#    $ tox -e freeze-requirements
+#
+-c constraints.txt
+
+sphinx
+sphinx_rtd_theme
+

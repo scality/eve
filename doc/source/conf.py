@@ -15,6 +15,7 @@
 # import os
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
+from pkg_resources import get_distribution
 
 
 # -- Project information -----------------------------------------------------
@@ -23,10 +24,10 @@ project = 'Eve - continuous integration builder'
 copyright = '2018, Scality Release Engineering'
 author = 'Scality Release Engineering'
 
-# The short X.Y version # TODO automate
-version = '1.3.30'
-# The full version, including alpha/beta/rc tags
-release = '1.3.30'
+try:
+    version = release = get_distribution('eve').version
+except Exception:
+    version = release = 'unset_version'
 
 
 # -- General configuration ---------------------------------------------------
