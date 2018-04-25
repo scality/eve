@@ -8,5 +8,4 @@ Reference guide
 
    reference_workers
    reference_steps
-   reference_properties
    reference_api_client
