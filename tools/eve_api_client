@@ -66,7 +66,6 @@ import argparse
 import base64
 import cookielib
 import json
-import pprint
 import sys
 import urllib
 import urllib2
@@ -213,7 +212,7 @@ if __name__ == '__main__':
             args.username, args.password, args.consumer_key)
 
     if args.dry_run:
-        pprint.pprint('Dry run activated, the request was not executed')
+        print('Dry run activated, the request was not executed')
         sys.exit(0)
     req = request(
         token,
@@ -224,4 +223,4 @@ if __name__ == '__main__':
         json.loads(args.payload),
         args.api_version
     )
-    pprint.pprint(req)
+    print(json.dumps(req))

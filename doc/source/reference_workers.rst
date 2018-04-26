@@ -12,7 +12,7 @@ itself, so that the developers of the CI can customize the tools and
 dependencies required by the various steps of the stage.
 
 In the build yaml file, for each stage, the worker is described in a mandatory
-```worker``` section. The syntax of the section depends on the worker type,
+``worker`` section. The syntax of the section depends on the worker type,
 and is described in each section below.
 
 In order for the newly spawned workers to be able to communicate with Eve, each
@@ -51,7 +51,7 @@ not required for the developer to start buildbot-worker in this case.
 
 .. _local_examples:
 
-examples
+Examples
 ++++++++
 
 .. code-block:: yaml
@@ -98,7 +98,7 @@ like the following must appear in the Dockerfile::
 
 .. _docker_examples:
 
-examples
+Examples
 ++++++++
 
 .. code-block:: yaml
@@ -129,7 +129,7 @@ examples
 
 .. _docker_parameters:
 
-parameters
+Parameters
 ++++++++++
 
 ``path``
@@ -192,7 +192,7 @@ The virtual machine can be personnalized in two ways:
 
 .. _openstack_examples:
 
-examples
+Examples
 ++++++++
 
 .. code-block:: yaml
@@ -209,7 +209,7 @@ examples
 
 .. _openstack_parameters:
 
-parameters
+Parameters
 ++++++++++
 
 ``image``
@@ -258,7 +258,7 @@ the names of the namespaces that the stage will be allowed to access.
 
 .. _kube_examples:
 
-examples
+Examples
 ++++++++
 
 .. code-block:: yaml
@@ -298,7 +298,7 @@ examples
 
 .. _kube_parameters:
 
-parameters
+Parameters
 ++++++++++
 
 ``path``
