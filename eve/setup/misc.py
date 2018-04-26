@@ -21,6 +21,7 @@ from os import path
 
 from buildbot import version
 from buildbot.plugins import util
+from pkg_resources import get_distribution
 
 
 def register_starttime():
@@ -55,3 +56,16 @@ def verify_docker_certificates():
 
 def properties():
     return {'buildbot_version': version}
+
+
+def title():
+    try:
+        version = get_distribution('eve').version
+    except Exception:
+        version = 'unset_version'
+
+    return "Eve (%s) project %s/%s/%s" % (
+        version,
+        util.env.GIT_HOST,
+        util.env.GIT_OWNER,
+        util.env.GIT_SLUG)

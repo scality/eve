@@ -7,6 +7,7 @@ from math import ceil
 from tempfile import mkdtemp
 
 from buildbot.plugins import util
+from mock import patch
 
 import eve.setup.misc
 
@@ -54,3 +55,16 @@ class TestSetupMisc(unittest.TestCase):
         eve.setup.misc.register_starttime()
         self.assertGreaterEqual(ceil(time.time()),
                                 ceil(float(util.env.MASTER_START_TIME)))
+
+    @patch('eve.setup.misc.get_distribution')
+    def test_title(self, mock_distrib):
+        mock_distrib.return_value.version = '1.1.1'
+        util.env = util.load_env([
+            ('GIT_HOST', 'githost'),
+            ('GIT_OWNER', 'owner'),
+            ('GIT_SLUG', 'slug'),
+        ])
+        self.assertEqual(
+            eve.setup.misc.title(),
+            "Eve (1.1.1) project githost/owner/slug"
+        )
