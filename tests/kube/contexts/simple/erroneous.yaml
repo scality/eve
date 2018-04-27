@@ -9,19 +9,14 @@ spec:
   terminationGracePeriodSeconds: 10
   containers:
     - name: buildbot-worker
-      image: {{ images.test_worker }}
+      # err no image provided
+      resources:
+        limits:
+          cpu: "1"
+          memory: "1G"
+        requests:
+          cpu: "100m"
+          memory: "500Mi"
       env:
-        - name: TEST_STRING
-          value: "{{ vars.a_string }}"
-        {% for element in vars.a_list %}
-        - name: "TEST_LIST_{{ loop.index }}"
-          value: "{{ element }}"
-        {% endfor %}
-        {% for key in vars.a_dict %}
-        - name: "TEST_DICT_{{ key }}"
-          value: "{{ vars.a_dict[key] }}"
-        {% endfor %}
-    - name: sidekick
-      image: alpine:latest
-      command: ["tail", "-f", "/dev/null"]
-      env: "an invalid field to make instanciation fail, until tests are fixed"
+        - name: dummy
+          value: "{{ vars.dummy }}"

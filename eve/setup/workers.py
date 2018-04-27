@@ -63,6 +63,13 @@ def kube_pod_workers():
         node_affinity = NodeAffinity(
             *util.env.KUBE_POD_NODE_AFFINITY.split(':'))
 
+    service = ''
+    service_data = ''
+    if util.env.KUBE_SERVICE_IN_USE:
+        service = util.env.KUBE_SERVICE
+        service_data = util.env.KUBE_SERVICE_DATA
+        assert service
+
     for i in range(util.env.MAX_KUBE_POD_WORKERS):
         workers.append(
             worker.EveKubeLatentWorker(
@@ -78,6 +85,8 @@ def kube_pod_workers():
                 kube_config=None,
                 keepalive_interval=300,
                 active_deadline=util.env.KUBE_POD_ACTIVE_DEADLINE,
+                service=service,
+                service_data=service_data,
             ))
     return workers
 
