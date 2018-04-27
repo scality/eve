@@ -50,4 +50,4 @@ mv minikube /usr/local/bin/
 minikube start --vm-driver none
 chmod 777 -R /.minikube /.kube
 ln -s /.minikube /.kube/.minikube
-echo "export KUBECONFIG=/.kube/config" >> /home/eve/.profile
+ln -s /.kube /home/eve/.kube

@@ -1,0 +1,64 @@
+#!/bin/bash
+set -e
+set -u
+set -o pipefail
+
+check_env() {
+    set +e
+    test -z "${!1+x}" \
+        && echo "$1 is not specified in environment!" >&2 \
+        && exit 1
+    if [ -n "${2:-}" ]; then
+        test "${!1}" != "$2" \
+            && echo "$1 does not have the expected value (${!1} != $2)" \
+            && exit 1
+    fi
+    set -e
+}
+
+# test the service data has been passed all the way
+# from the config map to here
+check_env EXPECTED_KEY "expected_value"
+
+# check eve is passing the values for uuid and user
+check_env UUID
+check_env WORKERNAME "kw000-test_suffix"
+check_env BUILDMASTER "localhost"
+check_env RUNNING_IN_CI "1"
+check_env STAGE "pod-worker-stage"
+
+# check that the values specified in the build have
+# been passed all the way to here
+check_env NAMESPACES
+check_env version "999.9.666"
+check_env some_ignored_key "toto"
+
+# read some configuration conveniently passed by the service-data
+TEST_FORCE_INIT_STATUS=${TEST_FORCE_INIT_STATUS:-0}
+TEST_FORCE_TEARDOWN_STATUS=${TEST_FORCE_TEARDOWN_STATUS:-0}
+
+COMMAND="${1:-undefined}"
+case "${COMMAND}" in
+
+init):
+    # set a cm to store status for test to review
+    ./kubectl create configmap fake-service-init-status --from-literal=status=${TEST_FORCE_INIT_STATUS}
+    [ ${TEST_FORCE_INIT_STATUS} -eq 1 ] && exit 1
+    # store a secret at UUID for eve to attach in worker
+    ./kubectl create secret generic ${UUID} --from-literal=kubeconfig=somecredentials
+    ;;
+
+teardown):
+    # set a cm to store status for test to review
+    ./kubectl create configmap fake-service-teardown-status --from-literal=status=${TEST_FORCE_TEARDOWN_STATUS}
+    [ ${TEST_FORCE_TEARDOWN_STATUS} -eq 1 ] && exit 1
+    # cleanup the secret at UUID (may fail if it does not exist)
+    set +e
+    ./kubectl delete secret ${UUID}
+    set -e
+    ;;
+*)
+    echo "fake_service: unknown command: ${COMMAND}" >&2
+    exit 1
+    ;;
+esac

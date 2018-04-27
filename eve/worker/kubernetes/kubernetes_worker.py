@@ -18,6 +18,7 @@
 """Allow eve to use kubernetes pods as workers."""
 
 import socket
+from hashlib import md5
 from time import sleep
 
 import yaml
@@ -36,6 +37,69 @@ try:
     from kubernetes.client.rest import ApiException
 except ImportError:
     client = None
+
+SERVICE_POD_TEMPLATE = """
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "service-pod"
+  labels:
+    worker_pod_name: "{{ worker_pod_name }}"
+    uuid: "{{ uuid }}"
+spec:
+  activeDeadlineSeconds: 300
+  restartPolicy: Never
+  containers:
+    - name: kube-worker-service
+      image: "{{ image }}"
+      resources:
+        requests:
+          cpu: "500m"
+          memory: "1Gi"
+        limits:
+          cpu: "500m"
+          memory: "1Gi"
+      env:
+        - name: BUILDID
+          value: "{{ buildid }}"
+        - name: BUILDNUMBER
+          value: "{{ buildnumber }}"
+        - name: NAMESPACES
+          value: "{{ namespaces|join(' ') }}"
+        - name: UUID
+          value: "{{ uuid }}"
+        {% for key in service_requests.keys() %}
+        - name: "{{ key }}"
+          value: "{{ service_requests[key] }}"
+        {% endfor %}
+      {% if service_data %}
+      envFrom:
+        - secretRef:
+            name: "{{ service_data }}"
+      {% endif %}
+      args: [ "init" ]
+"""
+
+
+def kube_hash(*args):
+    """Return a unique name based on args.
+
+    The value must be useable as a valid namespace name
+    and a valid UUID for service providers. In the case
+    of GCE service accounts for example, this means less
+    than 30 chars, and start with a letter.
+
+    We return the md5 sum of the provided args, make sure
+    the first character is an 'e' for Eve, and limit the md5
+    signature to 28 characters, which will hopefully be enough
+    to avoid collisions.
+
+    """
+    m = md5()
+    for arg in args:
+        m.update(str(arg))
+    return "e%s" % m.hexdigest()[:28]
 
 
 class KubePodWorkerCannotSubstantiate(LatentWorkerCannotSubstantiate):
@@ -82,13 +146,16 @@ class KubePodWorkerCannotSubstantiate(LatentWorkerCannotSubstantiate):
                                   msg))
 
                     if container.state.terminated.reason == 'Error':
-                        log = client.CoreV1Api().read_namespaced_pod_log(
-                            self.pod,
-                            instance.metadata.namespace,
-                            container=container.name,
-                            tail_lines=10,
-                        )
-                        error += '\n\n %s' % log
+                        try:
+                            log = client.CoreV1Api().read_namespaced_pod_log(
+                                self.pod,
+                                instance.metadata.namespace,
+                                container=container.name,
+                                tail_lines=100,
+                            )
+                        except ApiException:
+                            log = 'container is gone, log is not available'
+                        error += '\ncontainer last 100 log lines:\n\n%s' % log
 
         self.message = self.message % (error or 'Unknown error')
         super(KubePodWorkerCannotSubstantiate, self).__init__(self.message)
@@ -99,6 +166,7 @@ class EveKubeLatentWorker(AbstractLatentWorker):
     logger = Logger('eve.workers.EveKubeLatentWorker')
     instance = None
     _poll_resolution = 2
+    service_pod = None
 
     def load_config(self):
         try:
@@ -112,7 +180,7 @@ class EveKubeLatentWorker(AbstractLatentWorker):
     def checkConfig(self, name, password, master_fqdn, pb_port,
                     namespace, node_affinity, max_memory, max_cpus,
                     microservice_gitcache, active_deadline, kube_config,
-                    **kwargs):
+                    service, service_data, **kwargs):
         """Ensure we have the kubernetes client available."""
         # Set build_wait_timeout to 0 if not explicitly set: Starting a
         # container is almost immediate, we can afford doing so for each build.
@@ -125,7 +193,7 @@ class EveKubeLatentWorker(AbstractLatentWorker):
     def reconfigService(self, name, password, master_fqdn, pb_port,
                         namespace, node_affinity, max_memory, max_cpus,
                         microservice_gitcache, active_deadline, kube_config,
-                        **kwargs):
+                        service, service_data, **kwargs):
         # Set build_wait_timeout to 0 if not explicitly set: Starting a
         # container is almost immediate, we can afford doing so for each build.
         kwargs.setdefault('build_wait_timeout', 0)
@@ -139,28 +207,25 @@ class EveKubeLatentWorker(AbstractLatentWorker):
         self.max_cpus = max_cpus
         self.microservice_gitcache = microservice_gitcache
         self.deadline = active_deadline
+        self.service = service
+        self.service_data = service_data
         return AbstractLatentWorker.reconfigService(self, name, password,
                                                     **kwargs)
 
-    def get_pod_config(self, build):
-        """Render and load valid pod template from build."""
+    def get_pod_config(self, name, source, variables):
+        """Render and load valid pod template."""
         try:
-            template = Template(build.getProperty('worker_template'),
-                                undefined=StrictUndefined)
-            rendered_body = template.render(
-                images=build.getProperty('worker_images'),
-                vars=build.getProperty('worker_vars'),
-            )
+            template = Template(source, undefined=StrictUndefined)
+            rendered_body = template.render(variables)
         except Exception as ex:
             raise LatentWorkerCannotSubstantiate(
-                'Unable to render %s (%s)' % (self.template_path, ex))
+                'Unable to render %s (%s)' % (name, ex))
 
         try:
             pod = yaml.load(rendered_body)
         except Exception as ex:
             raise LatentWorkerCannotSubstantiate(
-                'Unable to read yaml from %s (%s)' % (self.template_path,
-                                                      ex))
+                'Unable to read yaml from %s (%s)' % (name, ex))
 
         try:
             assert pod['kind'] == 'Pod'
@@ -168,7 +233,7 @@ class EveKubeLatentWorker(AbstractLatentWorker):
         except Exception as ex:
             raise LatentWorkerCannotSubstantiate(
                 '%s is not a valid Kuberbetes pod '
-                'definition (%s)' % (self.template_path, ex))
+                'definition (%s)' % (name, ex))
 
         return pod
 
@@ -316,6 +381,74 @@ class EveKubeLatentWorker(AbstractLatentWorker):
         else:
             pod['spec']['activeDeadlineSeconds'] = self.deadline
 
+    def configure_service_pod(self, pod, build):
+        """Define the pod that init/teardown an external service."""
+
+        self.service_pod = None
+
+        worker_service = build.getProperty('worker_service')
+
+        if worker_service is None:
+            return
+
+        if not self.service:
+            # configuration does not provide any service
+            raise LatentWorkerCannotSubstantiate(
+                'The worker is requesting access to a Kubernetes '
+                'cluster but Eve is not configured to provide one; '
+                'either remove the `service` section from the worker '
+                'or reconfigure Eve.')
+
+        buildid = build.getProperty('buildnumber')
+        buildnumber = build.getProperty('bootstrap')
+        repository = build.getProperty('repository')
+
+        # create unique user id and namespace ids
+        uuid = kube_hash(repository, self.name)
+        ns_plain = worker_service.get('namespaces', [])
+        ns_hash = [kube_hash(repository, ns, buildnumber, buildid)
+                   for ns in ns_plain]
+
+        # store in properties
+        build.setProperty("worker_uuid", uuid, "Build")
+        for (plain, hashed) in zip(ns_plain, ns_hash):
+            build.setProperty(plain, hashed, "Build")
+
+        self.service_pod = self.get_pod_config(
+            'SERVICE_POD_TEMPLATE', SERVICE_POD_TEMPLATE, {
+                'buildid': buildid,
+                'buildnumber': buildnumber,
+                'image': self.service,
+                'namespaces': ns_hash,
+                'service_data': self.service_data,
+                'service_requests': worker_service.get('requests', {}),
+                'uuid': uuid,
+                'worker_pod_name': 'worker-%d-%d' % (buildnumber, buildid),
+            }
+        )
+        self.enforce_affinity_policy(self.service_pod)
+        self.add_common_worker_env_vars(self.service_pod, build)
+        self.add_common_worker_metadata(self.service_pod, build)
+
+        # attach credentials to all containers in the worker pod
+        pod['spec'].setdefault('volumes', [])
+        pod['spec']['volumes'].append({
+            'name': 'kubeconfig', 'secret': {
+                'secretName': uuid}
+        })
+        for container in pod['spec']['containers']:
+            container.setdefault('env', [])
+            container['env'].extend([
+                {'name': 'KUBECONFIG', 'value': '/.kubeconfig'},
+            ])
+            container.setdefault('volumeMounts', [])
+            container['volumeMounts'].append({
+                'name': 'kubeconfig',
+                'readOnly': True,
+                'mountPath': '/.kubeconfig',
+                'subPath': 'kubeconfig'
+            })
+
     @defer.inlineCallbacks
     def start_instance(self, build):
         if self.instance is not None:
@@ -326,7 +459,14 @@ class EveKubeLatentWorker(AbstractLatentWorker):
         self.template_path = build.getProperty('worker_path')
 
         try:
-            pod = self.get_pod_config(build)
+            pod = self.get_pod_config(
+                self.template_path,
+                build.getProperty('worker_template'),
+                variables={
+                    'images': build.getProperty('worker_images'),
+                    'vars': build.getProperty('worker_vars'),
+                }
+            )
             self.enforce_restart_policy(pod)
             self.enforce_affinity_policy(pod)
             self.enforce_gitconfig(pod)
@@ -334,6 +474,7 @@ class EveKubeLatentWorker(AbstractLatentWorker):
             self.add_common_worker_metadata(pod, build)
             self.enforce_resource_limits(pod)
             self.enforce_active_deadline(pod)
+            self.configure_service_pod(pod, build)
         except LatentWorkerCannotSubstantiate:
             raise
         except Exception as ex:
@@ -343,62 +484,111 @@ class EveKubeLatentWorker(AbstractLatentWorker):
 
         res = yield threads.deferToThread(
             self._thd_start_instance,
-            self.namespace,
             pod
         )
         defer.returnValue(res)
 
-    def _thd_start_instance(self, namespace, pod):
-        self.load_config()
-        # TODO block until buildbot-worker has reported back
-        # otherwise unable to log pod generation errors
-        self.logger.debug('Starting pod with config:\n%s' %
-                          yaml.dump(pod, default_flow_style=False))
+    def _thd_start_pod(self, pod, wait_for_completion=False):
+        """Start the pod resource provided as a dictionnary.
+
+        This method will block until the pod has reached one
+        of the stable condition RUNNING/COMPLETE/FAILED.
+
+        """
+        pod_name = pod.get('metadata', {}).get('name', 'no_name')
+        self.logger.debug('Starting pod %r with config:\n%s' % (
+                          pod_name,
+                          yaml.safe_dump(pod, default_flow_style=False)))
         try:
-            instance = client.CoreV1Api().create_namespaced_pod(namespace,
-                                                                pod)
+            instance = client.CoreV1Api().create_namespaced_pod(
+                self.namespace, pod)
         except ApiException as ex:
             raise LatentWorkerCannotSubstantiate(
-                'Failed to create pod %s: %s' % (pod.metadata.name,
-                                                 ex.reason))
+                'Failed to create pod %s: %s' % (pod_name, ex.reason))
 
-        # Wait for pod to be running
+        pending = [None, 'Pending', 'Unknown']
+        if wait_for_completion:
+            pending.append('Running')
         duration = 0
-        while instance.status.phase in ['Pending', None]:
+        while instance.status.phase in pending:
             sleep(self._poll_resolution)
             duration += self._poll_resolution
             try:
                 instance = client.CoreV1Api().read_namespaced_pod_status(
-                    instance.metadata.name, namespace)
+                    instance.metadata.name, self.namespace)
             except ApiException as ex:
+                if wait_for_completion:
+                    # pod may have completed
+                    break
+
                 raise LatentWorkerFailedToSubstantiate(
                     'Pod %s went missing: %s' % (instance.metadata.name,
                                                  ex.reason))
 
-        # Ensure the pod is running
-        if instance.status.phase != 'Running':
-            raise KubePodWorkerCannotSubstantiate(
-                'Pod %(pod)s is not running (%(phase)s)', instance)
-        self.logger.debug('Pod created, id: %s...' %
-                          instance.metadata.name)
+        # Ensure the pod is running or has run successfully
+        if instance.status.phase in [None, 'Pending', 'Failed', 'Unknown']:
+            try:
+                raise KubePodWorkerCannotSubstantiate(
+                    'Creating Pod %(pod)s failed (%(phase)s)', instance)
+            finally:
+                self.delete_pod(instance.metadata.name)
 
-        self.instance = instance
+        if wait_for_completion:
+            self.delete_pod(instance.metadata.name)
+
         return instance.metadata.name
+
+    def service_run(self, stage):
+        if self.service_pod:
+            self.service_pod['spec']['containers'][0]['args'] = [stage]
+            self.service_pod['metadata']['name'] = '%s-service-%s' % (
+                self.service_pod['metadata']['labels']['worker_pod_name'],
+                stage
+            )
+            self._thd_start_pod(self.service_pod, wait_for_completion=True)
+
+    def service_init(self):
+        self.logger.debug('Run kube service init (%s)...' % self.service)
+        self.service_run('init')
+
+    def service_teardown(self):
+        self.logger.debug('Run kube service teardown (%s)...' % self.service)
+        try:
+            self.service_run('teardown')
+        except Exception:
+            # fail silently on teardown to prevent
+            # hiding previous potential exceptions
+            pass
+
+    def delete_pod(self, name):
+        self.logger.debug('deleting kube pod %s...' % name)
+        try:
+            client.CoreV1Api().delete_namespaced_pod(name,
+                                                     self.namespace,
+                                                     client.V1DeleteOptions())
+        except ApiException:
+            self.logger.debug('unable to delete kube pod %s...' % name)
+            pass
+
+    def _thd_start_instance(self, pod):
+        self.load_config()
+
+        self.service_init()
+        self.instance = self._thd_start_pod(pod)
+
+        return self.instance
 
     def stop_instance(self, fast=False):
         assert not fast
-        if self.instance is None:
-            # be gentle. Something may just be trying to alert us that an
-            # instance never attached, and it's because, somehow, we never
-            # started.
-            return defer.succeed(None)
         instance = self.instance
         self.instance = None
         return threads.deferToThread(self._thd_stop_instance, instance, fast)
 
     def _thd_stop_instance(self, instance, fast):
+        self.logger.debug('Deleting worker %s...' % instance)
         self.load_config()
-        self.logger.debug('Deleting pod %s...' % instance.metadata.name)
-        client.CoreV1Api().delete_namespaced_pod(instance.metadata.name,
-                                                 instance.metadata.namespace,
-                                                 client.V1DeleteOptions())
+        try:
+            if instance:
+                self.delete_pod(instance)
+        finally:
+            self.service_teardown()

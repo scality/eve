@@ -1,0 +1,46 @@
+---
+version: '0.2'
+
+branches:
+  default:
+    stage: top-stage
+
+stages:
+  top-stage:
+    worker:
+      type: local
+    steps:
+      - Git:
+          name: git pull
+          repourl: "%(prop:git_reference)s"
+          submodules: True
+          retryFetch: True
+      - ShellCommand:
+          name: pre-build local image of fake service
+          command: docker build --tag fake-service:testing simple/fake-service
+          haltOnFailure: True
+      - TriggerStages:
+          name: trigger the stage requesting a pod worker
+          stage_names:
+            - pod-worker-stage
+          waitForFinish: True
+
+  pod-worker-stage:
+    worker:
+      type: kube_pod
+      path: simple/erroneous.yaml
+      vars:
+        dummy: "example"
+      images:
+        test_worker: simple/buildbot-worker
+      service:
+        requests:
+          version: 999.9.666
+          some_ignored_key: toto
+        namespaces:
+          - mynamespace1
+          - mynamespace-2
+    steps:
+      - ShellCommand:
+          name: no test since should not be able to spawn
+          command: exit 0

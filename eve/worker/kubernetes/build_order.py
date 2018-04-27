@@ -50,3 +50,6 @@ class KubernetesPodBuildOrder(util.BaseDockerBuildOrder):
                                             'KubernetesPodBuildOrder')
         self.properties['worker_vars'] = (self._worker.get('vars', {}),
                                           'KubernetesPodBuildOrder')
+
+        self.properties['worker_service'] = (self._worker.get('service', None),
+                                             'KubernetesPodBuildOrder')
