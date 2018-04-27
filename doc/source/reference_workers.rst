@@ -83,7 +83,7 @@ supported:
 
 - **Static images**
 
-  When :ref:`image` is specified in the worker :ref:`docker_parameters`, Eve
+  When :ref:`image <docker_images>` is specified in the worker :ref:`docker_parameters`, Eve
   expects the image is pre-built, and either present in the local docker
   registry, or available through an accessible remote registry. This image is
   then used to spawn the docker container.
@@ -140,6 +140,8 @@ Parameters
     not allowed.
 
     This parameter is ignored if ``image`` is specified.
+
+.. _docker_images:
 
 ``image``
     The name of an image understandable by the ``docker run`` command.

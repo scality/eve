@@ -3,6 +3,10 @@ User interface
 
 main page
 ---------
+
+.. image:: images/buildbot-interface.png
+   :target: _images/buildbot-interface.png
+
 1. build number.
 
 2. relaunch builds. Note that only “bootstrap” (or “root”) builds can be rebuilt
@@ -88,4 +92,3 @@ build page
      name, ...)
 
 .. _more powerful: http://docs.buildbot.net/latest/manual/cfg-properties.html
-

@@ -51,4 +51,5 @@ uploaded content.
 
 Artifacts are also available for download from a web browser (see screenshots).
 
-.. TODO add screenshots
+.. image:: images/artifacts-ui.png
+   :target: _images/artifacts-ui.png
