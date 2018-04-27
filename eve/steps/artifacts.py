@@ -141,7 +141,7 @@ class SetArtifactsPrivateURL(EvePropertyFromCommand):
 
 
 class Upload(ShellCommand):
-    """Upload files to rackspace."""
+    """Upload files to artifacts."""
 
     renderables = [
         'source',

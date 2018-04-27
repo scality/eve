@@ -79,7 +79,7 @@ stages:
     worker:
       type: openstack
       image: Ubuntu 16.04 LTS (Xenial Xerus) (PVHVM)
-      flavor: general1-4
+      flavor: general1-8
       path: build/workers/docker_tests
     steps:
       - Git:
