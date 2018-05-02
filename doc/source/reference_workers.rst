@@ -39,7 +39,6 @@ is left behind.
 Local worker
 ------------
 
-.. py:class:: buildbot.worker.local.LocalWorker
 
 A stage can run in the local context of Eve. This is sufficient for
 very light stages that do not require any specific dependencies to
@@ -66,7 +65,6 @@ Examples
 Docker worker
 -------------
 
-.. py:class:: eve.workers.docker.docker_worker.EveDockerLatentWorker
 
 When a stage uses a worker of type ``docker``, Eve will spawn a container
 corresponding to the specifications given in the parameters, and execute
@@ -165,7 +163,6 @@ Parameters
 Openstack worker
 ----------------
 
-.. py:class:: eve.workers.openstack_heat.openstack_heat_worker.HeatLatentWorker
 
 When a stage uses a worker of type ``openstack``, Eve will spawn a single
 virtual machine in the Openstack cloud configured for the project.
@@ -229,7 +226,6 @@ Parameters
 Kubernetes pod worker
 ---------------------
 
-.. py:class:: eve.workers.kubernetes.kubernetes_worker.EveKubeLatentWorker
 
 When a stage uses a worker of type ``kube_pod``, Eve will spawn a pod
 in the local Kubernetes cluster where Eve resides.
