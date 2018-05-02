@@ -8,7 +8,7 @@ import yaml
 from mock import patch
 from twisted.trial import unittest
 
-from eve.setup.www_dashboards import (DashboardsConfig, metabase_dashboard,
+from eve.setup.www_dashboards import (DashboardsConfig, link_dashboard,
                                       wsgi_dashboards)
 
 correct_data = [
@@ -97,14 +97,14 @@ class TestWsgiDashboards(unittest.TestCase):
         }
 
     @patch('eve.setup.www_dashboards.util.env')
-    @patch('eve.setup.www_dashboards.metabase_dashboard')
+    @patch('eve.setup.www_dashboards.link_dashboard')
     @patch('eve.setup.www_dashboards.open')
     def test_wsgi_dashboards(self,
                              mock_open,
-                             mock_metabase_dashboard,
+                             mock_link_dashboard,
                              mock_env):
         mock_env.request.side_effect = self.mock_env
-        mock_metabase_dashboard.return_value = {
+        mock_link_dashboard.return_value = {
             'name': 'mock_name',
             'caption': 'mock_caption',
             'app': 'mock_app',
@@ -133,17 +133,17 @@ class TestWsgiDashboards(unittest.TestCase):
 
 
 class TestMetabaseDashboard(unittest.TestCase):
-    def test_metabase_dashboard(self):
-        ret = metabase_dashboard(correct_data[0])
+    def test_link_dashboard(self):
+        ret = link_dashboard(correct_data[0])
         self.assertEqual(ret['name'], 'monitoring_1')
         self.assertEqual(ret['caption'], 'Monitoring')
         self.assertEqual(ret['order'], 10)
         self.assertEqual(ret['icon'], 'test-icon')
 
-        ret = metabase_dashboard(correct_data[1])
+        ret = link_dashboard(correct_data[1])
         self.assertEqual(ret['name'], 'monitoring_2')
         self.assertEqual(ret['caption'], 'Monitoring 2')
         self.assertEqual(ret['order'], 50)
         self.assertEqual(ret['icon'], 'bar-chart')
 
-        self.assertIsNone(metabase_dashboard(correct_data[2]))
+        self.assertIsNone(link_dashboard(correct_data[2]))
