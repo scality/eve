@@ -4,8 +4,8 @@ User interface
 main page
 ---------
 
-.. image:: images/buildbot-interface.png
-   :target: _images/buildbot-interface.png
+.. image:: ../images/buildbot-interface.png
+   :target: ../_images/buildbot-interface.png
 
 1. build number.
 
