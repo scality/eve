@@ -9,7 +9,7 @@ Eve: continuous integration builder by Scality
 .. TODO add image
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
    :name: master_toc
    :caption: Contents:
 

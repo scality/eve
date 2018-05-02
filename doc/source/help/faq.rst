@@ -10,24 +10,24 @@ On the UI main page select:
 
 Click on ``builds`` -> ``builders``:
 
-.. image:: images/builders.png
-   :target: _images/builders.png
+.. image:: ../images/builders.png
+   :target: ../_images/builders.png
 
 
 Select the ``bootstrap``:
 
-.. image:: images/bootstrap.png
-   :target: _images/bootstrap.png
+.. image:: ../images/bootstrap.png
+   :target: ../_images/bootstrap.png
 
 Click on the ``force`` bar on the up right :
 
-.. image:: images/force-build.png
-   :target: _images/force-build.png
+.. image:: ../images/force-build.png
+   :target: ../_images/force-build.png
 
 Then fill up the ``form``:
 
-.. image::  images/force-form.png
-   :target: _images/force-form.png
+.. image::  ../images/force-form.png
+   :target: ../_images/force-form.png
 
 Setup the branch name you want to build and click on ``Start Build``.
 

@@ -43,14 +43,14 @@ pipeline. The build status is displayed on their web ui (see screenshots below).
 On Github
 +++++++++
 
-.. image:: images/github-build-status.png
-   :target: _images/github-build-status.png
+.. image:: ../images/github-build-status.png
+   :target: ../_images/github-build-status.png
 
 On Bitbucket
 ++++++++++++
 
-.. image:: images/bitbucket-build-status.png
-   :target: _images/bitbucket-build-status.png
+.. image:: ../images/bitbucket-build-status.png
+   :target: ../_images/bitbucket-build-status.png
 
 Clicking on the status badges will take you to eve's interface (See screenshot
 below). Note that, currently, eve can only be accessed from Scality's offices or
@@ -59,8 +59,8 @@ from removing this constraint. However, this may change in the (not so far)
 future.
 
 
-.. image:: images/buildbot-build-ui.png
-   :target: _images/buildbot-build-ui.png
+.. image:: ../images/buildbot-build-ui.png
+   :target: ../_images/buildbot-build-ui.png
 
 The screenshot above shows how a successful build looks like in the standard
 buildbot interface.
