@@ -57,6 +57,9 @@ stages:
           name: run static analysis tools
           command: tox --sitepackages -e lint
       - ShellCommand:
+          name: Ensure the doc compiles
+          command: tox --sitepackages -e doc
+      - ShellCommand:
           name: run unit tests
           command: tox --sitepackages -e unit
       - ShellCommand:

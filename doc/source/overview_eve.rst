@@ -40,7 +40,17 @@ Once the build finished, eve will report its outcome to github/bitbucket using
 their respective APIs, by setting a status on the commit that has entered the
 pipeline. The build status is displayed on their web ui (see screenshots below).
 
-.. TODO add images
+On Github
++++++++++
+
+.. image:: images/github-build-status.png
+   :target: _images/github-build-status.png
+
+On Bitbucket
+++++++++++++
+
+.. image:: images/bitbucket-build-status.png
+   :target: _images/bitbucket-build-status.png
 
 Clicking on the status badges will take you to eve's interface (See screenshot
 below). Note that, currently, eve can only be accessed from Scality's offices or
@@ -48,12 +58,12 @@ through the VPN. Some security holes discovered on buildbot are preventing us
 from removing this constraint. However, this may change in the (not so far)
 future.
 
-.. TODO add screenshot
+
+.. image:: images/buildbot-build-ui.png
+   :target: _images/buildbot-build-ui.png
 
 The screenshot above shows how a successful build looks like in the standard
-buildbot interface
-
-.. TODO bullet points
+buildbot interface.
 
 For every received webhook, eve checks out the relative git branch and looks in
 the target repository for a yaml file, under ``eve/main.yaml``. This file will
@@ -64,17 +74,10 @@ will eventually decide to start a build.
 
 Once the build finished, eve will report its outcome to github/bitbucket using
 their respective APIs, by setting a status on the commit that has entered the
-pipeline. The build status is displayed on their web ui (see screenshots below).
-
-.. TODO add images
+pipeline. The build status is displayed on their web ui.
 
 Clicking on the status badges will take you to eve's interface (See screenshot
 below). Note that, currently, eve can only be accessed from Scality's offices or
 through the VPN. Some security holes discovered on buildbot are preventing us
 from removing this constraint. However, this may change in the (not so far)
 future.
-
-.. TODO add screenshot
-
-The screenshot above shows how a successful build looks like in the standard
-buildbot interface

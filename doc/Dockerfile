@@ -7,5 +7,5 @@ RUN apk update && \
 COPY . /opt/eve
 RUN pip install --no-deps /opt/eve
 
-COPY ./doc/source/* /web/
+COPY ./doc/source /web/
 VOLUME ["/web/_build"]
