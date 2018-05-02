@@ -145,7 +145,7 @@ class ExecuteTriggerStages(Trigger):
         if not self.triggeredNames:
             return {u'step': u'running'}
         return {u'step': u'triggered %s' % (
-            u', '.join(bo.properties['reason'][0]
+            u', '.join(bo.properties['stage_name'][0]
                        for bo in self._build_orders))}
 
     def createTriggerProperties(self, properties):
