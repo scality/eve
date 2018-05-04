@@ -17,6 +17,25 @@ Release Notes
 
 .. towncrier release notes start
 
+Eve 1.3.32 (2018-05-04)
+=======================
+
+Features
+--------
+
+- Show version in interface (About). (EVE-839)
+- Add Kubernetes cluster service. It is now possible to request a service in
+  the Pod workers. When requested, Eve will invoke the service setup
+  micro-service (if configured), and configure the pod to access that external
+  cluster. (EVE-887)
+
+
+Bugfixes
+--------
+
+- Inherit the reason property from bootstrap. (EVE-948)
+
+
 Eve 1.3.31 (2018-04-25)
 =======================
 
