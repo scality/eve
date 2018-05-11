@@ -69,10 +69,10 @@ class TestExecuteTriggerStages(steps.BuildStepMixin, unittest.TestCase):
         self.assertEquals(ctx._build_orders, 'build_orders')
 
     def test_set_properties(self):
-        self.setupStep(properties={'stage_name': ('because', 'here'),
+        self.setupStep(properties={'reason': ('because', 'here'),
                                    'x': (1, 'there')})
         self.expectOutcome(result=SUCCESS,
                            state_string='triggered because')
-        self.expectTriggeredWith(properties={'stage_name': ('because', 'here'),
+        self.expectTriggeredWith(properties={'reason': ('because', 'here'),
                                              'x': (1, 'there')})
         return self.runStep()

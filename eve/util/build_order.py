@@ -47,6 +47,7 @@ class BaseBuildOrder(object):
         self.properties.update(self._parent_step.getProperties().properties)
         self.properties.update({
             'stage_name': (self._stage_name, 'BuildOrder'),
+            'reason': (self._stage_name, 'BuildOrder'),
             'git_reference': (self.git_repo, 'BuildOrder'),
             'git_repo': (self.git_repo, 'BuildOrder'),
         })
