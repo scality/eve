@@ -17,6 +17,16 @@ Release Notes
 
 .. towncrier release notes start
 
+Eve 1.3.33 (2018-05-14)
+=======================
+
+Bugfixes
+--------
+
+- Reverting a bugfix due to regression on the UI. Now adding a new field
+  ``bootstrap_reason`` to identify the build reason inside any stage. (EVE-948)
+
+
 Eve 1.3.32 (2018-05-04)
 =======================
 

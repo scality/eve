@@ -1,1 +1,0 @@
-Reverting a bugfix due to regression on the UI. Now adding a new field ``bootstrap_reason`` to identify the build reason inside any stage.
