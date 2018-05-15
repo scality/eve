@@ -17,6 +17,15 @@ Release Notes
 
 .. towncrier release notes start
 
+Eve 1.3.34 (2018-05-15)
+=======================
+
+Bugfixes
+--------
+
+- Fixing a regression that broke the rebuild form request. (EVE-950)
+
+
 Eve 1.3.33 (2018-05-14)
 =======================
 
