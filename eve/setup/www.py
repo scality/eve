@@ -69,7 +69,7 @@ class DenyRebuildIntermediateBuild(EndpointMatcherBase,
         """
         build = yield epobject.get({}, epdict)
         buildrequest = yield self.master.data.get(
-            ('buildrequests', build['buildid'])
+            ('buildrequests', build['buildrequestid'])
         )
         buildset = yield self.master.data.get(
             ('buildsets', buildrequest['buildsetid'])
