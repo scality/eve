@@ -180,7 +180,7 @@ class EveKubeLatentWorker(AbstractLatentWorker):
     def checkConfig(self, name, password, master_fqdn, pb_port,
                     namespace, node_affinity, max_memory, max_cpus,
                     microservice_gitcache, active_deadline, kube_config,
-                    service, service_data, **kwargs):
+                    service, service_data, docker_host=None, **kwargs):
         """Ensure we have the kubernetes client available."""
         # Set build_wait_timeout to 0 if not explicitly set: Starting a
         # container is almost immediate, we can afford doing so for each build.
@@ -193,7 +193,7 @@ class EveKubeLatentWorker(AbstractLatentWorker):
     def reconfigService(self, name, password, master_fqdn, pb_port,
                         namespace, node_affinity, max_memory, max_cpus,
                         microservice_gitcache, active_deadline, kube_config,
-                        service, service_data, **kwargs):
+                        service, service_data, docker_host=None, **kwargs):
         # Set build_wait_timeout to 0 if not explicitly set: Starting a
         # container is almost immediate, we can afford doing so for each build.
         kwargs.setdefault('build_wait_timeout', 0)
@@ -207,6 +207,7 @@ class EveKubeLatentWorker(AbstractLatentWorker):
         self.max_cpus = max_cpus
         self.microservice_gitcache = microservice_gitcache
         self.deadline = active_deadline
+        self.docker_host = docker_host
         self.service = service
         self.service_data = service_data
         return AbstractLatentWorker.reconfigService(self, name, password,
@@ -293,6 +294,7 @@ class EveKubeLatentWorker(AbstractLatentWorker):
                 {'name': 'STAGE', 'value': stage_name},
                 {'name': 'WORKERNAME', 'value': self.name},
                 {'name': 'WORKERPASS', 'value': self.password},
+                {'name': 'DOCKER_HOST', 'value': self.docker_host},
             ])
 
     def add_common_worker_metadata(self, pod, build):

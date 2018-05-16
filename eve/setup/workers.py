@@ -82,6 +82,7 @@ def kube_pod_workers():
                 max_memory=util.env.KUBE_POD_MAX_MEMORY,
                 max_cpus=util.env.KUBE_POD_MAX_CPU,
                 microservice_gitcache=util.env.MICROSERVICE_GITCACHE_IN_USE,
+                docker_host=util.env.KUBE_POD_DOCKER_HOST,
                 kube_config=None,
                 keepalive_interval=300,
                 active_deadline=util.env.KUBE_POD_ACTIVE_DEADLINE,
