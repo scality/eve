@@ -78,3 +78,30 @@ class TestYamlSyntax(unittest.TestCase):
         self.assertEqual(len(child_buildsets), 1)
         child_build = child_buildsets[0].buildrequest.build
         self.assertEqual(child_build.result, 'success')
+
+    def test_stage_validity(self):
+        """Check behavior with special stage names."""
+
+        steps = [{'ShellCommand': {'command': 'exit 0', 'env': {}}}]
+
+        branches = {'default': {'stage': 'pre-merge'}}
+        stages = {'pre-merge': {'worker': {'type': 'local'}, 'steps': steps}}
+        self.local_repo.push(yaml=YamlFactory(branches=branches, stages=stages))
+        buildset = self.cluster.api.force(branch=self.local_repo.branch)
+        import pdb; pdb.set_trace()
+        self.assertEqual(buildset.result, 'success')
+
+        branches = {'default': {'stage': 'pre-merge'}}
+        stages = {
+            'bootstrap': {'worker': {'type': 'local'}, 'steps': steps},
+            'pre-merge': {'worker': {'type': 'local'}, 'steps': steps},
+        }
+        self.local_repo.push(yaml=YamlFactory(branches=branches, stages=stages))
+        buildset = self.cluster.api.force(branch=self.local_repo.branch)
+        self.assertEqual(buildset.result, 'failure')
+
+        branches = {'default': {'stage': 'post-merge'}}
+        stages = {'pre-merge': {'worker': {'type': 'local'}, 'steps': steps}}
+        self.local_repo.push(yaml=YamlFactory(branches=branches, stages=stages))
+        buildset = self.cluster.api.force(branch=self.local_repo.branch)
+        self.assertEqual(buildset.result, 'failure')

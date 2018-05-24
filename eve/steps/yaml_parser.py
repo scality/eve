@@ -152,6 +152,20 @@ class ReadConfFromYaml(FileUpload):
                         'Branch <%s> not covered by yaml file' % branch)
                     defer.returnValue(CANCELLED)
 
+        if 'bootstrap' in conf.get('stages', {}):
+            self.addCompleteLog('stderr',
+                                'Error in yaml file:\n'
+                                'boostrap is reserved and '
+                                'cannot be used as a stage name')
+            defer.returnValue(FAILURE)
+
+        if stage_name not in conf.get('stages', {}):
+            self.addCompleteLog('stderr',
+                                'Error in yaml file:\n'
+                                'the specified stage cannot be '
+                                'found (%s)' % stage_name)
+            defer.returnValue(FAILURE)
+
         self.build.addStepsAfterCurrentStep([
             GetApiVersion(eve_api_version=eve_api_version),
             steps.TriggerStages([
