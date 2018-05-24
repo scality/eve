@@ -148,6 +148,8 @@ sqlparse==0.2.4
 stevedore==1.28.0
 subprocess32==3.2.7
 tempita==0.5.2
+toml==0.9.4
+towncrier==18.5.0
 tox==2.9.1
 treq==17.8.0
 twisted==17.9.0

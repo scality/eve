@@ -1,0 +1,11 @@
+# This file has been automatically generated, DO NOT EDIT!
+
+# Frozen requirements for "requirements/relnotes.in"
+
+click==6.7
+incremental==17.5.0
+jinja2==2.10
+markupsafe==1.0
+toml==0.9.4
+towncrier==18.5.0
+
