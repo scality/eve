@@ -1,0 +1,1 @@
+Fix reporters in the case the master is a KubeLatentWorker or Local worker.

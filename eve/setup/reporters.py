@@ -19,14 +19,9 @@
 from buildbot.plugins import reporters, util
 
 
-def hipchat_reporter():
+def hipchat_reporter(builders_whitelist):
     assert util.env.HIPCHAT_ROOM
     assert util.env.HIPCHAT_TOKEN
-
-    builders = [
-        util.env.DOCKER_BUILDER_NAME,
-        util.env.OPENSTACK_BUILDER_NAME
-    ]
 
     if util.env.HIPCHAT_REPORTER_STAGE_FILTER:
         stage_filter = util.env.HIPCHAT_REPORTER_STAGE_FILTER.split(';')
@@ -37,17 +32,12 @@ def hipchat_reporter():
         stage_filter,
         util.env.HIPCHAT_ROOM,
         util.env.HIPCHAT_TOKEN,
-        builders=builders
+        builders=builders_whitelist
     )
 
 
-def github_reporter():
+def github_reporter(builders_whitelist):
     assert util.env.GITHUB_TOKEN
-
-    builders = [
-        util.env.DOCKER_BUILDER_NAME,
-        util.env.OPENSTACK_BUILDER_NAME
-    ]
 
     if util.env.GIT_HOST_REPORTER_STAGE_FILTER:
         stage_filter = util.env.GIT_HOST_REPORTER_STAGE_FILTER.split(';')
@@ -57,18 +47,13 @@ def github_reporter():
     return reporters.GithubBuildStatusPush(
         stage_filter,
         util.env.GITHUB_TOKEN,
-        builders=builders
+        builders=builders_whitelist
     )
 
 
-def bitbucket_reporter():
+def bitbucket_reporter(builders_whitelist):
     assert util.env.EVE_GITHOST_LOGIN
     assert util.env.EVE_GITHOST_PWD
-
-    builders = [
-        util.env.DOCKER_BUILDER_NAME,
-        util.env.OPENSTACK_BUILDER_NAME
-    ]
 
     if util.env.GIT_HOST_REPORTER_STAGE_FILTER:
         stage_filter = util.env.GIT_HOST_REPORTER_STAGE_FILTER.split(';')
@@ -79,17 +64,12 @@ def bitbucket_reporter():
         stage_filter,
         util.env.EVE_GITHOST_LOGIN,
         util.env.EVE_GITHOST_PWD,
-        builders=builders
+        builders=builders_whitelist
     )
 
 
-def ultron_reporter():
+def ultron_reporter(builders_whitelist):
     assert util.env.ULTRON_REPORTER_URL
-
-    builders = [
-        util.env.DOCKER_BUILDER_NAME,
-        util.env.OPENSTACK_BUILDER_NAME
-    ]
 
     if util.env.ULTRON_REPORTER_STAGE_FILTER:
         stage_filter = util.env.ULTRON_REPORTER_STAGE_FILTER.split(';')
@@ -101,5 +81,5 @@ def ultron_reporter():
         util.env.ULTRON_REPORTER_LOGIN,
         util.env.ULTRON_REPORTER_PWD,
         util.env.ULTRON_REPORTER_URL,
-        builders=builders
+        builders=builders_whitelist
     )
