@@ -57,6 +57,9 @@ stages:
           name: run static analysis tools
           command: tox --sitepackages -e lint
       - ShellCommand:
+          name: Ensure the release notes compile
+          command: tox --sitepackages -e relnotes -- test_version
+      - ShellCommand:
           name: Ensure the doc compiles
           command: tox --sitepackages -e doc
       - ShellCommand:
