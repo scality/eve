@@ -19,7 +19,7 @@
 from twisted.internet import defer
 
 
-class BootstrapMixin:
+class BootstrapMixin(object):
 
     @defer.inlineCallbacks
     def _get_bootstrap(self, buildid):
