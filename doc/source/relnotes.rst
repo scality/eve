@@ -23,7 +23,7 @@ Eve 1.3.34 (2018-05-15)
 Bugfixes
 --------
 
-- Fixing a regression that broke the rebuild form request. (EVE-950)
+- Fix a regression that broke the rebuild form request. (EVE-950)
 
 
 Eve 1.3.33 (2018-05-14)
@@ -32,7 +32,7 @@ Eve 1.3.33 (2018-05-14)
 Bugfixes
 --------
 
-- Reverting a bugfix due to regression on the UI. Now adding a new field
+- Revert EVE-948 due to regression on the UI. Now adding a new field
   ``bootstrap_reason`` to identify the build reason inside any stage. (EVE-948)
 
 
