@@ -177,7 +177,7 @@ class BuildbotDataAPI(object):
 
     def get_build_properties(self, build):
         """Return properties from specified build."""
-        return self.get('/builds/%d/properties' % build['number'])[0]
+        return self.get('/builds/%d/properties' % build['buildid'])[0]
 
     def get_build_steps(self, build):
         """Return steps from specified build."""
