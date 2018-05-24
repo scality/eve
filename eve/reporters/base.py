@@ -143,18 +143,24 @@ class BaseBuildStatusPush(HttpStatusPushBase):
         """
         raise NotImplementedError()
 
+    def filterBuilds(self, build):
+        """Tell if the result of the stage (aka build) should be reported.
 
-class BuildStatusPushMixin(object):
-    # pylint: disable=too-few-public-methods
-    def _filterBuilds(self, filter_build, build):
-        if not self.stages:
-            return filter_build(build)
+        This overrides entirely Buildbot's default `filterBuilds`.
 
-        try:
-            key = build['properties']['stage_name'][0]
-        except (KeyError, IndexError):
-            return False
-        else:
-            if key not in self.stages:
-                return False
-        return filter_build(build)
+        Currently Eve only reports build statuses for the master
+        build (i.e. the top stage selected to run during bootstrap).
+
+        If the parent build is bootstrap: report build status (True)
+        If the parent build is something else (lower stage): block (False)
+
+        We identify the parent build by reading property `reason`, which
+        contains the string "triggered by bootstrap" if and only if
+        the stage has been triggered by bootstrap.
+
+        Args:
+            build: The build running the stage.
+
+        """
+        return build['properties']['reason'][0].endswith(
+            '(triggered by bootstrap)')

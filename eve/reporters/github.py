@@ -20,21 +20,11 @@ from buildbot.reporters.github import GitHubStatusPush
 from twisted.internet import defer
 from twisted.logger import Logger
 
-from eve.reporters.base import BuildStatusPushMixin
 
-
-class GithubBuildStatusPush(GitHubStatusPush, BuildStatusPushMixin):
+class GithubBuildStatusPush(GitHubStatusPush):
     """Send build result to github build status API."""
 
     logger = Logger('eve.steps.GithubBuildStatusPush')
-
-    def __init__(self, stages, *args, **kwargs):
-        self.stages = [stages] if isinstance(stages, basestring) else stages
-        super(GithubBuildStatusPush, self).__init__(*args, **kwargs)
-
-    def filterBuilds(self, build):
-        return self._filterBuilds(
-            super(GithubBuildStatusPush, self).filterBuilds, build)
 
     @defer.inlineCallbacks
     def send(self, build):

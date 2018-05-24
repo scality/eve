@@ -25,26 +25,20 @@ from twisted.internet import defer
 from twisted.logger import Logger
 
 from eve.process.bootstrap import BootstrapMixin
-from eve.reporters.base import BaseBuildStatusPush, BuildStatusPushMixin
+from eve.reporters.base import BaseBuildStatusPush
 
 
-class UltronBuildStatusPush(BaseBuildStatusPush, BuildStatusPushMixin,
-                            BootstrapMixin):
+class UltronBuildStatusPush(BaseBuildStatusPush, BootstrapMixin):
     """Send build result to Scality Ultron status API."""
 
     name = 'UltronBuildStatusPush'
     logger = Logger('eve.steps.HttpBuildStatusPush')
 
-    def __init__(self, stages, req_login, req_password, req_url, **kwargs):
-        self.stages = [stages] if isinstance(stages, basestring) else stages
+    def __init__(self, req_login, req_password, req_url, **kwargs):
         self.req_login = req_login
         self.req_password = req_password
         self.req_url = req_url
         super(UltronBuildStatusPush, self).__init__(**kwargs)
-
-    def filterBuilds(self, build):
-        return self._filterBuilds(
-            super(UltronBuildStatusPush, self).filterBuilds, build)
 
     @defer.inlineCallbacks
     def send(self, build):

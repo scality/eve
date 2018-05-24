@@ -93,5 +93,6 @@ def bootstrap_builder(workers):
             'git_owner': util.env.GIT_OWNER,
             'git_slug': util.env.GIT_SLUG,
             'max_step_duration': util.env.MAX_STEP_DURATION,
+            'stage_name': 'bootstrap',
         }
     )

@@ -19,67 +19,39 @@
 from buildbot.plugins import reporters, util
 
 
-def hipchat_reporter(builders_whitelist):
+def hipchat_reporter():
     assert util.env.HIPCHAT_ROOM
     assert util.env.HIPCHAT_TOKEN
 
-    if util.env.HIPCHAT_REPORTER_STAGE_FILTER:
-        stage_filter = util.env.HIPCHAT_REPORTER_STAGE_FILTER.split(';')
-    else:
-        stage_filter = []
-
     return reporters.HipChatBuildStatusPush(
-        stage_filter,
         util.env.HIPCHAT_ROOM,
         util.env.HIPCHAT_TOKEN,
-        builders=builders_whitelist
     )
 
 
-def github_reporter(builders_whitelist):
+def github_reporter():
     assert util.env.GITHUB_TOKEN
 
-    if util.env.GIT_HOST_REPORTER_STAGE_FILTER:
-        stage_filter = util.env.GIT_HOST_REPORTER_STAGE_FILTER.split(';')
-    else:
-        stage_filter = []
-
     return reporters.GithubBuildStatusPush(
-        stage_filter,
         util.env.GITHUB_TOKEN,
-        builders=builders_whitelist
     )
 
 
-def bitbucket_reporter(builders_whitelist):
+def bitbucket_reporter():
     assert util.env.EVE_GITHOST_LOGIN
     assert util.env.EVE_GITHOST_PWD
 
-    if util.env.GIT_HOST_REPORTER_STAGE_FILTER:
-        stage_filter = util.env.GIT_HOST_REPORTER_STAGE_FILTER.split(';')
-    else:
-        stage_filter = []
-
     return reporters.BitbucketBuildStatusPush(
-        stage_filter,
         util.env.EVE_GITHOST_LOGIN,
         util.env.EVE_GITHOST_PWD,
-        builders=builders_whitelist
     )
 
 
-def ultron_reporter(builders_whitelist):
+def ultron_reporter():
     assert util.env.ULTRON_REPORTER_URL
 
-    if util.env.ULTRON_REPORTER_STAGE_FILTER:
-        stage_filter = util.env.ULTRON_REPORTER_STAGE_FILTER.split(';')
-    else:
-        stage_filter = []
-
     return reporters.UltronBuildStatusPush(
-        stage_filter,
         util.env.ULTRON_REPORTER_LOGIN,
         util.env.ULTRON_REPORTER_PWD,
         util.env.ULTRON_REPORTER_URL,
-        builders=builders_whitelist
     )

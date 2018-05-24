@@ -22,10 +22,10 @@ from buildbot.util.httpclientservice import HTTPClientService
 from twisted.internet import defer
 from twisted.logger import Logger
 
-from eve.reporters.base import BaseBuildStatusPush, BuildStatusPushMixin
+from eve.reporters.base import BaseBuildStatusPush
 
 
-class BitbucketBuildStatusPush(BaseBuildStatusPush, BuildStatusPushMixin):
+class BitbucketBuildStatusPush(BaseBuildStatusPush):
     """Send build result to bitbucket build status API."""
 
     base_url = "https://api.bitbucket.org"
@@ -43,10 +43,9 @@ class BitbucketBuildStatusPush(BaseBuildStatusPush, BuildStatusPushMixin):
         None: 'INPROGRESS',
     }
 
-    def __init__(self, stages, login, password, **kwargs):
+    def __init__(self, login, password, **kwargs):
         self.login = login
         self.password = password
-        self.stages = [stages] if isinstance(stages, basestring) else stages
         super(BitbucketBuildStatusPush, self).__init__(**kwargs)
 
     def forge_url(self, build):
@@ -64,10 +63,6 @@ class BitbucketBuildStatusPush(BaseBuildStatusPush, BuildStatusPushMixin):
     def add_tag(self, name, value, icon, color=None):
         name_value = '[%s: %s]' % (name, value)
         self.description_suffix = name_value + self.description_suffix
-
-    def filterBuilds(self, build):
-        return self._filterBuilds(
-            super(BitbucketBuildStatusPush, self).filterBuilds, build)
 
     @defer.inlineCallbacks
     def send(self, build):

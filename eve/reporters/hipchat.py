@@ -22,10 +22,10 @@ from buildbot.util.httpclientservice import HTTPClientService
 from twisted.internet import defer
 from twisted.logger import Logger
 
-from eve.reporters.base import BaseBuildStatusPush, BuildStatusPushMixin
+from eve.reporters.base import BaseBuildStatusPush
 
 
-class HipChatBuildStatusPush(BaseBuildStatusPush, BuildStatusPushMixin):
+class HipChatBuildStatusPush(BaseBuildStatusPush):
     """Send build result to HipChat build status API."""
 
     name = 'HipChatBuildStatusPush'
@@ -53,10 +53,9 @@ class HipChatBuildStatusPush(BaseBuildStatusPush, BuildStatusPushMixin):
         None: 'gray',
     }
 
-    def __init__(self, stages, room_id, token, **kwargs):
+    def __init__(self, room_id, token, **kwargs):
         self.room_id = room_id
         self.token = token
-        self.stages = [stages] if isinstance(stages, basestring) else stages
         super(HipChatBuildStatusPush, self).__init__(**kwargs)
 
     def add_tag(self, name, value, icon, color=None):
@@ -66,10 +65,6 @@ class HipChatBuildStatusPush(BaseBuildStatusPush, BuildStatusPushMixin):
         if icon:
             attr['value']['icon'] = dict(url=icon)
         self.attributes.append(attr)
-
-    def filterBuilds(self, build):
-        return self._filterBuilds(
-            super(HipChatBuildStatusPush, self).filterBuilds, build)
 
     @defer.inlineCallbacks
     def send(self, build):

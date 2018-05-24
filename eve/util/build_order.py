@@ -47,9 +47,11 @@ class BaseBuildOrder(object):
         self.properties.update(self._parent_step.getProperties().properties)
         self.properties.setdefault('bootstrap_reason',
                                    (self.properties['reason'], 'BuildOrder'))
+        stage_name = self.properties.get('stage_name', ['unknown'])[0]
         self.properties.update({
             'stage_name': (self._stage_name, 'BuildOrder'),
-            'reason': (self._stage_name, 'BuildOrder'),
+            'reason': ('%s (triggered by %s)' % (
+                self._stage_name, stage_name), 'BuildOrder'),
             'git_reference': (self.git_repo, 'BuildOrder'),
             'git_repo': (self.git_repo, 'BuildOrder'),
         })
