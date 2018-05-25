@@ -84,24 +84,23 @@ class TestYamlSyntax(unittest.TestCase):
 
         steps = [{'ShellCommand': {'command': 'exit 0', 'env': {}}}]
 
-        branches = {'default': {'stage': 'pre-merge'}}
-        stages = {'pre-merge': {'worker': {'type': 'local'}, 'steps': steps}}
-        self.local_repo.push(yaml=YamlFactory(branches=branches, stages=stages))
+        branch = {'default': {'stage': 'pre-merge'}}
+        stage = {'pre-merge': {'worker': {'type': 'local'}, 'steps': steps}}
+        self.local_repo.push(yaml=YamlFactory(branches=branch, stages=stage))
         buildset = self.cluster.api.force(branch=self.local_repo.branch)
-        import pdb; pdb.set_trace()
         self.assertEqual(buildset.result, 'success')
 
-        branches = {'default': {'stage': 'pre-merge'}}
-        stages = {
+        branch = {'default': {'stage': 'pre-merge'}}
+        stage = {
             'bootstrap': {'worker': {'type': 'local'}, 'steps': steps},
             'pre-merge': {'worker': {'type': 'local'}, 'steps': steps},
         }
-        self.local_repo.push(yaml=YamlFactory(branches=branches, stages=stages))
+        self.local_repo.push(yaml=YamlFactory(branches=branch, stages=stage))
         buildset = self.cluster.api.force(branch=self.local_repo.branch)
         self.assertEqual(buildset.result, 'failure')
 
-        branches = {'default': {'stage': 'post-merge'}}
-        stages = {'pre-merge': {'worker': {'type': 'local'}, 'steps': steps}}
-        self.local_repo.push(yaml=YamlFactory(branches=branches, stages=stages))
+        branch = {'default': {'stage': 'post-merge'}}
+        stage = {'pre-merge': {'worker': {'type': 'local'}, 'steps': steps}}
+        self.local_repo.push(yaml=YamlFactory(branches=branch, stages=stage))
         buildset = self.cluster.api.force(branch=self.local_repo.branch)
         self.assertEqual(buildset.result, 'failure')

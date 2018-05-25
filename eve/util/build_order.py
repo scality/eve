@@ -45,8 +45,9 @@ class BaseBuildOrder(object):
     def setup_properties(self):
         """Set additional properties."""
         self.properties.update(self._parent_step.getProperties().properties)
-        self.properties.setdefault('bootstrap_reason',
-                                   (self.properties['reason'], 'BuildOrder'))
+        self.properties.setdefault(
+            'bootstrap_reason',
+            (self.properties['reason'][0], 'BuildOrder'))
         stage_name = self.properties.get('stage_name', ['unknown'])[0]
         self.properties.update({
             'stage_name': (self._stage_name, 'BuildOrder'),

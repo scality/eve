@@ -115,6 +115,8 @@ class TestCluster(unittest.TestCase):
             from pprint import pprint
             pprint(properties)
             # TODO: imagine useful tests with build properties
+            self.assertEqual(properties['properties']['stage_name'][0],
+                             'bootstrap')
             self.assertEqual(properties['properties']['reason'][0],
                              'force build')
             self.assertEqual(properties['properties']['reason'][1],
@@ -223,7 +225,7 @@ class TestCluster(unittest.TestCase):
             build = cluster.api.get_finished_build()
             self.assertEqual(build['results'], CANCELLED)
 
-    def test_bootstrap_properties(self):
+    def test_bootstrap_and_master_properties(self):
         """Check the properties on bootstrap build.
 
         Steps:
@@ -242,24 +244,69 @@ class TestCluster(unittest.TestCase):
 
             properties = cluster.api.get_build_properties(build)
 
-            def check_prop(name, value, source=None):
+            def check_prop(name, value=None, source=None):
                 self.assertTrue(name in properties)
-                self.assertEqual(properties[name][0], value)
+                if value:
+                    self.assertEqual(properties[name][0], value)
                 if source:
                     self.assertEqual(properties[name][1], source)
 
+            check_prop('artifacts_name')
+            check_prop('artifacts_public_url')
             check_prop('bootstrap', 1, 'set the bootstrap build number')
             check_prop('branch', 'spam', 'Build')
             check_prop('buildbot_version', '0.9.12')
+            check_prop('builddir')
             check_prop('buildername', 'bootstrap', 'Builder')
             check_prop('buildnumber', 1, 'Build')
+            check_prop('commit_short_revision')
+            check_prop('commit_timestamp')
+            check_prop('conf')
+            check_prop('eve_api_version')
             check_prop('git_host', 'mock', 'Builder')
             check_prop('git_owner', 'repo_owner', 'Builder')
             check_prop('git_slug', 'test', 'Builder')
             check_prop('got_revision', repo.revision, 'Git')
+            check_prop('master_builddir')
             check_prop('max_step_duration', 14400, 'Builder')
+            check_prop('product_version', '0.0.0')
             check_prop('project', 'TEST', 'Build')
+            check_prop('reason', 'branch updated', 'Scheduler')
             check_prop('repository', 'http://www.example.com/', 'Build')
             check_prop('revision', repo.revision, 'Build')
             check_prop('scheduler', 'bootstrap-scheduler', 'Scheduler')
-            check_prop('reason', 'branch updated', 'Scheduler')
+            check_prop('stage_name', 'bootstrap', 'Builder')
+            check_prop('start_time')
+            check_prop('workername')
+
+            master_build = cluster.api.get_finished_build(
+                'local-test_suffix')
+            properties = cluster.api.get_build_properties(master_build)
+            check_prop('artifacts_name')
+            check_prop('artifacts_public_url')
+            check_prop('bootstrap', 1, 'set the bootstrap build number')
+            check_prop('bootstrap_reason', 'branch updated', 'BuildOrder')
+            check_prop('branch', 'spam', 'Build')
+            check_prop('buildbot_version', '0.9.12')
+            check_prop('builddir')
+            check_prop('buildername', 'local-test_suffix', 'Builder')
+            check_prop('buildnumber', 1, 'Build')
+            check_prop('commit_short_revision')
+            check_prop('commit_timestamp')
+            check_prop('conf')
+            check_prop('eve_api_version')
+            check_prop('git_host', 'mock', 'Builder')
+            check_prop('git_owner', 'repo_owner', 'Builder')
+            check_prop('git_slug', 'test', 'Builder')
+            check_prop('got_revision', repo.revision, 'Git')
+            check_prop('master_builddir')
+            check_prop('max_step_duration', 14400, 'Builder')
+            check_prop('product_version', '0.0.0')
+            check_prop('project', 'TEST', 'Build')
+            check_prop('reason', 'pre-merge (triggered by bootstrap)')
+            check_prop('repository', 'http://www.example.com/', 'Build')
+            check_prop('revision', repo.revision, 'Build')
+            check_prop('scheduler', 'local-test_suffix', 'Scheduler')
+            check_prop('stage_name', 'pre-merge', 'BuildOrder')
+            check_prop('start_time')
+            check_prop('workername')

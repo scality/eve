@@ -135,7 +135,7 @@ class TestDockerCluster(unittest.TestCase):
                 buildset.buildrequest.build.children[0].buildrequest.build
             self.assertEqual(
                 child_build.properties['bootstrap_reason'],
-                [[u'force build', u'Force Build Form'], u'BuildOrder'])
+                [u'force build', u'BuildOrder'])
             self.assertEqual(child_build.result, 'success')
             cluster.sanity_check()
 
