@@ -1,1 +1,0 @@
-Simplify mechanism of reporters.

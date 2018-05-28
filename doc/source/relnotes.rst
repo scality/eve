@@ -17,6 +17,26 @@ Release Notes
 
 .. towncrier release notes start
 
+Eve 1.3.35 (2018-05-28)
+=======================
+
+Features
+--------
+
+- Verify generation of release notes in CI. (EVE-839)
+- Simplify mechanism of reporters. (EVE-951)
+- Prevent users from using a stage name `bootstrap` and pre-check validity of
+  stages. (EVE-951)
+
+
+Bugfixes
+--------
+
+- Fix bootstrap_reason property and update reason property. (EVE-948)
+- Fix reporters in the case the master is a KubeLatentWorker or Local worker.
+  (EVE-951)
+
+
 Eve 1.3.34 (2018-05-15)
 =======================
 
