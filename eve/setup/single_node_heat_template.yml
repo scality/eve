@@ -101,6 +101,19 @@ resources:
                 echo "nameserver 8.8.8.8" >> /etc/resolv.conf
                 echo "nameserver 208.67.222.222" >> /etc/resolv.conf
 
+                # setup the private interface, if needed
+                if [ `cat /sys/class/net/eth2/operstate` != "up" ]
+                then
+                  if [ -f /etc/redhat-release ]
+                  then
+                    echo $'DEVICE="eth2"\nBOOTPROTO="dhcp"\nONBOOT="yes"\nTYPE="Ethernet"\nUSERCTL="yes"\nPEERDNS="no"\nIPV6INIT="no"\nPERSISTENT_DHCLIENT="1"\nDEFROUTE="no"' > /etc/sysconfig/network-scripts/ifcfg-eth2
+                  elif [ -f /etc/debian_version ]
+                  then
+                    echo $'auto eth2\niface eth2 inet dhcp' > /etc/network/interfaces.d/eth2.cfg && (echo; cat /etc/network/interfaces.d/eth2.cfg) >> /etc/network/interfaces
+                  fi
+                  ifup eth2
+                fi
+
                 if [ -s /tmp/worker_init_script.sh ] && [ ! -s /tmp/worker_requirements_script.sh ]
                 then
                   # run init.sh
@@ -117,7 +130,7 @@ resources:
                     export LANG=en_US.utf8
 
                     retry yum -y install git gcc python-devel python-setuptools libffi-devel openssl-devel
-                    retry easy_install pip
+                    retry easy_install pip==9.0.3
 
                     adduser -u 1042 --home-dir /home/eve eve
                     usermod -G wheel eve
@@ -149,7 +162,7 @@ resources:
                   fi
 
                   # install twisted and buildbot
-                  retry sudo pip install --index-url=https://pypi.python.org/simple/ --upgrade pip
+                  retry sudo pip install --index-url=https://pypi.python.org/simple/ --upgrade pip==9.0.3
                   retry sudo pip install twisted==$twisted_version
                   retry sudo pip install buildbot-worker==$worker_version
 
