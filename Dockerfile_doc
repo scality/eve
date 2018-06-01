@@ -4,7 +4,9 @@ FROM dldl/sphinx-server
 RUN apk update && \
     apk upgrade && \
     apk add git
-COPY . /opt/eve
+RUN pip install --upgrade pip==9.0.2
+
+COPY . /opt/eve/
 RUN pip install --no-deps /opt/eve
 
 COPY ./doc/source /web/
