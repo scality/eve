@@ -1,1 +1,0 @@
-Support Scality Cloud.

@@ -17,6 +17,24 @@ Release Notes
 
 .. towncrier release notes start
 
+Eve 1.3.36 (2018-06-04)
+=======================
+
+Features
+--------
+
+- Fix Centos6 VM spawn. (RELENG-2650)
+- Support Scality Cloud. (RELENG-2650)
+
+
+Bugfixes
+--------
+
+- Ensure docker images contain untouched code, so that git tags are rid of
+  'dirty' mention. (EVE-953)
+- Fix documentation container generation. (PIPDEP-492)
+
+
 Eve 1.3.35 (2018-05-28)
 =======================
 

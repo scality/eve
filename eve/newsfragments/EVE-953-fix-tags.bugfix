@@ -1,1 +1,0 @@
-Ensure docker images contain untouched code, so that git tags are rid of 'dirty' mention.
