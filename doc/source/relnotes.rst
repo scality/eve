@@ -17,6 +17,15 @@ Release Notes
 
 .. towncrier release notes start
 
+Eve 1.3.37 (2018-06-06)
+=======================
+
+Bugfixes
+--------
+
+- Fix Wheezy VM worker support. (RELENG-2650)
+
+
 Eve 1.3.36 (2018-06-04)
 =======================
 
