@@ -97,22 +97,36 @@ resources:
                 EOF2
                 chmod u+x /tmp/worker_requirements_script.sh
 
-                # add Google and OpenDNS nameservers
-                echo "nameserver 8.8.8.8" >> /etc/resolv.conf
-                echo "nameserver 208.67.222.222" >> /etc/resolv.conf
-
                 # setup the private interface, if needed
                 if [ `cat /sys/class/net/eth2/operstate` != "up" ]
                 then
                   if [ -f /etc/redhat-release ]
                   then
-                    echo $'DEVICE="eth2"\nBOOTPROTO="dhcp"\nONBOOT="yes"\nTYPE="Ethernet"\nUSERCTL="yes"\nPEERDNS="no"\nIPV6INIT="no"\nPERSISTENT_DHCLIENT="1"\nDEFROUTE="no"' > /etc/sysconfig/network-scripts/ifcfg-eth2
+                    # Redhat/Centos
+                    echo $'DEVICE="eth2"\nBOOTPROTO="dhcp"\nONBOOT="yes"\nTYPE="Ethernet"\nUSERCTL="yes"\nPEERDNS="no"\nIPV6INIT="no"\nPERSISTENT_DHCLIENT="1"' > /etc/sysconfig/network-scripts/ifcfg-eth2
                   elif [ -f /etc/debian_version ]
                   then
-                    echo $'auto eth2\niface eth2 inet dhcp' > /etc/network/interfaces.d/eth2.cfg && (echo; cat /etc/network/interfaces.d/eth2.cfg) >> /etc/network/interfaces
+                    if [ -d /etc/network/interfaces.d]
+                    then
+                      # Ubuntu
+                      echo $'auto eth2\niface eth2 inet dhcp' > /etc/network/interfaces.d/eth2.cfg && echo $'\nauto eth2\niface eth2 inet dhcp' >> /etc/network/interfaces
+                    else
+                      # Debian
+                      echo $'\nallow-hotplug eth2\niface eth2 inet dhcp' >> /etc/network/interfaces
+                    fi
                   fi
+
+                  # enable eth2
                   ifup eth2
+
+                  # restart eth0 to grab the "good" DNS settings (those that come from DHCP on eth0)
+                  ifdown eth0 && sleep 5 && ifup eth0
                 fi
+
+                # add Google and OpenDNS nameservers
+                echo "nameserver 8.8.8.8" >> /etc/resolv.conf
+                echo "nameserver 208.67.222.222" >> /etc/resolv.conf
+                echo "nameserver 208.67.220.220" >> /etc/resolv.conf
 
                 if [ -s /tmp/worker_init_script.sh ] && [ ! -s /tmp/worker_requirements_script.sh ]
                 then
