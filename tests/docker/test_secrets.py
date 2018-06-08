@@ -33,12 +33,16 @@ class TestSecrets(unittest.TestCase):
               its value : expected failure + expected success
             - stop the cluster
         """
-        conf = {'VAULT_IN_USE': '1'}
+        conf = {
+            'VAULT_IN_USE': '1',
+            'VAULT_FILE': 'path/to/file'
+        }
         with Cluster(extra_conf=conf) as cluster:
             cluster.sanity_check()
-            cluster.vault.write_secret('secret_id', {'value': 'polichinelle'})
+            cluster.vault.write_secret(
+                'path/to/file/secret_id', {'value': 'polichinelle'})
             self.assertEqual(
-                cluster.vault.read_secret('secret_id'),
+                cluster.vault.read_secret('path/to/file/secret_id'),
                 {'value': 'polichinelle'}
             )
 

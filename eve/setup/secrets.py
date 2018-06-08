@@ -20,7 +20,12 @@ from buildbot.plugins import secrets, util
 
 
 def secrets_providers():
+    if util.env.VAULT_FILE:
+        secretsmount = 'secret/%s' % util.env.VAULT_FILE
+    else:
+        secretsmount = 'secret'
     return [secrets.HashiCorpVaultSecretProvider(
         vaultToken=util.env.VAULT_TOKEN,
-        vaultServer=util.env.VAULT_URL
+        vaultServer=util.env.VAULT_URL,
+        secretsmount=secretsmount
     )]
