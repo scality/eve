@@ -16,5 +16,6 @@ Eve: continuous integration builder by Scality
    overview
    first_steps
    reference
+   services
    help
    relnotes

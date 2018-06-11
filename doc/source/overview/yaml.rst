@@ -136,11 +136,8 @@ line 9, 21, 36 and 69
 Examples of yaml files
 ----------------------
 
-* `RING`_
 * `EVE`_
 * `BERT-E`_
-
-.. _RING: https://bitbucket.org/scality/ring/src/addd7f8f0a4c698dcf3f0deb9abfb3ef149d1845/eve/main.yml
 
 .. _EVE: https://bitbucket.org/scality/eve/src/9d0a7425ecec2be751bc65367dd6522f808f8fd5/eve/main.yml?at=development%2F1.0&fileviewer=file-view-default
 
