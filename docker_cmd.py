@@ -33,18 +33,19 @@ def _print(string):
     print(string)
     sys.stdout.flush()
 
-_print("pinging crossbar...")
-wamp_router_url =  os.environ['WAMP_ROUTER_URL']
-for i in xrange(120):
-    try:
-        requests.get(wamp_router_url.replace('ws://', 'http://'))
-        break
-    except requests.exceptions.ConnectionError:
-        _print('Waiting for the wamp queue to wake up {} ...'.format(
-            wamp_router_url))
-        time.sleep(1)
-else:
-    raise Exception('wamp server never responded')
+wamp_router_url = os.environ.get('WAMP_ROUTER_URL', '')
+if wamp_router_url:
+    _print("pinging crossbar...")
+    for i in xrange(120):
+        try:
+            requests.get(wamp_router_url.replace('ws://', 'http://'))
+            break
+        except requests.exceptions.ConnectionError:
+            _print('Waiting for the wamp queue to wake up {} ...'.format(
+                wamp_router_url))
+            time.sleep(1)
+    else:
+        raise Exception('wamp server never responded')
 
 _print("pinging database...")
 db_url = os.environ['DB_URL']
@@ -77,7 +78,7 @@ if os.environ.get('DEBUG_MODE', '0') in ['true', 'True', '1', 'y', 'yes']:
         pass
     _print("resuming startup sequence")
 
-if os.environ['MASTER_MODE'] in ['frontend', 'standalone']:
+if os.environ.get('MASTER_MODE', 'standalone') in ['frontend', 'standalone']:
     _print("upgrading master...")
     subprocess.check_call('buildbot upgrade-master .', shell=True)
 
