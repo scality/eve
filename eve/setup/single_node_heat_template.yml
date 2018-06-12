@@ -50,7 +50,7 @@ resources:
   heat_worker:
     type: OS::Nova::Server
     properties:
-      image: {get_param: image}
+      image: "{get_param: image}"
       flavor: {get_param: flavor}
       key_name: {get_param: key_name}
       networks:
