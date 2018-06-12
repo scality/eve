@@ -23,11 +23,11 @@ My build did not start. What should I do?
 
 2. You need to check that the webhooks were sent by bitbucket/github and
    received a 20X response (200 OK or 202 Added). If you see HTTP errors (40X
-   responses) there, please contact RelEng as these are indicative of
+   responses) there, please contact eve's admin as these are indicative of
    a deployment issue.
 
 3. You need to check that eve is responding
-   ``https://eve.devsca.com/<github/bitbucket>/scality/<repo-name>``
+   ``https://<eve_base_url>/<github/bitbucket>/scality/<repo-name>``
 
 4. Sometimes the build request is received by eve but takes some time to send
    the ``IN PROGRESS`` status build to bitbucket/github. Waiting a little bit.
@@ -49,7 +49,7 @@ Other possibilities are:
 
     * buildbot has lost its TCP connection to crossbar.io (a service allowing to
       sync multiple buildbot masters). When this happens, buildbot needs to be
-      restarted (`contact RelEng`_).
+      restarted.
 
     * A network failure caused the loss of the github/bitbucket webhook. Retry
       or force the build.
@@ -57,6 +57,4 @@ Other possibilities are:
     * Your commit is not a tip of a branch anymore. Another commit has been
       pushed on top of it.
 
-    * A bug in eve/buildbot (`contact RelEng`_).
-
-.. _contact RelEng: mailto:releng@scality.com
+    * A bug in eve/buildbot.

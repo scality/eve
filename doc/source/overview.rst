@@ -1,13 +1,16 @@
 Overview
 ========
 
-Eve is a builder that can run arbitrary pipelines on commits of a Git
-repository. It is constructed as a software layer above Buildbot. It enriches
-Buildbot’s feature set to fit Scality's needs. Currently, Eve is able to spawn
-openstack workers, docker workers and kubernetes workers.
+Eve is a continuous integration tool that can run arbitrary pipelines on commits
+of a Git repository. It is constructed as a software layer above Buildbot. It
+enriches Buildbot’s feature set, notably by using code in the built repository
+itself to define the pipeline.
 
-Today, Eve is managing an infrastructure build around Kubernetes with peaks
-reaching around 130 nodes.
+This lets developpers update their CI pipeline without needing the independently
+of the platform operator.
+
+Currently, eve is able to spawn openstack workers, docker workers and kubernetes
+workers.
 
 Eve is open source and its code is available on bitbucket_.
 
@@ -22,6 +25,3 @@ Eve is open source and its code is available on bitbucket_.
    overview/build
    overview/yaml
    overview/ui
-   overview/artifacts
-   overview/secrets
-   overview/stats

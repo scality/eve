@@ -16,18 +16,15 @@ are violated.
 
 Buildbot must be seen more as a library than a ready-to-use tool. It offers you
 a maximum of flexibility to build your pipeline. Basically, if you need to add
-a feature, you need to create a Python class that inherits from one of
+a feature, you just have to create a Python class that inherits from one of
 buildbot's core classes and change their behavior. Extremely powerful!
 
 Another great feature in buildbot is that it uses a database to store all of its
 data. The database's model is available and allows us to get stats, to monitor
-and to troubleshoot issues.
+and to troubleshoot issues easily.
 
-What is Eve?
-------------
-First, you need to configure your github/bitbucket repository to send webhooks
-to eve (See "How to register a new git repository ?" section below). eve listens
-to github/bitbucket webhooks triggered by "git push" events.
+How does eve work?
+------------------
 
 For every received webhook, eve checks out the relative git branch and looks in
 the target repository for a yaml file, under ``eve/main.yaml``. This file will
@@ -52,32 +49,14 @@ On Bitbucket
 .. image:: ../images/bitbucket-build-status.png
    :target: ../_images/bitbucket-build-status.png
 
-Clicking on the status badges will take you to eve's interface (See screenshot
-below). Note that, currently, eve can only be accessed from Scality's offices or
-through the VPN. Some security holes discovered on buildbot are preventing us
-from removing this constraint. However, this may change in the (not so far)
-future.
 
+Clicking on the status badges will take you to eve's interface (See screenshot
+below).
 
 .. image:: ../images/buildbot-build-ui.png
    :target: ../_images/buildbot-build-ui.png
 
-The screenshot above shows how a successful build looks like in the standard
-buildbot interface.
-
-For every received webhook, eve checks out the relative git branch and looks in
-the target repository for a yaml file, under ``eve/main.yaml``. This file will
-dictate the behavior of the pipeline for that specific commit.
-
-Depending on the presence/absence of ``eve/main.yaml`` and on its contents, eve
-will eventually decide to start a build.
-
-Once the build finished, eve will report its outcome to github/bitbucket using
-their respective APIs, by setting a status on the commit that has entered the
-pipeline. The build status is displayed on their web ui.
-
-Clicking on the status badges will take you to eve's interface (See screenshot
-below). Note that, currently, eve can only be accessed from Scality's offices or
-through the VPN. Some security holes discovered on buildbot are preventing us
-from removing this constraint. However, this may change in the (not so far)
-future.
+.. warning::
+    Currently, eve has some security holes and if you have sensitive
+    informations in your pipeline or repository (i.e. passwords), it is advised
+    to only allow access to it through local network or VPN.

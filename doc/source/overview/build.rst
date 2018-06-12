@@ -1,53 +1,29 @@
 Builds, stages & workers
 ========================
 
-5. The build block:
+In buildbot, a build is a list of steps executed sequentially on a given worker.
+Each build can trigger multiple other builds (which allow to run tasks
+concurently).
+A pipeline ends up looking like a tree of nested builds.
 
-   In buildbot, a build is a list of steps executed sequentially on a given
-   worker. The most common steps allow to run a shell command. It is not
-   possible to parallelize steps within the same build.
+In eve some builds have special meaning, so a special vocabulary is used to
+refer to them.
 
-   What you can do, however, is to add a 'Trigger' step to launch one or more
-   sub-builds on other workers, and in parallel. The parent build can wait for
-   the results of its sub builds, check their results and decide to
-   continue/halt. Child builds can also have children and the final shape of
-   your pipeline looks like a directory tree.
+The first build (started either by a webhook or a force form) is called
+`Bootstrap`, it runs a number of eve internal steps automatically (settings some
+environment, parsing the yaml file...) and then decide to trigger a build
+according to the instruction written in eve/main.yml.
 
-   eve uses this system to build a pipeline from the yaml file. Every webhook
-   triggers a build named 'bootstrap'. 'bootstrap' loads the yaml file and
-   triggers your pipeline's top-level build and this top-level build may, in
-   turn trigger other child builds::
+Any builds below the bootstrap is called a "stage" in eve.
+The first stage called by bootstrap according to the branch mapping in
+eve/main.yml is the one the reporter will send build status update for.
 
-       1 bootstrap build -> 1 top-level build -> 0..n child builds
+Then this main stage can trigger any number of other stages (which in turn can
+do just that do) with the special `TriggerStage` step.
 
-   As you can see, for buildbot all the builds and their children are called
-   builds.
+When clicking on a status badge on github/bitbucket, you are directly redirected
+to the top-level stage so you won't see the bootstrap (and probably will never
+have to worry about it).
 
-   At RelEng, we've found out that this is confusing, especially for end users.
-   The wording 'build' refers to different things depending on the context. We
-   prefer calling the top-level block the top-level stage and all of its
-   children "stages". For instance, in the eve/main.yaml file, we only refer to
-   stages. In eve's language, the line above becomes::
-
-       1 bootstrap -> 1 top-level stage -> 0..n stages
-
-   When you click on a status badge on github/bitbucket, you are directly
-   redirected to the top-level stage (and not the bootstrap). The bootstrap
-   contains internal steps barely useful for developers.
-
-   The top-level's stage description here is 'pre-merge'. Please use this
-   description in your eve/main.yaml files. This is part of a bigger plan to
-   have pre-merge and post-merge pipelines (quick/slow tests).
-
-   On the right side, we can access the corresponding bootstrap if you are
-   curious or if you want to rebuild it.
-
-6. The stages:
-
-   The stages are folded by default. You can unfold them to see the details of
-   their steps.
-
-First, you need to configure your github/bitbucket repository to send webhooks
-to eve (See "How to register a new git repository ?" section below). eve listens
-to github/bitbucket webhooks triggered by "git push" events.
-
+In eve UI, the stages are folded by default. You can fold/unfold them to see the
+details of their steps execution by clicking the '>' arrows.

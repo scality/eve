@@ -54,10 +54,6 @@ properties.  The field ``Extra Properties`` is available for this purpose.
 Proper steps will be skipped inside the build pipeline and the values defined
 in the form will be set instead.
 
-Per example for the `Ring`_ project, on the ``post-merge`` stage,
-overwriting the ``premerge_artifacts_names`` property allow you to start a
-``post-merge`` build with any artifacts available.
-
 The form might look like this:
 
 +----------------------------------+-----------------------------------+
@@ -69,7 +65,7 @@ The form might look like this:
 +----------------------------------+-----------------------------------+
 | properties name                  | ``premerge_artifacts_names``      |
 +----------------------------------+-----------------------------------+
-| properties value                 | ``bitbucket:scality::ring:...``   |
+| properties value                 | ``bitbucket:...``                 |
 +----------------------------------+-----------------------------------+
 
 
@@ -79,14 +75,3 @@ Can I have access to the workers?
 Yes and no. There is no easy way to do it today with eve. We need to give root
 access to the platform. It is a bit dangerous so we avoid doing it for everybody
 in the company but will definitely do on demand.
-
-
-How can I get help?
--------------------
-
-The HipChat ``Community support (RELENG projects)`` room is the place to go. The
-Release Engineering team dedicates one person every day (The Night's Watch lord
-Commander) to answer questions in this room.
-
-
-.. _ring: https://bitbucket.org/scality/ring
