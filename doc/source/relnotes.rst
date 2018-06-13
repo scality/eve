@@ -17,6 +17,26 @@ Release Notes
 
 .. towncrier release notes start
 
+Eve 1.3.38 (2018-06-13)
+=======================
+
+Features
+--------
+
+- Add possibility to restrain vault secrets to a namespace via secretsmount and
+  VAULT_FILE. (EVE-354)
+
+
+Bugfixes
+--------
+
+- Remove references to proprietary code or business specific concepts.
+  (EVE-954)
+- Moved additionnals non-core services to a new `Services` section. (EVE-954)
+- Overhaul of the whole `first steps` and `Overview` sections. (EVE-954)
+- Fix boot of Docker container in standalone mode. (PIPDEP-393)
+
+
 Eve 1.3.37 (2018-06-06)
 =======================
 
