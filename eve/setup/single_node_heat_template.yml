@@ -152,6 +152,13 @@ resources:
                     if [ "$(rpm -q --queryformat '%{VERSION}' centos-release)" = "6" ]
                     then
                       twisted_version=15.4 # no more recent with python2.6 (Centos 6 only)
+i
+                      #hack centos 6
+                      yum update -y
+                      yum install -y epel-release
+                      yum install -y cloud-init dracut-modules-growroot
+                      rpm -qa kernel | sed 's/^kernel-//'  | xargs -I {} dracut -f /boot/initramfs-{}.img {}
+
                     else
                       twisted_version=16.4.0
                     fi
