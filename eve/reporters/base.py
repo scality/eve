@@ -102,6 +102,12 @@ class BaseBuildStatusPush(HttpStatusPushBase):
         if result is not None:
             description = 'Hooray!'
             duration = build['complete_at'] - build['started_at']
+            # Workaround: `complete_at` and `started_at` may be an int or
+            # a datetime.timedelta, below we convert it to a int in any case.
+            try:
+                duration = duration.seconds
+            except AttributeError:
+                pass
             summary += '[%s]' % Results[result]
             if result != SUCCESS:
                 description = Results[result] + ' in step(s): ' + ', '.join(
