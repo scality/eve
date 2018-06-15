@@ -20,8 +20,10 @@ from buildbot.reporters.github import GitHubStatusPush
 from twisted.internet import defer
 from twisted.logger import Logger
 
+from eve.reporters.base import TopLevelBuildFilter
 
-class GithubBuildStatusPush(GitHubStatusPush):
+
+class GithubBuildStatusPush(TopLevelBuildFilter, GitHubStatusPush):
     """Send build result to github build status API."""
 
     logger = Logger('eve.steps.GithubBuildStatusPush')

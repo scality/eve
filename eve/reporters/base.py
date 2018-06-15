@@ -34,7 +34,31 @@ CLOCK_ICON = 'https://image.freepik.com/free-icon/clock-of-circular-shape-at' \
              '-two-o-clock_318-48022.jpg'
 
 
-class BaseBuildStatusPush(HttpStatusPushBase):
+class TopLevelBuildFilter(object):
+    def filterBuilds(self, build):
+        """Tell if the result of the stage (aka build) should be reported.
+
+        This overrides entirely Buildbot's default `filterBuilds`.
+
+        Currently Eve only reports build statuses for the master
+        build (i.e. the top stage selected to run during bootstrap).
+
+        If the parent build is bootstrap: report build status (True)
+        If the parent build is something else (lower stage): block (False)
+
+        We identify the parent build by reading property `reason`, which
+        contains the string "triggered by bootstrap" if and only if
+        the stage has been triggered by bootstrap.
+
+        Args:
+            build: The build running the stage.
+
+        """
+        return build['properties']['reason'][0].endswith(
+            '(triggered by bootstrap)')
+
+
+class BaseBuildStatusPush(TopLevelBuildFilter, HttpStatusPushBase):
     """Base class for pushing build status."""
 
     repo = None
@@ -148,25 +172,3 @@ class BaseBuildStatusPush(HttpStatusPushBase):
 
         """
         raise NotImplementedError()
-
-    def filterBuilds(self, build):
-        """Tell if the result of the stage (aka build) should be reported.
-
-        This overrides entirely Buildbot's default `filterBuilds`.
-
-        Currently Eve only reports build statuses for the master
-        build (i.e. the top stage selected to run during bootstrap).
-
-        If the parent build is bootstrap: report build status (True)
-        If the parent build is something else (lower stage): block (False)
-
-        We identify the parent build by reading property `reason`, which
-        contains the string "triggered by bootstrap" if and only if
-        the stage has been triggered by bootstrap.
-
-        Args:
-            build: The build running the stage.
-
-        """
-        return build['properties']['reason'][0].endswith(
-            '(triggered by bootstrap)')
