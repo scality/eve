@@ -1,1 +1,0 @@
-Fix a bug crashing reporters when formatting the end status of a build.

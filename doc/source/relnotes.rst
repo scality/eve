@@ -17,6 +17,16 @@ Release Notes
 
 .. towncrier release notes start
 
+Eve  (2018-06-15)
+=================
+
+Bugfixes
+--------
+
+- Fix a bug crashing reporters when formatting the end status of a build.
+  (PIPDEP-393)
+
+
 Eve 1.3.38 (2018-06-13)
 =======================
 
