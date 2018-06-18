@@ -26,28 +26,24 @@ Then add an Upload step and give it the name of the folder, like below:
    - ShellCommand:
        name: "prepare artifacts to be uploaded"
        command: >
-           mkdir -p artifacts/repo artifacts/installer artifacts/sources
-           ; cd artifacts/repo
+           mkdir -p artifacts/repo artifacts/installer
+           && cd artifacts/repo
            && ln -s `echo ../../build/prod/packages/repository/[0-9]*` %(prop:os_name)s
-           && ln -sf ../../build/prod/packages/repository/init.log %(prop:os_name)s-init.log
-           && ln -sf ../../build/prod/packages/repository/add-scality.log %(prop:os_name)s-add-scality.log
-           && ln -sf ../../build/prod/packages/repository/add-3rdparty.log %(prop:os_name)s-add-3rdparty.log
            && cd ../../artifacts/installer
-           && ln -s `echo ../../build/prod/installer/scality-ring-*.run` .
-           && cd ../../artifacts/sources
-           && find ../../build/prod/ -name '*.tar.gz'
-           && ln -s `echo ../../build/prod/pyscaldisk/scaldisk-*.tar.gz` .
-           # scaldisk tarball is produced on all distribs and pushed 3 times
+           && ln -s `echo ../../build/prod/installer/installer*.run` .
        haltOnFailure: True
        alwaysRun: True
    - Upload:
-       source: "artifacts"
+       source: artifacts
        urls:
          - ['\1.run', 'installer/*.run']
        alwaysRun: True
 
+The property ``%(prop:artifacts_private_url)s`` can be used by other steps to
+access, password free, a local and cached copy of artifacts already produced.
+
 The property ``%(prop:artifacts_public_url)s`` will contain the URL of the
-uploaded content.
+uploaded content for users outside the CI.
 
 Artifacts are also available for download from a web browser (see screenshots).
 
