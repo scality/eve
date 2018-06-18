@@ -1,5 +1,5 @@
-Statistical viewer with Metabase
---------------------------------
+Statistical viewer
+------------------
 
 A metabase instance can be deployed and plugged to eve database.
 This allows to have real-time stats for the whole repository pipeline.
