@@ -19,10 +19,12 @@
 from collections import namedtuple
 from os.path import abspath, dirname, join
 
+import yaml
 from buildbot import version
 from buildbot.plugins import util, worker
-from buildbot.process.properties import Interpolate, Property
+from buildbot.process.properties import Interpolate, Property, Transform
 from buildbot.worker.local import LocalWorker
+from twisted.logger import Logger
 from twisted.python.reflect import namedModule
 
 
@@ -104,6 +106,37 @@ sudo -Hu eve buildbot-worker start /home/eve/worker
 """
 
 
+def openstack_mapping(provider, field, value):
+    logger = Logger('eve.setup.workers')
+
+    mapping = {}
+    mapping_path = util.env.OS_MAPPING_FILE_PATH
+
+    try:
+        with open(mapping_path) as mapping_file:
+            mapping = yaml.load(mapping_file.read())
+    except (OSError, IOError, yaml.YAMLError) as err:
+        logger.error('An error occured while loading the mapping file at '
+                     '{path}: {err}', path=mapping_path, err=err)
+        return value
+
+    try:
+        for chunk in mapping.get(provider, []):
+            field_section = chunk.get(field, None)
+
+            if field_section:
+                original_value = field_section.get('original_value', None)
+                new_value = field_section.get('new_value', None)
+
+                if original_value == value and new_value is not None:
+                    return new_value
+    except AttributeError as err:
+        logger.error('An error occured while parsing the mapping file at '
+                     '{path}: {err}', path=mapping_path, err=err)
+
+    return value
+
+
 def openstack_heat_workers():
     workers = []
     heat_template = open(join(dirname(abspath(__file__)),
@@ -127,8 +160,14 @@ def openstack_heat_workers():
                 password=password,
                 heat_template=heat_template,
                 heat_template_parameters={
-                    'image': Property('openstack_image'),
-                    'flavor': Property('openstack_flavor'),
+                    'image': Transform(openstack_mapping,
+                                       provider=util.env.OS_PROVIDER,
+                                       field="image",
+                                       value=Property('openstack_image')),
+                    'flavor': Transform(openstack_mapping,
+                                        provider=util.env.OS_PROVIDER,
+                                        field="flavor",
+                                        value=Property('openstack_flavor')),
                     'key_name': util.env.OS_KEY_NAME,
                     'public_network': util.env.OS_NETWORK_PUBLIC,
                     'service_network': util.env.OS_NETWORK_SERVICE,
