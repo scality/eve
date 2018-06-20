@@ -18,6 +18,8 @@ spec:
           cpu: "100m"
           memory: "500Mi"
       env:
+        - name: MY_PROPERTY
+          value: "%(prop:stage_name)s"
         - name: TEST_STRING
           value: "{{ vars.a_string }}"
         {% for element in vars.a_list %}

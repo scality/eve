@@ -32,3 +32,6 @@ stages:
             test ${TEST_LIST_2} = "test list value 2" &&
             test ${TEST_DICT_K1} = "test dict value 1" &&
             test ${TEST_DICT_K2} = "test dict value 2"
+      - ShellCommand:
+          name: Ensure that properties can be interpolated inside a pod
+          command: test ${MY_PROPERTY} = "simple-stage"

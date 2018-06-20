@@ -101,7 +101,8 @@ setup(
             'nextBootstrapBuild=eve.util.next_bootstrap_build:nextBootstrapBuild',
             'password_generator=eve.util.password_generator:password_generator',
             'step_factory=eve.util.step_factory:step_factory',
-            'verify_docker_certificates=eve.util.docker:verify_docker_certificates'
+            'verify_docker_certificates=eve.util.docker:verify_docker_certificates',
+            'replace_with_interpolate=eve.util.step_factory:replace_with_interpolate',
         ],
         'buildbot.worker': [
             'EveDockerLatentWorker=eve.worker.docker.docker_worker:EveDockerLatentWorker',

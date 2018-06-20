@@ -19,7 +19,7 @@
 from os import environ
 from re import finditer
 
-from buildbot.plugins import steps
+from buildbot.plugins import steps, util
 from buildbot.process.properties import Interpolate
 from buildbot.steps.http import HTTPStep
 from buildbot.steps.source.git import Git
@@ -59,7 +59,7 @@ def step_factory(custom_steps, step_type, **params):
         params['name'] = stepname[:50]
 
     # Replace the %(prop:*)s in the text with an Interpolate obj
-    params = replace_with_interpolate(params)
+    params = util.replace_with_interpolate(params)
 
     if issubclass(_cls, Git):
         # retry 10 times if git step fails, wait 60s between retries
