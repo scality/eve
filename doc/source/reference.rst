@@ -8,4 +8,5 @@ Reference guide
 
    reference/workers
    reference/steps
+   reference/product_version
    reference/api_client

@@ -105,3 +105,10 @@ Can I have access to the workers to investigate my failing step?
 ----------------------------------------------------------------
 
 Please contact the administrator of Eve to obtain access to a specific worker.
+
+
+Why do my build artifacts reference version '0.0.0'?
+----------------------------------------------------
+
+You need to implement a :ref:`product version script <get_product_version>` in
+order to tell Eve the current version of the repository.
