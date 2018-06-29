@@ -1,8 +1,10 @@
 Frequently asked questions
 ==========================
 
-How do I force a build on a branch?
------------------------------------
+.. _how_to_force_build:
+
+How to start a build on a branch manually?
+------------------------------------------
 
 On the UI main page select:
 ``builds`` -> ``builders`` -> ``bootstrap`` -> ``force`` -> enter your branch's name
@@ -31,30 +33,57 @@ Then fill up the ``form``:
 
 Setup the branch name you want to build and click on ``Start Build``.
 
-How do I force a build on a commit?
------------------------------------
-
-Currently, eve refuses to build a commit that is not a tip of a branch. You need
-to create a user/* branch pointing on it and push it. The results will be
-accessible from the git provider interface: https://bitbucket.org/<owner>/<your
-repo>/branches/ or https://github.com/<owner>/<your repo>/branches
+For an alternate way to start builds from your local command line,
+check on :ref:`Eve command line tool <api_client>`.
 
 
-Can I have parameterized builds?
---------------------------------
+How to build a commit hash?
+---------------------------
 
-A few options are available on the build form:
+Eve builds branches rather than commit hash. The reason is easy to understand
+if you look at the mapping between branch names and stages to run at the
+top of the yaml file.
 
-Optionally there's a ``Override stage`` option that provide the ability to build
-a single stage (can be useful to trigger post-merge builds on a feature/bugfix
-branch).
+Currently, eve refuses to build a commit that is not the tip of a branch (see
+the :ref:`relevant automatic step <CancelNonTipBuild>`).
 
-It's possible to bind this feature with the ability to override build
-properties.  The field ``Extra Properties`` is available for this purpose.
-Proper steps will be skipped inside the build pipeline and the values defined
-in the form will be set instead.
+If you plan to build a commit that is the current tip of a branch, you can
+follow the procedure described in :ref:`the section above
+<how_to_force_build>`.
 
-The form might look like this:
+In order to build a commit that is not currently the tip of a branch, an
+additional step is required: first create a branch pointing to the target
+commit, and push it to the GIT server. Given the webhook settings on the
+repository, the build will start automatically; alternatively, start a build
+manually as described above.
+
+
+Can builds be customised?
+-------------------------
+
+In the case of builds that are launched automatically (usually via a webhook
+received when the repository is updated), Eve will always run the build with
+the default values that are specified in the yaml file, in particular the
+stage to run and default property values.
+
+Those values can however be customized for builds that are started manually
+(either a build launched via the :ref:`build form <how_to_force_build>`, or via
+the :ref:`command line <api_client>`).
+
+The build stage to run can be forced in the ``Override stage`` box. It can
+be used to build a single stage or a stage that the target branch would
+normally not run.
+
+Properties can be overridden in the ``extra properties`` box.
+
+The values can be overriden on the build form:
+
+.. image::  ../images/force-form.png
+   :target: ../_images/force-form.png
+
+
+A form where the stage name and some properties are customized will
+look like this:
 
 +----------------------------------+-----------------------------------+
 | Build form example                                                   |
@@ -63,15 +92,16 @@ The form might look like this:
 +----------------------------------+-----------------------------------+
 | stage                            | ``post-merge``                    |
 +----------------------------------+-----------------------------------+
-| properties name                  | ``premerge_artifacts_names``      |
+| properties name                  | ``my_property``                   |
 +----------------------------------+-----------------------------------+
-| properties value                 | ``bitbucket:...``                 |
+| properties value                 | ``the value of my_property``      |
 +----------------------------------+-----------------------------------+
 
+If the yaml specifies a value for ``my_property``, this value will be
+ignored and the value specified in the form will be used instead.
 
-Can I have access to the workers?
----------------------------------
 
-Yes and no. There is no easy way to do it today with eve. We need to give root
-access to the platform. It is a bit dangerous so we avoid doing it for everybody
-in the company but will definitely do on demand.
+Can I have access to the workers to investigate my failing step?
+----------------------------------------------------------------
+
+Please contact the administrator of Eve to obtain access to a specific worker.

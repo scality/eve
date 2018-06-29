@@ -15,6 +15,8 @@ Cancel a build according to the result of the command provided in parameters.
 
 Used internally by Eve. Do not use in the build yaml.
 
+.. _CancelNonTipBuild:
+
 CancelNonTipBuild
 -----------------
 
