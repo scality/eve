@@ -310,6 +310,13 @@ class EveKubeLatentWorker(AbstractLatentWorker):
         pod['metadata']['labels']['app'] = 'eve'
         pod['metadata']['labels']['service'] = 'worker'
 
+    @defer.inlineCallbacks
+    def interpolate_pod(self, pod, build):
+        """Interpolate properties inside the pod description file."""
+        interpolated_pod = yield build.render(
+            util.replace_with_interpolate(pod))
+        defer.returnValue(interpolated_pod)
+
     def enforce_resource_limits(self, pod):
         """Enforce resource request limits."""
         total = {'requests': {'cpu': 0, 'memory': 0},
@@ -475,6 +482,7 @@ class EveKubeLatentWorker(AbstractLatentWorker):
             self.enforce_resource_limits(pod)
             self.enforce_active_deadline(pod)
             self.configure_service_pod(pod, build)
+            pod = yield self.interpolate_pod(pod, build)
         except LatentWorkerCannotSubstantiate:
             raise
         except Exception as ex:

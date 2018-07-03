@@ -296,6 +296,48 @@ Examples
 
 .. _kube_parameters:
 
+
+.. code-block:: yaml
+   :caption: Example of a Kubernetes pod yaml file with Eve
+
+   apiVersion: v1
+   kind: Pod
+   metadata:
+     name: "pod"
+   spec:
+     containers:
+     - name: my-app
+       resources:
+         requests:
+           cpu: 500m
+           memory: 1Gi
+         limits:
+           cpu: "1"
+           memory: 2Gi
+       image: "{{ images.myapp }}"
+       env:
+       - name: CREDENTIALS
+         value: '%(secret:credentials)s' # Note that you can also retrieve
+                                         # secrets and properties inside a
+                                         # worker yaml file
+     - name: eve-worker
+       resources:
+         requests:
+           cpu: 500m
+           memory: 1Gi
+         limits:
+           cpu: "1"
+           memory: 2Gi
+       image: "{{ images.eve-worker }}"
+       # Assuming you already have buildbot-worker installed on this image
+       command:
+         - /bin/sh
+         - -c
+         - >-
+           buildbot-worker create-worker . ${BUILDMASTER}:${BUILDMASTER_PORT}
+           ${WORKERNAME} ${WORKERPASS} && buildbot-worker start --nodaemon
+
+
 Parameters
 ++++++++++
 

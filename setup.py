@@ -49,7 +49,7 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'eve=eve.scripts.runner:main'
+            'eve=eve.scripts.runner:main',
         ],
         'buildbot.reporters': [
             'BitbucketBuildStatusPush=eve.reporters.bitbucket:BitbucketBuildStatusPush',
@@ -58,7 +58,7 @@ setup(
             'UltronBuildStatusPush=eve.reporters.ultron:UltronBuildStatusPush',
         ],
         'buildbot.schedulers': [
-            'EveForceScheduler=eve.schedulers.force:EveForceScheduler'
+            'EveForceScheduler=eve.schedulers.force:EveForceScheduler',
         ],
         'buildbot.steps': [
             'CancelNonTipBuild=eve.steps.cancel:CancelNonTipBuild',
@@ -83,7 +83,7 @@ setup(
             'StepExtractor=eve.steps.yaml_parser:StepExtractor',
             'PatcherConfig=eve.steps.patcher:PatcherConfig',
             'TriggerStages=eve.steps.trigger_stages:TriggerStages',
-            'Upload=eve.steps.artifacts:Upload'
+            'Upload=eve.steps.artifacts:Upload',
         ],
         'buildbot.util': [
             'BaseBuildOrder=eve.util.build_order:BaseBuildOrder',
@@ -101,12 +101,13 @@ setup(
             'nextBootstrapBuild=eve.util.next_bootstrap_build:nextBootstrapBuild',
             'password_generator=eve.util.password_generator:password_generator',
             'step_factory=eve.util.step_factory:step_factory',
-            'verify_docker_certificates=eve.util.docker:verify_docker_certificates'
+            'verify_docker_certificates=eve.util.docker:verify_docker_certificates',
+            'replace_with_interpolate=eve.util.step_factory:replace_with_interpolate',
         ],
         'buildbot.worker': [
             'EveDockerLatentWorker=eve.worker.docker.docker_worker:EveDockerLatentWorker',
             'HeatLatentWorker=eve.worker.openstack_heat.openstack_heat_worker:HeatLatentWorker',
-            'EveKubeLatentWorker=eve.worker.kubernetes.kubernetes_worker:EveKubeLatentWorker'
+            'EveKubeLatentWorker=eve.worker.kubernetes.kubernetes_worker:EveKubeLatentWorker',
         ]
     },
     zip_safe=False
