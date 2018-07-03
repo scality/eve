@@ -17,6 +17,28 @@ Release Notes
 
 .. towncrier release notes start
 
+Eve 1.3.40 (2018-07-03)
+=======================
+
+Features
+--------
+
+- Amend artifacts documentation (simplified example and un-branding). (EVE-354)
+- Bootstrap some documentation for the new secret manager. (EVE-354)
+- Document get_product_version script. (EVE-959)
+- Update FAQ. (EVE-959)
+- Interpolate secrets inside a ``kube_pod`` worker. (EVE-962)
+- Added a dynamic mapping of image and flavor values for heat stack workers.
+  (RELENG-2672)
+
+
+Bugfixes
+--------
+
+- Fix github reporter sending build status for every stage. (EVE-957)
+- Fail generation of release notes if version is not specified. (EVE-959)
+
+
 Eve 1.3.39 (2018-06-15)
 =======================
 
