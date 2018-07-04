@@ -17,11 +17,9 @@
 # Boston, MA  02110-1301, USA.
 """Allow eve to use docker workers."""
 
-import time
 from subprocess import STDOUT, CalledProcessError, check_output
 
-from buildbot.interfaces import (LatentWorkerCannotSubstantiate,
-                                 LatentWorkerFailedToSubstantiate)
+from buildbot.interfaces import LatentWorkerCannotSubstantiate
 from buildbot.plugins import util
 from buildbot.process.properties import Property
 from buildbot.worker.latent import AbstractLatentWorker
@@ -110,7 +108,14 @@ class EveDockerLatentWorker(AbstractLatentWorker):
             cmd.append('--label=docker_hook=%s' % docker_hook_version)
 
         cmd.append(image)
-        self.instance = self.docker(*cmd)
+
+        try:
+            self.instance = self.docker(*cmd)
+        except CalledProcessError:
+            raise LatentWorkerCannotSubstantiate(
+                'Docker run: CMD failed to start or died shortly after'
+            )
+
         self.logger.debug('Container created, Id: %s...' % self.instance)
         return [self.instance, image]
 
@@ -142,16 +147,6 @@ class EveDockerLatentWorker(AbstractLatentWorker):
             str: The output of the commmand (stderr + stdout).
 
         """
-        cmd = ['docker']
-        cmd.extend(args)
-        cmd_shell = ' '.join(cmd)
-        try:
-            self.logger.debug('::RUNNING::{}'.format(cmd_shell))
-            res = check_output(cmd, stderr=STDOUT).strip()
-            return res
-        except CalledProcessError as exception:
-            time.sleep(5)  # avoid a fast loop in case of failure
-            raise LatentWorkerFailedToSubstantiate(
-                'CalledProcessError: {} *** OUTPUT: {}'
-                .format(cmd_shell, exception.output)
-            )
+        cmd = ['docker'] + list(args)
+        self.logger.debug('::RUNNING::{}'.format(' '.join(cmd)))
+        return check_output(cmd, stderr=STDOUT).strip()
