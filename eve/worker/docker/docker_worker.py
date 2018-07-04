@@ -72,7 +72,7 @@ class EveDockerLatentWorker(AbstractLatentWorker):
     def _image_exists(self, image):
         """Check if docker image exist on host."""
         cmd = ['images', '--format', '{{.Repository}}', image]
-        return self.docker_invoke(*cmd).strip() != ''
+        return self.docker(*cmd).strip() != ''
 
     def _thd_start_instance(self, image, memory, volumes, buildnumber,
                             docker_hook_version):
@@ -115,7 +115,7 @@ class EveDockerLatentWorker(AbstractLatentWorker):
             cmd.append('--label=docker_hook=%s' % docker_hook_version)
 
         cmd.append(image)
-        self.instance = self.docker_invoke(*cmd)
+        self.instance = self.docker(*cmd)
         self.logger.debug('Container created, Id: %s...' % self.instance)
         return [self.instance, image]
 
@@ -129,12 +129,12 @@ class EveDockerLatentWorker(AbstractLatentWorker):
 
     def _thd_stop_instance(self, instance):
         self.logger.debug('Stopping container %s...' % instance)
-        self.docker_invoke('kill', instance)
-        self.docker_invoke('wait', instance)
-        self.docker_invoke('rm', '--volumes', instance)
+        self.docker('kill', instance)
+        self.docker('wait', instance)
+        self.docker('rm', '--volumes', instance)
         self.logger.debug('Container %s stopped successfully.' % instance)
 
-    def docker_invoke(self, *args):
+    def docker(self, *args):
         """Call the docker client binary.
 
         It calls the `docker` command with the arguments given as a parameter
