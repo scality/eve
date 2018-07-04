@@ -49,6 +49,93 @@ Then add an Upload step and give it the name of the folder, like below:
        alwaysRun: True
 
 
+Permanent archival
+------------------
+
+Eve archives artifacts permanently, via a "promotion" mechanism, if the following
+conditions are met:
+
+- a set of artifacts corresponding to a SUCCESSFUL build exists for the hash
+  on which the tag points (this induces that promotion can only occur within
+  14 days of the last successful build).
+
+- a tag exists in the repository in the format of 3 or 4 numbers separated by
+  a dot, and possibly followed by '_' and free text. The tag must be annoted
+  with the number of a build on that hash, with format '%<buildnumber>'. The
+  artifacts of that build will be archived.
+
+  Valid examples of tagging are:
+
+  - git tag -am '%1234' 7.8.9
+  - git tag -am '%1234' 7.8.9.10
+  - git tag -am '%1234' 7.8.9_label
+
+In order for this to work, this version of Eve additionally requires the
+following mandatory rules to be implemented for each repository that requires
+artifacts archival:
+
+- :ref:`the script get_product_version.sh<get_product_version>` *must* exist
+  and *must* return a string of 3 or 4 integers separated by dots.
+
+- The finalized artifacts container *must* contain a file named
+  `build_status/.final_status`, which contains the global status of the build
+  (i.e. the string SUCCESSFUL or the string FAILED). It is currently the
+  responsibility of the repository yaml to ensure this file is reachable from
+  the root of artifacts. It can be achieved with the following yaml at the very
+  end of a build for example:
+
+.. code-block:: yaml
+   :caption: how to finalize artifacts for promotion
+
+   - ShellCommand:
+       name: add successful .final_status to artifacts
+       command: >
+           mkdir build_status
+           && echo -n "SUCCESSFUL" > build_status/.final_status
+
+
+Permanent archival of related artifacts
+---------------------------------------
+
+It is possible to include artifacts from other builds during the promotion
+of a container. If this is required, create a file named identically to the
+other's build artifacts in directory *build_status/.related_artifacts* at the
+root of artifacts. Combined with :ref:`the step GetArtifactsFromStage
+<GetArtifactsFromStage>`, we can create promoted artifacts which also include
+the latest SUCCESSFUL artifacts generated on that hash by another stage
+of the build.
+
+This is a useful feature when running various stages at different lifetimes
+of the repository (pre and post merge builds like in the example below for
+instance).
+
+.. code-block:: yaml
+   :caption: how to include other builds' artifacts in promoted artifacts
+
+   pre-merge:
+     steps:
+       # .... generate some pre-merge build artifacts here
+
+   post-merge:
+     steps:
+       # .... generate some post-merge build artifacts here
+
+       - GetArtifactsFromStage:
+           # fill in a property with the name
+           # of the latest successful pre-merge build artifacts
+           stage: stage1
+           property: premerge_artifacts
+
+       - ShellCommand:
+           # create a reference so that the pre-merge
+           # artifacts get promoted at the same time
+           # as the post-merge artifacts
+           name: save the pre-merge artifacts reference
+           command: >
+               mkdir -p build_status/.related_artifacts
+               && touch "build_status/.related_artifacts/%(prop:premerge_artifacts)s"
+
+
 Related build properties
 ------------------------
 
