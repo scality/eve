@@ -69,16 +69,11 @@ class EveDockerLatentWorker(AbstractLatentWorker):
                                           docker_hook_version)
         defer.returnValue(res)
 
-    def _image_exists(self, image):
-        """Check if docker image exist on host."""
-        cmd = ['images', '--format', '{{.Repository}}', image]
-        return self.docker(*cmd).strip() != ''
-
     def _thd_start_instance(self, image, memory, volumes, buildnumber,
                             docker_hook_version):
 
         self.logger.info('Checking if %r docker image exist.' % image)
-        if not self._image_exists(image):
+        if not self.docker('images', '--format', '{{.Repository}}', image):
             self.logger.error('%r image not found.' % image)
             raise LatentWorkerCannotSubstantiate(
                 'Image %s not found on docker host' % image
