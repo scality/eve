@@ -23,6 +23,8 @@ stages:
       - Upload:
           source: big
           alwaysRun: True
+          urls:
+              - big/*
       - ShellCommand:
           name: add successful .final_status to artifacts
           command: >
