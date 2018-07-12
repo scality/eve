@@ -2,7 +2,7 @@
 version: 0.2
 
 branches:
-  user/*, feature/*, improvement/*, bugfix/*, w/*, q/*:
+  feature/*, improvement/*, bugfix/*, w/*, q/*:
     stage: pre-merge
 
 stages:
@@ -13,13 +13,16 @@ stages:
       volumes:
         - '/home/eve/workspace'
     steps:
-      - TriggerStages:
-          name: trigger local and remote tests simultaneously
-          stage_names:
-            - local tests
-            - docker tests
-          waitForFinish: True
-          haltOnFailure: True
+      - ShellCommand:
+          name: generate a big artifact
+          command: >
+              mkdir big
+              && cd big
+              && dd if=/dev/urandom of=data bs=1M count=3000
+              && sha1sum data > data.sha1
+      - Upload:
+          source: big
+          alwaysRun: True
       - ShellCommand:
           name: add successful .final_status to artifacts
           command: >
@@ -35,78 +38,4 @@ stages:
           alwaysRun: True
       - Upload:
           source: build_status
-          alwaysRun: True
-
-  local tests:
-    worker:
-      type: docker
-      path: build/workers/xenial
-      volumes:
-        - '/home/eve/workspace'
-    steps:
-      - Git:
-          name: fetch source
-          repourl: '%(prop:git_reference)s'
-          shallow: True
-          retryFetch: True
-      - ShellCommand:
-          name: install eve
-          command: sudo pip install .
-          haltOnFailure: True
-      - ShellCommand:
-          name: run static analysis tools
-          command: tox --sitepackages -e lint
-      - ShellCommand:
-          name: Ensure the release notes compile
-          command: tox --sitepackages -e relnotes -- test_version
-      - ShellCommand:
-          name: Ensure the doc compiles
-          command: tox --sitepackages -e doc
-      - ShellCommand:
-          name: run unit tests
-          command: tox --sitepackages -e unit
-      - ShellCommand:
-          name: run system utils tests
-          command: tox --sitepackages -e testutil
-          haltOnFailure: True
-      - ShellCommand:
-          name: run system tests
-          command: tox --sitepackages -e system
-          haltOnFailure: True
-      - Upload:
-          source: .htmlcov
-          urls:
-            - ['coverage report (unit)', 'unit/index.html']
-            - ['coverage report (testutil)', 'util/index.html']
-            - ['coverage report (system)', 'system/index.html']
-          alwaysRun: True
-
-  docker tests:
-    worker:
-      type: openstack
-      image: Ubuntu 16.04 LTS (Xenial Xerus) (PVHVM)
-      flavor: general1-8
-      path: build/workers/docker_tests
-    steps:
-      - Git:
-          name: fetch source
-          repourl: '%(prop:git_reference)s'
-          shallow: True
-          retryFetch: True
-      - ShellCommand:
-          name: run docker-compose build
-          command: HOME=/home/eve tox --sitepackages -e compose-build
-          haltOnFailure: True
-      - ShellCommand:
-          name: run docker tests
-          command: HOME=/home/eve tox --sitepackages -e docker
-          haltOnFailure: True
-      - ShellCommand:
-          name: run kube tests
-          command: HOME=/home/eve tox --sitepackages -e kube
-          haltOnFailure: True
-      - Upload:
-          source: .htmlcov
-          urls:
-            - ['coverage report (docker)', 'docker/index.html']
           alwaysRun: True
