@@ -24,7 +24,7 @@ stages:
           source: big
           alwaysRun: True
           urls:
-              - big/*
+              - data*
       - ShellCommand:
           name: add successful .final_status to artifacts
           command: >
