@@ -47,10 +47,15 @@ stages:
           name: check downloads
           command: >
               cd download
+              for i in `seq 0 9`
+              do
+                  cat ../big/data.sha1 | sed -e "s/data/data.$i/" >> data.sha1
+              done
               && ls -l ../big/data
               && cat ../big/data.sha1
               && ls -l data*
-              && sha1sum data*
+              && cat data.sha1
+              && sha1sum -c data.sha1
           haltOnFailure: True
       - ShellCommand:
           name: add successful .final_status to artifacts
