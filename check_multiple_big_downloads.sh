@@ -11,6 +11,7 @@ cd download
 
 # try to mess the uwsgi cache with concurrent interrupted GET operations while downloading the data
 /bin/echo -e "GET $uri HTTP/1.1\nHost: $host\n\n" | nc $host $port | head -c 500000000 > /dev/null
+wget -q -O data.cached $full_url
 wget -q -O data.first $full_url &
 for i in `seq 0 9`
 do
@@ -28,6 +29,7 @@ done
 wait
 
 # check complete downloads
+cat ../big/data.sha1 | sed -e "s/data/data.cached/" >> data.sha1
 cat ../big/data.sha1 | sed -e "s/data/data.first/" >> data.sha1
 cat ../big/data.sha1 | sed -e "s/data/data.last/" >> data.sha1
 for i in `seq 0 9`
