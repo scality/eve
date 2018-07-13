@@ -14,7 +14,7 @@ wget -q -O data.before $full_url &
 for i in `seq 0 9`
 do
     bytes=$(( 1000000000 + $i * 100000000))
-    (/bin/echo -e "GET /$uri HTTP/1.1\nHost: $host\n\n" | nc $host $port | head -c $bytes > /dev/null)&
+    (/bin/echo -e "GET $uri HTTP/1.1\nHost: $host\n\n" | nc $host $port | head -c $bytes > /dev/null)&
 done
 wget -q -O data.after $full_url &
 wait
