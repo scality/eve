@@ -33,7 +33,7 @@ stages:
               - data*
       - ShellCommand:
           name: check downloads integrity under stress
-          command: "./check_multiple_big_downloads.sh"
+          command: "./check_multiple_big_downloads.sh %(prop:artifacts_private_url)s/data"
           haltOnFailure: True
       - ShellCommand:
           name: add successful .final_status to artifacts

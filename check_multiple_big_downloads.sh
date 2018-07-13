@@ -5,7 +5,7 @@ cd download
 
 for i in `seq 0 9`
 do
-    wget -q -O data.$i "%(prop:artifacts_private_url)s/data" &
+    wget -q -O data.$i $1 &
 done
 wait
 
