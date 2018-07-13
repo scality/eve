@@ -30,16 +30,16 @@ stages:
           command: >
               mkdir download
               && cd download
-              && wget "%(prop:artifacts_private_url)s/data" &
-               wget "%(prop:artifacts_private_url)s/data" &
-               wget "%(prop:artifacts_private_url)s/data" &
-               wget "%(prop:artifacts_private_url)s/data" &
-               wget "%(prop:artifacts_private_url)s/data" &
-               wget "%(prop:artifacts_private_url)s/data" &
-               wget "%(prop:artifacts_private_url)s/data" &
-               wget "%(prop:artifacts_private_url)s/data" &
-               wget "%(prop:artifacts_private_url)s/data" &
-               wget "%(prop:artifacts_private_url)s/data" &
+              && wget -q "%(prop:artifacts_private_url)s/data" &
+               wget -q "%(prop:artifacts_private_url)s/data" &
+               wget -q "%(prop:artifacts_private_url)s/data" &
+               wget -q "%(prop:artifacts_private_url)s/data" &
+               wget -q "%(prop:artifacts_private_url)s/data" &
+               wget -q "%(prop:artifacts_private_url)s/data" &
+               wget -q "%(prop:artifacts_private_url)s/data" &
+               wget -q "%(prop:artifacts_private_url)s/data" &
+               wget -q "%(prop:artifacts_private_url)s/data" &
+               wget -q "%(prop:artifacts_private_url)s/data" &
                wait
               && ls -l ../big/data
               && cat ../big/data.sha1
