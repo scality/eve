@@ -20,6 +20,7 @@ stages:
               && cd big
               && dd if=/dev/urandom of=data bs=1M count=3000
               && sha1sum data > data.sha1
+          haltOnFailure: True
       - Upload:
           source: big
           alwaysRun: True
@@ -41,10 +42,16 @@ stages:
                wget -q "%(prop:artifacts_private_url)s/data" &
                wget -q "%(prop:artifacts_private_url)s/data" &
                wait
+          haltOnFailure: True
+      - ShellCommand:
+          name: check downloads
+          command: >
+              cd download
               && ls -l ../big/data
               && cat ../big/data.sha1
               && ls -l data*
               && sha1sum data*
+          haltOnFailure: True
       - ShellCommand:
           name: add successful .final_status to artifacts
           command: >
