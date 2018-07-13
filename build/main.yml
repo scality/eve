@@ -27,8 +27,8 @@ stages:
           urls:
               - data*
       - ShellCommand:
-          name: download stress
-          command: ./check_multiple_big_downloads.sh
+          name: check downloads integrity under stress
+          command: "./check_multiple_big_downloads.sh"
           haltOnFailure: True
       - ShellCommand:
           name: add successful .final_status to artifacts
