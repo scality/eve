@@ -40,7 +40,7 @@ stages:
                wget "%(prop:artifacts_private_url)s/data" &
                wget "%(prop:artifacts_private_url)s/data" &
                wget "%(prop:artifacts_private_url)s/data" &
-              sleep 300
+               wait
               && ls -l ../big/data
               && cat ../big/data.sha1
               && ls -l data*
