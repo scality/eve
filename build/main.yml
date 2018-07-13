@@ -26,6 +26,17 @@ stages:
           urls:
               - data*
       - ShellCommand:
+          name: download stress
+          command: >
+              mkdir download
+              && cd download
+              && for i in `seq 1 10`; do wget "%(prop:artifacts_private_url)s/big/data" &; done
+              && sleep 300
+              && ls -l ../big/data
+              && cat ../big/data.sha1
+              && ls -l data*
+              && sha1sum data*
+      - ShellCommand:
           name: add successful .final_status to artifacts
           command: >
               mkdir build_status
