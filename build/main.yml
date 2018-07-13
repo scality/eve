@@ -13,6 +13,11 @@ stages:
       volumes:
         - '/home/eve/workspace'
     steps:
+      - Git:
+          name: fetch source
+          repourl: "%(prop:git_reference)s"
+          shallow: True
+          retryFetch: True
       - ShellCommand:
           name: generate a big artifact
           command: >
