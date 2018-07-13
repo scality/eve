@@ -28,34 +28,7 @@ stages:
               - data*
       - ShellCommand:
           name: download stress
-          command: >
-              mkdir download
-              && cd download
-              && wget -q -b -O data.0 "%(prop:artifacts_private_url)s/data"
-              && wget -q -b -O data.1 "%(prop:artifacts_private_url)s/data"
-              && wget -q -b -O data.2 "%(prop:artifacts_private_url)s/data"
-              && wget -q -b -O data.3 "%(prop:artifacts_private_url)s/data"
-              && wget -q -b -O data.4 "%(prop:artifacts_private_url)s/data"
-              && wget -q -b -O data.5 "%(prop:artifacts_private_url)s/data"
-              && wget -q -b -O data.6 "%(prop:artifacts_private_url)s/data"
-              && wget -q -b -O data.7 "%(prop:artifacts_private_url)s/data"
-              && wget -q -b -O data.8 "%(prop:artifacts_private_url)s/data"
-              && wget -q -b -O data.9 "%(prop:artifacts_private_url)s/data"
-              && wait
-          haltOnFailure: True
-      - ShellCommand:
-          name: check downloads
-          command: >
-              cd download
-              for i in `seq 0 9`
-              do
-                  cat ../big/data.sha1 | sed -e "s/data/data.$i/" >> data.sha1
-              done
-              && ls -l ../big/data
-              && cat ../big/data.sha1
-              && ls -l data*
-              && cat data.sha1
-              && sha1sum -c data.sha1
+          command: ./check_multiple_big_downloads.sh
           haltOnFailure: True
       - ShellCommand:
           name: add successful .final_status to artifacts
