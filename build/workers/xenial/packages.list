@@ -5,6 +5,7 @@ libffi-dev
 libmysqlclient-dev
 libssl-dev
 libtool
+netcat
 build-essential
 python
 python-dev
