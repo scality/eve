@@ -1,0 +1,1 @@
+When starting the bootstrap, check there is not index.lock left by a previous git command.

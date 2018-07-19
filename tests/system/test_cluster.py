@@ -75,6 +75,7 @@ class TestCluster(unittest.TestCase):
                                            for step in bootstrap_steps]
             self.assertEqual(step_names_and_descriptions, [
                 (u'set the bootstrap build number', u'Set'),
+                (u'check index.lock', u"'test ! ...'"),
                 (u'checkout git branch', u'update'),
                 (u'cancel builds for commits that are not branch tips',
                  u'CancelNonTipBuild'),
