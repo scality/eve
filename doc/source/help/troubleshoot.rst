@@ -58,3 +58,21 @@ Other possibilities are:
       pushed on top of it.
 
     * A bug in eve/buildbot.
+
+
+My ShellCommand is frozen, stdout stops updating after a while and times out
+----------------------------------------------------------------------------
+
+Some shell commands use UTF-8 characters when trying to update previous
+lines on stdout (some known examples: npm install, mocha, py.test -s, ...).
+
+In order to use those commands without interfering with Buildbot parsing of
+standard outputs, usePTY option should be set on the step, i.e.:
+
+.. code-block:: yaml
+   :caption: eve/main.yml
+
+   - ShellCommand:
+       name: "a command that wants to play with advanced console features"
+       command: npm install
+       usePTY: true
