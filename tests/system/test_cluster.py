@@ -18,7 +18,7 @@
 
 import unittest
 
-from buildbot.process.results import CANCELLED, SUCCESS
+from buildbot.process.results import CANCELLED, FAILURE, SUCCESS
 from tests.util.cluster import Cluster
 from tests.util.yaml_factory import SingleCommandYaml, YamlFactory
 
@@ -75,6 +75,7 @@ class TestCluster(unittest.TestCase):
                                            for step in bootstrap_steps]
             self.assertEqual(step_names_and_descriptions, [
                 (u'set the bootstrap build number', u'Set'),
+                (u'check index.lock', u"'test ! ...'"),
                 (u'checkout git branch', u'update'),
                 (u'cancel builds for commits that are not branch tips',
                  u'CancelNonTipBuild'),
@@ -121,6 +122,42 @@ class TestCluster(unittest.TestCase):
                              'force build')
             self.assertEqual(properties['properties']['reason'][1],
                              'Force Build Form')
+
+    def test_index_lock_failure(self):
+        """Test a simple build failure on a cluster due to index.lock.
+
+        Steps:
+            - Start a cluster with 01 frontend and 01 backend.
+            - Force a job.
+            - Check that all the expected steps are there.
+            - Stop it.
+
+        """
+
+        conf = {'MAX_LOCAL_WORKERS': '1'}
+        with Cluster(extra_conf=conf) as cluster:
+            local_repo = cluster.clone()
+            local_repo.push()
+
+            for master_name in cluster._masters:
+                if master_name.startswith('backend'):
+                    base_path = cluster._masters[master_name]._base_path
+                    git_path = ('{}/workers/lw000-test_suffix/bootstrap/'
+                                'build/.git'.format(base_path))
+                    local_repo.cmd('mkdir -p {}'.format(git_path))
+                    local_repo.cmd('touch {}/index.lock'.format(git_path))
+
+            cluster.api.force(branch=local_repo.branch)
+
+            # Check bootstrap
+            bootstrap_build = cluster.api.get_finished_build()
+            self.assertEqual(bootstrap_build['results'], FAILURE)
+            bootstrap_steps = cluster.api.get_build_steps(bootstrap_build)
+            step_names_and_descriptions = [(step['name'], step['state_string'])
+                                           for step in bootstrap_steps]
+            self.assertEqual(step_names_and_descriptions, [
+                (u'set the bootstrap build number', u'Set'),
+                (u'check index.lock', u"'test ! ...' (failure)")])
 
     def test_worker_environ(self):
         """Test worker environment.

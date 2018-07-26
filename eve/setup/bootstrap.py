@@ -22,6 +22,7 @@ from buildbot.config import BuilderConfig
 from buildbot.plugins import steps, util
 from buildbot.process.factory import BuildFactory
 from buildbot.process.properties import Property
+from buildbot.steps.shell import ShellCommand
 from buildbot.steps.source.git import Git
 from twisted.internet import defer
 
@@ -44,6 +45,13 @@ def bootstrap_builder(workers):
             property='bootstrap',
             hideStepIf=util.hideStepIfSuccess,
             value=Property('buildnumber')))
+
+    bootstrap_factory.addStep(ShellCommand(
+        name='check index.lock',
+        command='test ! -f .git/index.lock',
+        hideStepIf=util.hideStepIfSuccess,
+        haltOnFailure=True,
+        logEnviron=False))
 
     bootstrap_factory.addStep(
         Git(name='checkout git branch',
