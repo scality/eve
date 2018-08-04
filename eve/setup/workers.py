@@ -180,7 +180,7 @@ def openstack_heat_workers():
                 },
                 os_auth_url=util.env.OS_AUTH_URL,
                 os_username=util.env.OS_USERNAME,
-                os_password=util.env.SECRET_OS_PASSWORD,
+                os_password=util.env.OS_PASSWORD,
                 os_project_id=util.env.OS_TENANT_NAME,
                 os_region_name=util.env.OS_REGION_NAME,
                 build_wait_timeout=0,  # do not reuse the stack

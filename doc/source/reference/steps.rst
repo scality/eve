@@ -60,7 +60,6 @@ Custom steps
    steps/docker
    steps/property
    steps/build_lifecycle
-   steps/misc
 
 
 .. _Buildbot's online documentation: http://docs.buildbot.net/current/manual/cfg-buildsteps.html

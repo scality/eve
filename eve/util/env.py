@@ -19,7 +19,6 @@
 from os import environ
 
 SETTINGS = {}
-SECRETS = {}
 
 
 class Settings(dict):
@@ -59,18 +58,7 @@ class Settings(dict):
         return self[name]
 
 
-def filter_secrets():
-    for key in dict(environ):
-        if key.startswith('SECRET_'):
-            SECRETS[key[7:]] = environ.pop(key)
-
-
-def get_secrets():
-    return SECRETS
-
-
 def load_env(variables):
     global SETTINGS  # pylint: disable=global-statement
     SETTINGS = Settings(variables)
-    filter_secrets()
     return SETTINGS

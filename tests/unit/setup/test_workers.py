@@ -108,12 +108,12 @@ class TestSetupWorkers(unittest.TestCase):
             ('OS_NETWORK_PRIVATE', 'foo'),
             ('OS_NETWORK_PUBLIC', 'foo'),
             ('OS_NETWORK_SERVICE', 'foo'),
+            ('OS_PASSWORD', 'bar'),
             ('OS_PROVIDER', 'foo'),
             ('OS_REGION_NAME', 'foo'),
             ('OS_SSH_KEY', 'foo'),
             ('OS_TENANT_NAME', 'foo'),
             ('OS_USERNAME', 'foo'),
-            ('SECRET_OS_PASSWORD', 'bar'),
             ('SUFFIX', '_foo'),
         ])
         workers = eve.setup.workers.openstack_heat_workers()
