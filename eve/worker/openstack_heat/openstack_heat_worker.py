@@ -26,6 +26,7 @@ from buildbot.worker import AbstractWorker
 from buildbot.worker.latent import AbstractLatentWorker
 from heatclient.exc import HTTPBadRequest
 from keystoneauth1 import loading, session
+from keystoneauth1.identity import v3
 from twisted.internet import defer, threads
 from twisted.logger import Logger
 
@@ -50,8 +51,10 @@ class HeatLatentWorker(AbstractLatentWorker):
             os_auth_url,
             os_username,
             os_password,
-            os_project_id,
+            os_project_domain_id,
+            os_project_name,
             os_region_name,
+            os_identity_api_version,
             **kwargs):  # flake8: noqa
 
         super(HeatLatentWorker, self).__init__(name, password, **kwargs)
@@ -64,12 +67,19 @@ class HeatLatentWorker(AbstractLatentWorker):
         else:
             self.heat_template_parameters = heat_template_parameters
 
-        loader = loading.get_plugin_loader('password')
-        auth = loader.load_from_options(
-            auth_url=os_auth_url,
-            username=os_username,
-            password=os_password,
-            project_name=os_project_id)
+        if os_identity_api_version == '3':
+            password = v3.PasswordMethod(
+                username=os_username,
+                password=os_password,
+                user_domain_id=os_project_domain_id)
+            auth = v3.Auth(auth_url=os_auth_url, auth_methods=[password])
+        else:
+            loader = loading.get_plugin_loader('password')
+            auth = loader.load_from_options(
+                auth_url=os_auth_url,
+                username=os_username,
+                password=os_password,
+                project_name=os_project_name)
 
         sess = session.Session(auth=auth)
         self.heat_client = heatclient.client.Client(

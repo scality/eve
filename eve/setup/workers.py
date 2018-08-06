@@ -179,9 +179,11 @@ def openstack_heat_workers():
                     'start_worker_script': start_worker_script,
                 },
                 os_auth_url=util.env.OS_AUTH_URL,
+                os_identity_api_version=util.env.OS_IDENTITY_API_VERSION,
                 os_username=util.env.OS_USERNAME,
                 os_password=util.env.OS_PASSWORD,
-                os_project_id=util.env.OS_TENANT_NAME,
+                os_project_domain_id=util.env.OS_PROJECT_DOMAIN_ID,
+                os_project_name=util.env.OS_TENANT_NAME,
                 os_region_name=util.env.OS_REGION_NAME,
                 build_wait_timeout=0,  # do not reuse the stack
                 keepalive_interval=300
