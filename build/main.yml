@@ -97,14 +97,17 @@ stages:
           name: run docker-compose build
           command: HOME=/home/eve tox --sitepackages -e compose-build
           haltOnFailure: True
+          usePTY: true
       - ShellCommand:
           name: run docker tests
           command: HOME=/home/eve tox --sitepackages -e docker
           haltOnFailure: True
+          usePTY: true
       - ShellCommand:
           name: run kube tests
           command: HOME=/home/eve tox --sitepackages -e kube
           haltOnFailure: True
+          usePTY: true
       - Upload:
           source: .htmlcov
           urls:
