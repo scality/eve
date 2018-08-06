@@ -17,6 +17,25 @@ Release Notes
 
 .. towncrier release notes start
 
+Eve 1.3.41 (2018-08-06)
+=======================
+
+Features
+--------
+
+- Document mechanism to archive artifacts. (EVE-959)
+- Deprecate ShellCommandWithSecrets. (EVE-966)
+- Update troubleshooting in documentation regarding frozen steps. (EVE-984)
+
+
+Bugfixes
+--------
+
+- When starting the bootstrap, check there is not index.lock left by a previous
+  git command. (EVE-963)
+- Fixing cloud init script to avoid race condition on ip routes. (PIPDEP-551)
+
+
 Eve 1.3.40 (2018-07-03)
 =======================
 

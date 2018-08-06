@@ -1,1 +1,0 @@
-Fixing cloud init script to avoid race condition on ip routes.
