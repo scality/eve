@@ -1,0 +1,1 @@
+Prevent docker and openstack worker auto-retry in case of known permanent failure.

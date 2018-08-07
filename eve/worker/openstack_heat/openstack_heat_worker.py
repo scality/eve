@@ -21,8 +21,10 @@ import time
 
 import heatclient
 import heatclient.client
+from buildbot.interfaces import LatentWorkerCannotSubstantiate
 from buildbot.worker import AbstractWorker
 from buildbot.worker.latent import AbstractLatentWorker
+from heatclient.exc import HTTPBadRequest
 from keystoneauth1 import loading, session
 from twisted.internet import defer, threads
 from twisted.logger import Logger
@@ -94,10 +96,14 @@ class HeatLatentWorker(AbstractLatentWorker):
     def _start_instance(
             self, stack_name, heat_template, heat_template_parameters):
 
-        result = self.heat_client.stacks.create(
-            stack_name=stack_name,
-            template=heat_template,
-            parameters=heat_template_parameters)
+        try:
+            result = self.heat_client.stacks.create(
+                stack_name=stack_name,
+                template=heat_template,
+                parameters=heat_template_parameters)
+        except HTTPBadRequest as ex:
+            raise LatentWorkerCannotSubstantiate(
+                ex.error['error'].get('message'))
         self.stack_id = result['stack']['id']
         stack = self.heat_client.stacks.get(stack_id=self.stack_id)
         while stack.stack_status == 'CREATE_IN_PROGRESS':

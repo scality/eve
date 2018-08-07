@@ -17,11 +17,9 @@
 # Boston, MA  02110-1301, USA.
 """Allow eve to use docker workers."""
 
-import time
 from subprocess import STDOUT, CalledProcessError, check_output
 
-from buildbot.interfaces import (LatentWorkerCannotSubstantiate,
-                                 LatentWorkerFailedToSubstantiate)
+from buildbot.interfaces import LatentWorkerCannotSubstantiate
 from buildbot.plugins import util
 from buildbot.process.properties import Property
 from buildbot.worker.latent import AbstractLatentWorker
@@ -69,16 +67,11 @@ class EveDockerLatentWorker(AbstractLatentWorker):
                                           docker_hook_version)
         defer.returnValue(res)
 
-    def _image_exists(self, image):
-        """Check if docker image exist on host."""
-        cmd = ['images', '--format', '{{.Repository}}', image]
-        return self.docker_invoke(*cmd).strip() != ''
-
     def _thd_start_instance(self, image, memory, volumes, buildnumber,
                             docker_hook_version):
 
         self.logger.info('Checking if %r docker image exist.' % image)
-        if not self._image_exists(image):
+        if not self.docker('images', '--format', '{{.Repository}}', image):
             self.logger.error('%r image not found.' % image)
             raise LatentWorkerCannotSubstantiate(
                 'Image %s not found on docker host' % image
@@ -115,7 +108,14 @@ class EveDockerLatentWorker(AbstractLatentWorker):
             cmd.append('--label=docker_hook=%s' % docker_hook_version)
 
         cmd.append(image)
-        self.instance = self.docker_invoke(*cmd)
+
+        try:
+            self.instance = self.docker(*cmd)
+        except CalledProcessError:
+            raise LatentWorkerCannotSubstantiate(
+                'Docker run: CMD failed to start or died shortly after'
+            )
+
         self.logger.debug('Container created, Id: %s...' % self.instance)
         return [self.instance, image]
 
@@ -129,12 +129,12 @@ class EveDockerLatentWorker(AbstractLatentWorker):
 
     def _thd_stop_instance(self, instance):
         self.logger.debug('Stopping container %s...' % instance)
-        self.docker_invoke('kill', instance)
-        self.docker_invoke('wait', instance)
-        self.docker_invoke('rm', '--volumes', instance)
+        self.docker('kill', instance)
+        self.docker('wait', instance)
+        self.docker('rm', '--volumes', instance)
         self.logger.debug('Container %s stopped successfully.' % instance)
 
-    def docker_invoke(self, *args):
+    def docker(self, *args):
         """Call the docker client binary.
 
         It calls the `docker` command with the arguments given as a parameter
@@ -147,16 +147,6 @@ class EveDockerLatentWorker(AbstractLatentWorker):
             str: The output of the commmand (stderr + stdout).
 
         """
-        cmd = ['docker']
-        cmd.extend(args)
-        cmd_shell = ' '.join(cmd)
-        try:
-            self.logger.debug('::RUNNING::{}'.format(cmd_shell))
-            res = check_output(cmd, stderr=STDOUT).strip()
-            return res
-        except CalledProcessError as exception:
-            time.sleep(5)  # avoid a fast loop in case of failure
-            raise LatentWorkerFailedToSubstantiate(
-                'CalledProcessError: {} *** OUTPUT: {}'
-                .format(cmd_shell, exception.output)
-            )
+        cmd = ['docker'] + list(args)
+        self.logger.debug('::RUNNING::{}'.format(' '.join(cmd)))
+        return check_output(cmd, stderr=STDOUT).strip()

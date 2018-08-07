@@ -1,0 +1,16 @@
+---
+version: '0.2'
+
+branches:
+  default:
+    stage: simple-stage
+
+stages:
+  simple-stage:
+    worker:
+      type: docker
+      path: docker_exit_1
+    steps:
+      - ShellCommand:
+          name: succeed
+          command: exit 0

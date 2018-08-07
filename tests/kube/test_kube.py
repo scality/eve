@@ -54,6 +54,30 @@ class TestKube(unittest.TestCase):
             self.assertEqual(buildset.result, 'success')
             cluster.sanity_check()
 
+    @unittest.skip('cannot run to completion until '
+                   'we have an eve deployed in kube during tests')
+    def test_fail_docker_run_in_kube(self):
+        """Test a bad docker worker failing on CMD.
+
+        Steps:
+            - Force a build
+            - Check that the build fails
+
+        """
+        with Cluster() as cluster:
+            local_repo = cluster.clone()
+            local_repo.push(
+                yaml=abspath(
+                    join(__file__, pardir, 'yaml',
+                         'docker_run_error', 'main.yml')),
+                dirs=[
+                    abspath(join(__file__, pardir, 'contexts',
+                                 'docker_exit_1'))
+                ])
+            cluster.sanity_check()
+            buildset = cluster.api.force(branch=local_repo.branch)
+            self.assertEqual(buildset.result, 'exception')
+
     def test_incorrect_kube_yaml(self):
         """Test a build fails when incorrect yaml is provided to kube.
 
