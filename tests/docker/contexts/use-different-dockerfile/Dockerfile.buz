@@ -1,5 +1,9 @@
 FROM ubuntu:xenial
 
+# The following copy checks that the context points
+# at the expected place.
+COPY bar/test-context /tmp/
+
 RUN apt-get update && apt-get install -y \
    python-dev \
    python-pip \

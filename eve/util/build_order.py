@@ -61,7 +61,7 @@ class BaseBuildOrder(object):
 class BaseDockerBuildOrder(BaseBuildOrder):
     """Base class representing a build using docker images."""
 
-    def _build_image(self, image_name, context_dir):
+    def _build_image(self, image_name, context_dir, dockerfile=None):
         """Ensure given docker image is available for worker.
 
         This method computes the fingerprint from the provided docker context
@@ -75,6 +75,11 @@ class BaseDockerBuildOrder(BaseBuildOrder):
             self.properties['master_builddir'][0],
             context_dir,
         )
+        if dockerfile:
+            dockerfile = '%s/build/%s' % (
+                self.properties['master_builddir'][0],
+                dockerfile,
+            )
 
         # image name is image_name + hash of path to avoid collisions
         basename = "{0}_{1}".format(
@@ -122,8 +127,8 @@ class BaseDockerBuildOrder(BaseBuildOrder):
         common_args = {
             'label': basename,
             'image': image,
-            'dockerfile': self._worker.get('dockerfile'),
-            'workdir': full_context_dir,
+            'dockerfile': dockerfile,
+            'context_dir': full_context_dir,
             'build_args': {
                 'BUILDBOT_VERSION': buildbot.version
             },

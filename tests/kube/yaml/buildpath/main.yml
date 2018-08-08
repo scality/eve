@@ -1,0 +1,20 @@
+---
+version: '0.2'
+
+branches:
+  default:
+    stage: simple-stage
+
+stages:
+  simple-stage:
+    worker:
+      type: kube_pod
+      path: simple/buildpath.yaml
+      images:
+        test_worker:
+          context: simple/buildpath
+          dockerfile: simple/buildpath/worker/Dockerfile
+    steps:
+      - ShellCommand:
+          name: Success!
+          command: exit 0

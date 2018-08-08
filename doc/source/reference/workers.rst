@@ -139,6 +139,12 @@ Parameters
 
     This parameter is ignored if ``image`` is specified.
 
+``dockerfile``
+    (optional): defaults to the ``Dockerfile`` located in ``path``.
+    When specified, the argument will be the path to a ``Dockefile``
+    that will be used in the build process. Note that it can be located
+    either inside or outside the context.
+
 .. _docker_images:
 
 ``image``
@@ -259,24 +265,41 @@ the names of the namespaces that the stage will be allowed to access.
 Examples
 ++++++++
 
+.. _example_with_image_string_path:
 .. code-block:: yaml
-   :caption: a simple pod worker with two dynamic images
+   :caption: A simple pod worker with two dynamic images
 
    stage_running_in_a_pod:
      worker:
        type: kube_pod
        path: <path/to/kubernetes/pod/definition:filepath>
        images:
-         <first_image:str>: <path/to/image/context:path>
-         <second_image:str>: <path/to/other/image/context:path>
+         my_image: <path/to/image/context:path>
+         my_other_image: <path/to/other/image/context:path>
        vars:
          <first_var:str>: <value:str,list,dict>
          <more_var:str>: <value:str,list,dict>
      steps:
        # ... describe steps here
 
+.. _example_with_image_dict:
 .. code-block:: yaml
-   :caption: a pod worker with access to an external cluster
+   :caption: A pod worker with the dockerfile path different from the context
+
+   stage_running_in_a_pod:
+     worker:
+       type: kube_pod
+       path: <path/to/kubernetes/pod/definition:filepath>
+       images:
+         my_image:
+           context: <path/to/image/context:path>
+           dockerfile: <path/to/dockerfile:filepath>
+         my_other_image: <path/to/other/image/context:path>
+     steps:
+       # ... describe steps here
+
+.. code-block:: yaml
+   :caption: A pod worker with access to an external cluster
 
    stage_running_in_a_pod:
      worker:
@@ -295,8 +318,6 @@ Examples
        # ... describe steps here
 
 .. _kube_parameters:
-
-
 .. code-block:: yaml
    :caption: Example of a Kubernetes pod yaml file with Eve
 
@@ -314,7 +335,7 @@ Examples
          limits:
            cpu: "1"
            memory: 2Gi
-       image: "{{ images.myapp }}"
+       image: "{{ images.my_image }}"
        env:
        - name: CREDENTIALS
          value: '%(secret:credentials)s' # Note that you can also retrieve
@@ -328,7 +349,7 @@ Examples
          limits:
            cpu: "1"
            memory: 2Gi
-       image: "{{ images.eve-worker }}"
+       image: "{{ images.my_other_image }}"
        # Assuming you already have buildbot-worker installed on this image
        command:
          - /bin/sh
@@ -352,8 +373,29 @@ Parameters
     If the pod requires images that are defined in the repository, the path
     to the docker context must be specified in this dictionnary, where the
     keys are the images names (use as {{ images.key }} in the template), and
-    the values are the relative paths where the context (Dockerfile and files)
-    are found in the repository.
+    the values are:
+
+    - either a string pointing to the relative paths where the context
+      (Dockerfile and files) is found in the repository (see example
+      :ref:`example_with_image_string_path`),
+
+    - or, a dictionnary which keys are ``context`` and ``dockerfile``, as in
+      example :ref:`example_with_image_dict`:
+
+        * ``context``
+          a string pointing to the relative paths where the context
+          is found in the repository,
+
+        * ``dockerfile``
+          (optional; default value: ``Dockerfile``)
+          Defaults to the ``Dockerfile`` located in ``context``
+          (docker build context path). When specified, the value will
+          be the path to a ``Dockefile`` that will be used in the build
+          process. Note that it can be located either inside or outside the
+          context.
+
+    - or, a mix of the previous two styles.
+
 
 ``vars``
     Dictionnary containing the templating data to render the pod file in

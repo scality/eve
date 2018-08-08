@@ -103,6 +103,54 @@ class TestKube(unittest.TestCase):
 
     @unittest.skip('cannot run to completion until '
                    'we have an eve deployed in kube during tests')
+    def test_buildpath_docker_image(self):
+        """Test a build success with a dockerfile path different from context.
+
+        Steps:
+            - Force a build
+            - Check that the build succeed
+
+        """
+        conf = {
+            'KUBE_POD_WORKER_IN_USE': '1',
+        }
+        with Cluster(extra_conf=conf) as cluster:
+            local_repo = cluster.clone()
+            local_repo.push(
+                yaml=abspath(
+                    join(__file__, pardir, 'yaml', 'buildpath', 'main.yml')),
+                dirs=[
+                    abspath(join(__file__, pardir, 'contexts', 'simple'))
+                ])
+            cluster.sanity_check()
+            buildset = cluster.api.force(branch=local_repo.branch)
+            self.assertEqual(buildset.result, 'success')
+
+    def test_buildpath_docker_image_failure(self):
+        """Test a build failure with a dockerfile path different from context.
+
+        Steps:
+            - Force a build with an error on the kube_pod worker
+            - Check that the build fails
+
+        """
+        conf = {
+            'KUBE_POD_WORKER_IN_USE': '1',
+        }
+        with Cluster(extra_conf=conf) as cluster:
+            local_repo = cluster.clone()
+            local_repo.push(
+                yaml=abspath(
+                    join(__file__, pardir, 'yaml', 'path_fail', 'main.yml')),
+                dirs=[
+                    abspath(join(__file__, pardir, 'contexts', 'simple'))
+                ])
+            cluster.sanity_check()
+            buildset = cluster.api.force(branch=local_repo.branch)
+            self.assertEqual(buildset.result, 'exception')
+
+    @unittest.skip('cannot run to completion until '
+                   'we have an eve deployed in kube during tests')
     def test_kube_yaml_OK_with_fake_service(self):
         """Test a build with correct pod and fake service.
 

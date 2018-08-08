@@ -42,9 +42,26 @@ class KubernetesPodBuildOrder(util.BaseDockerBuildOrder):
 
         images = self._worker.get('images', {})
         image_vars = {}
-        for (image_name, context_path) in images.iteritems():
-            image_vars[image_name] = self._build_image(image_name,
-                                                       context_path)
+        for (name, params) in images.iteritems():
+            if isinstance(params, dict):
+                context = params.get('context')
+                if context is None or not isinstance(context, str):
+                    raise ValueError(
+                        'Missing or incorrect context arg type '
+                        'in image definition.')
+
+                dockerfile = params.get('dockerfile')
+                if dockerfile is not None and not isinstance(dockerfile, str):
+                    raise ValueError(
+                        'Incorrect arg dockerfile type in image definition.')
+
+                image_vars[name] = self._build_image(name, context, dockerfile)
+
+            elif isinstance(params, str):
+                image_vars[name] = self._build_image(name, params)
+
+            else:
+                raise ValueError('Unexpected data type in images.')
 
         self.properties['worker_images'] = (image_vars,
                                             'KubernetesPodBuildOrder')

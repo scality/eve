@@ -194,8 +194,9 @@ class TestDockerCluster(unittest.TestCase):
                     'exit 0',
                     worker={
                         'type': 'docker',
-                        'path': 'use-different-dockerfile',
-                        'dockerfile': 'foo/bar/Dockerfile.buz',
+                        'path': 'use-different-dockerfile/foo',
+                        'dockerfile':
+                            'use-different-dockerfile/Dockerfile.buz',
                     }),
                 dirs=[
                     abspath(
@@ -227,8 +228,9 @@ class TestDockerCluster(unittest.TestCase):
                     }],
                     worker={
                         'type': 'docker',
-                        'path': 'use-different-dockerfile',
-                        'dockerfile': 'foo/bar/Dockerfile.buz',
+                        'path': 'use-different-dockerfile/foo',
+                        'dockerfile':
+                            'use-different-dockerfile/Dockerfile.buz',
                     }),
                 dirs=[
                     abspath(

@@ -55,7 +55,9 @@ class DockerBuildOrder(util.BaseDockerBuildOrder):
                     util.env.DOCKER_HOOK_VERSION,
                     'DockerBuildOrder')
 
+        dockerfile = self._worker.get('dockerfile', None)
         self.properties['docker_image'] = (
-            self._build_image(path.basename(worker_path), worker_path),
+            self._build_image(path.basename(worker_path), worker_path,
+                              dockerfile),
             'DockerBuildOrder',
         )

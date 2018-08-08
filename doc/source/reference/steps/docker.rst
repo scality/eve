@@ -17,9 +17,17 @@ Parameters
 ``image``
     The full repo:name:tag of the image to build.
 
+``context_dir``
+    Full path to the docker context. Equivalent to the path parameter given to
+    a ``docker build`` command.
+
 ``dockerfile``
     (optional; default value: ``Dockerfile``)
-    Use the specified Dockerfile.
+    Defaults to the ``Dockerfile`` located in ``context_dir``
+    (docker build context path). When specified, the argument will
+    be the path to a ``Dockefile`` that will be used in the build
+    process. Note that it can be located either inside or outside the
+    context.
 
 ``is_retry``
     (optional; default value: ``False``)
@@ -31,7 +39,7 @@ Parameters
 
 ``build_args``
     (optional; default value: ``[]``)
-    provide additional ``--build-args`` to the ``docker build`` command.
+    Provide additional ``--build-args`` to the ``docker build`` command.
 
 Example
 +++++++
@@ -40,8 +48,9 @@ Example
 
    - DockerBuild:
        label: my_image
+       context_dir: path/to/context/dir
        image: scality/my_image:latest
-       dockerfile: path/to/dockerfile
+       dockerfile: path/to/dockerfile # optional
 
 DockerCheckLocalImage
 ---------------------

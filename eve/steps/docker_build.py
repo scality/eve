@@ -55,6 +55,7 @@ class DockerBuild(DockerStep):
             ``docker build`` command.
         build_args (dict): provide additional ``--build-args`` to the
             ``docker build`` command.
+        context_dir (str): full path to the context directory.
 
     """
 
@@ -62,7 +63,7 @@ class DockerBuild(DockerStep):
         'image',
     ]
 
-    def __init__(self, label, image, dockerfile=None, is_retry=False,
+    def __init__(self, label, image, context_dir='.', dockerfile=None, is_retry=False,
                  labels=None, build_args=None, **kwargs):
         kwargs.setdefault('name',
                           '[{0}] build'.format(label)[0:49])
@@ -93,7 +94,7 @@ class DockerBuild(DockerStep):
         if is_retry:
             command += ['--no-cache']
 
-        command += ['.']
+        command += [context_dir]
 
         super(DockerBuild, self).__init__(label, image, command, **kwargs)
 
