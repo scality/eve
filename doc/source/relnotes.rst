@@ -17,6 +17,17 @@ Release Notes
 
 .. towncrier release notes start
 
+Eve 1.3.42 (2018-08-09)
+=======================
+
+Bugfixes
+--------
+
+- Prevent docker and openstack worker auto-retry in case of known permanent
+  failure. (EVE-964)
+- Support Openstack keystoneauthv3 API authentication. (EVE-989)
+
+
 Eve 1.3.41 (2018-08-06)
 =======================
 
