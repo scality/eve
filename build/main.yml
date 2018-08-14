@@ -7,7 +7,7 @@ branches:
 
 stages:
   pre-merge:
-    worker:
+    worker: &xenial-worker
       type: docker
       path: build/workers/xenial
       volumes:
@@ -38,11 +38,7 @@ stages:
           alwaysRun: True
 
   local tests:
-    worker:
-      type: docker
-      path: build/workers/xenial
-      volumes:
-        - '/home/eve/workspace'
+    worker: *xenial-worker
     steps:
       - Git:
           name: fetch source
@@ -56,23 +52,29 @@ stages:
       - ShellCommand:
           name: run static analysis tools
           command: tox --sitepackages -e lint
+          usePTY: true
       - ShellCommand:
           name: Ensure the release notes compile
           command: tox --sitepackages -e relnotes -- test_version
+          usePTY: true
       - ShellCommand:
           name: Ensure the doc compiles
           command: tox --sitepackages -e doc
+          usePTY: true
       - ShellCommand:
           name: run unit tests
           command: tox --sitepackages -e unit
+          usePTY: true
       - ShellCommand:
           name: run system utils tests
           command: tox --sitepackages -e testutil
           haltOnFailure: True
+          usePTY: true
       - ShellCommand:
           name: run system tests
           command: tox --sitepackages -e system
           haltOnFailure: True
+          usePTY: true
       - Upload:
           source: .htmlcov
           urls:
