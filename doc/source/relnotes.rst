@@ -17,6 +17,16 @@ Release Notes
 
 .. towncrier release notes start
 
+Eve 1.3.43 (2018-09-04)
+=======================
+
+Features
+--------
+
+- Support building images with dockerfiles path different from build context on
+  ``kube_pod`` workers. (EVE-990)
+
+
 Eve 1.3.42 (2018-08-09)
 =======================
 
