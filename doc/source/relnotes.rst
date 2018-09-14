@@ -17,6 +17,16 @@ Release Notes
 
 .. towncrier release notes start
 
+Eve 1.3.44 (2018-09-14)
+=======================
+
+Bugfixes
+--------
+
+- Show progress bar while uploading artifacts to prevent being killed for
+  output timeout. (PIPDEP-590)
+
+
 Eve 1.3.43 (2018-09-04)
 =======================
 
