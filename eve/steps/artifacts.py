@@ -189,8 +189,8 @@ class Upload(ShellCommand):
              'echo "No files here. Nothing to do."; exit 0; fi'),
             'tar -chvzf ../artifacts.tar.gz .',
             'echo tar successful. Calling curl...',
-            ('curl --verbose --max-time {} -s -T ../artifacts.tar.gz -X PUT '
-             'http://{}/upload/{}').format(
+            ('curl --progress-bar --verbose --max-time {} -T '
+             '../artifacts.tar.gz -X PUT http://{}/upload/{}').format(
                 self._upload_max_time,
                 get_artifacts_proxy(self.build.builder),
                 self.get_container())]

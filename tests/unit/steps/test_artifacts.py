@@ -57,8 +57,9 @@ class TestUpload(steps.BuildStepMixin, unittest.TestCase,
                 'echo "No files here. Nothing to do."; exit 0; fi && '
                 'tar -chvzf ../artifacts.tar.gz . && '
                 'echo tar successful. Calling curl... && '
-                'curl --verbose --max-time 3600 -s -T ../artifacts.tar.gz -X '
-                'PUT http://artifacts/upload/my_artifacts')
+                'curl --progress-bar --verbose --max-time 3600 -T '
+                '../artifacts.tar.gz -X PUT '
+                'http://artifacts/upload/my_artifacts')
             + ExpectShell.log('stdio', stdout='Response Status: 201 Created')
             + 0)
         self.expectOutcome(result=SUCCESS)
@@ -75,8 +76,9 @@ class TestUpload(steps.BuildStepMixin, unittest.TestCase,
                 'echo "No files here. Nothing to do."; exit 0; fi && '
                 'tar -chvzf ../artifacts.tar.gz . && '
                 'echo tar successful. Calling curl... && '
-                'curl --verbose --max-time 3600 -s -T ../artifacts.tar.gz -X '
-                'PUT http://artifacts/upload/my_artifacts')
+                'curl --progress-bar --verbose --max-time 3600 -T '
+                '../artifacts.tar.gz -X PUT '
+                'http://artifacts/upload/my_artifacts')
             + ExpectShell.log('stdio', stdout='Response Status: 201 Created')
             + 0)
         self.expectOutcome(result=SUCCESS)
