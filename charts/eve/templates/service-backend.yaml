@@ -1,0 +1,21 @@
+{% for replica in range(env.pods_backend_replicas|int) %}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: eve
+    project: {{ env.namespace }}
+    service: backend
+  name: backend-{{ replica }}
+spec:
+  type: LoadBalancer
+  externalTrafficPolicy: Local
+  ports:
+  - name: backend-{{ replica }}
+    port: {{ env.pb_port }}
+    targetPort: {{ env.pb_port }}
+    protocol: TCP
+  selector:
+    backend-name: backend-{{ replica }}
+{% endfor %}

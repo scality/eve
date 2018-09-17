@@ -1,0 +1,37 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    app: eve
+    project: {{ env.namespace }}
+    service: openstack-mapping
+  name: openstack-mapping
+data:
+  "openstack_mapping.yml": |-
+    scality.cloud:
+      - image:
+          original_value: CentOS 6 (PVHVM)
+          new_value: 78a5f3ac-cd36-4c85-5dc8-f83ae89addaa
+      - image:
+          original_value: CentOS 7 (PVHVM)
+          new_value: 0a9bd300-f621-b8cf-4894-257c72206538
+      - image:
+          original_value: Debian 7 (Wheezy) (PVHVM)
+          new_value: 6543fdbe-342b-b50f-246d-fe082e36127c
+      - image:
+          original_value: Ubuntu 12.04 LTS (Precise Pangolin) (PVHVM)
+          new_value: a6476d61-6052-8b2a-9cf3-989bfb0bb2d1
+      - image:
+          original_value: Ubuntu 14.04 LTS (Trusty Tahr) (PVHVM)
+          new_value: 2a88b5bc-ccec-197d-6ebd-10632817dc51
+      - image:
+          original_value: Ubuntu 16.04 LTS (Xenial Xerus) (PVHVM)
+          new_value: 53c6169f-3174-a84f-c230-8eb463945a07
+      - flavor:
+          original_value: io1-30
+          new_value: 34d1db2b-e468-4976-bff7-e92aaf31930e
+    rackspace:
+      - image:
+          original_value: Debian 7 (Wheezy) (PVHVM)
+          new_value: 8dbe1146-3cc4-4c46-8888-64662a3ec809

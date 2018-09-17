@@ -1,0 +1,17 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    app: eve
+    project: {{ env.namespace }}
+    service: step-patcher
+  name: step-patcher
+data:
+{% if not env.is_production %}
+  "step_patcher.yml": |-
+    skip_steps:
+      - .*testrail.*
+{% else %}
+  "step_patcher.yml": ""
+{% endif %}

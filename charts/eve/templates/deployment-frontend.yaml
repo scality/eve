@@ -1,0 +1,95 @@
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: frontend
+spec:
+  selector:
+    matchLabels:
+      app: eve
+      project: {{ env.namespace }}
+      service: frontend
+  serviceName: frontend
+  replicas: {{ env.pods_frontend_replicas }}
+  template:
+    metadata:
+      labels:
+        app: eve
+        project: {{ env.namespace }}
+        service: frontend
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: pool
+                operator: In
+                values:
+                - core
+              - key: disk_size
+                operator: In
+                values:
+                - normal
+      containers:
+        - name: frontend
+          image: {{ env.pods_frontend_image }}
+          imagePullPolicy: Always
+          resources:
+            limits:
+              cpu: 2
+              memory: 1Gi
+            requests:
+              cpu: 2
+              memory: 1Gi
+          {% if env.debug_mode != '1' %}
+          livenessProbe:
+            exec:
+              command:
+                - "lsof"
+                - "-i"
+                - "@crossbar.{{ env.namespace }}.svc.cluster.local"
+            initialDelaySeconds: 300
+            periodSeconds: 60
+            timeoutSeconds: 30
+            failureThreshold: 2
+          {% endif %}
+          volumeMounts:
+            - name: dashboards
+              readOnly: True
+              mountPath: {{ env.dashboards_file_path }}
+              subPath: dashboards.yml
+            - name: workspace
+              mountPath: /root/eve/workers
+            - name: gitconfig
+              mountPath: /etc/gitconfig
+              subPath: gitconfig
+          envFrom:
+            - configMapRef:
+                name: eve-envvars
+            - secretRef:
+                name: eve-secret-envvars
+          env:
+            - name: DASHBOARDS_FILE_PATH
+              value: {{ env.dashboards_file_path }}
+            - name: DEBUG_MODE
+              value: '{{ env.debug_mode }}'
+            - name: MASTER_MODE
+              value: frontend
+            - name: MASTER_FQDN
+              value: {{ env.fqdn_frontend }}
+            - name: SUFFIX
+              value: {{ env.suffix_frontend }}
+          ports:
+            - containerPort: {{ env.http_port }}
+              name: buildbot-ui
+              protocol: TCP
+      volumes:
+        - name: dashboards
+          configMap:
+            name: dashboards
+        - name: gitconfig
+          configMap:
+            name: gitconfig
+        - name: workspace
+          emptyDir: {}

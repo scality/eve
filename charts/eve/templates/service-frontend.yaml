@@ -1,0 +1,19 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: eve
+    project: {{ env.namespace }}
+    service: frontend
+  name: frontend
+spec:
+  type: NodePort
+  ports:
+  - name: frontend
+    port: {{ env.http_port }}
+    targetPort: {{ env.http_port }}
+    protocol: TCP
+  selector:
+    app: eve
+    service: {{ env.frontend_service_selector }}

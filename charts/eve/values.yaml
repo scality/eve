@@ -1,0 +1,116 @@
+# Default values file for Eve helm chart.
+
+## nameOverride allows to change the name of the release
+## rather than default value 'eve'
+nameOverride: "eve"
+
+## useShortName shorten names of Kubernetes resources.
+##
+##   The release name will not be included in fullname. This
+##   is safe to use only if one release only of Eve is deployed
+##   per namespace (which is the typical use case).
+##
+useShortNames: false
+
+## Eve will run on the repository and with the settings declared here.
+Eve:
+
+## Eve container image
+image:
+  ## regitry to pull from.
+  ##
+  registry: docker.io
+
+  ## repository on the registry to pull from.
+  ##
+  repository: scality/eve
+
+  ## tag specifies the version of Eve to deploy.
+  ##
+  tag: 1.3.44
+
+  ## pullPolicy specifies the image pull policy
+  ##
+  ##   Defaults to 'IfNotPresent'
+  ##
+  pullPolicy: IfNotPresent
+
+  ## pullsecrets specifies a list of imagePullSecrets.
+  ##
+  ##   Secrets must be manually created in the namespace.
+  ##
+  pullSecrets: []
+
+
+## Kubernetes deployment configuration
+deployment:
+
+  ## Configure extra options for liveness and readiness probes
+  livenessProbe:
+    initialDelaySeconds: 120
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+    successThreshold: 1
+  readinessProbe:
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+    successThreshold: 1
+
+  ## Configure the ingress resource that allows you to access the service.
+  ingress:
+    ## enabled sets the ingress record generation or not.
+    ##
+    ##   Defaults to false.
+    ##
+    enabled: false
+
+    ## fqdn is the protocol/hostname to be covered with this ingress record.
+    ##
+    fqdn: "http://eve.local"
+
+    ## path contains the subpath where to access the HTTP service.
+    ##
+    ##   Defaults to '/'.
+    ##
+    path: "/"
+
+    ## tls is set to true in order to enable TLS on the ingress record.
+    ##
+    ##   Defaults to false.
+    ##
+    tls: false
+
+    ## tlsSecret specifies a secret that contains the key/certificate for TLS
+    ##
+    tlsSecret: "eve-tls-secret"
+
+    ## annotations contains the Ingress annotations done as key:value pairs
+    ##
+    annotations: {}
+
+  ## service port
+  ##
+  ##   Defaults to 5000
+  ##
+  servicePort: 5000
+
+  ## Configure resource requests and limits
+  resources:
+    requests:
+      memory: 512Mi
+      cpu: 300m
+
+  ## Node labels for pod assignment
+  ##
+  nodeSelector: {}
+
+  ## Tolerations for pod assignment
+  ##
+  tolerations: []
+
+  ## Affinity for pod assignment
+  ##
+  affinity: {}

@@ -1,0 +1,16 @@
+{%- macro read(file) -%}
+{% include '/root/workspace/' + file %}
+{%- endmacro %}
+{% import_yaml 'eve-kube/files/env.yml.jinja' as env with context %}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    app: eve
+    project: {{ env.namespace }}
+    service: dashboards
+  name: dashboards
+data:
+  dashboards.yml: |-
+    {{ read('frontend-dashboards.yml').replace('\n', '\n    ') }}

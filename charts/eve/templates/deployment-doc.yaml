@@ -1,0 +1,56 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: doc
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: eve
+      service: doc
+  template:
+    metadata:
+      labels:
+        app: eve
+        service: doc
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: pool
+                operator: In
+                values:
+                - core
+              - key: disk_size
+                operator: In
+                values:
+                - normal
+      containers:
+        - name: doc
+          image: {{ env.pods_doc_image }}
+          imagePullPolicy: Always
+          resources:
+            limits:
+              cpu: 1
+              memory: 4Gi
+            requests:
+              cpu: 100m
+              memory: 1Gi
+          {% if env.debug_mode != '1' %}
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8000
+            initialDelaySeconds: 300
+            periodSeconds: 60
+            failureThreshold: 3
+          {% endif %}
+          volumeMounts:
+            - name: cache
+              mountPath: /web/_build
+      volumes:
+        - name: cache
+          emptyDir:

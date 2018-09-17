@@ -1,0 +1,61 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: crossbar
+spec:
+  replicas: {{ env.pods_crossbar_replicas }}
+  selector:
+    matchLabels:
+      app: eve
+      project: {{ env.namespace }}
+      service: crossbar
+  template:
+    metadata:
+      labels:
+        app: eve
+        project: {{ env.namespace }}
+        service: crossbar
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: pool
+                operator: In
+                values:
+                - core
+              - key: disk_size
+                operator: In
+                values:
+                - normal
+      containers:
+        - name: crossbar
+          image: crossbario/crossbar:cpy3-17.9.2
+          imagePullPolicy: Always
+          {% if env.debug_mode != '1' %}
+          livenessProbe:
+            tcpSocket:
+              port: {{ env.wamp_port }}
+            initialDelaySeconds: 300
+            periodSeconds: 60
+            timeoutSeconds: 30
+            failureThreshold: 2
+          {% endif %}
+          args: ['--config', '/etc/crossbar/config.json']
+          volumeMounts:
+            - name: workspace
+              mountPath: /node/.crossbar/
+            - name: crossbar-config
+              mountPath: /etc/crossbar/
+          ports:
+            - containerPort: {{ env.wamp_port }}
+              name: crossbar
+              protocol: TCP
+      volumes:
+        - name: crossbar-config
+          configMap:
+            name: crossbar-config
+        - name: workspace
+          emptyDir: {}

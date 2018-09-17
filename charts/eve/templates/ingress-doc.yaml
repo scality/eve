@@ -1,0 +1,26 @@
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  labels:
+    app: eve
+    service: doc
+  name: doc-ingress
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    ingress.kubernetes.io/rewrite-target: /
+    ingress.kubernetes.io/configuration-snippet: |
+      rewrite ^/doc$ /doc/ permanent;
+spec:
+  rules:
+    - host: {{ env.fqdn }}
+      http:
+        paths:
+          - path: /doc
+            backend:
+              serviceName: doc
+              servicePort: 8000
+  tls:
+    - hosts:
+        - {{ env.fqdn }}
+      secretName: domain-certificate-secret

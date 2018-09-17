@@ -1,0 +1,15 @@
+name: eve
+version: 1.0.0
+description: Eve, a continuous integration builder over Buildbot.
+keywords:
+- continuous integration builder
+- buildbot
+- test and validation
+- GitHub
+- Bitbucket
+- python
+sources:
+- https://bitbucket.org/scality/eve
+maintainers:
+- name: Scality Release Engineering
+  email: release.engineering@scality.com

@@ -1,0 +1,211 @@
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: master
+spec:
+  serviceName: master
+  replicas: 1
+  selector:
+    matchLabels:
+      app: eve
+      project: {{ env.namespace }}
+      service: master
+  template:
+    metadata:
+      labels:
+        app: eve
+        project: {{ env.namespace }}
+        service: master
+        backend-name: backend-0
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: pool
+                operator: In
+                values:
+                - core
+              - key: disk_size
+                operator: In
+                values:
+                - {{ env.backend_core_disk_size }}
+      containers:
+        - name: master
+          image: {{ env.pods_backend_image }}
+          imagePullPolicy: Always
+          resources:
+            limits:
+              cpu: 1
+              memory: 4Gi
+            requests:
+              cpu: 500m
+              memory: 4Gi
+          volumeMounts:
+            - name: cloud-init
+              readOnly: true
+              mountPath: {{ env.cloud_init_script_path }}
+              subPath: cloud_init.sh
+            - name: dashboards
+              readOnly: True
+              mountPath: {{ env.dashboards_file_path }}
+              subPath: dashboards.yml
+            - name: docker-hook
+              readOnly: false
+              mountPath: /usr/local/bin/docker
+              subPath: docker
+            - name: docker-host-data
+              readOnly: false
+              mountPath: /var/lib/docker
+            - name: docker-host-sock
+              readOnly: false
+              mountPath: /var/run/docker.sock
+            - name: openstack-key
+              readOnly: false
+              mountPath: {{ env.os_ssh_key_path }}
+              subPath: os_id_rsa
+            - name: step-patcher
+              readOnly: false
+              mountPath: {{ env.patcher_file_path }}
+              subPath: step_patcher.yml
+            - name: openstack-mapping
+              readOnly: false
+              mountPath: {{ env.os_mapping_file_path }}
+              subPath: openstack_mapping.yml
+            - name: gitconfig
+              readOnly: false
+              mountPath: /etc/gitconfig
+              subPath: gitconfig
+            - name: workspace
+              mountPath: /root/eve/workers
+          envFrom:
+            - configMapRef:
+                name: eve-envvars
+            - secretRef:
+                name: eve-secret-envvars
+          env:
+            - name: DASHBOARDS_FILE_PATH
+              value: {{ env.dashboards_file_path }}
+            - name: CLOUD_INIT_SCRIPT
+              value: {{ env.cloud_init_script_path }}
+            - name: DEBUG_MODE
+              value: '{{ env.debug_mode }}'
+            - name: MASTER_FQDN
+              value: {{ env.fqdn_backend|format(0) }}
+            - name: MASTER_MODE
+              value: standalone
+            - name: OS_MAPPING_FILE_PATH
+              value: {{ env.os_mapping_file_path }}
+            - name: OS_SSH_KEY
+              value: {{ env.os_ssh_key_path }}
+            - name: PATCHER_FILE_PATH
+              value: {{ env.patcher_file_path }}
+            - name: SUFFIX
+              value: {{ env.suffix_backend|format(0) }}
+          ports:
+            - containerPort: {{ env.http_port }}
+              name: buildbot-ui
+              protocol: TCP
+            - containerPort: {{ env.pb_port }}
+              name: buildbot-pb
+              protocol: TCP
+        - name: docker-hook
+          image: {{ env.pods_docker_hook_image }}
+          imagePullPolicy: Always
+          resources:
+            limits:
+              cpu: 1
+              memory: 2Gi
+            requests:
+              cpu: 500m
+              memory: 2Gi
+          {% if env.debug_mode != '1' %}
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 5000
+            initialDelaySeconds: 300
+            periodSeconds: 60
+            timeoutSeconds: 300
+            failureThreshold: 1
+          {% endif %}
+          securityContext:
+            privileged: true
+          lifecycle:
+            preStop:
+              exec:
+                command:
+                  - "/bin/sh"
+                  - "-c"
+                  - >
+                    curl http://localhost:5000/quit
+          command:
+            - '/run.sh'
+          volumeMounts:
+            - name: creds
+              readOnly: true
+              mountPath: /creds
+            - name: docker-host-data
+              readOnly: false
+              mountPath: /var/lib/docker
+            - name: docker-host-sock
+              readOnly: false
+              mountPath: /var/run/docker.sock
+          env:
+            - name: DOCKER_API_VERSION
+              value: '{{ env.docker_api_version }}'
+            - name: DOCKER_CONTAINER_MAX_MEMORY
+              value: '{{ env.docker_container_max_memory }}'
+            - name: NAMESPACE
+              value: '{{ env.namespace }}'
+            - name: REGISTRY
+              value: '{{ env.docker_registry }}'
+            - name: WORKER_DEADLINE
+              value: '{{ env.pods_workers_deadline }}'
+            - name: WORKER_CPU_LIMIT
+              value: '{{ env.pods_workers_limits_cpu }}'
+            - name: WORKER_MEMORY_LIMIT
+              value: '{{ env.pods_workers_limits_memory }}'
+            - name: WORKER_CPU_REQUEST
+              value: '{{ env.pods_workers_requests_cpu }}'
+            - name: WORKER_MEMORY_REQUEST
+              value: '{{ env.pods_workers_requests_memory }}'
+            - name: VOLUME_LOCAL_BASEPATH
+              value: /mnt/disks/ssd0
+      volumes:
+        - name: cloud-init
+          configMap:
+            name: cloud-init
+        - name: creds
+          secret:
+            secretName: docker-hook-registry-credentials
+        - name: dashboards
+          configMap:
+            name: dashboards
+        - name: docker-hook
+          configMap:
+            name: docker-hook
+            defaultMode: 0755
+        - name: docker-host-data
+          hostPath:
+            path: /var/lib/docker
+        - name: docker-host-sock
+          hostPath:
+            path: /var/run/docker.sock
+        - name: openstack-key
+          secret:
+            secretName: openstack-key
+            defaultMode: 0600
+        - name: step-patcher
+          configMap:
+            name: step-patcher
+        - name: openstack-mapping
+          configMap:
+            name: openstack-mapping
+        - name: gitconfig
+          configMap:
+            name: gitconfig
+        - name: workspace
+          emptyDir: {}

@@ -1,0 +1,27 @@
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  labels:
+    app: eve
+    project: {{ env.namespace }}
+    service: frontend
+  name: namespace-ingress
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    ingress.kubernetes.io/rewrite-target: /
+    ingress.kubernetes.io/configuration-snippet: |
+      rewrite ^(/{{ env.githost }}/{{ env.owner }}/{{ env.slug_and_suffix }})$ $1/ permanent;
+spec:
+  rules:
+    - host: {{ env.fqdn }}
+      http:
+        paths:
+          - path: /{{ env.githost }}/{{ env.owner }}/{{ env.slug_and_suffix }}
+            backend:
+              serviceName: frontend
+              servicePort: {{ env.http_port }}
+  tls:
+    - hosts:
+        - {{ env.fqdn }}
+      secretName: domain-certificate-secret
