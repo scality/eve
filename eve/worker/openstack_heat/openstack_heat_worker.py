@@ -90,10 +90,28 @@ class HeatLatentWorker(AbstractLatentWorker):
         kwargs.setdefault('missing_timeout', MISSING_TIMEOUT)
         super(HeatLatentWorker, self).reconfigService(name, password, **kwargs)
 
+    def configure_openstack_api(self, build):
+        """Define the environment to let builds use the OS API on their own."""
+
+        # For now this function only set a property, later on we'll setup
+        # proper teardown and setup features, and use the
+        # variables defined on openstack_resources
+
+        os_service = build.getProperty('openstack_resources')
+        if os_service is None:
+            return
+        vcpus = os_service.get('vpcus')
+        memory = os_service.get('memory')
+        block_storage = os_service.get('block_storage')
+        storage = os_service.get('storage')
+        build.setProperty('multivm_prefix', "%s-%s" %
+                          (self.name, build.buildid),"Build")
+
     @defer.inlineCallbacks
     def start_instance(self, build):
         heat_template = yield build.render(self.heat_template)
         tmp_heat_template_parameters = {}
+        self.configure_openstack_api(build)
         for key, value in self.heat_template_parameters.items():
             tmp_heat_template_parameters[key] = yield build.render(value)
 

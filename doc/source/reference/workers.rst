@@ -166,6 +166,9 @@ Parameters
     so that Eve can translate the volumes into Kubernetes equivalents,
     in the case when Eve runs on a Kubernetes cluster.
 
+
+.. _openstack_worker:
+
 Openstack worker
 ----------------
 
@@ -195,6 +198,24 @@ The virtual machine can be personnalized in two ways:
 
   ``requirements.sh``: install extra packages
 
+
+- **Use the Openstack API on your own**
+
+  .. warning::
+     This feature is currently under development and it's API will change in
+     the future. Be prepared to address those changes. You have been warned.
+
+  When you specify the ``resources`` parameter, Eve will provide a property
+  ``multivm_prefix``. All resources created during this stage need to use
+  that prefix. It will allow admins to carefully clean all resources if needed.
+
+
+  .. note::
+      For now Eve doesn't perform any operation on the Openstack API that is
+      provided to the user, that means the user is responsible for the cleanup of
+      all resources. The goal is to dynamically provide the credentials,
+      and properly perform the cleanup.
+
 .. _openstack_examples:
 
 Examples
@@ -212,6 +233,20 @@ Examples
      steps:
        # ... describe steps here
 
+    multi_vm_stage:
+      worker:
+        type: openstack
+        image: <image_name:str>
+        flavor: <flavor_name:str>
+        path: <path/to/worker/customisation:path>
+        resources:
+          vcpus: <number_vcpus>
+          memory: <total_amount_of_ram>
+          storage: <total_amount_of_storage>
+          block_storage: <total_amount_of_block_storage>
+      steps:
+        # ... steps
+
 .. _openstack_parameters:
 
 Parameters
@@ -228,6 +263,11 @@ Parameters
     If provided, ``path`` may contain two files to configure the worker:
     - init.sh
     - requirements.sh
+
+``resources``
+    (optional): default to ``<empty>``
+    if provided it must contain the total amount of resources that plan to be
+    used during the stage execution. A ``multivm_prefix`` property will be set.
 
 Kubernetes pod worker
 ---------------------

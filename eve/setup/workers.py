@@ -94,15 +94,15 @@ def kube_pod_workers():
 
 
 START_WORKER_SCRIPT = """
-sudo -Hu eve git config --global \
+sudo -iu eve git config --global \
   url.http://{gitcache_host}/https/bitbucket.org/.insteadOf \
   git@bitbucket.org:
-sudo -Hu eve git config --global \
+sudo -iu eve git config --global \
   url.http://{gitcache_host}/https/github.com/.insteadOf \
   git@github.com:
-sudo -Hu eve buildbot-worker create-worker --umask=022 /home/eve/worker \
+sudo -iu eve buildbot-worker create-worker --umask=022 /home/eve/worker \
 "{master_fqdn}:{master_port}" {worker_name} "{worker_password}"
-sudo -Hu eve buildbot-worker start /home/eve/worker
+sudo -iu eve buildbot-worker start /home/eve/worker
 """
 
 

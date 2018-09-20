@@ -63,4 +63,6 @@ class HeatOpenStackBuildOrder(util.BaseBuildOrder):
             'openstack_flavor': (self._worker.get('flavor',
                                                   self.DEFAULT_FLAVOR),
                                  'OpenstackBuildOrder'),
+            'openstack_resources': (self._worker.get('resources'),
+                                    'OpenstackBuildOrder')
         })

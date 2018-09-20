@@ -5,6 +5,7 @@
 *.pyc
 .eggs
 eve.egg-info
+.pytest_cache
 
 .coverage
 .htmlcov
