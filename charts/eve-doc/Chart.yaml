@@ -1,0 +1,12 @@
+name: eve-doc
+version: 1.0.0
+description: Deploy Eve documentation.
+keywords:
+- Eve
+- continuous builder
+- documentation
+sources:
+- https://bitbucket.org/scality/eve
+maintainers:
+- name: Scality Release Engineering
+  email: release.engineering@scality.com

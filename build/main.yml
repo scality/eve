@@ -62,8 +62,11 @@ stages:
           command: tox --sitepackages -e doc
           usePTY: true
       - ShellCommand:
-          name: check helm packaging
+          name: check helm packaging eve-cron-builder
           command: helm lint charts/eve-cron-builder
+      - ShellCommand:
+          name: check helm packaging eve-doc
+          command: helm lint charts/eve-doc
       - ShellCommand:
           name: run unit tests
           command: tox --sitepackages -e unit
