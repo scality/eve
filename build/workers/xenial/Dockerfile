@@ -16,6 +16,9 @@ RUN wget -q -O - https://bootstrap.pypa.io/get-pip.py | python2 - 'pip==9.0.1' \
  && pip install --no-binary buildbot --no-cache-dir -r /tmp/requirements.txt \
  && rm -f /tmp/requirements.txt
 
+# Install helm
+RUN curl https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get > \
+ /tmp/get_helm.sh && bash /tmp/get_helm.sh
 
 #
 # Add user eve

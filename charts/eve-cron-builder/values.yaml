@@ -1,0 +1,110 @@
+# Default values file for eve-cron-builder helm chart.
+
+## nameOverride allows to change the name of the release
+## rather than default value 'eve-cron-builder'
+nameOverride: "eve-cron-builder"
+
+## useShortName shorten names of Kubernetes resources.
+##
+##   The release name will not be included in fullname. This
+##   is safe to use only if one release only is deployed
+##
+useShortNames: false
+
+settings:
+  eve:
+    ## url is the address of Eve.
+    ##
+    url: "<a valid url>"
+
+    ## APIVersion can be used to specify the version of the API to query.
+    ##
+    ##  default is 2 (API v2)
+    ##
+    APIVersion: "2"
+
+    ## token contains a GitHub token.
+    ##
+    ##   Required for GitHub projects only.
+    ##
+    token: ""
+
+    ## clientId contains a Bitbucket OAuth client id.
+    ##
+    ##   Required for Bitbucket projects only.
+    ##
+    clientId: ""
+
+    ## clientSecret contains a Bitbucket OAuth client secret.
+    ##
+    ##   Required for Bitbucket projects only.
+    ##
+    clientSecret: ""
+
+  job:
+    ## branch to build in Eve.
+    ##
+    branch: "<a valid branch>"
+
+    ## stage can be used to override the stage to run in the new build.
+    ##
+    ##   defaults to "" (default stage for the target branch will run).
+    ##
+    stage: ""
+
+    ## reason is stored in the build as a description of why the build started.
+    ##
+    ##   defaults to "cronjob".
+    ##
+    reason: "cronjob"
+
+  ## cronJobSchedule defines the frequency of the job.
+  ##
+  cronJobSchedule: "@daily"
+
+  ## dryRun is a boolean that dictates the micro-service effect.
+  ##
+  ##   false (default): expired Heat stacks are listed and deleted
+  ##   true: expired Heat stacks are only listed
+  ##
+  dryRun: false
+
+## container image
+image:
+  ## regitry to pull from.
+  ##
+  registry: docker.io
+
+  ## repository on the registry to pull from.
+  ##
+  repository: scality/eve-api-client
+
+  ## tag specifies the version to deploy.
+  ##
+  tag: 1.3.45
+
+  ## pullPolicy specifies the image pull policy
+  ##
+  ##   Defaults to 'IfNotPresent'
+  ##
+  pullPolicy: IfNotPresent
+
+  ## pullsecrets specifies a list of imagePullSecrets.
+  ##
+  ##   Secrets must be manually created in the namespace.
+  ##
+  pullSecrets: []
+
+## Kubernetes deployment configuration
+deployment:
+  ## Node labels for pod assignment
+  ##
+  nodeSelector: {}
+
+  ## Tolerations for pod assignment
+  ##
+  tolerations: []
+
+  ## Affinity for pod assignment
+  ##
+  affinity: {}

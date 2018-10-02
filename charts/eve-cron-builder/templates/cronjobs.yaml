@@ -1,0 +1,53 @@
+---
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: {{ template "fullname" $ }}
+  labels:
+    app: {{ template "fullname" $ }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: "{{ .Release.Name }}"
+spec:
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 200
+  schedule: {{ required "A valid cron schedule is required." .Values.settings.cronJobSchedule | quote }}
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app: {{ template "fullname" $ }}
+            chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+            release: "{{ .Release.Name }}"
+        spec:
+          restartPolicy: Never
+          containers:
+          - name: cron-builder
+            image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+            imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
+            envFrom:
+            - secretRef:
+                name: {{ template "fullname" $ }}
+            - configMapRef:
+                name: {{ template "fullname" $ }}
+            args:
+            {{ if .Values.settings.dryRun }}
+            - --dry-run
+            {{ end }}
+            - '--httpmethod'
+            - 'post'
+            - '--payload'
+            - '{"branch":"{{ required "branch is required." .Values.settings.job.branch }}","reason":"{{ required "reason is required." .Values.settings.job.reason }}","force_stage":"{{ .Values.settings.job.stage }}"}'
+            - '/forceschedulers/force'
+          {{- with .Values.deployment.nodeSelector }}
+          nodeSelector:
+{{ toYaml . | indent 12 }}
+          {{- end -}}
+          {{- with .Values.deployment.affinity }}
+          affinity:
+{{ toYaml . | indent 12 }}
+          {{- end }}
+          {{- with .Values.deployment.tolerations }}
+         tolerations:
+{{ toYaml . | indent 12 }}
+         {{- end }}

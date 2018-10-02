@@ -1,0 +1,13 @@
+name: eve-cron-builder
+version: 1.0.0
+description: Launch periodically builds on Eve through the API.
+keywords:
+- Eve
+- cron scheduler
+- force builds
+- python
+sources:
+- https://bitbucket.org/scality/eve
+maintainers:
+- name: Scality Release Engineering
+  email: release.engineering@scality.com

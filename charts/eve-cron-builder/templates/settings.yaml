@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "fullname" $ }}
+  labels:
+    app: {{ template "fullname" $ }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+data:
+  EVE_API_URL: {{ required "A valid Eve URL is required." .Values.settings.eve.url | quote }}
+  EVE_API_VERSION: {{ required "A valid API version is required." .Values.settings.eve.APIVersion | quote }}
