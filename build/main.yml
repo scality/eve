@@ -92,7 +92,7 @@ stages:
   docker tests:
     worker:
       type: openstack
-      image: Ubuntu 16.04 LTS (Xenial Xerus) (PVHVM)
+      image: Ubuntu 16.04 LTS (Xenial Xerus) Eve
       flavor: general1-8
       path: build/workers/docker_tests
     steps:
