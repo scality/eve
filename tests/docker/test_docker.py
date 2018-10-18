@@ -25,6 +25,8 @@ from buildbot.process.results import SUCCESS
 from tests.docker.cluster import DockerizedCluster as Cluster
 from tests.util.yaml_factory import PreMerge, SingleCommandYaml
 
+from eve.util.hash import create_hash
+
 
 class TestDockerCluster(unittest.TestCase):
     def test1_bad_dockerfile(self):
@@ -137,6 +139,10 @@ class TestDockerCluster(unittest.TestCase):
                 child_build.properties['bootstrap_reason'],
                 [u'force build', u'BuildOrder'])
             self.assertEqual(child_build.result, 'success')
+            hash = create_hash(child_build.properties['repository'][0],
+                               child_build.properties['workername'][0])
+            self.assertEqual(child_build.properties['worker_uuid'][0],
+                             hash)
             cluster.sanity_check()
 
     @unittest.skip('Flaky, need to understand how this works')

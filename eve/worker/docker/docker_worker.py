@@ -57,6 +57,9 @@ class EveDockerLatentWorker(AbstractLatentWorker):
     def start_instance(self, build):
         if self.instance is not None:
             raise ValueError('instance active')
+        repository = build.getProperty('repository')
+        uuid = util.create_hash(repository, self.name)
+        build.setProperty("worker_uuid", uuid, "Build")
         image = yield build.render(self.image)
         memory = build.getProperty('docker_memory')
         volumes = build.getProperty('docker_volumes')

@@ -18,7 +18,6 @@
 """Allow eve to use kubernetes pods as workers."""
 
 import socket
-from hashlib import md5
 from time import sleep
 
 import yaml
@@ -80,26 +79,6 @@ spec:
       {% endif %}
       args: [ "init" ]
 """
-
-
-def kube_hash(*args):
-    """Return a unique name based on args.
-
-    The value must be useable as a valid namespace name
-    and a valid UUID for service providers. In the case
-    of GCE service accounts for example, this means less
-    than 30 chars, and start with a letter.
-
-    We return the md5 sum of the provided args, make sure
-    the first character is an 'e' for Eve, and limit the md5
-    signature to 28 characters, which will hopefully be enough
-    to avoid collisions.
-
-    """
-    m = md5()
-    for arg in args:
-        m.update(str(arg))
-    return "e%s" % m.hexdigest()[:28]
 
 
 class KubePodWorkerCannotSubstantiate(LatentWorkerCannotSubstantiate):
@@ -410,14 +389,13 @@ class EveKubeLatentWorker(AbstractLatentWorker):
         buildnumber = build.getProperty('bootstrap')
         repository = build.getProperty('repository')
 
-        # create unique user id and namespace ids
-        uuid = kube_hash(repository, self.name)
+        # retrieve unique user id and create namespace ids
+        uuid = build.getProperty('worker_uuid')
         ns_plain = worker_service.get('namespaces', [])
-        ns_hash = [kube_hash(repository, ns, buildnumber, buildid)
+        ns_hash = [util.create_hash(repository, ns, buildnumber, buildid)
                    for ns in ns_plain]
 
         # store in properties
-        build.setProperty("worker_uuid", uuid, "Build")
         for (plain, hashed) in zip(ns_plain, ns_hash):
             build.setProperty(plain, hashed, "Build")
 
@@ -474,6 +452,9 @@ class EveKubeLatentWorker(AbstractLatentWorker):
                     'vars': build.getProperty('worker_vars'),
                 }
             )
+            repository = build.getProperty('repository')
+            uuid = util.create_hash(repository, self.name)
+            build.setProperty("worker_uuid", uuid, "Build")
             self.enforce_restart_policy(pod)
             self.enforce_affinity_policy(pod)
             self.enforce_gitconfig(pod)

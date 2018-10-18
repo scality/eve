@@ -22,6 +22,7 @@ import time
 import heatclient
 import heatclient.client
 from buildbot.interfaces import LatentWorkerCannotSubstantiate
+from buildbot.plugins import util
 from buildbot.worker import AbstractWorker
 from buildbot.worker.latent import AbstractLatentWorker
 from heatclient.exc import HTTPBadRequest
@@ -92,6 +93,9 @@ class HeatLatentWorker(AbstractLatentWorker):
 
     @defer.inlineCallbacks
     def start_instance(self, build):
+        repository = build.getProperty('repository')
+        uuid = util.create_hash(repository, self.name)
+        build.setProperty("worker_uuid", uuid, "Build")
         heat_template = yield build.render(self.heat_template)
         tmp_heat_template_parameters = {}
         for key, value in self.heat_template_parameters.items():
