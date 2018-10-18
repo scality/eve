@@ -115,7 +115,6 @@ class Cluster(object):
 
     default_conf = dict(
         ARTIFACTS_PUBLIC_URL='None',
-        CLOUDFILES_URL='None',
         DOCKER_API_VERSION='1.25',
         DOCKER_REGISTRY_URL='',
         GIT_HOST='mock',

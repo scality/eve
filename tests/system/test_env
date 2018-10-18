@@ -2,7 +2,6 @@ ARTIFACTS_PREFIX=test_artifacts_prefix-
 ARTIFACTS_PUBLIC_URL=https://artifacts.foo.baz
 BOOTSTRAP_BUILDER_NAME=test_bootstrap
 BOOTSTRAP_SCHEDULER_NAME=test_bootstrap_scheduler
-CLOUDFILES_URL=test_cloudfiles_url
 CODECOV_IO_BASE_URL=https://codecov.io
 DB_URL=test_database
 DEBUG_MODE=0

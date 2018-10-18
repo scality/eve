@@ -36,7 +36,6 @@ class TestMaster(TestCase):
         ports = Daemon.get_free_port(3)
         conf = dict(
             ARTIFACTS_PUBLIC_URL='None',
-            CLOUDFILES_URL='None',
             DB_URL='sqlite:///state.sqlite',
             DOCKER_API_VERSION='1.25',
             EXTERNAL_URL='http://example.com/',
