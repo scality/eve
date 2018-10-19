@@ -101,6 +101,7 @@ setup(
             'step_factory=eve.util.step_factory:step_factory',
             'verify_docker_certificates=eve.util.docker:verify_docker_certificates',
             'replace_with_interpolate=eve.util.step_factory:replace_with_interpolate',
+            'create_hash=eve.util.hash:create_hash',
         ],
         'buildbot.worker': [
             'EveDockerLatentWorker=eve.worker.docker.docker_worker:EveDockerLatentWorker',
