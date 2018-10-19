@@ -21,10 +21,9 @@ import unittest
 from os import pardir
 from os.path import abspath, join
 
+from buildbot.plugins import util
 from kubernetes.client.rest import ApiException
 from tests.kube.cluster import KubeCluster as Cluster
-
-from eve.worker.kubernetes.kubernetes_worker import kube_hash
 
 
 class TestKube(unittest.TestCase):
@@ -199,7 +198,8 @@ class TestKube(unittest.TestCase):
             # (repository name changes with every run of the test)
             child_build = cluster.api.get_builds('kube_pod-test_suffix')[0]
             props = cluster.api.get_build_properties(child_build)
-            uuid = kube_hash(props['repository'][0], 'kw000-test_suffix')
+            uuid = util.create_hash(props['repository'][0],
+                                    'kw000-test_suffix')
             self.assertEqual(cluster.get_config_map(
                 'fake-service-init-status').data['status'], '0')
             self.assertEqual(cluster.get_config_map(
@@ -219,11 +219,11 @@ class TestKube(unittest.TestCase):
 
             self.assertEqual(
                 props['mynamespace1'],
-                kube_hash(props['repository'][0], 'mynamespace1', 1, 3)
+                util.create_hash(props['repository'][0], 'mynamespace1', 1, 3)
             )
             self.assertEqual(
                 props['mynamespace2'],
-                kube_hash(props['repository'][0], 'mynamespace2', 1, 3)
+                util.create_hash(props['repository'][0], 'mynamespace2', 1, 3)
             )
 
             # a bit of cleanup last
@@ -279,7 +279,8 @@ class TestKube(unittest.TestCase):
             # (repository name changes with every run of the test)
             child_build = cluster.api.get_builds('kube_pod-test_suffix')[0]
             props = cluster.api.get_build_properties(child_build)
-            uuid = kube_hash(props['repository'][0], 'kw000-test_suffix')
+            uuid = util.create_hash(props['repository'][0],
+                                    'kw000-test_suffix')
             self.assertEqual(cluster.get_config_map(
                 'fake-service-init-status').data['status'], '1')
             time.sleep(5)  # teardown runs in background
@@ -309,7 +310,8 @@ class TestKube(unittest.TestCase):
             # (repository name changes with every run of the test)
             child_build = cluster.api.get_builds('kube_pod-test_suffix')[0]
             props = cluster.api.get_build_properties(child_build)
-            uuid = kube_hash(props['repository'][0], 'kw000-test_suffix')
+            uuid = util.create_hash(props['repository'][0],
+                                    'kw000-test_suffix')
             self.assertEqual(cluster.get_config_map(
                 'fake-service-init-status').data['status'], '0')
             time.sleep(5)  # teardown runs in background
@@ -341,7 +343,8 @@ class TestKube(unittest.TestCase):
             # (repository name changes with every run of the test)
             child_build = cluster.api.get_builds('kube_pod-test_suffix')[0]
             props = cluster.api.get_build_properties(child_build)
-            uuid = kube_hash(props['repository'][0], 'kw000-test_suffix')
+            uuid = util.create_hash(props['repository'][0],
+                                    'kw000-test_suffix')
             self.assertEqual(cluster.get_config_map(
                 'fake-service-init-status').data['status'], '0')
             time.sleep(5)  # teardown runs in background

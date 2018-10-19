@@ -10,3 +10,4 @@ Reference guide
    reference/steps
    reference/product_version
    reference/api_client
+   reference/common_properties
