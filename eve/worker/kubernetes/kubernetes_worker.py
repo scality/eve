@@ -551,12 +551,35 @@ class EveKubeLatentWorker(AbstractLatentWorker):
 
     def delete_pod(self, name):
         self.logger.debug('deleting kube pod %s...' % name)
+        max_wait_time = 240
+        duration = 0
         try:
             client.CoreV1Api().delete_namespaced_pod(name,
                                                      self.namespace,
                                                      client.V1DeleteOptions())
-        except ApiException:
-            self.logger.debug('unable to delete kube pod %s...' % name)
+            # Ensure that deleted pods are actually gone and not
+            # on terminating phase. This allow us to avoid attaching undesired
+            # buildbot-workers on new builds.
+            while duration < max_wait_time:
+                instance = client.CoreV1Api().read_namespaced_pod_status(
+                    name,
+                    self.namespace)
+                self.logger.info('kube pod %s still in phase %s' %
+                                 (name, instance.status.phase))
+                sleep(self._poll_resolution)
+                duration += self._poll_resolution
+
+            self.logger.info('max wait time reached forcing'
+                             ' deletion of pod %s' % name)
+            client.CoreV1Api().delete_namespaced_pod(
+                name,
+                self.namespace,
+                client.V1DeleteOptions(grace_period_seconds=0))
+        except ApiException as ex:
+            if ex.status == 404:
+                self.logger.info('kube pod %s was successfully deleted' % name)
+            else:
+                self.logger.debug('unable to delete kube pod %s...' % name)
             pass
 
     def _thd_start_instance(self, pod):
