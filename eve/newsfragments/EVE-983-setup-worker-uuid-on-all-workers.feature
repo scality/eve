@@ -1,1 +1,0 @@
-Setup the property ``worker_uuid`` on all worker types.

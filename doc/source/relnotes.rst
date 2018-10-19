@@ -17,6 +17,27 @@ Release Notes
 
 .. towncrier release notes start
 
+Eve 1.3.45 (2018-10-19)
+=======================
+
+Features
+--------
+
+- Setup the property ``worker_uuid`` on all worker types. (EVE-983)
+- Add Helm charts for eve-cron-builder, a microservice based on eve-api-client.
+  (PIPDEP-595)
+- Add Helm charts for documentation. (PIPDEP-595)
+- Import improvements on eve-api-client from Bert-E 3.2.0: - support for python
+  3, - better authentication flow on Bitbucket, - better autodetection of git
+  host. (PIPDEP-595)
+
+
+Bugfixes
+--------
+
+- Remove deprecated env variable CLOUDFILES_URL. (PIPDEP-595)
+
+
 Eve 1.3.44 (2018-09-14)
 =======================
 
