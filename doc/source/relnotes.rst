@@ -27,9 +27,10 @@ Features
 - Add Helm charts for eve-cron-builder, a microservice based on eve-api-client.
   (PIPDEP-595)
 - Add Helm charts for documentation. (PIPDEP-595)
-- Import improvements on eve-api-client from Bert-E 3.2.0: - support for python
-  3, - better authentication flow on Bitbucket, - better autodetection of git
-  host. (PIPDEP-595)
+- Import improvements on eve-api-client from Bert-E 3.2.0 (PIPDEP-595):
+    - support for python 3
+    - better authentication flow on Bitbucket
+    - better autodetection of git host.
 
 
 Bugfixes
