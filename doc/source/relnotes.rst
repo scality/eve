@@ -17,6 +17,16 @@ Release Notes
 
 .. towncrier release notes start
 
+Eve 1.3.46 (2018-10-22)
+=======================
+
+Bugfixes
+--------
+
+- Ensure that kube pods worker are actually gone when deleting them from the
+  cluster. (EVE-1008)
+
+
 Eve 1.3.45 (2018-10-19)
 =======================
 
