@@ -60,9 +60,6 @@ for i in xrange(120):
 else:
     raise Exception('database never responded')
 
-_print("checking cloud key mode...")
-openstack_key =  os.environ.get('OS_SSH_KEY', False)
-
 if os.environ.get('DEBUG_MODE', '0') in ['true', 'True', '1', 'y', 'yes']:
     _print("starting in debug mode...")
     _print("-> to start buildbot manually, connect to container then type:")
