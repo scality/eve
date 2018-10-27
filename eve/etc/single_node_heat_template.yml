@@ -1,0 +1,150 @@
+heat_template_version: 2013-05-23
+
+description: Simple template to deploy a single buildbot worker
+
+parameters:
+  image:
+    type: string
+    label: Image
+    description: Image
+  flavor:
+    type: string
+    label: Flavor
+    description: Flavor
+  key_name:
+    type: string
+    label: Key name
+    description: Key name
+  script_boot:
+    type: string
+    label: Boot script
+    description: Internal boot script
+    default: ""
+  script_init:
+    type: string
+    label: Init script
+    description: Initialization script
+    default: ""
+  script_requirements:
+    type: string
+    label: Requirements script
+    description: Requirements script
+    default: ""
+  script_start:
+    type: string
+    label: Start buildbot worker script
+    description: Start script
+    default: ""
+  worker_version:
+    type: string
+    label: Worker version
+    description: Buildbot worker version
+  network_public:
+    type: string
+    label: Public network ID
+    description: Public network to attach instance to.
+  network_service:
+    type: string
+    label: Service network ID
+    description: Service network to attach instance to.
+  network_private:
+    type: string
+    label: Private network name or ID
+    description: Private network to attach instance to.
+  master_fqdn:
+    type: string
+    label: Master address
+    description: Callback address of master (fqdn).
+  master_port:
+    type: string
+    label: Master port
+    description: Callback address of master (port).
+  worker_name:
+    type: string
+    label: Worker name
+    description: Credential of the Buildbot worker (name)
+  worker_password:
+    type: string
+    label: Worker password
+    description: Credential of the Buildbot worker (password)
+
+resources:
+  heat_worker:
+    type: OS::Nova::Server
+    properties:
+      image: {get_param: image}
+      flavor: {get_param: flavor}
+      key_name: {get_param: key_name}
+      networks:
+        - network: {get_param: network_public}
+        - network: {get_param: network_service}
+        - network: {get_param: network_private}
+      config_drive: "true"
+      user_data_format: RAW
+      user_data:
+        str_replace:
+          template: |
+                #!/bin/bash
+                set -o xtrace -o errexit -o nounset -o pipefail
+
+                function retry {
+                  local n=1
+                  local max=5
+                  local delay=30
+                  echo "Running this command with retry ($max attempts, $delay seconds delay):"
+                  echo "'$@'"
+                  while true; do
+                  echo "Attempt $n/$max:"
+                  "$@" && break || {
+                    if [[ $n -lt $max ]]; then
+                      ((n++))
+                      echo "Command failed. Sleeping $delay seconds." >&2
+                      sleep $delay;
+                    else
+                      echo "The command has failed after $n attempts." >&2
+                      exit 1
+                    fi
+                  }
+                  done
+                  echo "The command has succeeded."
+                }
+
+                # prepare scripts
+                cat << 'EOF0' | head -c -1 > /tmp/script_boot.sh
+                $script_boot
+                EOF0
+                chmod u+x /tmp/script_boot.sh
+
+                cat << 'EOF1' | head -c -1 > /tmp/script_init.sh
+                $script_init
+                EOF1
+                chmod u+x /tmp/script_init.sh
+
+                cat << 'EOF2' | head -c -1 > /tmp/script_requirements.sh
+                $script_requirements
+                EOF2
+                chmod u+x /tmp/script_requirements.sh
+
+                cat << 'EOF3' | head -c -1 > /tmp/script_start.sh
+                $script_start
+                EOF3
+                chmod u+x /tmp/script_start.sh
+
+                # execute scripts
+                /tmp/script_boot.sh
+                /tmp/worker_init_script.sh $worker_version
+                retry /tmp/script_requirements.sh
+                /tmp/script_start.sh \
+                    "$master_fqdn" "$master_port" \
+                    "$worker_name" "$worker_password"
+
+          params:
+            "$master_fqdn": {get_param: master_fqdn}
+            "$master_port": {get_param: master_port}
+            "$script_boot": {get_param: script_boot}
+            "$script_init": {get_param: script_init}
+            "$script_requirements": {get_param: script_requirements}
+            "$script_start": {get_param: script_start}
+            "$worker_name": {get_param: worker_name}
+            "$worker_password": {get_param: worker_password}
+            "$worker_version": {get_param: worker_version}

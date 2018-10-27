@@ -22,8 +22,6 @@ class TestSetupBuilders(unittest.TestCase):
             ('DOCKER_BUILDER_NAME', 'foo'),
             ('OPENSTACK_BUILDER_NAME', 'bar'),
             ('MASTER_START_TIME', '9999', int),
-            ('MICROSERVICE_GITCACHE_IN_USE', '0', int),
-            ('MICROSERVICE_ARTIFACTS_IN_USE', '0', int),
         ])
 
     def test_triggerable_builder(self):
