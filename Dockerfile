@@ -39,7 +39,6 @@ RUN pip install -r /tmp/requirements.txt
 COPY . /opt/eve
 RUN pip install --no-deps /opt/eve
 
-COPY eve/bin/docker-hook /root/eve/docker-hook
 COPY eve/etc/master.cfg /root/eve
 COPY buildbot.tac /root/eve
 COPY docker_cmd.py /root/eve

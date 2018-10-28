@@ -418,7 +418,6 @@ class TestDockerCluster(unittest.TestCase):
         """
         conf = {
             'DOCKER_HOOK_IN_USE': '1',
-            'DOCKER_HOOK_FAKE_INSTALL': '1',
             'DOCKER_HOOK_VERSION': '1.2.3',
             'DOCKER_HOOK_WORKERS': 'riri;ubuntu-xenial-with-docker-ctxt;plop',
         }
@@ -460,7 +459,6 @@ class TestDockerCluster(unittest.TestCase):
         """
         conf = {
             'DOCKER_HOOK_IN_USE': '1',
-            'DOCKER_HOOK_FAKE_INSTALL': '1',
             'DOCKER_HOOK_VERSION': '1.2.3',
             'DOCKER_HOOK_WORKERS': 'ri;not-ubuntu-xenial-with-docker-ctxt;pl',
         }
