@@ -60,12 +60,6 @@ for i in xrange(120):
 else:
     raise Exception('database never responded')
 
-if os.environ.get('DOCKER_HOOK_IN_USE', '0') in ['true', 'True', '1', 'y', 'yes']:
-    if not os.environ.get('DOCKER_HOOK_FAKE_INSTALL', '1'):  # for tests only
-        _print("installing docker hook...")
-        subprocess.check_call(
-            'cp /root/eve/docker-hook /usr/local/bin/docker', shell=True)
-
 if os.environ.get('DEBUG_MODE', '0') in ['true', 'True', '1', 'y', 'yes']:
     _print("starting in debug mode...")
     _print("-> to start buildbot manually, connect to container then type:")
