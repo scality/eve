@@ -28,39 +28,30 @@ class HeatOpenStackBuildOrder(util.BaseBuildOrder):
 
     """
 
-    DEFAULT_IMAGE = 'Ubuntu 14.04 LTS (Trusty Tahr) (PVHVM)'
-    DEFAULT_FLAVOR = 'general1-4'
-    """See https://developer.rackspace.com/docs/cloud-servers/v2/general-api-info/flavors/."""  # noqa: E501, pylint: disable=line-too-long
+    def read_worker_scripts(self):
+        for script in ['init.sh', 'requirements.sh', 'start.sh']:
+            file_ = "%s/build/%s/%s" % (
+                self.properties['master_builddir'][0],
+                self._worker['path'],
+                script)
+
+            if not os.path.isfile(file_):
+                continue
+
+            contents = open(file_).read()
+            self.properties.update({script: (contents, 'OpenstackBuildOrder')})
 
     def setup_properties(self):
         super(HeatOpenStackBuildOrder, self).setup_properties()
         worker_path = self._worker.get('path', '')
-        init_script_contents = ''
-        requirements_script_contents = ''
 
         if worker_path:
-            init_script = "%s/build/%s/init.sh" % (
-                self.properties['master_builddir'][0],
-                self._worker['path'])
-
-            requirements_script = "%s/build/%s/requirements.sh" % (
-                self.properties['master_builddir'][0],
-                self._worker['path'])
-
-            if os.path.isfile(init_script):
-                init_script_contents = open(init_script).read()
-
-            if os.path.isfile(requirements_script):
-                requirements_script_contents = open(requirements_script).read()
+            self.read_worker_scripts()
 
         self.properties.update({
             'worker_path': (worker_path, 'OpenstackBuildOrder'),
-            'init_script': (init_script_contents, 'OpenstackBuildOrder'),
-            'requirements_script': (requirements_script_contents,
-                                    'OpenstackBuildOrder'),
-            'openstack_image': (self._worker.get('image', self.DEFAULT_IMAGE),
+            'openstack_image': (self._worker.get('image', ''),
                                 'OpenstackBuildOrder'),
-            'openstack_flavor': (self._worker.get('flavor',
-                                                  self.DEFAULT_FLAVOR),
+            'openstack_flavor': (self._worker.get('flavor', ''),
                                  'OpenstackBuildOrder'),
         })

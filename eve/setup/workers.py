@@ -22,7 +22,7 @@ from os.path import abspath, dirname, join
 import yaml
 from buildbot import version
 from buildbot.plugins import util, worker
-from buildbot.process.properties import Interpolate, Property, Transform
+from buildbot.process.properties import Property, Transform
 from buildbot.worker.local import LocalWorker
 from twisted.logger import Logger
 from twisted.python.reflect import namedModule
@@ -83,7 +83,7 @@ def kube_pod_workers():
                 node_affinity=node_affinity,
                 max_memory=util.env.KUBE_POD_MAX_MEMORY,
                 max_cpus=util.env.KUBE_POD_MAX_CPU,
-                microservice_gitcache=util.env.MICROSERVICE_GITCACHE_IN_USE,
+                gitconfig=util.env.KUBE_POD_GITCONFIG_CM,
                 kube_config=None,
                 keepalive_interval=300,
                 active_deadline=util.env.KUBE_POD_ACTIVE_DEADLINE,
@@ -91,19 +91,6 @@ def kube_pod_workers():
                 service_data=service_data,
             ))
     return workers
-
-
-START_WORKER_SCRIPT = """
-sudo -iu eve git config --global \
-  url.http://{gitcache_host}/https/bitbucket.org/.insteadOf \
-  git@bitbucket.org:
-sudo -iu eve git config --global \
-  url.http://{gitcache_host}/https/github.com/.insteadOf \
-  git@github.com:
-sudo -iu eve buildbot-worker create-worker --umask=022 /home/eve/worker \
-"{master_fqdn}:{master_port}" {worker_name} "{worker_password}"
-sudo -iu eve buildbot-worker start /home/eve/worker
-"""
 
 
 def openstack_mapping(provider, field, value):
@@ -137,55 +124,94 @@ def openstack_mapping(provider, field, value):
     return value
 
 
+def openstack_worker_script(default_script_path, user_script_contents):
+    """Render initialization script at build time.
+
+    The source of the script is selected according to the following rules:
+    - if the worker path contains the script, use it
+    - else, use the default script
+
+    The default script location can be customised in settings.
+
+    """
+    logger = Logger('eve.setup.workers')
+
+    if user_script_contents:
+        return user_script_contents
+
+    try:
+        with open(join(dirname(dirname(abspath(__file__))), 'bin',
+                  default_script_path)) as script:
+            contents = script.read()
+    except (OSError, IOError) as err:
+        logger.error('An error occured while loading the default script file '
+                     '{path}: {err}', path=default_script_path, err=err)
+        raise
+
+    return contents
+
+
 def openstack_heat_workers():
     workers = []
-    heat_template = open(join(dirname(abspath(__file__)),
-                              'single_node_heat_template.yml')).read()
+    template = open(join(dirname(dirname(abspath(__file__))), 'etc',
+                         'single_node_heat_template.yml')).read()
+
+    params = {
+        'flavor': Transform(
+            openstack_mapping,
+            provider=util.env.OS_PROVIDER,
+            field="flavor",
+            value=Property('openstack_flavor')),
+        'image': Transform(
+            openstack_mapping,
+            provider=util.env.OS_PROVIDER,
+            field="image",
+            value=Property('openstack_image')),
+        'key_name': util.env.OS_KEY_NAME,
+        'master_fqdn': util.env.MASTER_FQDN,
+        'master_port': util.env.EXTERNAL_PB_PORT,
+        'network_private': util.env.OS_NETWORK_PRIVATE,
+        'network_public': util.env.OS_NETWORK_PUBLIC,
+        'network_service': util.env.OS_NETWORK_SERVICE,
+        'script_boot': Transform(
+            openstack_worker_script,
+            default_script=util.env.OS_SCRIPT_BOOT_FILE_PATH,
+            user_script=None),
+        'script_init': Transform(
+            openstack_worker_script,
+            default_script=util.env.OS_SCRIPT_INIT_FILE_PATH,
+            user_script=Property('init.sh')),
+        'script_requirements': Transform(
+            openstack_worker_script,
+            default_script=util.env.OS_SCRIPT_REQUIREMENTS_FILE_PATH,
+            user_script=Property('requirements.sh')),
+        'script_start': Transform(
+            openstack_worker_script,
+            default_script=util.env.OS_SCRIPT_START_FILE_PATH,
+            user_script=Property('start.sh')),
+        'worker_version': version,
+    }
 
     for i in range(util.env.MAX_OPENSTACK_WORKERS):
         name = 'hw%03d-%s' % (i, util.env.SUFFIX)
         password = util.password_generator()
 
-        start_worker_script = Interpolate(START_WORKER_SCRIPT.format(
-            gitcache_host=util.env.MICROSERVICE_GITCACHE_VM_URL,
-            master_fqdn=util.env.MASTER_FQDN,
-            master_port=util.env.EXTERNAL_PB_PORT,
-            worker_name=name,
-            worker_password=password,
-        ))
+        params['worker_name'] = name
+        params['worker_password'] = password
 
         workers.append(
             worker.HeatLatentWorker(
                 name=name,
                 password=password,
-                heat_template=heat_template,
-                heat_template_parameters={
-                    'image': Transform(openstack_mapping,
-                                       provider=util.env.OS_PROVIDER,
-                                       field="image",
-                                       value=Property('openstack_image')),
-                    'flavor': Transform(openstack_mapping,
-                                        provider=util.env.OS_PROVIDER,
-                                        field="flavor",
-                                        value=Property('openstack_flavor')),
-                    'key_name': util.env.OS_KEY_NAME,
-                    'public_network': util.env.OS_NETWORK_PUBLIC,
-                    'service_network': util.env.OS_NETWORK_SERVICE,
-                    'private_network': util.env.OS_NETWORK_PRIVATE,
-                    'worker_version': version,
-                    'worker_init_script': Property('init_script'),
-                    'worker_requirements_script': Property(
-                        'requirements_script'),
-                    'start_worker_script': start_worker_script,
-                },
+                heat_template=template,
+                heat_params=params,
                 os_auth_url=util.env.OS_AUTH_URL,
-                os_identity_api_version=util.env.OS_IDENTITY_API_VERSION,
                 os_username=util.env.OS_USERNAME,
                 os_password=util.env.OS_PASSWORD,
                 os_project_domain_id=util.env.OS_PROJECT_DOMAIN_ID,
                 os_project_name=util.env.OS_TENANT_NAME,
                 os_region_name=util.env.OS_REGION_NAME,
+                os_identity_api_version=util.env.OS_IDENTITY_API_VERSION,
                 build_wait_timeout=0,  # do not reuse the stack
-                keepalive_interval=300
-            ))
+                keepalive_interval=300))
     return workers

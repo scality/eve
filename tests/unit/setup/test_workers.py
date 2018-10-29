@@ -1,14 +1,22 @@
 """Unit tests of `eve.setup.workers`."""
 
-import os
 import unittest
+from io import StringIO
 
 from buildbot.plugins import util
+from mock import patch
 
 import eve.setup.workers
 
 
 class TestSetupWorkers(unittest.TestCase):
+    mapping_data = u"""
+provider:
+  - field:
+      original_value: foo
+      new_value: bar
+"""
+
     def test_local_workers(self):
         util.env = util.load_env([
             ('GIT_SLUG', 'slug'),
@@ -35,73 +43,100 @@ class TestSetupWorkers(unittest.TestCase):
 
     def test_kube_pod_workers(self):
         util.env = util.load_env([
+            ('EXTERNAL_PB_PORT', '12345'),
             ('KUBE_POD_ACTIVE_DEADLINE', '3600'),
+            ('KUBE_POD_GITCONFIG_CM', 'gitconfig'),
             ('KUBE_POD_MAX_CPU', '4'),
             ('KUBE_POD_MAX_MEMORY', '4G'),
             ('KUBE_POD_NAMESPACE', 'spameggbacon'),
-            ('EXTERNAL_PB_PORT', '12345'),
             ('KUBE_POD_NODE_AFFINITY', 'pool:worker'),
             ('KUBE_SERVICE', 'test-service'),
             ('KUBE_SERVICE_DATA', 'test-service-data'),
             ('KUBE_SERVICE_IN_USE', 1),
             ('MASTER_FQDN', 'foo'),
-            ('MICROSERVICE_GITCACHE_IN_USE', 1),
             ('MAX_KUBE_POD_WORKERS', 3),
             ('SUFFIX', '_foo'),
         ])
         workers = eve.setup.workers.kube_pod_workers()
         self.assertEquals(len(workers), 3)
 
-    def test_openstack_mapping(self):
-        provider = 'provider1'
-        field = 'field1'
-        value = 'value1'
-
-        # No mapping if yaml file does not exist
+    @patch('eve.setup.workers.open')
+    def test_openstack_mapping_nofile(self, mock_open):
         util.env = util.load_env([
-            ('OS_MAPPING_FILE_PATH', '/tmp/this_mapping_file_does_not_exist'),
+            ('OS_MAPPING_FILE_PATH', 'filepath'),
         ])
-        res = eve.setup.workers.openstack_mapping(provider, field, value)
-        self.assertEquals(res, value)
 
-        # No mapping if yaml file is invalid
-        with open('/tmp/this_mapping_file_is_invalid', 'w') as f:
-            f.write("??? this content is invalid yaml\n")
-        util.env = util.load_env([
-            ('OS_MAPPING_FILE_PATH', '/tmp/this_mapping_file_is_invalid'),
-        ])
-        res = eve.setup.workers.openstack_mapping(provider, field, value)
-        os.remove('/tmp/this_mapping_file_is_invalid')
-        self.assertEquals(res, value)
+        mock_open.side_effect = OSError
+        res = eve.setup.workers.openstack_mapping('provider', 'field', 'foo')
+        self.assertEquals(res, 'foo')
 
-        # Mapping checks if yaml file is valid
-        with open('/tmp/this_mapping_file_is_valid', 'w') as f:
-            f.write("provider1:\n")
-            f.write("  - field1:\n")
-            f.write("      original_value: value1\n")
-            f.write("      new_value: value2\n")
+        mock_open.side_effect = IOError
+        res = eve.setup.workers.openstack_mapping('provider', 'field', 'foo')
+        self.assertEquals(res, 'foo')
+
+    @patch('eve.setup.workers.open')
+    def test_openstack_mapping_invalid_yaml(self, mock_open):
         util.env = util.load_env([
-            ('OS_MAPPING_FILE_PATH', '/tmp/this_mapping_file_is_valid'),
+            ('OS_MAPPING_FILE_PATH', 'filepath'),
         ])
-        res1 = eve.setup.workers.openstack_mapping('provider0', field, value)
-        res2 = eve.setup.workers.openstack_mapping(provider, 'field0', value)
-        res3 = eve.setup.workers.openstack_mapping(provider, field, 'value0')
-        res4 = eve.setup.workers.openstack_mapping(provider, field, value)
-        os.remove('/tmp/this_mapping_file_is_valid')
-        self.assertEquals(res1, value)
-        self.assertEquals(res2, value)
-        self.assertEquals(res3, 'value0')
-        self.assertEquals(res4, 'value2')
+
+        mock_open.return_value = StringIO(u"not: 'yaml")
+        res = eve.setup.workers.openstack_mapping('provider', 'field', 'foo')
+        self.assertEquals(res, 'foo')
+
+    @patch('eve.setup.workers.open')
+    def test_openstack_mapping_no_provider(self, mock_open):
+        mock_open.return_value = StringIO(self.mapping_data)
+        res = eve.setup.workers.openstack_mapping('nomatch', 'field', 'foo')
+        self.assertEquals(res, 'foo')
+
+    @patch('eve.setup.workers.open')
+    def test_openstack_mapping_no_field(self, mock_open):
+        mock_open.return_value = StringIO(self.mapping_data)
+        res = eve.setup.workers.openstack_mapping('provider', 'nomatch', 'foo')
+        self.assertEquals(res, 'foo')
+
+    @patch('eve.setup.workers.open')
+    def test_openstack_mapping_no_value(self, mock_open):
+        mock_open.return_value = StringIO(self.mapping_data)
+        res = eve.setup.workers.openstack_mapping('provider', 'field', 'baz')
+        self.assertEquals(res, 'baz')
+
+    @patch('eve.setup.workers.open')
+    def test_openstack_mapping_match(self, mock_open):
+        mock_open.return_value = StringIO(self.mapping_data)
+        res = eve.setup.workers.openstack_mapping('provider', 'field', 'foo')
+        self.assertEquals(res, 'bar')
+
+    def test_openstack_worker_script_with_user_script(self):
+        res = eve.setup.workers.openstack_worker_script('path', 'user_data')
+        self.assertEquals(res, 'user_data')
+
+    @patch('eve.setup.workers.open')
+    def test_openstack_worker_script_missing_default_file(self, mock_open):
+        mock_open.side_effect = OSError
+        with self.assertRaises(OSError):
+            eve.setup.workers.openstack_worker_script('/path', '')
+
+    def test_openstack_worker_script_default_script(self):
+        res = eve.setup.workers.openstack_worker_script(
+            'os_script_init.sh', '')
+        self.assertTrue(res.startswith('#!/bin/bash'))
+
+    @patch('eve.setup.workers.open')
+    def test_openstack_worker_script_custom_script(self, mock_open):
+        mock_open.return_value = StringIO(u"script contents")
+        res = eve.setup.workers.openstack_worker_script('/path', '')
+        self.assertEquals(res, 'script contents')
+        mock_open.assert_called_once()
+        self.assertEqual(mock_open.call_args_list[0][0][0], '/path')
 
     def test_openstack_heat_workers(self):
         util.env = util.load_env([
-            ('CLOUD_INIT_SCRIPT', 'foo'),
             ('EXTERNAL_PB_PORT', 12345),
             ('GIT_SLUG', 'slug'),
             ('MASTER_FQDN', 'foo'),
             ('MAX_OPENSTACK_WORKERS', 3),
-            ('MICROSERVICE_ARTIFACTS_VM_URL', 'foo.bar'),
-            ('MICROSERVICE_GITCACHE_VM_URL', 'foo.bar'),
             ('OS_AUTH_URL', 'foo'),
             ('OS_IDENTITY_API_VERSION', '2'),
             ('OS_KEY_NAME', 'bar'),
@@ -113,6 +148,10 @@ class TestSetupWorkers(unittest.TestCase):
             ('OS_PROJECT_DOMAIN_ID', 'default'),
             ('OS_PROVIDER', 'foo'),
             ('OS_REGION_NAME', 'foo'),
+            ('OS_SCRIPT_BOOT_FILE_PATH', 'bootscript'),
+            ('OS_SCRIPT_INIT_FILE_PATH', 'initscript'),
+            ('OS_SCRIPT_REQUIREMENTS_FILE_PATH', 'reqscript'),
+            ('OS_SCRIPT_START_FILE_PATH', 'startscript'),
             ('OS_SSH_KEY', 'foo'),
             ('OS_TENANT_NAME', 'foo'),
             ('OS_USERNAME', 'foo'),

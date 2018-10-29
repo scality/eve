@@ -158,7 +158,7 @@ class EveKubeLatentWorker(AbstractLatentWorker):
 
     def checkConfig(self, name, password, master_fqdn, pb_port,
                     namespace, node_affinity, max_memory, max_cpus,
-                    microservice_gitcache, active_deadline, kube_config,
+                    gitconfig, active_deadline, kube_config,
                     service, service_data, **kwargs):
         """Ensure we have the kubernetes client available."""
         # Set build_wait_timeout to 0 if not explicitly set: Starting a
@@ -171,7 +171,7 @@ class EveKubeLatentWorker(AbstractLatentWorker):
 
     def reconfigService(self, name, password, master_fqdn, pb_port,
                         namespace, node_affinity, max_memory, max_cpus,
-                        microservice_gitcache, active_deadline, kube_config,
+                        gitconfig, active_deadline, kube_config,
                         service, service_data, **kwargs):
         # Set build_wait_timeout to 0 if not explicitly set: Starting a
         # container is almost immediate, we can afford doing so for each build.
@@ -184,8 +184,8 @@ class EveKubeLatentWorker(AbstractLatentWorker):
         self.pb_port = pb_port
         self.max_memory = max_memory
         self.max_cpus = max_cpus
-        self.microservice_gitcache = microservice_gitcache
         self.deadline = active_deadline
+        self.gitconfig = gitconfig
         self.service = service
         self.service_data = service_data
         return AbstractLatentWorker.reconfigService(self, name, password,
@@ -248,11 +248,18 @@ class EveKubeLatentWorker(AbstractLatentWorker):
 
     def enforce_gitconfig(self, pod):
         """Implicitly set the git config in every containers."""
-        if not self.microservice_gitcache:
+        if not self.gitconfig:
             return
-        volume = {'name': 'gitconfig', 'configMap': {'name': 'gitconfig'}}
-        volume_mount = {'name': 'gitconfig', 'mountPath': '/etc/gitconfig',
-                        'subPath': 'gitconfig'}
+
+        volume = {
+            'name': 'gitconfig',
+            'configMap': {'name': self.gitconfig}
+        }
+        volume_mount = {
+            'name': 'gitconfig',
+            'mountPath': '/etc/gitconfig',
+            'subPath': 'gitconfig'
+        }
         pod['spec'].setdefault('volumes', [])
         pod['spec']['volumes'].append(volume)
         for container in pod['spec']['containers']:

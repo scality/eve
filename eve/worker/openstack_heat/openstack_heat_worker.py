@@ -43,30 +43,16 @@ class HeatLatentWorker(AbstractLatentWorker):
     quarantine_timeout = quarantine_initial_timeout = 5 * 60
     quarantine_max_timeout = 60 * 60
 
-    def __init__(
-            self,
-            name,
-            password,
-            heat_template,
-            heat_template_parameters,
-            os_auth_url,
-            os_username,
-            os_password,
-            os_project_domain_id,
-            os_project_name,
-            os_region_name,
-            os_identity_api_version,
-            **kwargs):  # flake8: noqa
+    def __init__(self, name, password, heat_template, heat_params,
+                 os_auth_url, os_username, os_password, os_project_domain_id,
+                 os_project_name, os_region_name, os_identity_api_version,
+                 **kwargs):  # flake8: noqa
 
         super(HeatLatentWorker, self).__init__(name, password, **kwargs)
 
         self.heat_template = heat_template
+        self.heat_params = heat_params or {}
         self.stack_id = None
-
-        if heat_template_parameters is None:
-            self.heat_template_parameters = {}
-        else:
-            self.heat_template_parameters = heat_template_parameters
 
         if os_identity_api_version == '3':
             password = v3.PasswordMethod(
@@ -86,9 +72,10 @@ class HeatLatentWorker(AbstractLatentWorker):
         self.heat_client = heatclient.client.Client(
             '1', session=sess, region_name=os_region_name)
 
-    def reconfigService(self, name, password,
-                        **kwargs):
+    def reconfigService(self, name, password, **kwargs):
         kwargs.setdefault('missing_timeout', MISSING_TIMEOUT)
+        self.heat_params['worker_name'] = name
+        self.heat_params['worker_password'] = password
         super(HeatLatentWorker, self).reconfigService(name, password, **kwargs)
 
     @defer.inlineCallbacks
@@ -98,7 +85,7 @@ class HeatLatentWorker(AbstractLatentWorker):
         build.setProperty("worker_uuid", uuid, "Build")
         heat_template = yield build.render(self.heat_template)
         tmp_heat_template_parameters = {}
-        for key, value in self.heat_template_parameters.items():
+        for key, value in self.heat_params.items():
             tmp_heat_template_parameters[key] = yield build.render(value)
 
         res = yield threads.deferToThread(self._start_instance,
@@ -107,19 +94,20 @@ class HeatLatentWorker(AbstractLatentWorker):
                                           tmp_heat_template_parameters)
         defer.returnValue(res)
 
-    def _start_instance(
-            self, stack_name, heat_template, heat_template_parameters):
-
+    def _start_instance(self, stack_name, heat_template, heat_params):
         try:
             result = self.heat_client.stacks.create(
                 stack_name=stack_name,
                 template=heat_template,
-                parameters=heat_template_parameters)
+                parameters=heat_params
+            )
         except HTTPBadRequest as ex:
             raise LatentWorkerCannotSubstantiate(
                 ex.error['error'].get('message'))
+
         self.stack_id = result['stack']['id']
         stack = self.heat_client.stacks.get(stack_id=self.stack_id)
+
         while stack.stack_status == 'CREATE_IN_PROGRESS':
             time.sleep(POLLING_FREQ)
             stack = self.heat_client.stacks.get(stack_id=self.stack_id)
@@ -135,12 +123,14 @@ class HeatLatentWorker(AbstractLatentWorker):
             # instance never attached, and it's because, somehow, we never
             # started.
             return defer.succeed(None)
+
         # this allows to call the stack deletion in a thread so we can wait
         # until we are sure they are deleted.
         return threads.deferToThread(self._stop_instance, self.stack_id, fast)
 
     def _stop_instance(self, stack_id, fast):
         stack = self.heat_client.stacks.get(stack_id=stack_id)
+
         while 'DELETE' not in stack.stack_status:
             # sometimes, the 'DELETE_IN_PROGRESS' status is not set
             # instantaneously after stack.delete() is called. This loop makes
@@ -148,6 +138,7 @@ class HeatLatentWorker(AbstractLatentWorker):
             stack.delete()
             time.sleep(POLLING_FREQ)
             stack = self.heat_client.stacks.get(stack_id=stack_id)
+
         if fast:
             return
 

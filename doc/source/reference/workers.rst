@@ -185,15 +185,51 @@ The virtual machine can be personnalized in two ways:
   Openstack instance. Check your cloud provider settings to identify valid
   values.
 
-- **personalisation of image**
+- **personalisation of image and startup scripts**
 
-  It is possible to create two scripts in ``path``, that will run once the
-  virtual machine is up, and before the stage runs:
+  There are three customizable scripts that will run in order once the machine
+  is up. Eve provides default scripts for each, which can be overwritten by
+  the worker: place one or more scripts in the worker ``path``:
 
-  ``init.sh``: execute some shell commands to modify the setup of the VM (e.g.
-  add extra users, start additional services, ...)
+  - ``init.sh``,
+  - ``start.sh``,
+  - and ``requirements.sh``.
 
-  ``requirements.sh``: install extra packages
+  Note: Each script can use a special shell function ``retry``, which takes
+  a command as argument, and will retry up to 5 times in case of failure.
+
+  ``init.sh <version>``
+
+  Execute some shell commands to modify the setup of the VM (e.g.
+  create the Buildbot user, add extra users, start additional services, ...);
+  This script takes one argument: the version of the Buildbot master.
+
+  ``requirements.sh``
+
+  Install extra packages on the worker; This script will be retried
+  up to 5 times, so needs to be re-entrant.
+
+  ``start.sh <master_fqdn> <master_port> <worker_name> <worker_password>``
+
+  Create Builbot worker and start program buildbot-worker, like in the
+  default sample below. This script takes four arguments: the master callback
+  details and worker credentials.
+
+.. code-block:: shell
+   :caption: Default Openstack start script
+
+   master_fqdn=$1
+   master_port=$2
+   worker_name=$3
+   worker_password=$4
+
+   sudo -iu eve buildbot-worker create-worker --umask=022 \
+                                /home/eve/worker \
+                                ${master_fqdn}:${master_port} \
+                                ${worker_name} \
+                                ${worker_password}
+   sudo -iu eve buildbot-worker start /home/eve/worker
+
 
 .. _openstack_examples:
 

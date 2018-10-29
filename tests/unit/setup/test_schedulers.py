@@ -23,8 +23,6 @@ class TestSetupSchedulers(unittest.TestCase):
             ('GIT_OWNER', 'foo'),
             ('GIT_REPO', 'blblbl'),
             ('GIT_SLUG', 'bar'),
-            ('MICROSERVICE_ARTIFACTS_IN_USE', '0', int),
-            ('MICROSERVICE_GITCACHE_IN_USE', '0', int)
         ])
         self.assertIsNotNone(eve.setup.schedulers.force_scheduler())
 
