@@ -132,7 +132,7 @@ resources:
 
                 # execute scripts
                 /tmp/script_boot.sh
-                /tmp/worker_init_script.sh $worker_version
+                /tmp/script_init.sh "$worker_version"
                 retry /tmp/script_requirements.sh
                 /tmp/script_start.sh \
                     "$master_fqdn" "$master_port" \

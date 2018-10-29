@@ -1,7 +1,7 @@
 include eve/etc/single_node_heat_template.yml
-include eve/bin/os_worker_boot.sh
-include eve/bin/os_worker_init.sh
-include eve/bin/os_worker_requirements.sh
-include eve/bin/os_worker_start.sh
+include eve/bin/os_script_boot.sh
+include eve/bin/os_script_init.sh
+include eve/bin/os_script_requirements.sh
+include eve/bin/os_script_start.sh
 include requirements.txt
 recursive-include requirements *.in *.txt

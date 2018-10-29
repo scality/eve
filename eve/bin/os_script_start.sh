@@ -5,6 +5,8 @@ master_port=$2
 worker_name=$3
 worker_password=$4
 
+export LANG=en_US.utf8
+
 sudo -iu eve buildbot-worker create-worker --umask=022 \
                              /home/eve/worker \
                              ${master_fqdn}:${master_port} \

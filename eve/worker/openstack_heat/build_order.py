@@ -35,10 +35,10 @@ class HeatOpenStackBuildOrder(util.BaseBuildOrder):
                 self._worker['path'],
                 script)
 
-            if not os.path.isfile(file_):
-                continue
+            contents = ''
+            if os.path.isfile(file_):
+                contents = open(file_).read()
 
-            contents = open(file_).read()
             self.properties.update({script: (contents, 'OpenstackBuildOrder')})
 
     def setup_properties(self):
