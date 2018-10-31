@@ -1,0 +1,79 @@
+{{- if gt (.Values.eve.project.mastersCount | int) 1 }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "fullname" $ }}-crossbar
+  labels:
+    app: {{ template "fullname" $ }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+data:
+  config.json: >
+    {
+      "version": 2,
+      "controller": {},
+      "workers": [
+        {
+          "type": "router",
+          "realms": [
+            {
+              "name": "buildbot",
+              "roles": [
+                {
+                  "name": "anonymous",
+                  "permissions": [
+                    {
+                      "uri": "",
+                      "match": "prefix",
+                      "allow": {
+                        "call": true,
+                        "register": true,
+                        "publish": true,
+                        "subscribe": true
+                      },
+                      "disclose": {
+                        "caller": false,
+                        "publisher": false
+                      },
+                      "cache": true
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "transports": [
+            {
+              "type": "universal",
+              "endpoint": {
+                "type": "tcp",
+                "port": {{ .Values.deployment.ports.wamp }}
+              },
+              "rawsocket": {
+              },
+              "websocket": {
+                "ws": {
+                  "type": "websocket",
+                  "options": {
+                    "auto_ping_interval": 60000,
+                    "auto_ping_timeout": 30000,
+                    "fail_by_drop": true
+                  }
+                }
+              },
+              "web": {
+                "paths": {
+                  "/": {
+                    "type": "static",
+                    "directory": ".."
+                  }
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+{{- end }}

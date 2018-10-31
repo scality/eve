@@ -2,6 +2,28 @@
 
 worker_version=$1
 
+function retry {
+  local n=1
+  local max=5
+  local delay=30
+  echo "Running this command with retry ($max attempts, $delay seconds delay):"
+  echo "'$@'"
+  while true; do
+  echo "Attempt $n/$max:"
+  "$@" && break || {
+    if [[ $n -lt $max ]]; then
+      ((n++))
+      echo "Command failed. Sleeping $delay seconds." >&2
+      sleep $delay;
+    else
+      echo "The command has failed after $n attempts." >&2
+      exit 1
+    fi
+  }
+  done
+  echo "The command has succeeded."
+}
+
 # configure user eve and twisted version
 if [ -f /etc/redhat-release ]
 then

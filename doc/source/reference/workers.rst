@@ -174,7 +174,10 @@ When a stage uses a worker of type ``openstack``, Eve will spawn a single
 virtual machine in the Openstack cloud configured for the project.
 
 Eve automatically calls buildbot-worker for Openstack workers, there is no
-need for the repository to do it.
+need for the repository to do it (see start.sh below if you need to customize
+this).
+
+By default the username on the remote machine is ``eve``.
 
 The virtual machine can be personnalized in two ways:
 
@@ -185,7 +188,7 @@ The virtual machine can be personnalized in two ways:
   Openstack instance. Check your cloud provider settings to identify valid
   values.
 
-- **personalisation of image and startup scripts**
+- **personalization of image and startup scripts**
 
   There are three customizable scripts that will run in order once the machine
   is up. Eve provides default scripts for each, which can be overwritten by
@@ -195,13 +198,11 @@ The virtual machine can be personnalized in two ways:
   - ``start.sh``,
   - and ``requirements.sh``.
 
-  Note: Each script can use a special shell function ``retry``, which takes
-  a command as argument, and will retry up to 5 times in case of failure.
-
   ``init.sh <version>``
 
   Execute some shell commands to modify the setup of the VM (e.g.
-  create the Buildbot user, add extra users, start additional services, ...);
+  create the Buildbot user, install buildbot software, add extra users,
+  start additional services, ...);
   This script takes one argument: the version of the Buildbot master.
 
   ``requirements.sh``
@@ -218,6 +219,8 @@ The virtual machine can be personnalized in two ways:
 .. code-block:: shell
    :caption: Default Openstack start script
 
+   export LANG=en_US.utf8
+
    master_fqdn=$1
    master_port=$2
    worker_name=$3
@@ -228,6 +231,7 @@ The virtual machine can be personnalized in two ways:
                                 ${master_fqdn}:${master_port} \
                                 ${worker_name} \
                                 ${worker_password}
+
    sudo -iu eve buildbot-worker start /home/eve/worker
 
 

@@ -1,0 +1,15 @@
+{{- if .Values.eve.dockerHook.hookBinary }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "fullname" $ }}-docker-hook-binary
+  labels:
+    app: {{ template "fullname" $ }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+data:
+  docker: |
+{{ .Values.eve.dockerHook.hookBinary | indent 4 }}
+{{- end }}

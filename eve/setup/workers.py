@@ -175,20 +175,20 @@ def openstack_heat_workers():
         'network_service': util.env.OS_NETWORK_SERVICE,
         'script_boot': Transform(
             openstack_worker_script,
-            default_script=util.env.OS_SCRIPT_BOOT_FILE_PATH,
-            user_script=None),
+            default_script_path=util.env.OS_SCRIPT_BOOT_FILE_PATH,
+            user_script_contents=None),
         'script_init': Transform(
             openstack_worker_script,
-            default_script=util.env.OS_SCRIPT_INIT_FILE_PATH,
-            user_script=Property('init.sh')),
+            default_script_path=util.env.OS_SCRIPT_INIT_FILE_PATH,
+            user_script_contents=Property('init.sh')),
         'script_requirements': Transform(
             openstack_worker_script,
-            default_script=util.env.OS_SCRIPT_REQUIREMENTS_FILE_PATH,
-            user_script=Property('requirements.sh')),
+            default_script_path=util.env.OS_SCRIPT_REQUIREMENTS_FILE_PATH,
+            user_script_contents=Property('requirements.sh')),
         'script_start': Transform(
             openstack_worker_script,
-            default_script=util.env.OS_SCRIPT_START_FILE_PATH,
-            user_script=Property('start.sh')),
+            default_script_path=util.env.OS_SCRIPT_START_FILE_PATH,
+            user_script_contents=Property('start.sh')),
         'worker_version': version,
     }
 
@@ -204,7 +204,7 @@ def openstack_heat_workers():
                 name=name,
                 password=password,
                 heat_template=template,
-                heat_params=params,
+                heat_params=dict(params),  # a new copy for each worker
                 os_auth_url=util.env.OS_AUTH_URL,
                 os_username=util.env.OS_USERNAME,
                 os_password=util.env.OS_PASSWORD,

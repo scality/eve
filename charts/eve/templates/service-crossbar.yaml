@@ -1,0 +1,20 @@
+{{ if gt (.Values.eve.project.mastersCount | int) 1 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "fullname" $ }}-crossbar
+  labels:
+    app: {{ template "fullname" $ }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+spec:
+  ports:
+    - name: crossbar
+      port: {{ .Values.deployment.ports.wamp }}
+      targetPort: {{ .Values.deployment.ports.wamp }}
+      protocol: TCP
+  selector:
+    app: {{ template "fullname" $ }}-crossbar
+{{- end }}

@@ -17,6 +17,23 @@ Release Notes
 
 .. towncrier release notes start
 
+Eve 1.3.47 (2018-10-31)
+=======================
+
+Features
+--------
+
+- Add Helm charts for Eve. (PIPDEP-595)
+- Refactor and extend capabilities of Openstack init scripts. (PIPDEP-595)
+- Update default value of FORCE_BUILD_PARAM_COUNT: 0 -> 2. (PIPDEP-595)
+- Remove phony configuration variable NGROK. (PIPDEP-595)
+- Deprecate conf setting CLOUD_INIT_SCRIPT (was unused since introduction of
+  Heat). (PIPDEP-595)
+- Deprecate MICROSERVICE* conf settings (replaced with better OpenStack and
+  Kube interfaces). (PIPDEP-595)
+- Add conf setting KUBE_POD_GITCONFIG_CM. (PIPDEP-595)
+
+
 Eve 1.3.46 (2018-10-22)
 =======================
 

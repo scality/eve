@@ -1,0 +1,14 @@
+eve.dockerHook.hookBinary
+eve.masterConf.builds.noNewBuild
+eve.masterConf.builds.stepPatcher
+eve.masterConf.dockerWorkers.ca
+eve.masterConf.dockerWorkers.cert
+eve.masterConf.dockerWorkers.key
+eve.masterConf.git.gitConfig
+eve.masterConf.openstackWorkers.osIdRsa
+eve.masterConf.openstackWorkers.osMapping
+eve.masterConf.openstackWorkers.osScriptBoot
+eve.masterConf.openstackWorkers.osScriptInit
+eve.masterConf.openstackWorkers.osScriptRequirements
+eve.masterConf.openstackWorkers.osScriptStart
+eve.masterConf.ui.dashboards
