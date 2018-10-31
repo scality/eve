@@ -17,8 +17,8 @@ Release Notes
 
 .. towncrier release notes start
 
-Eve 1.3.47 (2018-10-31)
-=======================
+Eve 1.4.0 (2018-10-31)
+======================
 
 Features
 --------
