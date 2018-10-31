@@ -1,0 +1,38 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "fullname" $ }}-files
+  labels:
+    app: {{ template "fullname" $ }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+data:
+  {{- if .Values.eve.masterConf.ui.dashboards }}
+  dashboards.yaml: |
+{{ .Values.eve.masterConf.ui.dashboards | indent 4 }}
+  {{- end }}
+  {{- if not (eq .Values.eve.masterConf.builds.noNewBuild "") }}
+  no_new_build: " "
+  {{- end }}
+  {{- if .Values.eve.masterConf.openstackWorkers.osMapping }}
+  os_mapping.yaml: |
+{{ .Values.eve.masterConf.openstackWorkers.osMapping | indent 4 }}
+  {{- end }}
+  {{- if .Values.eve.masterConf.openstackWorkers.osScriptBoot }}
+  os_script_boot.sh: {{ .Values.eve.masterConf.openstackWorkers.osScriptBoot | quote }}
+  {{- end }}
+  {{- if .Values.eve.masterConf.openstackWorkers.osScriptInit }}
+  os_script_init.sh: {{ .Values.eve.masterConf.openstackWorkers.osScriptInit | quote }}
+  {{- end }}
+  {{- if .Values.eve.masterConf.openstackWorkers.osScriptRequirements }}
+  os_script_requirements.sh: {{ .Values.eve.masterConf.openstackWorkers.osScriptRequirements | quote }}
+  {{- end }}
+  {{- if .Values.eve.masterConf.openstackWorkers.osScriptStart }}
+  os_script_start.sh: {{ .Values.eve.masterConf.openstackWorkers.osScriptStart | quote }}
+  {{- end }}
+  {{- if .Values.eve.masterConf.builds.stepPatcher }}
+  step_patcher.yaml: |
+{{ .Values.eve.masterConf.builds.stepPatcher | indent 4 }}
+  {{- end }}

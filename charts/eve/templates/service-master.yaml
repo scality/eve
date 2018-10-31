@@ -1,0 +1,22 @@
+{{- range $k, $v := until (.Values.eve.project.mastersCount | int) }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "fullname" $ }}-master-{{ $v }}
+  labels:
+    app: {{ template "fullname" $ }}
+    chart: "{{ $.Chart.Name }}-{{ $.Chart.Version }}"
+    release: "{{ $.Release.Name }}"
+    heritage: "{{ $.Release.Service }}"
+spec:
+  type: LoadBalancer
+  externalTrafficPolicy: Local
+  ports:
+  - name: {{ template "fullname" $ }}-master-{{ $v }}
+    port: {{ $.Values.deployment.ports.pb }}
+    targetPort: {{ $.Values.deployment.ports.pb }}
+    protocol: TCP
+  selector:
+    app: "{{ template "fullname" $ }}-master-{{ $v }}"
+{{- end }}

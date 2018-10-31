@@ -1,0 +1,70 @@
+{{ if gt (.Values.eve.project.mastersCount | int) 1 }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "fullname" $ }}-crossbar
+  labels:
+    app: {{ template "fullname" $ }}-crossbar
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ template "fullname" $ }}-crossbar
+  template:
+    metadata:
+      labels:
+        app: {{ template "fullname" $ }}-crossbar
+        chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+        release: "{{ .Release.Name }}"
+    spec:
+      {{- if .Values.image.pullSecrets }}
+      imagePullSecrets:
+      {{- range .Values.image.pullSecrets }}
+        - name: {{ . }}
+      {{- end }}
+      {{- end }}
+      containers:
+      - name: {{ template "name" $ }}
+        image: "crossbario/crossbar:{{ .Values.image.crossbar.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
+        ports:
+        - containerPort: {{ .Values.deployment.ports.wamp }}
+          name: crossbar
+          protocol: TCP
+        livenessProbe:
+          tcpSocket:
+            port: crossbar
+{{ toYaml .Values.deployment.crossbar.livenessProbe | indent 10 }}
+        resources:
+{{ toYaml .Values.deployment.crossbar.resources | indent 10 }}
+        args:
+        - --config
+        - /etc/crossbar/config.json
+        volumeMounts:
+        - name: workspace
+          mountPath: /node/.crossbar/
+        - name: config
+          mountPath: /etc/crossbar/
+      volumes:
+      - name: config
+        configMap:
+          name: {{ template "fullname" $ }}-crossbar
+      - name: workspace
+        emptyDir: {}
+      {{- with .Values.deployment.crossbar.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with .Values.deployment.crossbar.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with .Values.deployment.crossbar.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+{{- end }}

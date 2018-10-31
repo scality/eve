@@ -1,0 +1,6 @@
+{{ if gt (.Values.eve.project.mastersCount | int) 1 }}
+
+{{ $data := dict "index" 0 "isFrontend" true "isMaster" false "hasCrossbar" true "mode" "frontend" "name" "frontend" "Values" .Values "Release" .Release "Chart" .Chart }}
+{{- template "eve.master" $data }}
+
+{{- end }}

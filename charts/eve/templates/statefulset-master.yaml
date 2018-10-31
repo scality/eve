@@ -1,0 +1,13 @@
+{{ if gt (.Values.eve.project.mastersCount | int) 1 }}
+
+{{- range $k, $v := until (.Values.eve.project.mastersCount | int) }}
+{{- $data := dict "index" $v "isFrontend" false "isMaster" true "hasCrossbar" true "mode" "backend" "name" (printf "master-%d" $v) "Values" $.Values "Release" $.Release "Chart" $.Chart }}
+{{- template "eve.master" $data }}
+{{- end }}
+
+{{- else }}
+
+{{ $data := dict "index" 0 "isFrontend" true "isMaster" true "hasCrossbar" false "mode" "standalone" "name" "master-0" "Values" .Values "Release" .Release "Chart" .Chart }}
+{{- template "eve.master" $data }}
+
+{{- end }}

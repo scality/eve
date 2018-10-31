@@ -1,0 +1,75 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "fullname" $ }}-env
+  labels:
+    app: {{ template "fullname" $ }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+data:
+  {{/* user settings as extracted from value files */}}
+  {{- template "printConf" $ }}
+
+  {{/* fixed settings below */}}
+  BOOTSTRAP_BUILDER_NAME: "bootstrap"
+  BOOTSTRAP_SCHEDULER_NAME: "bootstrap-scheduler"
+  DOCKER_BUILDER_PREFIX: "docker"
+  DOCKER_CERT_PATH: "/root/conf-secret"
+  DOCKER_SCHEDULER_PREFIX: "docker"
+  EXTERNAL_PB_PORT: {{ .Values.deployment.ports.pb | quote }}
+  FORCE_SCHEDULER_NAME: "force"
+  GIT_POLLING: "0"
+  HTTP_PORT: {{ .Values.deployment.ports.http | quote }}
+  KUBE_POD_BUILDER_PREFIX: "kube_pod"
+  KUBE_POD_NAMESPACE: "{{ $.Release.Namespace }}"
+  KUBE_POD_SCHEDULER_PREFIX: "kube_pod"
+  LOCAL_BUILDER_PREFIX: "local"
+  LOCAL_JOBS_DIR_PATH: "none"
+  LOCAL_SCHEDULER_PREFIX: "local"
+  NO_NEW_BUILD_FILE_PATH: "/root/conf/no_new_build"
+  OPENSTACK_BUILDER_PREFIX: "openstack"
+  OPENSTACK_SCHEDULER_PREFIX: "openstack"
+  OS_SSH_KEY: "/root/conf-secret/os_id_rsa"
+  PB_PORT: {{ .Values.deployment.ports.pb | quote }}
+
+  {{- if gt (.Values.eve.project.mastersCount | int) 1 }}
+  WAMP_REALM: "buildbot"
+  WAMP_ROUTER_URL: "ws://{{ template "fullname" $ }}-crossbar:{{ .Values.deployment.ports.wamp }}/ws"
+  {{- else }}
+  WAMP_REALM: ""
+  WAMP_ROUTER_URL: ""
+  {{- end }}
+
+  {{- if .Values.eve.masterConf.git.gitConfig }}
+  KUBE_POD_GITCONFIG_CM: "{{ template "fullname" $ }}-gitconfig"
+  {{- end }}
+
+  {{- if .Values.eve.masterConf.openstackWorkers.osMapping }}
+  OS_MAPPING_FILE_PATH: "/root/conf/os_mapping.yaml"
+  {{- end }}
+
+  {{- if .Values.eve.masterConf.openstackWorkers.osScriptBoot }}
+  OS_SCRIPT_BOOT_FILE_PATH: "/root/conf/os_script_boot.sh"
+  {{- end }}
+
+  {{- if .Values.eve.masterConf.openstackWorkers.osScriptInit }}
+  OS_SCRIPT_INIT_FILE_PATH: "/root/conf/os_script_init.sh"
+  {{- end }}
+
+  {{- if .Values.eve.masterConf.openstackWorkers.osScriptRequirements }}
+  OS_SCRIPT_REQUIREMENTS_FILE_PATH: "/root/conf/os_script_requirements.sh"
+  {{- end }}
+
+  {{- if .Values.eve.masterConf.openstackWorkers.osScriptStart }}
+  OS_SCRIPT_START_FILE_PATH: "/root/conf/os_script_start.sh"
+  {{- end }}
+
+  {{- if .Values.eve.masterConf.ui.dashboards }}
+  DASHBOARDS_FILE_PATH: "/root/conf/dashboards.yaml"
+  {{- end }}
+
+  {{- if .Values.eve.masterConf.builds.stepPatcher }}
+  PATCHER_FILE_PATH: "/root/conf/step_patcher.yaml"
+  {{- end }}

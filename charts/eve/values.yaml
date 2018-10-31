@@ -1,0 +1,718 @@
+# Default values file for Eve helm chart.
+
+## nameOverride allows to change the name of the release
+## rather than default value 'eve'
+nameOverride: "eve"
+
+## useShortName shorten names of Kubernetes resources.
+##
+##   The release name will not be included in fullname. This
+##   is safe to use only if one release only of Eve is deployed
+##   per namespace (which is the typical use case).
+##
+useShortNames: false
+
+eve:
+  project:
+    ## mastersCount defines the number of build masters.
+    ##
+    ##   1: Eve is deployed in standalone mode (i.e. frontend and
+    ##       master services are running in a single pod)
+    ##
+    ##   n>1: Eve frontend is deployed in a pod, and n build masters
+    ##       pods are added. The masters are communicating via an instance
+    ##       of Crossbar, running in an additional pod.
+    ##
+    mastersCount: 1
+
+    ## resourceSuffix is the template string suffixed to database resources.
+    ##
+    ##   The master index must be placed in the template with %d, e.g.:
+    ##
+    resourceSuffix: "myproject-%d"
+
+    ## workerCallbackFqdn is the templated worker registration adress.
+    ##
+    ##   Workers must register back once spawned, using a URL or IP
+    ##   that is provided to them by their respective masters.
+    ##
+    ##   The master index must be placed in the template with %d, e.g.:
+    ##
+    ##       backend-%d.my-eve-project.com
+    ##
+    workerCallbackFqdn: "backend-%d.eve"
+
+  masterConf:
+    repository:
+      ## gitHost is the hoster of the target repository.
+      ##
+      ##   supported values:
+      ##   - bitbucket
+      ##   - github
+      ##
+      gitHost: ""
+
+      ## gitOwner is the name of team (bitbucket) or organization (github)
+      ## where the target repository resides.
+      ##
+      gitOwner: ""
+
+      ## gitSlug is the name of target repository.
+      ##
+      gitSlug: ""
+
+      ## projectYaml defines the path to the build configuration file.
+      ##
+      projectYaml: "eve/main.yml"
+
+    git:
+      ## gitRepo is the clone address, starting with the protocol.
+      ##
+      ##   HTTP works out of the box. Other protocols may require
+      ##   additional configuration (see gitconfig setting).
+      ##
+      ##   e.g.:
+      ##    https://bitbucket.org/scality/eve
+      ##    https://<user>:<password>@bitbucket.org/scality/eve
+      ##
+      gitRepo: ""
+
+      ## gitConfig is a Git configuration file used by Eve and Kube workers.
+      ##
+      ##   This can be used to setup extra credentials or options for
+      ##   Git operations.
+      ##
+      ##   For example, to use a local GIT proxy/cache, that could also
+      ##   handle authentication, and deployed in the same namespace
+      ##   behind a service named `gitcache`:
+      ##
+      ##   gitconfig: |
+      ##     [url "http://gitcache/https/bitbucket.org/"]
+      ##       insteadOf = git@bitbucket.org:
+      ##       insteadOf = https://bitbucket.org/
+      ##       insteadOf = ssh://git@bitbucket.org
+      ##
+      gitConfig: ""
+
+    database:
+      ## dbUrl points to the database storing builbot data.
+      ##
+      ##   You may include credentials and options in the URL
+      ##   if required, e.g.:
+      ##
+      ##   mysql+mysqldb://<login>:<pass>@<db_host>/<db_name>?max_idle=300
+      ##
+      dbUrl: ""
+
+    ui:
+      ## externalUrl is the address of the web UI (ending with /)
+      ##
+      externalUrl: ""
+
+      ## dashboards is a list of extra links to add to Buildbot's swim lane.
+      ##
+      ##   Each link is displayed as a frame within Buildbot web page.
+      ##
+      ##   The format of an item in the list is a dictionnary with keys:
+      ##
+      ##   - type: standard / metabase
+      ##   - name: unique identifier of the buildbot dashboard
+      ##   - caption: label of dashboard in buildbot menu
+      ##   - id: unique identifier of metabase dashboard (meaningless for
+      ##     standard boards)
+      ##   - secret_key: metabase embedded dashboards secret key (meaningless
+      ##     for standard boards)
+      ##   - site_url: address of target frame
+      ##   - order (optional): order of dashboard in buildbot menu
+      ##   - icon (optional): icon to display next to label in buildbot menu
+      ##   - frameborder (optional): border of iframe in buildbot interface
+      ##   - width (optional): width of iframe in buildbot interface
+      ##   - height (optional): height of iframe in buildbot interface
+      ##
+      ##   e.g.:
+      ##   dashboards:
+      ##   - type: metabase
+      ##     name: monitoring
+      ##     caption: Monitoring
+      ##     site_url: http://...
+      ##     secret_key: deadbeaf12345
+      ##     id: 1
+      ##     icon: bar-chart
+      ##     order: 52
+      ##     frameborder: 0
+      ##     width: 100%
+      ##     height: 1200
+      ##
+      ##   Refer to Buildbot user guide for more information on embedded
+      ##   dashboards.
+      ##
+      dashboards: []
+
+      ## forceBuildParamCount defines the number of extra properties allowed
+      ## in the force build form.
+      ##
+      forceBuildParamCount: "2"
+
+      ## projectUrl is a URL pointing to informative resources.
+      ## on the target repository (displayed as a link in the About page)
+      ##
+      projectUrl: ""
+
+      ## wwwPlain* activate plain credentials for Eve UI.
+      ##
+      ##   default: "" (plain user/pass login disabled)
+      ##
+      wwwPlainLogin: ""
+      wwwPlainPassword: ""
+
+      ## oauth2* activate OAuth2 login.
+      ##
+      ##   Obtain values from either Bitbucket or GitHub.
+      ##
+      oauth2ClientId: ""
+      oauth2ClientSecret: ""
+      oauth2Group: ""
+      oauth2Provider: ""
+
+    builds:
+      ## lowPriorityBranch is a regexp of branches to build last.
+      ##
+      ##   e.g.:
+      ##   lowPriorityBranch: '^(development|release)/"
+      ##
+      ##   -> builds triggered by webhook on branches which name
+      ##      start with either 'development' or 'release' will
+      ##      be built after all other branches, once the build
+      ##      queue is empty.
+      ##
+      lowPriorityBranch: ""
+
+      ## maxStepDuration defines how long a step can run before being killed.
+      ##
+      maxStepDuration: "14400"
+
+      ## noNewBuild prevents any new build requests to run and wait in queue.
+      ##
+      ##   "" (default): build requests are processed.
+      ##   anything else: build requests stay in queue.
+      ##
+      noNewBuild: ""
+
+      ## stepPatcher contains directives for skipping specific steps, stages
+      ## and branches.
+      ##
+      ##    stepPatcher:
+      ##      skip_steps:
+      ##      - .*step.*
+      ##      skip_stages:
+      ##      - pre-merge
+      ##      skip_branches:
+      ##      - dev.*
+      ##
+      stepPatcher: ""
+
+    artifacts:
+      ## artifactsPrefix configures the prefix of published artifacts containers.
+      ##
+      artifactsPrefix: "staging-"
+
+      ## artifactsPublicUrl is the base url where users can access artifacts.
+      ##
+      ##   Internally, builds will push atifacts via a proxy at http://artifacts.
+      ##   The public URL is used to build a property on each build, which is
+      ##   stored as a reference to artifacts that can be accessed anywhere.
+      ##
+      artifactsPublicUrl: ""
+
+    localWorkers:
+      ## maxLocalWorkers is the max number of simultaneous local workers.
+      ##
+      ##   Note that bootstrap builds run in local workers, therefore
+      ##   the value defined here is the max number of parallel builds
+      ##   allowed by Eve before queuing.
+      ##
+      maxLocalWorkers: "4"
+
+    dockerWorkers:
+      ## dockerWorkerInUse activates the usage of docker workers.
+      ##
+      ##   Check dockerHook section in case the project needs to activate
+      ##   docker support on the Kubernetes cluster.
+      ##
+      dockerWorkerInUse: "0"
+
+      ## maxLocalWorkers is the max number of simultaneous docker workers.
+      ##
+      maxDockerWorkers: "24"
+
+      ## dockerApiVersion specifies which version of Docker API to use.
+      ##
+      dockerApiVersion: "1.25"
+
+      ## dockerContainerMax* define limits for containers.
+      ##
+      dockerContainerMaxCpu: "1"
+      dockerContainerMaxMemory: "4G"
+
+      ## dockerRegistryUrl is the registry where to cache images.
+      ##
+      ##   If pod workers are activated, the same registry
+      ##   is shared and this value must match
+      ##   kubernetesPodWorkers.dockerRegistryUrl
+      ##
+      dockerRegistryUrl: ""
+
+      ## dockerHost specifies the host that runs containers.
+      ##
+      dockerHost: ""
+
+      ## dockerTlsVerify activate docker secure communications.
+      ##
+      ##   Strongly recommended when if dockerHost is pointing
+      ##   outside the Kubernetes cluster.
+      ##
+      dockerTlsVerify: "0"
+      cert: ""
+      ca: ""
+      key: ""
+
+    kubernetesPodWorkers:
+      ## kubePodWorkerInUse activates the usage of pod workers.
+      ##
+      kubePodWorkerInUse: "1"
+
+      ## maxKubePodWorkers is the max number of simultaneous pod workers.
+      ##
+      maxKubePodWorkers: "24"
+
+      ## dockerRegistryUrl is the registry where to cache images.
+      ##
+      ##   If docker workers are activated, the same registry
+      ##   is shared and this value must match
+      ##   dockerWorkers.dockerRegistryUrl
+      ##
+      dockerRegistryUrl: ""
+
+      ## kubePodActiveDeadline is the time-to-live of pod workers.
+      ##
+      kubePodActiveDeadline: "86400"
+
+      ## kubePodMax* define limits on pod workers.
+      ##
+      kubePodMaxCpu: "1"
+      kubePodMaxMemory: "4G"
+
+      ## kubePodNodeAffinity defines the affinity of pod workers.
+      ##
+      kubePodNodeAffinity: ""
+
+      ## kubeServiceInUse activates the support of external K8 test clusters.
+      ##
+      kubeServiceInUse: "0"
+
+      ## kubeService is the name of the microservice in charge of init/teardown
+      ## the test cluster.
+      ##
+      kubeService: ""
+
+      ## kubeServiceData is custom yaml data to configure kubeService.
+      ##
+      kubeServiceData: ""
+
+    openstackWorkers:
+      ## osWorkerInUse activates the usage of OpenStack VM workers.
+      ##
+      osWorkerInUse: "0"
+
+      ## maxOpenstackWorkers is the max number of simultaneous openstack workers.
+      ##
+      maxOpenstackWorkers: "20"
+
+      ## os* define OpenStack credentials.
+      ##
+      osAuthUrl: ""
+      osIdentityApiVersion: "2"
+      osKeyName: ""
+      osPassword: ""
+      osProjectDomainId: "default"
+      osRegionName: ""
+      osTenantName: ""
+      osUsername: ""
+
+      ## osNetwork* define the Openstack network interface ids.
+      ##
+      osNetworkPrivate: ""
+      osNetworkPublic: ""
+      osNetworkService: ""
+
+      ## osIdRsa will be deployed on VMs as the root SSH key.
+      ##
+      osIdRsa: ""
+
+      ## osMapping define an image mapping between OpenStack providers.
+      ##
+      ##   This facility maps images from different OpenStack providers
+      ##   to make a transition from one provider to another easier
+      ##   (no need to update the workers in the target repository
+      ##   immediately after the change of provider in Eve).
+      ##
+      ##   Note that Eve only supports one Openstack provider
+      ##   at the moment, but the mapping file provides support
+      ##   for multiple providers; the correct mapping needs
+      ##   to be selected with the extra setting 'osProvider', e.g.:
+      ##
+      ##   osMapping:
+      ##     provider1:
+      ##     - image:
+      ##         original_value: CentOS 6
+      ##         new_value: 78a5f3ac-cd36-4c85-5dc8-f83ae89addaa
+      ##     - image:
+      ##         original_value: CentOS 7
+      ##         new_value: 0a9bd300-f621-b8cf-4894-257c72206538
+      ##     provider2:
+      ##     - image:
+      ##         original_value: Debian 7 (Wheezy)
+      ##         new_value: 8dbe1146-3cc4-4c46-8888-64662a3ec809
+      ##     - flavor:
+      ##         original_value: io1-30
+      ##         new_value: 34d1db2b-e468-4976-bff7-e92aaf31930e
+      ##   osProvider: "provider1"
+      ##
+      osMapping: ""
+      osProvider: ""
+
+      ## osScript* are init shell scripts that will run on each VM.
+      ##
+      ##   When a the script is _not_ specified (""), Eve will run
+      ##   its default embedded script instead.
+      ##
+      ##   osScriptBoot:
+      ##     Runs first, and applies modifications to all spawned VMs.
+      ##
+      ##     This script is _not_ customizable by individual worker
+      ##     definitions, so is garanteed to always run.
+      ##
+      ##   osScriptInit:
+      ##     Runs seconds, and applies modifications to all spawned VMs.
+      ##
+      ##     This script is in charge of installing the Buildbot worker
+      ##     binary and configuring the user that will run it.
+      ##
+      ##     Individual worker definitions in the target repository
+      ##     can overwrite this script by placing a script ``init.sh``
+      ##     in their directory.
+      ##
+      ##     This script takes one argument: the version of Buildbot.
+      ##
+      ##   osScriptRequirements:
+      ##     Runs third, and installs additional software.
+      ##
+      ##     Individual worker definitions in the target repository
+      ##     can overwrite this script by placing a script ``requirements.sh``
+      ##     in their directory.
+      ##
+      ##     This script must be re-entrant (5 retries in case of failure).
+      ##
+      ##   osScriptStart:
+      ##     Runs fourth, and is in charge of starting Buildbot worker.
+      ##
+      ##     Individual worker definitions in the target repository
+      ##     can overwrite this script by placing a script ``start.sh``
+      ##     in their directory.
+      ##
+      ##     This script takes four arguments:
+      ##     - the master address
+      ##     - the master worker communication port
+      ##     - the worker name
+      ##     - the worker password
+      ##
+      osScriptBoot: ""
+      osScriptInit: ""
+      osScriptRequirements: ""
+      osScriptStart: ""
+
+    dockerHook:
+      ## dockerHookInUse activates Scality's docker-hook for Kubernetes/Eve.
+      ##
+      ##   Docker-hook is a microservice in charge of translating
+      ##   docker commands into Kubernetes equivalent commands.
+      ##
+      ##   Docker-hook is a private Scality project, and has been developped
+      ##   to support legacy EVE CI projets relying on docker workers.
+      ##   New CI projects should prefer Kubernetes pod workers over docker
+      ##   workers and _not_ use the hook.
+      ##
+      dockerHookInUse: "0"
+      dockerHookVersion: ""
+
+      ## dockerHookWorkers is a list of workers requiring the hook.
+      ##
+      ##   Docker-hook is not attached to all workers by default,
+      ##   because this would create an extra container for each
+      ##   spawned worker.
+      ##
+      ##   The list of workers requiring a docker-hook is then
+      ##   specified as a ';' separated list of paths designating
+      ##   the workers requiring access to docker on the Kubernetes
+      ##   host, e.g.:
+      ##
+      ##   dockerHookWorkers: "eve/workers/worker1;eve/workers/worker2"
+      ##
+      dockerHookWorkers: ""
+
+    reporters:
+      ## gitHostReporterInUse activates sending build results to the git host.
+      ##
+      gitHostReporterInUse: "0"
+
+      ## eveGithost* are Bitbucket credentials used to set commit statuses.
+      ##
+      ##   Ignored if the target gitHost is not Bitbucket or
+      ##   gitHostReporterInUse is not set.
+      ##
+      eveGithostLogin: ""
+      eveGithostPwd: ""
+
+      ## githubToken is a GitHub token used to set commit statuses.
+      ##
+      ##   Ignored if the target gitHost is not Github or
+      ##   gitHostReporterInUse is not set.
+      ##
+      githubToken: ""
+
+      ## hipchatRoom, hipchatToken point a HipChat room to push build results.
+      ##
+      ##   default: "" (no notification of build results)
+      ##
+      hipchatRoom: ""
+      hipchatToken: ""
+
+      ## ultronReporterInUse actives sending build results to Scality Ultron.
+      ##
+      ultronReporterInUse: "0"
+      ultronReporterUrl: ""
+      ultronReporterLogin: ""
+      ultronReporterPwd: ""
+
+    vault:
+      ## vaultInUse activates the use of an external Vault to store secrets.
+      ##
+      vaultInUse: "0"
+
+      ## vaultFile is the secrets root path in the Vault.
+      ##
+      vaultFile: ""
+
+      ## vaultUrl is the URL of the HashiCorp Vault.
+      ##
+      vaultUrl: ""
+
+      ## vaultToken is a token granting access to vaultFile in the Hashicorp Vault.
+      ##
+      ##   Note: the token shall never expire.
+      ##
+      vaultToken: ""
+
+    coverage:
+      ## codecovIoBaseUrl is the base URL of the codecov service.
+      codecovIoBaseUrl: "https://codecov.io"
+
+      ## codecovIoUploadToken is the codecov.io token used to push reports.
+      codecovIoUploadToken: ""
+
+    try:
+      ## Buildbot Try feature settings.
+      ##
+      ##   Username is always "try".
+      ##
+      tryPort: "7999"
+      trySchedulerName: "try"
+      tryPwd: "try"
+
+    debug:
+      ## debugMode activates a few debug facilities.
+      ##
+      ##   0: normal mode
+      ##
+      ##   1: the following will happen:
+      ##      - the manhole is activated
+      ##        (irrespective of the value of manholeInUse)
+      ##
+      ##      - Eve/Buildbot must be started manually in the pod
+      ##        (to allow access to the debugger prompt)
+      ##
+      ##      - internal steps will be show in the UI
+      ##        (irrespective of the value of hideInternalSteps)
+      ##
+      debugMode: "0"
+
+      ## hideInternalSteps hides internal step from the build page.
+      ##
+      ##     1 (default): internal steps are hidden
+      ##     0: internal steps are displayed
+      ##
+      hideInternalSteps: "1"
+
+      ## manhole* define settings for Buildbot's manhole.
+      ##
+      manholeInUse: "0"
+      manholePort: "12345"
+      manholeLogin: ""
+      manholePassword: ""
+
+  dockerHook:
+    ## Extra settings for docker-hook containers within worker pods.
+    ##
+    ##   Ignored if eve.masterConf.dockerHook.dockerHookInUse is 0.
+    ##
+    ##   Docker-hook is a private Scality project, and has been developped
+    ##   to support legacy EVE CI projets relying on docker workers.
+    ##   New CI projects should prefer Kubernetes pod workers over docker
+    ##   workers and _not_ use the hook.
+    ##
+    ##   As a direct consequence, values below are soon to be deprecated
+    ##   and undocumented.
+    ##
+    activeDeadline: "18000"
+    cpuLimit: "1"
+    cpuRequest: "200m"
+    hookBinary: ""
+    memoryLimit: "4Gi"
+    memoryRequest: "4Gi"
+    maxMemory: "4G"
+    updateGitconfig: ""
+    registry: ""
+    registryCredentials: ""
+    volumeLocalBasePath: ""
+
+## Container images.
+image:
+  ## regitry to pull from.
+  ##
+  registry: docker.io
+
+  master:
+    repository: "scality/eve"
+    tag: "1.3.45"
+
+  dockerHook:
+    repository: "scality/docker-hook"
+    tag: "1.0.9"
+
+  crossbar:
+    tag: "cpy3-17.9.2"
+
+  ## pullPolicy specifies the image pull policy
+  ##
+  ##   Defaults to 'IfNotPresent'
+  ##
+  pullPolicy: IfNotPresent
+
+  ## pullsecrets specifies a list of imagePullSecrets.
+  ##
+  ##   Secrets must be manually created in the namespace.
+  ##
+  pullSecrets: []
+
+## Kubernetes deployment configuration
+deployment:
+  ports:
+    http: 9997
+    pb: 9998
+    wamp: 9999
+
+  frontend:
+    livenessProbe:
+      initialDelaySeconds: 300
+      periodSeconds: 60
+      timeoutSeconds: 30
+      failureThreshold: 2
+      successThreshold: 1
+    ## next values are only for standalone frontend:
+    resources:
+      limits:
+        cpu: 2
+        memory: 1Gi
+      requests:
+        cpu: 2
+        memory: 1Gi
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
+
+  master:
+    livenessProbe:
+      initialDelaySeconds: 300
+      periodSeconds: 60
+      timeoutSeconds: 30
+      failureThreshold: 2
+      successThreshold: 1
+    resources:
+      limits:
+        cpu: 1
+        memory: 4Gi
+      requests:
+        cpu: 500m
+        memory: 4Gi
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
+
+  crossbar:
+    livenessProbe:
+      initialDelaySeconds: 300
+      periodSeconds: 60
+      timeoutSeconds: 30
+      failureThreshold: 2
+      successThreshold: 1
+    resources: {}
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
+
+  dockerHook:
+    livenessProbe:
+      initialDelaySeconds: 300
+      periodSeconds: 60
+      timeoutSeconds: 300
+      failureThreshold: 1
+      successThreshold: 1
+    resources:
+      limits:
+        cpu: 1
+        memory: 2Gi
+      requests:
+        cpu: 500m
+        memory: 2Gi
+
+  ## Configure the ingress resource that allows you to access the service.
+  ingress:
+    ## enabled sets the ingress record generation or not.
+    ##
+    ##   Defaults to false.
+    ##
+    enabled: false
+
+    ## fqdn is the protocol/hostname to be covered with this ingress record.
+    ##
+    fqdn: "http://eve.local"
+
+    ## path contains the subpath where to access the HTTP service.
+    ##
+    ##   Defaults to '/'.
+    ##
+    path: "/"
+
+    ## tls is set to true in order to enable TLS on the ingress record.
+    ##
+    ##   Defaults to false.
+    ##
+    tls: false
+
+    ## tlsSecret specifies a secret that contains the key/certificate for TLS
+    ##
+    tlsSecret: ""
+
+    ## annotations contains the Ingress annotations done as key:value pairs
+    ##
+    annotations: {}

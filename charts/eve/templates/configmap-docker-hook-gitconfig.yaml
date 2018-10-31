@@ -1,0 +1,15 @@
+{{- if .Values.eve.dockerHook.updateGitconfig }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "fullname" $ }}-docker-hook-update-gitconfig
+  labels:
+    app: {{ template "fullname" $ }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
+data:
+  update-gitconfig.sh: |
+{{ .Values.eve.dockerHook.updateGitconfig | indent 4 }}
+{{- end }}
