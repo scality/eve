@@ -1,1 +1,0 @@
-Fix unexpected data type error when using unicode string on kube_pod worker.

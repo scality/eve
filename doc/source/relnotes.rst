@@ -17,6 +17,16 @@ Release Notes
 
 .. towncrier release notes start
 
+Eve 1.3.47 (2018-11-22)
+=======================
+
+Bugfixes
+--------
+
+- Fix unexpected data type error when using unicode string on kube_pod worker.
+  (EVE-1016)
+
+
 Eve 1.3.46 (2018-10-22)
 =======================
 
