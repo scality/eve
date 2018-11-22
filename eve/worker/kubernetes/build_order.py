@@ -57,11 +57,12 @@ class KubernetesPodBuildOrder(util.BaseDockerBuildOrder):
 
                 image_vars[name] = self._build_image(name, context, dockerfile)
 
-            elif isinstance(params, str):
+            elif isinstance(params, basestring):
                 image_vars[name] = self._build_image(name, params)
 
             else:
-                raise ValueError('Unexpected data type in images.')
+                raise ValueError('Unexpected data type in images. '
+                                 'type: %s' % type(params))
 
         self.properties['worker_images'] = (image_vars,
                                             'KubernetesPodBuildOrder')
