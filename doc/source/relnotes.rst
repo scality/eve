@@ -17,6 +17,16 @@ Release Notes
 
 .. towncrier release notes start
 
+Eve 1.3.48 (2018-11-23)
+=======================
+
+Bugfixes
+--------
+
+- Revert changes on api client (PIPDEP-595) due to broken compatibilites.
+  (EVE-1017)
+
+
 Eve 1.3.47 (2018-11-22)
 =======================
 
