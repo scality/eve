@@ -1,7 +1,10 @@
-#! /usr/bin/env python
-"""Access Eve/buildbot API from the command line.
+#! /usr/bin/env python2
+"""Use this script to access Eve/buildbot API from the
+command line. To look for help run please run:
 
-An OAuth token is required. It can be obtained from
+    eve_api_client --help
+
+An OAuth consumer key is required. It can be obtained from
 the Git host provider:
 
 Bitbucket:
@@ -10,9 +13,7 @@ and create a new consumer with the following settings:
 - permissions:
     - account: READ access
     - team membership: READ access
-
--> use the newly create consumer ids with command line options
-   --consumer-id and --consumer-secret.
+- callback URL: address of eve (it does not really matter)
 
 Github:
 Go to https://github.com/settings/tokens
@@ -20,90 +21,98 @@ and create a new token with the following settings:
 - description: eve-api-client
 - scopes: user (read:user, user:email and user:follow)
 
--> use the newly created token with command line option --token.
+You will be asked to authorize the new consumer on the first call.
 
-Invocation examples:
+Examples:
 
-List builders with:
-
-    eve_api_client
-      --token <token>
-      --base-url <url of eve>
+List builders:
+    eve_api_client \
+      --username <username> \
+      --password <password> \
+      --consumer-key <key> \
+      --base-url <url of eve> \
       /builders
 
-Force a build with:
-
-    eve_api_client
-      --token <token>
-      --base-url <url of eve>
-      --httpmethod post
-      --payload '{"branch": "development/6.4"}'
+Force a build:
+    eve_api_client \
+      --username <username> \
+      --password <password> \
+      --consumer-key <key> \
+      --base-url <url of eve> \
+      --httpmethod post \
+      --payload '{"branch": "development/6.4"}' \
       /forceschedulers/force
 
-Force a build with parameters (bitbucket version):
-
-    eve_api_client
-      --client-id <client id>
-      --client-secret <client secret>
-      --base-url <url of eve>
-      --httpmethod post
-      --payload '{"branch": "development/6.4",
-                  "prop00_name": "param_name",
-                  "prop00_value": "param_value"}'
+Force a build with parameters:
+    eve_api_client \
+      --username <username> \
+      --password <password> \
+      --consumer-key <key> \
+      --base-url <url of eve> \
+      --httpmethod post \
+      --payload '{"branch": "development/6.4", \
+                  "prop00_name": "param_name", \
+                  "prop00_value": "param_value"}' \
       /forceschedulers/force
-
-The script returns json data.
 
 Report any bug/error at release.engineering@scality.com
+
+sources:
+https://confluence.atlassian.com/bitbucket/oauth-on-bitbucket-cloud-238027431.html
+https://github.com/bullhorn/oauth-example-python/blob/master/oauth_example.py
 
 """
 import argparse
 import base64
+import cookielib
 import json
-import os
 import sys
-try:
-    # python 3
-    from http.cookiejar import CookieJar
-    from urllib.request import Request, HTTPRedirectHandler, build_opener, HTTPError, HTTPCookieProcessor
-    from urllib.parse import urlparse, parse_qs, urlencode
-except ImportError:
-    # python 2
-    from cookielib import CookieJar
-    from urllib import urlencode
-    from urllib2 import Request, HTTPRedirectHandler, build_opener, HTTPError, HTTPCookieProcessor
-    from urlparse import urlparse, parse_qs
+import urllib
+import urllib2
+import urlparse
 
 
-def get_access_token(githost, consumer_id, consumer_secret):
-    """Get an access token from Bitbucket OAuth API.
+class AuthCodeRedirectHandler(urllib2.HTTPRedirectHandler):
+    def http_error_302(self, req, fp, code, msg, headers):
+        """Handler for 302 responses that assumes a properly constructed
+        OAuth 302 response and pulls the token out of the header."""
+        qs = urlparse.urlparse(headers["location"]).fragment
+        token = urlparse.parse_qs(qs)['access_token'][0]
+        return token
+
+
+def get_access_token(username, password, consumer):
+    """Get an access token from Bitbucket.
 
     Args:
-        consumer_id (str): username of the consumer.
-        consumer_secret (str): password of the consumer.
+        username (str): username of the bitbucket account.
+        password (str): password of the bitbucket account
+        consumer (str): consumer key of this app on bitbucket
 
     Returns:
-        string containing the access token
+        string containing the authentication token
 
     """
-    authstr = '{}:{}'.format(consumer_id, consumer_secret)
-    base64auth = base64.b64encode(authstr.encode('ascii'))
-
-    auth_url = 'https://bitbucket.org/site/oauth2/access_token'
-    data = 'grant_type=client_credentials'.encode('ascii')
-    req = Request(auth_url, data=data)
-    req.get_method = lambda: 'POST'
-    req.add_header("Authorization", "Basic %s" % base64auth.decode())
+    base64auth = base64.b64encode('%s:%s' % (username, password))
+    opener = urllib2.build_opener(AuthCodeRedirectHandler)
+    auth_url = ('https://bitbucket.org/site/oauth2/authorize'
+                '?client_id=%s&response_type=token' % consumer)
+    req = urllib2.Request(auth_url)
+    req.add_header("Authorization", "Basic %s" % base64auth)
     try:
-        res = build_opener().open(req)
-    except HTTPError as excp:
-        sys.exit('HTTP error: %s, %s (%s)' % (
-            excp.url, excp.reason, excp.code))
+        auth_code = opener.open(req)
+    except urllib2.HTTPError as excp:
+        sys.exit('HTTP error: %s (%s)' % (excp.reason, excp.code))
 
-    return json.load(res)['access_token']
+    if not isinstance(auth_code, str):
+        sys.exit('Please visit this URL to authorize the token, '
+                 'then launch this script again:\n%s' % auth_url)
+
+    return auth_code
 
 
-def request(token, base_url, endpoint, httpmethod, payload, version=2):
+def request(token, base_url, endpoint, httpmethod,
+            jsonrpcmethod, payload, version=2):
     """Access buildbot API thank to pre-obtained access token.
 
     Args:
@@ -111,6 +120,7 @@ def request(token, base_url, endpoint, httpmethod, payload, version=2):
         base_url (str): url of Eve/Buildbot instance
         endpoint (str): endpoint to query
         httpmethod (str): get/post/put/delete
+        jsonrpcmethod (str): refer to buildbot's doc for possible values
         payload (dict): The parameters to send to jsonrpc
         version: version of api to hit
 
@@ -118,14 +128,14 @@ def request(token, base_url, endpoint, httpmethod, payload, version=2):
         API response (json)
 
     """
-    cj = CookieJar()
-    opener = build_opener(HTTPCookieProcessor(cj))
+    cj = cookielib.CookieJar()
+    opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
 
     auth_url = base_url + '/auth/login?token=%s' % token
-    auth_req = Request(auth_url)
+    auth_req = urllib2.Request(auth_url)
     try:
         auth_res = opener.open(auth_req)
-    except HTTPError as excp:
+    except urllib2.HTTPError as excp:
         sys.exit('HTTP error: %s (%s) (check consumer permissions)' % (
             excp.reason, excp.code))
 
@@ -133,130 +143,73 @@ def request(token, base_url, endpoint, httpmethod, payload, version=2):
         'id': 999,
         # sequence number doesn't matter for synchronous requests
         'jsonrpc': '2.0',
-        'method': 'force',
+        'method': jsonrpcmethod,
         'params': payload
     })
     if endpoint.startswith('/'):
         endpoint = endpoint[1:]
     url = '%s/api/v%d/%s' % (base_url, version, endpoint)
 
-    req = Request(url, data=data)
+    req = urllib2.Request(url, data=data)
     req.add_header('Content-Type', 'application/json')
     req.get_method = lambda: httpmethod.upper()
 
     try:
         res = opener.open(req)
-    except HTTPError as excp:
+    except urllib2.HTTPError as excp:
         sys.exit('HTTP error: %s (%s)' % (excp.reason, excp.code))
     return json.load(res)
 
 
-# From Russell Heilling: http://stackoverflow.com/a/10551190
-class EnvDefault(argparse.Action):  # pylint: disable=R0903
-
-    def __init__(self, envvar, required=False, default=None, **kwargs):
-        # Overriding default with environment variable if available
-        if envvar in os.environ:
-            default = os.environ[envvar]
-        if required and default:
-            required = False
-        super(EnvDefault, self).__init__(default=default, required=required,
-                                         **kwargs)
-
-    def __call__(self, parser, namespace, values, option_string=None):
-        setattr(namespace, self.dest, values)
-
-
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
-        description=__doc__,
-        formatter_class=argparse.RawDescriptionHelpFormatter
-    )
-    parser.add_argument('--githost', '-g',
-                        help='Remote git host name. Defaults to "auto" '
-                             '(the client will try to guess which host '
-                             'is used from other command line arguments); '
-                             'Can also be set with environment variable '
-                             'EVE_API_GITHOST.',
-                        action=EnvDefault, envvar='EVE_API_GITHOST',
-                        choices=['auto', 'bitbucket', 'github'],
-                        default='auto')
-    parser.add_argument('--dry-run', '-d',
-                        help='Do not really change anything.',
-                        default=False,
-                        action='store_true')
-    parser.add_argument('--token', '-k',
-                        help='Git host authentication token. '
-                             'Can also be set with environment variable '
-                             'EVE_API_TOKEN.',
-                        action=EnvDefault, envvar='EVE_API_TOKEN',
-                        default='')
-    parser.add_argument('--client-id', '-u',
-                        help='Consumer client id (Bitbucket only). '
-                             'Can also be set with environment variable '
-                             'EVE_API_CLIENT_ID.',
-                        action=EnvDefault, envvar='EVE_API_CLIENT_ID',
-                        default='')
-    parser.add_argument('--client-secret', '-p',
-                        help='Consumer client secret (Bitbucket only). '
-                             'Can also be set with environment variable '
-                             'EVE_API_CLIENT_SECRET.',
-                        action=EnvDefault, envvar='EVE_API_CLIENT_SECRET',
-                        default='')
-    parser.add_argument('--base-url', '-b',
-                        help='Eve base url. '
-                             'Can also be set with environment variable '
-                             'EVE_API_VERSION.',
-                        action=EnvDefault, envvar='EVE_API_URL',
+        description='Control Eve API via bitbucket oauth2')
+    parser.add_argument('--username', '-u',
+                        help='Bitbucket username',
                         required=True)
-    parser.add_argument('--api-version', '-v',
-                        help='API version to use (defaults to v2). '
-                             'Can also be set with environment variable '
-                             'EVE_API_VERSION.',
-                        action=EnvDefault, envvar='EVE_API_VERSION',
-                        metavar='INT', type=int,
-                        default=2)
+    parser.add_argument('--password', '-p',
+                        help='Bitbucket password',
+                        required=True)
+    parser.add_argument('--consumer-key', '-k',
+                        help='Bitbucket consumer key for this app',
+                        metavar='CONSUMER_KEY',
+                        required=True)
+    parser.add_argument('--base-url', '-b',
+                        help='eve base url',
+                        metavar='EVE_BASE_URL',
+                        required=True)
     parser.add_argument('--httpmethod', '-m',
-                        help='HTTP method (default: GET)',
+                        help='get/post/put/delete',
                         choices=['get', 'post', 'put', 'delete'],
                         default='get')
+    parser.add_argument('--jsonrpcmethod', '-j',
+                        help='for now only "force" is supported',
+                        choices=['force'],
+                        default='force')
     parser.add_argument('--payload', '-l',
                         help='json data to send to the server',
                         metavar='JSON',
                         default='{}')
+    parser.add_argument('--api-version', '-v',
+                        help='api version to use (default to v2)',
+                        metavar='INT', type=int,
+                        default=2)
     parser.add_argument('endpoint',
                         help='api endpoint',
                         metavar='ENDPOINT')
+    parser.add_argument('--dry-run', '-d',
+                        help='Do not really do anything',
+                        default=False,
+                        action='store_true')
     args = parser.parse_args(sys.argv[1:])
 
-    if args.githost == 'auto':
-        if 'github' in args.base_url:
-            githost = 'github'
-        elif 'bitbucket' in args.base_url or args.client_id:
-            githost = 'bitbucket'
-        else:
-            sys.exit('cannot extrapolate githost from service URL or arguments,'
-                     ' please specify it with -g/--githost option')
-    else:
-        githost = args.githost
+    githost = 'github' if 'github' in args.base_url else 'bitbucket'
 
     if githost == 'github':
-        if not args.token:
-            sys.exit(
-                'The remote Git host is GitHub. Please provide a valid '
-                'token obtained from https://github.com/settings/tokens, '
-                'via the --token option.'
-            )
-        token = args.token
+        token = args.consumer_key
     else:
-        if not args.client_id or not args.client_secret:
-            sys.exit(
-                'The remote Git host is Bitbucket. Please provide a consumer '
-                'id and consumer secret obtained from the OAuth page in '
-                'https://bitbucket.org/account/user, via the --client-id '
-                'and --client-secret options.'
-            )
-        token = get_access_token(githost, args.client_id, args.client_secret)
+        token = get_access_token(
+            args.username, args.password, args.consumer_key)
 
     if args.dry_run:
         print('Dry run activated, the request was not executed')
@@ -266,6 +219,7 @@ if __name__ == '__main__':
         args.base_url,
         args.endpoint,
         args.httpmethod,
+        args.jsonrpcmethod,
         json.loads(args.payload),
         args.api_version
     )

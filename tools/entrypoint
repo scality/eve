@@ -1,0 +1,18 @@
+#!/bin/bash
+
+check_env() {
+    set +e
+    test -z "${!1+x}" && echo "$1 is not specified in environment, I cannot proceed." && exit 1
+    set -e
+}
+
+check_env BASE_URL
+check_env USERNAME
+check_env PASSWORD
+check_env KEY
+
+exec /eve_api_client --base-url ${BASE_URL} \
+                     --username ${USERNAME} \
+                     --password ${PASSWORD} \
+                     --consumer-key ${KEY} \
+                     $@
