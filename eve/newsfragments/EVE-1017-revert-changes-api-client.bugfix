@@ -1,0 +1,1 @@
+Revert changes on api client (PIPDEP-595) due to broken compatibilites.
