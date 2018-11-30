@@ -151,6 +151,10 @@ spec:
           value: {{ .Values.eve.dockerHook.memoryRequest | quote }}
         - name: VOLUME_LOCAL_BASEPATH
           value: {{ .Values.eve.dockerHook.volumeLocalBasePath | quote }}
+        {{- range $key, $value := .Values.eve.dockerHook.env }}
+        - name: {{ $key }}
+          value: {{ $value | quote }}
+        {{- end }}
         command:
         - '/run.sh'
         volumeMounts:

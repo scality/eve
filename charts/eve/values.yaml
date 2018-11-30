@@ -584,6 +584,8 @@ eve:
     registry: ""
     registryCredentials: ""
     volumeLocalBasePath: ""
+    env: {}
+
 
 ## Container images.
 image:
