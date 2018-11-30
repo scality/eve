@@ -17,6 +17,15 @@ Release Notes
 
 .. towncrier release notes start
 
+Eve 1.4.2 (2018-11-30)
+======================
+
+Features
+--------
+
+- Add env vars for docker-hook. (RELENG-2721)
+
+
 Eve 1.3.48 (2018-11-23)
 =======================
 
