@@ -7,6 +7,8 @@ the Git host provider:
 Bitbucket:
 Go to https://bitbucket.org/account/user/<your_username>/api
 and create a new consumer with the following settings:
+- details:
+    - Callback URL: <eve base URL>
 - permissions:
     - account: READ access
     - team membership: READ access
