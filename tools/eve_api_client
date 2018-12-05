@@ -103,7 +103,7 @@ if __name__ == '__main__':
     parser.add_argument('--base-url', '-b',
                         help='Eve base url. '
                              'Can also be set with environment variable '
-                             'EVE_API_VERSION.',
+                             'EVE_API_URL.',
                         action=EnvDefault, envvar='EVE_API_URL',
                         required=True)
     parser.add_argument('--api-version', '-v',
