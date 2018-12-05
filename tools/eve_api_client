@@ -2,27 +2,7 @@
 """Access Eve/buildbot API from the command line.
 
 An OAuth token is required. It can be obtained from
-the Git host provider:
-
-Bitbucket:
-Go to https://bitbucket.org/account/user/<your_username>/api
-and create a new consumer with the following settings:
-- details:
-    - Callback URL: <eve base URL>
-- permissions:
-    - account: READ access
-    - team membership: READ access
-
--> use the newly create consumer ids with command line options
-   --consumer-id and --consumer-secret.
-
-Github:
-Go to https://github.com/settings/tokens
-and create a new token with the following settings:
-- description: eve-api-client
-- scopes: user (read:user, user:email and user:follow)
-
--> use the newly created token with command line option --token.
+the Git host provider by following the documentation in the file githost.py
 
 Invocation examples:
 
@@ -76,33 +56,7 @@ except ImportError:
     from urllib2 import Request, HTTPRedirectHandler, build_opener, HTTPError, HTTPCookieProcessor
     from urlparse import urlparse, parse_qs
 
-
-def get_access_token(githost, consumer_id, consumer_secret):
-    """Get an access token from Bitbucket OAuth API.
-
-    Args:
-        consumer_id (str): username of the consumer.
-        consumer_secret (str): password of the consumer.
-
-    Returns:
-        string containing the access token
-
-    """
-    authstr = '{}:{}'.format(consumer_id, consumer_secret)
-    base64auth = base64.b64encode(authstr.encode('ascii'))
-
-    auth_url = 'https://bitbucket.org/site/oauth2/access_token'
-    data = 'grant_type=client_credentials'.encode('ascii')
-    req = Request(auth_url, data=data)
-    req.get_method = lambda: 'POST'
-    req.add_header("Authorization", "Basic %s" % base64auth.decode())
-    try:
-        res = build_opener().open(req)
-    except HTTPError as excp:
-        sys.exit('HTTP error: %s, %s (%s)' % (
-            excp.url, excp.reason, excp.code))
-
-    return json.load(res)['access_token']
+from githost import getProvider, guessProvider
 
 
 def request(token, base_url, endpoint, httpmethod, payload, version=2):
@@ -126,7 +80,7 @@ def request(token, base_url, endpoint, httpmethod, payload, version=2):
     auth_url = base_url + '/auth/login?token=%s' % token
     auth_req = Request(auth_url)
     try:
-        auth_res = opener.open(auth_req)
+        opener.open(auth_req)
     except HTTPError as excp:
         sys.exit('HTTP error: %s (%s) (check consumer permissions)' % (
             excp.reason, excp.code))
@@ -231,40 +185,14 @@ if __name__ == '__main__':
                         metavar='ENDPOINT')
     args = parser.parse_args(sys.argv[1:])
 
-    if args.githost == 'auto':
-        if 'github' in args.base_url:
-            githost = 'github'
-        elif 'bitbucket' in args.base_url or args.client_id:
-            githost = 'bitbucket'
-        else:
-            sys.exit('cannot extrapolate githost from service URL or arguments,'
-                     ' please specify it with -g/--githost option')
-    else:
-        githost = args.githost
-
-    if githost == 'github':
-        if not args.token:
-            sys.exit(
-                'The remote Git host is GitHub. Please provide a valid '
-                'token obtained from https://github.com/settings/tokens, '
-                'via the --token option.'
-            )
-        token = args.token
-    else:
-        if not args.client_id or not args.client_secret:
-            sys.exit(
-                'The remote Git host is Bitbucket. Please provide a consumer '
-                'id and consumer secret obtained from the OAuth page in '
-                'https://bitbucket.org/account/user, via the --client-id '
-                'and --client-secret options.'
-            )
-        token = get_access_token(githost, args.client_id, args.client_secret)
-
+    githost = guessProvider(args.githost, args.githost, args.base_url)
+    provider = getProvider(githost, token=args.token, client_id=args.client_id,
+                           client_secret=args.client_secret)
     if args.dry_run:
         print('Dry run activated, the request was not executed')
         sys.exit(0)
     req = request(
-        token,
+        provider.token,
         args.base_url,
         args.endpoint,
         args.httpmethod,
