@@ -41,11 +41,14 @@ Report any bug/error at release.engineering@scality.com
 """
 import argparse
 import json
+import logging
 import sys
 
 from eve_client import EveClient
 from githost import getProvider, guessProvider
 from utils import EnvDefault
+
+logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
 
 
 if __name__ == '__main__':
