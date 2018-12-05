@@ -40,71 +40,12 @@ Report any bug/error at release.engineering@scality.com
 
 """
 import argparse
-import base64
 import json
 import os
 import sys
-try:
-    # python 3
-    from http.cookiejar import CookieJar
-    from urllib.request import Request, HTTPRedirectHandler, build_opener, HTTPError, HTTPCookieProcessor
-    from urllib.parse import urlparse, parse_qs, urlencode
-except ImportError:
-    # python 2
-    from cookielib import CookieJar
-    from urllib import urlencode
-    from urllib2 import Request, HTTPRedirectHandler, build_opener, HTTPError, HTTPCookieProcessor
-    from urlparse import urlparse, parse_qs
 
+from eve_client import EveClient
 from githost import getProvider, guessProvider
-
-
-def request(token, base_url, endpoint, httpmethod, payload, version=2):
-    """Access buildbot API thank to pre-obtained access token.
-
-    Args:
-        token (str): OAuth2 access token
-        base_url (str): url of Eve/Buildbot instance
-        endpoint (str): endpoint to query
-        httpmethod (str): get/post/put/delete
-        payload (dict): The parameters to send to jsonrpc
-        version: version of api to hit
-
-    Returns:
-        API response (json)
-
-    """
-    cj = CookieJar()
-    opener = build_opener(HTTPCookieProcessor(cj))
-
-    auth_url = base_url + '/auth/login?token=%s' % token
-    auth_req = Request(auth_url)
-    try:
-        opener.open(auth_req)
-    except HTTPError as excp:
-        sys.exit('HTTP error: %s (%s) (check consumer permissions)' % (
-            excp.reason, excp.code))
-
-    data = json.dumps({
-        'id': 999,
-        # sequence number doesn't matter for synchronous requests
-        'jsonrpc': '2.0',
-        'method': 'force',
-        'params': payload
-    })
-    if endpoint.startswith('/'):
-        endpoint = endpoint[1:]
-    url = '%s/api/v%d/%s' % (base_url, version, endpoint)
-
-    req = Request(url, data=data)
-    req.add_header('Content-Type', 'application/json')
-    req.get_method = lambda: httpmethod.upper()
-
-    try:
-        res = opener.open(req)
-    except HTTPError as excp:
-        sys.exit('HTTP error: %s (%s)' % (excp.reason, excp.code))
-    return json.load(res)
 
 
 # From Russell Heilling: http://stackoverflow.com/a/10551190
@@ -191,12 +132,9 @@ if __name__ == '__main__':
     if args.dry_run:
         print('Dry run activated, the request was not executed')
         sys.exit(0)
-    req = request(
-        provider.token,
-        args.base_url,
-        args.endpoint,
-        args.httpmethod,
-        json.loads(args.payload),
-        args.api_version
-    )
+    eve = EveClient(provider.token, args.base_url)
+    req = eve._request(args.httpmethod,
+                       args.endpoint,
+                       json.loads(args.payload),
+                       args.api_version)
     print(json.dumps(req))
