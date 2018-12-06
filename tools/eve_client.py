@@ -5,6 +5,7 @@
 
 import logging
 import json
+import math
 import parse
 import sys
 try:
@@ -128,11 +129,29 @@ class EveClient:
         build_urls = []
         artifact_urls = []
         for step in steps['steps']:
+            names = []
+            # XXX NOTE FIXME : here, we will need to change the references and
+            # usage when (and if) we switch to virtual builders, since the data
+            # might look quite different after that.
+            if 'state_string' in step and 'triggered' in step['state_string']:
+                names = step['state_string'][len('triggered '):].split(', ')
             for idx in range(len(step['urls'])):
                 url = step['urls'][idx]['url']
                 logging.debug('{}Checking URL {}'.format(depth * 4 * ' ', url))
                 if '/#builders/' in url and '/builds/' in url:
-                    build_urls.append((step['number'], idx, url))
+                    # Each stage generates a builds request + a build URL
+                    # As such, we need to infer the index of the name from the
+                    # index of the build link, which is part of the second half
+                    # of the links.
+                    # ex: the step triggers 4 stages.
+                    # - len(names) ought to be 4
+                    # - len(step['urls']) ought to be 8, composed of 4
+                    #   buildrequest links, followed by 4 build links.
+                    # - The build links with thus be located at index [4-7]
+                    # - Thus, buildrequest at index 1 matches build link at
+                    #   index 5, which matches the stage name at index 1
+                    namei = math.floor(idx - len(step['urls']) / 2)
+                    build_urls.append((names[namei], step['number'], idx, url))
                 elif 'artifacts' in url:
                     artifact_urls.append(url)
                 else:
@@ -143,12 +162,13 @@ class EveClient:
         steps = self.steps(builder_id, build_id)
         builds = {}
         build_urls, artifact_urls = self._collect_urls(steps, depth)
-        for (stepidx, idx, url) in build_urls:
+        for (stage_name, stepidx, idx, url) in build_urls:
             step = steps['steps'][stepidx]
             desc = extract_build_desc(self._burl, url)
             sub_build = self.buildtree(depth=depth + 1, **desc)
             builds[url] = {
-                'name': step['name'],
+                'step': step['name'],
+                'stage': stage_name,
                 'stepid': step['stepid'],
                 'desc': desc,
                 'builds': sub_build['builds'],

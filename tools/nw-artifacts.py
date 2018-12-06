@@ -13,6 +13,20 @@ from utils import EnvDefault
 logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
 
 
+def collect_step_artifacts(tree, stepname, collect=False):
+    if (not stepname
+            or ('step' in tree and tree['step'] == stepname)
+            or ('stage' in tree and tree['stage'] == stepname)):
+        collect = True
+
+    artifacts = []
+    if collect is True:
+        artifacts += tree['artifacts']
+    for url, build in tree['builds'].items():
+        artifacts += collect_step_artifacts(build, stepname, collect)
+    return artifacts
+
+
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser('Download NW failure artifacts and '
@@ -87,3 +101,8 @@ if __name__ == '__main__':
     eve = EveClient(provider.token, build['url'])
     buildtree = eve.buildtree('bootstrap', build['id'])
     logging.info('builds: {}'.format(json.dumps(buildtree, indent=2)))
+
+    artifacts = collect_step_artifacts(buildtree, args.step_name)
+    logging.info('Collecting artifacts:')
+    for artifact in artifacts:
+        logging.info(' - {}'.format(artifact))
