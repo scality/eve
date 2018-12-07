@@ -139,6 +139,26 @@ if __name__ == '__main__':
         'id': args.build_id,
     }
 
+    auth_eve_set = ((authparams['client_id'] is not None
+                     and authparams['client_secret'] is not None)
+                    or authparams['token'] is not None)
+    auth_artifacts_set = (authparams['artifacts_user'] is not None
+                          and authparams['artifacts_pass'] is not None)
+    auth_jira_set = (jira['user'] is not None
+                     and jira['password'] is not None)
+    logging.info('Eve authentication {}: {}trying to inspect build'
+                 .format(['unset', 'set'][auth_eve_set],
+                         ['not ', ''][auth_eve_set]))
+    logging.info('Artifacts authentication {}: {}trying to download artifacts'
+                 .format(['unset', 'set'][auth_artifacts_set],
+                         ['not ', ''][auth_artifacts_set]))
+    logging.info('JIRA authentication {}: {}trying to upload attachments'
+                 .format(['unset', 'set'][auth_jira_set],
+                         ['not ', ''][auth_jira_set]))
+
+    if not auth_eve_set:
+        sys.exit()
+
     githost = guessProvider('auto', None, build['project'])
     provider = getProvider(githost, **authparams)
     eve = EveClient(provider.token, build['url'])
@@ -160,6 +180,8 @@ if __name__ == '__main__':
         logging.info('Generating attachment "{}"\n\t-> "{}"'
                      .format(fname, url))
 
+    if not auth_artifacts_set:
+        sys.exit()
     # Prepare JIRA object
     j = JIRA("https://scality.atlassian.net",
              basic_auth=(jira['user'], jira['password']))
@@ -179,6 +201,7 @@ if __name__ == '__main__':
             with open(filename, 'wb') as f:
                 f.write(r.content)
             logging.info('Download status {}'.format(r.status_code))
-            logging.info('Uploading...')
-            j.add_attachment(jira['issue'], attachment=filename)
+            if auth_jira_set:
+                logging.info('Uploading...')
+                j.add_attachment(jira['issue'], attachment=filename)
             logging.info('{} processing finished.'.format(fname))
