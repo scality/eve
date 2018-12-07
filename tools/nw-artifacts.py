@@ -4,6 +4,7 @@ import argparse
 # from jira import JIRA
 import logging
 # import sys
+import os
 import time
 
 from eve_client import EveClient
@@ -25,6 +26,30 @@ def collect_step_artifacts(tree, stepname, collect=False):
     for url, build in tree['builds'].items():
         artifacts += collect_step_artifacts(build, stepname, collect)
     return artifacts
+
+
+def extract_name(url, dir_parts=0):
+    name = os.path.basename(url)
+    dir = os.path.dirname(url)
+    for i in range(dir_parts):
+        name = os.path.basename(dir) + '_' + name
+        dir = os.path.dirname(dir)
+    return name
+
+
+def sanitize_names(urls):
+    """ Transform a set of urls into a set of the smallest names possible
+        extracted from the urls.
+
+        If two names match, then all of them are prepended with one additional
+        parent folder name from the URL.
+    """
+    sanitized_names = []
+    dir_parts = 0
+    while len(set(sanitized_names)) != len(urls):
+        sanitized_names = [extract_name(url, dir_parts) for url in urls]
+        dir_parts += 1
+    return sanitized_names
 
 
 if __name__ == '__main__':
@@ -110,3 +135,9 @@ if __name__ == '__main__':
     logging.info('Collecting artifacts:')
     for artifact in artifacts:
         logging.info(' - {}'.format(artifact))
+
+    # Ensure that no two basenames are identical
+    sanitized_names = sanitize_names(artifacts)
+    for fname, url in zip(sanitized_names, artifacts):
+        logging.info('Generating attachment "{}"\n\t-> "{}"'
+                     .format(fname, url))
