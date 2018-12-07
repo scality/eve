@@ -1,7 +1,7 @@
 #!/usr/bin/env python3.6
 
 import argparse
-# from jira import JIRA
+from jira import JIRA
 import logging
 # import sys
 import os
@@ -142,7 +142,7 @@ if __name__ == '__main__':
     githost = guessProvider('auto', None, build['project'])
     provider = getProvider(githost, **authparams)
     eve = EveClient(provider.token, build['url'])
-    print('Building tree of builds and artifacts...')
+    logging.info('Building tree of builds and artifacts...')
     start_building = time.time()
     buildtree = eve.buildtree('bootstrap', build['id'])
     end_building = time.time()
@@ -160,6 +160,9 @@ if __name__ == '__main__':
         logging.info('Generating attachment "{}"\n\t-> "{}"'
                      .format(fname, url))
 
+    # Prepare JIRA object
+    j = JIRA("https://scality.atlassian.net",
+             basic_auth=(jira['user'], jira['password']))
     # Prepare auth
     artifacts_auth = HTTPBasicAuth(authparams['artifacts_user'],
                                    authparams['artifacts_pass'])
@@ -176,3 +179,6 @@ if __name__ == '__main__':
             with open(filename, 'wb') as f:
                 f.write(r.content)
             logging.info('Download status {}'.format(r.status_code))
+            logging.info('Uploading...')
+            j.add_attachment(jira['issue'], attachment=filename)
+            logging.info('{} processing finished.'.format(fname))
