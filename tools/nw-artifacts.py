@@ -5,7 +5,11 @@ import argparse
 import logging
 # import sys
 import os
+import requests
+from requests.auth import HTTPBasicAuth
+import tempfile
 import time
+import sys
 
 from eve_client import EveClient
 from githost import getProvider, guessProvider
@@ -85,6 +89,18 @@ if __name__ == '__main__':
                         action=EnvDefault, envvar='EVE_API_VERSION',
                         metavar='INT', type=int,
                         default=2)
+    parser.add_argument('--artifacts-user', '-a',
+                        help='Eve Artifacts repository User. '
+                             'Can also be set with environment variable '
+                             'ARTIFACTS_USERNAME.',
+                        action=EnvDefault, envvar='ARTIFACTS_USERNAME',
+                        default='developer')
+    parser.add_argument('--artifacts-pass', '-k',
+                        help='Eve Artifacts repository Password. '
+                             'Can also be set with environment variable '
+                             'ARTIFACTS_PASSWORD.',
+                        action=EnvDefault, envvar='ARTIFACTS_PASSWORD',
+                        default=None)
     parser.add_argument('--jira-user', '-U',
                         help='JIRA User. '
                              'Can also be set with environment variable '
@@ -114,6 +130,8 @@ if __name__ == '__main__':
         'client_id': args.auth_client,
         'client_secret': args.auth_secret,
         'token': args.auth_token,
+        'artifacts_user': args.artifacts_user,
+        'artifacts_pass': args.artifacts_pass,
     }
     build = {
         'url': '{}/{}'.format(args.base_url, args.eve_project),
@@ -141,3 +159,20 @@ if __name__ == '__main__':
     for fname, url in zip(sanitized_names, artifacts):
         logging.info('Generating attachment "{}"\n\t-> "{}"'
                      .format(fname, url))
+
+    # Prepare auth
+    artifacts_auth = HTTPBasicAuth(authparams['artifacts_user'],
+                                   authparams['artifacts_pass'])
+    # Download the relevant artifacts into a temp dir
+    with tempfile.TemporaryDirectory() as tmpdir:
+        for fname, url in zip(sanitized_names, artifacts):
+            logging.info('Processing attachment "{}"...'.format(fname))
+            logging.info('Downloading...')
+            filename = os.path.join(tmpdir, fname)
+            r = requests.get(url, allow_redirects=True, auth=artifacts_auth)
+            if not r.ok:
+                sys.exit('Could not retrieve the artifacts successfully: '
+                         'HTTP {}: {}'.format(r.status_code, r.reason))
+            with open(filename, 'wb') as f:
+                f.write(r.content)
+            logging.info('Download status {}'.format(r.status_code))
