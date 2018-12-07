@@ -2,9 +2,9 @@
 
 import argparse
 # from jira import JIRA
-import json
 import logging
 # import sys
+import time
 
 from eve_client import EveClient
 from githost import getProvider, guessProvider
@@ -99,8 +99,12 @@ if __name__ == '__main__':
     githost = guessProvider('auto', None, build['project'])
     provider = getProvider(githost, **authparams)
     eve = EveClient(provider.token, build['url'])
+    print('Building tree of builds and artifacts...')
+    start_building = time.time()
     buildtree = eve.buildtree('bootstrap', build['id'])
-    logging.info('builds: {}'.format(json.dumps(buildtree, indent=2)))
+    end_building = time.time()
+    spent_building = end_building - start_building
+    logging.debug('Spend {}s retrieving the build tree'.format(spent_building))
 
     artifacts = collect_step_artifacts(buildtree, args.step_name)
     logging.info('Collecting artifacts:')
