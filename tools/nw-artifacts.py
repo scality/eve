@@ -24,6 +24,9 @@ CLI Variables:
     bootstrap-build-number: Build number of the Boostrap builder (root builder)
     JIRA-issue-number: JIRA Issue reference, containing project and issue
         number (ex: RING-2354)
+    builder-name: Name of the builder shown in the Eve UI
+    builder-specific-build-number: Build number of build under the specified
+        builder.
 
 Attach all artifacts from a build (from a bitbucket project) to a ticket:
     ./nw-artifacts.py
@@ -43,6 +46,16 @@ ticket:
       --jira-pass <JIRA-password>
       --step-name <Name of the step or stage to collect the artifacts from>
       <eve-project> <bootstrap-build-number> <JIRA-issue-number>
+
+Attach artifacts of a build failure from a cancelled bootstrap build to a
+ticket:
+    ./nw-artifacts.py
+      --auth-token <github-token>
+      --artifacts-pass <artifacts-repository-password>
+      --jira-user <JIRA-username>
+      --jira-pass <JIRA-password>
+      --builder <builder-name>
+      <eve-project> <builder-specifci-build-number> <JIRA-issue-number>
 
 Report any bug/error at release.engineering@scality.com
 """
@@ -163,6 +176,12 @@ if __name__ == '__main__':
                              'the artifacts for. Artifacts of all builds or '
                              'steps triggered by this step will be collected.',
                         default=None)
+    parser.add_argument('--builder', '-B',
+                        help='ID of the builder that owns the specified build'
+                        ' number. Defaults to "bootstrap", but can be'
+                        ' overriden to cover for the case of un-browsable'
+                        ' builds (such as cancelled builds)',
+                        default='bootstrap')
     parser.add_argument('eve_project', help='Eve project name')
     parser.add_argument('build_id', help='Eve bootstrap build number')
     parser.add_argument('jira_issue', help='Jira issue ID')
@@ -211,7 +230,7 @@ if __name__ == '__main__':
     eve = EveClient(provider.token, build['url'])
     logging.info('Building tree of builds and artifacts...')
     start_building = time.time()
-    buildtree = eve.buildtree('bootstrap', build['id'])
+    buildtree = eve.buildtree(args.builder, build['id'])
     end_building = time.time()
     spent_building = end_building - start_building
     logging.debug('Spend {}s retrieving the build tree'.format(spent_building))
