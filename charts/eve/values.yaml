@@ -480,14 +480,6 @@ eve:
       ##
       githubToken: ""
 
-
-      ## ultronReporterInUse actives sending build results to Scality Ultron.
-      ##
-      ultronReporterInUse: "0"
-      ultronReporterUrl: ""
-      ultronReporterLogin: ""
-      ultronReporterPwd: ""
-
     vault:
       ## vaultInUse activates the use of an external Vault to store secrets.
       ##

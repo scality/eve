@@ -35,13 +35,3 @@ def bitbucket_reporter():
         util.env.EVE_GITHOST_LOGIN,
         util.env.EVE_GITHOST_PWD,
     )
-
-
-def ultron_reporter():
-    assert util.env.ULTRON_REPORTER_URL
-
-    return reporters.UltronBuildStatusPush(
-        util.env.ULTRON_REPORTER_LOGIN,
-        util.env.ULTRON_REPORTER_PWD,
-        util.env.ULTRON_REPORTER_URL,
-    )
