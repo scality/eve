@@ -19,16 +19,6 @@
 from buildbot.plugins import reporters, util
 
 
-def hipchat_reporter():
-    assert util.env.HIPCHAT_ROOM
-    assert util.env.HIPCHAT_TOKEN
-
-    return reporters.HipChatBuildStatusPush(
-        util.env.HIPCHAT_ROOM,
-        util.env.HIPCHAT_TOKEN,
-    )
-
-
 def github_reporter():
     assert util.env.GITHUB_TOKEN
 

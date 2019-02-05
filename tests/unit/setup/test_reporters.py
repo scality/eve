@@ -8,13 +8,6 @@ import eve.setup.reporters
 
 
 class TestSetupReporters(unittest.TestCase):
-    def test_hipchat_reporter(self):
-        util.env = util.load_env([
-            ('HIPCHAT_ROOM', 'foo'),
-            ('HIPCHAT_TOKEN', 'bar'),
-        ])
-        self.assertIsNotNone(eve.setup.reporters.hipchat_reporter())
-
     def test_github_reporter(self):
         util.env = util.load_env([
             ('GITHUB_TOKEN', 'foo'),

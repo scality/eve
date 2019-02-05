@@ -480,12 +480,6 @@ eve:
       ##
       githubToken: ""
 
-      ## hipchatRoom, hipchatToken point a HipChat room to push build results.
-      ##
-      ##   default: "" (no notification of build results)
-      ##
-      hipchatRoom: ""
-      hipchatToken: ""
 
       ## ultronReporterInUse actives sending build results to Scality Ultron.
       ##

@@ -54,7 +54,6 @@ setup(
         'buildbot.reporters': [
             'BitbucketBuildStatusPush=eve.reporters.bitbucket:BitbucketBuildStatusPush',
             'GithubBuildStatusPush=eve.reporters.github:GithubBuildStatusPush',
-            'HipChatBuildStatusPush=eve.reporters.hipchat:HipChatBuildStatusPush',
             'UltronBuildStatusPush=eve.reporters.ultron:UltronBuildStatusPush',
         ],
         'buildbot.schedulers': [
