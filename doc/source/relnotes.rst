@@ -17,6 +17,24 @@ Release Notes
 
 .. towncrier release notes start
 
+Eve 1.4.3 (2019-02-06)
+======================
+
+Features
+--------
+
+- Add a script that retrieves artifacts from a failed build (optionally with a
+  step or stage name) and attaches them to the requested JIRA Issue. (EVE-1021)
+- Remove hipchat reporter. (EVE-1028)
+- Remove ultron reporter. (EVE-1029)
+
+
+Bugfixes
+--------
+
+- Updating frozen dependencies to fix docker compose build step. (EVE-1030)
+
+
 Eve 1.4.2 (2018-11-30)
 ======================
 
