@@ -109,6 +109,23 @@ spec:
           mountPath: /usr/local/bin/docker
           subPath: docker
         {{- end }}
+        {{- if .Values.registrySecret }}
+        - name: docker-registry-credentials
+          readOnly: true
+          mountPath: /root/.docker/config.json
+          subPath: .dockercfg
+        {{- end }}
+      - name: dind-daemon
+        image: docker:dind
+        resources:
+          requests:
+            cpu: 500m
+            memory: 500Mi
+        securityContext:
+          privileged: true
+        volumeMounts:
+          - name: docker-storage
+            mountPath: /var/lib/docker
       {{- if and .isMaster (eq .Values.eve.masterConf.dockerHook.dockerHookInUse "1") }}
       - name: docker-hook
         image: "{{ .Values.image.registry }}/{{ .Values.image.dockerHook.repository }}:{{ .Values.image.dockerHook.tag }}"
@@ -131,6 +148,8 @@ spec:
               - >
                 curl http://localhost:5000/quit
         env:
+        - name: DOCKER_HOST
+          value: localhost
         - name: DOCKER_API_VERSION
           value: {{ .Values.eve.masterConf.dockerWorkers.dockerApiVersion | quote }}
         - name: DOCKER_CONTAINER_MAX_MEMORY
@@ -161,14 +180,16 @@ spec:
         - name: docker-hook-credentials
           readOnly: true
           mountPath: /creds
-        - name: docker-host-data
-          readOnly: false
-          mountPath: /var/lib/docker
-        - name: docker-host-sock
-          readOnly: false
-          mountPath: /var/run/docker.sock
+        # - name: docker-host-data
+        #   readOnly: false
+        #   mountPath: /var/lib/docker
+        # - name: docker-host-sock
+        #   readOnly: false
+        #   mountPath: /var/run/docker.sock
       {{ end }}
       volumes:
+      - name: docker-storage
+        emptyDir: {}
       - name: workspace
         emptyDir: {}
       - name: files
@@ -190,6 +211,11 @@ spec:
       - name: docker-host-sock
         hostPath:
           path: /var/run/docker.sock
+      {{- end }}
+      {{- if .Values.registrySecret }}
+      - name: docker-registry-credentials
+        secret:
+          secretName: {{ .Values.registrySecret }}
       {{- end }}
       {{- if and .isMaster (eq .Values.eve.masterConf.dockerHook.dockerHookInUse "1") }}
       - name: docker-hook-binary

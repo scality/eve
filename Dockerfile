@@ -18,6 +18,15 @@ RUN apt-get update && \
         vim.tiny && \
     rm -rf /var/lib/apt/lists/*
 
+
+ARG DOCKER_VERSION=18.06.1~ce~3-0~ubuntu
+RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add - \
+ && echo "deb [arch=amd64] https://download.docker.com/linux/ubuntu xenial stable" \
+    | tee -a /etc/apt/sources.list.d/docker-ce.list \
+ && apt-get update \
+ && apt-get install -y -q docker-ce=${DOCKER_VERSION}
+
+
 # Install git lfs
 RUN echo "deb https://packagecloud.io/github/git-lfs/ubuntu/ xenial main" > /etc/apt/sources.list.d/github_git-lfs.list && \
     curl -sSL https://packagecloud.io/github/git-lfs/gpgkey | apt-key add - && \
@@ -26,9 +35,6 @@ RUN echo "deb https://packagecloud.io/github/git-lfs/ubuntu/ xenial main" > /etc
     git lfs install --system --skip-smudge --skip-repo
 
 RUN pip install --upgrade pip==9.0.2
-
-ARG INTERNAL_DOCKER
-RUN if [ -n "$INTERNAL_DOCKER" ]; then curl -sSL https://get.docker.com/ | sh; fi
 
 WORKDIR /root/eve
 

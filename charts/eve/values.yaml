@@ -12,6 +12,9 @@ nameOverride: "eve"
 ##
 useShortNames: false
 
+## registry secret name container credentials for a docker registry
+registrySecret:
+
 eve:
   project:
     ## mastersCount defines the number of build masters.
@@ -271,7 +274,7 @@ eve:
       ##   Strongly recommended when if dockerHost is pointing
       ##   outside the Kubernetes cluster.
       ##
-      dockerTlsVerify: "0"
+      # dockerTlsVerify: "0"
       cert: ""
       ca: ""
       key: ""

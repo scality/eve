@@ -16,7 +16,6 @@ data:
   BOOTSTRAP_BUILDER_NAME: "bootstrap"
   BOOTSTRAP_SCHEDULER_NAME: "bootstrap-scheduler"
   DOCKER_BUILDER_PREFIX: "docker"
-  DOCKER_CERT_PATH: "/root/conf-secret"
   DOCKER_SCHEDULER_PREFIX: "docker"
   EXTERNAL_PB_PORT: {{ .Values.deployment.ports.pb | quote }}
   FORCE_SCHEDULER_NAME: "force"
