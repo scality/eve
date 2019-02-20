@@ -1,5 +1,5 @@
 name: eve
-version: 1.0.0
+version: 1.0.1
 description: Eve, a continuous integration builder over Buildbot.
 keywords:
 - continuous integration builder
