@@ -54,4 +54,16 @@ class HeatOpenStackBuildOrder(util.BaseBuildOrder):
                                 'OpenstackBuildOrder'),
             'openstack_flavor': (self._worker.get('flavor', ''),
                                  'OpenstackBuildOrder'),
+            'redhat_username': (self._worker.get('redhat_username', ''),
+                                'OpenstackBuildOrder'),
+            'redhat_password': (self._worker.get('redhat_password', ''),
+                                'OpenstackBuildOrder'),
+            'redhat_pool': (self._worker.get('redhat_pool', ''),
+                            'OpenstackBuildOrder'),
+            'redhat_org': (self._worker.get('redhat_org', ''),
+                           'OpenstackBuildOrder'),
+            'redhat_activationkey': (
+                self._worker.get('redhat_activationkey', ''),
+                'OpenstackBuildOrder'
+            ),
         })
