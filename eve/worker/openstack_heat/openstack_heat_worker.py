@@ -83,11 +83,15 @@ class HeatLatentWorker(AbstractLatentWorker):
         repository = build.getProperty('repository')
         uuid = util.create_hash(repository, self.name)
         build.setProperty("worker_uuid", uuid, "Build")
-        heat_template = yield build.render(self.heat_template)
+        heat_template = yield build.render(
+            util.replace_with_interpolate(self.heat_template))
+        self.logger.info('heat_template %s' % heat_template)
         tmp_heat_template_parameters = {}
         for key, value in self.heat_params.items():
             tmp_heat_template_parameters[key] = yield build.render(
                 util.replace_with_interpolate(value))
+        self.logger.info('heat param %s' % tmp_heat_template_parameters)
+
 
         res = yield threads.deferToThread(self._start_instance,
                                           self.name,
