@@ -190,6 +190,11 @@ def openstack_heat_workers():
             default_script_path=util.env.OS_SCRIPT_START_FILE_PATH,
             user_script_contents=Property('start.sh')),
         'worker_version': version,
+        'redhat_username': util.env.REDHAT_USERNAME,
+        'redhat_password': util.env.REDHAT_PASSWORD,
+        'redhat_pool': util.env.REDHAT_POOL,
+        'redhat_org': util.env.REDHAT_ORG,
+        'redhat_activationkey': util.env.REDHAT_ACTIVATIONKEY,
     }
 
     for i in range(util.env.MAX_OPENSTACK_WORKERS):

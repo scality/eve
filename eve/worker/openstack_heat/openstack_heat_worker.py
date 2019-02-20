@@ -86,7 +86,8 @@ class HeatLatentWorker(AbstractLatentWorker):
         heat_template = yield build.render(self.heat_template)
         tmp_heat_template_parameters = {}
         for key, value in self.heat_params.items():
-            tmp_heat_template_parameters[key] = yield build.render(value)
+            tmp_heat_template_parameters[key] = yield build.render(
+                util.replace_with_interpolate(value))
 
         res = yield threads.deferToThread(self._start_instance,
                                           self.name,

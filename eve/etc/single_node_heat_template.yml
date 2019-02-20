@@ -67,6 +67,35 @@ parameters:
     type: string
     label: Worker password
     description: Credential of the Buildbot worker (password)
+  redhat_username:
+    type: string
+    label: RedHat username
+    description: RedHat username used for subscription-manager
+    default: ""
+  redhat_password:
+    type: string
+    label: RedHat password
+    description: RedHat password used for subscription-manager
+    hidden: True
+    default: ""
+  redhat_pool:
+    type: string
+    label: RedHat pool ID
+    description: RedHat pool ID to attach to
+    hidden: True
+    default: ""
+  redhat_org:
+    type: string
+    label: RedHat ORG ID
+    description: RedHat ORG ID used for Activation Key
+    hidden: True
+    default: ""
+  redhat_activationkey:
+    type: string
+    label: RedHat Activationkey
+    description: RedHat Activationkey to use with ORG ID
+    hidden: True
+    default: ""
 
 resources:
   heat_worker:
@@ -132,6 +161,45 @@ resources:
 
                 # execute scripts
                 /tmp/script_boot.sh
+
+                # If it is a RedHat Server
+                if rpm -qa | grep -qE '^redhat-release.+'; then
+                    export REDHAT_USERNAME="$redhat_username"
+                    export REDHAT_PASSWORD="$redhat_password"
+                    export REDHAT_POOL="$redhat_pool"
+                    export REDHAT_ORG="$redhat_org"
+                    export REDHAT_ACTIVATIONKEY="$redhat_activationkey"
+                    if [[ -n "$REDHAT_ORG" \
+                          && -n "$REDHAT_ACTIVATIONKEY" ]]; then
+                        subscription-manager register \
+                            --org="$REDHAT_ORG" \
+                            --activationkey="$REDHAT_ACTIVATIONKEY"
+                    elif [[ -n "$REDHAT_USERNAME" \
+                            && -n "$REDHAT_PASSWORD" ]]; then
+                        register_cmd=(
+                            subscription-manager register
+                            --username="$REDHAT_USERNAME"
+                            --password="$REDHAT_PASSWORD"
+                        )
+                        if [[ -n "REDHAT_POOL" ]]; then
+                            "${register_cmd[@]}"
+                            subscription-manager attach \
+                                --pool="$redhat_pool"
+                        else
+                           register_cmd+=(--auto-attach)
+                            "${register_cmd[@]}"
+                        fi
+                    else
+                        cat <<EOF
+                This system won't be registered
+                You can register this system by setting the following
+                combination of environment variables in your worker step
+                * REDHAT_USERNAME and REDHAT_PASSWORD (with possibly REDHAT_POOL_ID)
+                * REDHAT_ORG and REDHAT_ACTIVATIONKEY
+                EOF
+                    fi
+                fi
+
                 /tmp/script_init.sh "$worker_version"
                 retry /tmp/script_requirements.sh
                 /tmp/script_start.sh \
@@ -148,3 +216,8 @@ resources:
             "$worker_name": {get_param: worker_name}
             "$worker_password": {get_param: worker_password}
             "$worker_version": {get_param: worker_version}
+            "$redhat_username": {get_param: redhat_username}
+            "$redhat_password": {get_param: redhat_password}
+            "$redhat_pool": {get_param: redhat_pool}
+            "$redhat_org": {get_param: redhat_org}
+            "$redhat_activation": {get_param: redhat_activationkey}
