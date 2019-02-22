@@ -17,6 +17,16 @@ Release Notes
 
 .. towncrier release notes start
 
+Eve 1.4.4 (2019-02-22)
+======================
+
+Bugfixes
+--------
+
+- Now installing a missing dependency in the ``eve_api_client`` Docker image.
+  (EVE-1038)
+
+
 Eve 1.4.3 (2019-02-06)
 ======================
 
