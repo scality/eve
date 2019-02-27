@@ -29,8 +29,6 @@ if [ -f /etc/redhat-release ]
 then
   echo "CentOS/RedHat";
 
-  retry yum -y distro-sync
-
   localedef -v -c -i en_US -f UTF-8 en_US.UTF-8 || true
   export LANG=en_US.utf8
 

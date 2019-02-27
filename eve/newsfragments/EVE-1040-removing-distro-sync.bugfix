@@ -1,0 +1,1 @@
+Removing ``yum distro-sync`` commands on yum based images for the openstack worker.
