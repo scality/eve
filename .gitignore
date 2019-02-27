@@ -5,7 +5,7 @@
 *.pyc
 .eggs
 eve.egg-info
-
+*~
 .coverage
 .htmlcov
 venv
