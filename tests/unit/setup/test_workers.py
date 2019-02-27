@@ -155,6 +155,11 @@ provider:
             ('OS_SSH_KEY', 'foo'),
             ('OS_TENANT_NAME', 'foo'),
             ('OS_USERNAME', 'foo'),
+            ('REDHAT_ACTIVATIONKEY', 'foo'),
+            ('REDHAT_ORG', 'foo'),
+            ('REDHAT_PASSWORD', 'foo'),
+            ('REDHAT_POOL', 'foo'),
+            ('REDHAT_USERNAME', 'foo'),
             ('SUFFIX', '_foo'),
         ])
         workers = eve.setup.workers.openstack_heat_workers()

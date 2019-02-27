@@ -80,6 +80,7 @@ setup(
             'StepExtractor=eve.steps.yaml_parser:StepExtractor',
             'PatcherConfig=eve.steps.patcher:PatcherConfig',
             'TriggerStages=eve.steps.trigger_stages:TriggerStages',
+            'UnregisterRedhat=eve.steps.redhat:UnregisterRedhat',
             'Upload=eve.steps.artifacts:Upload',
         ],
         'buildbot.util': [
@@ -93,6 +94,7 @@ setup(
             'hideStepIfSkipped=eve.util.step:hideStepIfSkipped',
             'hideStepIfSuccess=eve.util.step:hideStepIfSuccess',
             'hideStepIfSuccessOrSkipped=eve.util.step:hideStepIfSuccessOrSkipped',
+            'isRedhat=eve.util.redhat:isRedhat',
             'load_env=eve.util.env:load_env',
             'nextBootstrapBuild=eve.util.next_bootstrap_build:nextBootstrapBuild',
             'password_generator=eve.util.password_generator:password_generator',

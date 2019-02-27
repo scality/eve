@@ -260,6 +260,10 @@ Parameters
 ``image``
     Name of image in the cloud provider.
 
+    .. note::
+      when a Red Hat image is set, eve will automatically register and
+      unregister the image into the customer portal.
+
 ``flavor``
     iName of flavor in the cloud provider.
 
