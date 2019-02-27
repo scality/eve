@@ -42,11 +42,13 @@ class Settings(dict):
             self.load(name, default, convert)
 
     def load(self, name, default, convert):
+        value = None
         try:
             value = environ[name]
         except KeyError:
             if default is None:
                 raise
+        if value is None or not value:
             value = default
         try:
             self[name] = convert(value)

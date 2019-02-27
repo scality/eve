@@ -25,7 +25,7 @@ RUN echo "deb https://packagecloud.io/github/git-lfs/ubuntu/ xenial main" > /etc
     DEBIAN_FRONTEND=noninteractive apt-get -y install -q git-lfs && \
     git lfs install --system --skip-smudge --skip-repo
 
-RUN pip install --upgrade pip==9.0.2
+RUN pip3 install --upgrade pip==9.0.2
 
 ARG INTERNAL_DOCKER
 RUN if [ -n "$INTERNAL_DOCKER" ]; then curl -sSL https://get.docker.com/ | sh; fi
@@ -34,10 +34,10 @@ WORKDIR /root/eve
 
 # Freezing requirements
 COPY requirements/base.txt /tmp/requirements.txt
-RUN pip install -r /tmp/requirements.txt
+RUN pip3 install -r /tmp/requirements.txt
 
 COPY . /opt/eve
-RUN pip install --no-deps /opt/eve
+RUN pip3 install --no-deps /opt/eve
 
 COPY eve/etc/master.cfg /root/eve
 COPY buildbot.tac /root/eve
