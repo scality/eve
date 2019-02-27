@@ -1,8 +1,8 @@
 # This file has been automatically generated, DO NOT EDIT!
 
-# Frozen requirements for "./pydocstyle.in"
+# Frozen requirements for "requirements/pydocstyle.in"
 
 pydocstyle==2.0.0
-six==1.11.0
+six==1.12.0
 snowballstemmer==1.2.1
 
