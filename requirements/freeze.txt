@@ -1,14 +1,13 @@
 # This file has been automatically generated, DO NOT EDIT!
 
-# Frozen requirements for "./freeze.in"
+# Frozen requirements for "requirements/freeze.in"
 
-buildbot-pkg==0.9.12
-click==6.7
+buildbot-pkg==2.0.1
+click==7.0
 freeze-requirements==0.5.3
-funcsigs==1.0.2
 mock==2.0.0
-pbr==3.1.1
-setuptools==39.0.1
+pbr==5.1.2
+setuptools==40.8.0
 sh==1.12.14
-six==1.11.0
+six==1.12.0
 
