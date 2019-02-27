@@ -42,17 +42,17 @@ class Settings(dict):
             self.load(name, default, convert)
 
     def load(self, name, default, convert):
-        try:
+        if default is None:
             value = environ[name]
-        except KeyError:
-            if default is None:
-                raise
-            value = default
+        else:
+            value = environ.get(name, "")
+            if value == "":
+                value = default
         try:
             self[name] = convert(value)
-        except ValueError:
+        except ValueError as exc:
             raise ValueError('Cannot convert {}={} to an {}'.format(
-                name, value, convert))
+                             name, value, convert)) from exc
 
     def __getattr__(self, name):
         return self[name]
