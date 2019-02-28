@@ -7,8 +7,8 @@ from tests.util.cmd import cmd
 class TestDockerizedRegistry(unittest.TestCase):
     def setUp(self):
         self.registry = DockerizedRegistry()
-        print 'Registry URL: {}:{}'.format(self.registry.external_ip,
-                                           self.registry.port)
+        print('Registry URL: {}:{}'.format(self.registry.external_ip,
+                                           self.registry.port))
         assert self.registry is self.registry.start()
 
     def tearDown(self):
