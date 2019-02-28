@@ -24,4 +24,4 @@ class TestBitbucketWebhook(unittest.TestCase):
 
         """
         patch()
-        self.assertEquals(BitBucketHandler.getChanges.im_func, getChanges)
+        self.assertEquals(BitBucketHandler.getChanges, getChanges)

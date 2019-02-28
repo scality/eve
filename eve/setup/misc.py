@@ -29,10 +29,13 @@ def register_starttime():
 
 
 def wamp():
+    realm = util.env.WAMP_REALM
+    if not isinstance(realm, str):
+        realm = realm.decode()
     return {
         'type': 'wamp',
         'router_url': util.env.WAMP_ROUTER_URL,
-        'realm': util.env.WAMP_REALM.decode(),
+        'realm': realm,
     }
 
 

@@ -17,8 +17,6 @@
 # Boston, MA  02110-1301, USA.
 """Eve client allowing to launch builds without pushing code to git."""
 
-from __future__ import print_function
-
 import argparse
 
 from buildbot.clients import tryclient

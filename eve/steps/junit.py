@@ -18,7 +18,7 @@
 """Steps snooping on test results in JUnit format."""
 
 import os
-from StringIO import StringIO
+from io import StringIO
 from xml.etree.ElementTree import ParseError
 
 from buildbot.process.buildstep import CommandMixin

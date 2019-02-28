@@ -218,7 +218,7 @@ class StepExtractor(BuildStep):
         stage_name = self.getProperty('stage_name')
         stage_conf = conf['stages'][stage_name]
         for step in reversed(stage_conf['steps']):
-            step_type, params = next(step.iteritems())
+            step_type, params = next(iter(step.items()))
             step_type, params = patcher.patch_step(step_type, params)
             bb_step = util.step_factory(globals(), step_type, **params)
             self.build.addStepsAfterCurrentStep([bb_step])

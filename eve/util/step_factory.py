@@ -93,7 +93,7 @@ def replace_with_interpolate(obj):
         return {k: replace_with_interpolate(v) for k, v in obj.items()}
     elif isinstance(obj, list):
         return [replace_with_interpolate(elem) for elem in obj]
-    elif isinstance(obj, basestring) and ('prop:' in obj or 'secret:' in obj):
+    elif isinstance(obj, str) and ('prop:' in obj or 'secret:' in obj):
         return Interpolate(obj)
     else:
         return obj
