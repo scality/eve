@@ -17,6 +17,22 @@ Release Notes
 
 .. towncrier release notes start
 
+Eve 1.4.5 (2019-02-28)
+======================
+
+Features
+--------
+
+- Support redhat images with the Openstack worker. (RING-29139)
+
+
+Bugfixes
+--------
+
+- Removing ``yum distro-sync`` commands on yum based images for the openstack
+  worker. (EVE-1040)
+
+
 Eve 1.4.4 (2019-02-22)
 ======================
 
