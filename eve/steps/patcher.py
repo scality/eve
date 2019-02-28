@@ -102,7 +102,7 @@ class Patcher(object):
         if not skip_data:
             return None
 
-        elif isinstance(skip_data, basestring):
+        elif isinstance(skip_data, str):
             try:
                 return re.compile(skip_data)
             except re.error as err:

@@ -39,7 +39,7 @@ class EveForceScheduler(ForceScheduler):
     @staticmethod
     @defer.inlineCallbacks
     def add_missing_revisions(sourcestamps):
-        for _, sourcestamp in sourcestamps.iteritems():
+        for _, sourcestamp in sourcestamps.items():
             if not sourcestamp['revision']:
                 # Retrieve revision from branch for sourcestamps without one
                 res = yield threads.deferToThread(

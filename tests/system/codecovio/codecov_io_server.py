@@ -58,7 +58,7 @@ class _RequestRec(object):
         self.query_params = dict(urlparse.parse_qsl(path_parts.query))
         self.headers = {
             key.lower(): value
-            for key, value in dict(headers).iteritems()
+            for key, value in dict(headers).items()
             if key.lower() not in self.ignore_headers
         }
 

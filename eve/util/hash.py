@@ -35,5 +35,5 @@ def create_hash(*args):
     """
     m = md5()
     for arg in args:
-        m.update(str(arg))
+        m.update(str(arg).encode())
     return "e%s" % m.hexdigest()[:28]
