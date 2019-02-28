@@ -71,13 +71,13 @@ class DockerBuild(DockerStep):
         command = ['docker', 'build', '--tag', image]
 
         if labels:
-            for label_name, label_value in labels.iteritems():
+            for label_name, label_value in labels.items():
                 command += ['--label', '{0}={1}'.format(
                     label_name, label_value
                 )]
 
         if build_args:
-            for build_arg_name, build_arg_value in build_args.iteritems():
+            for build_arg_name, build_arg_value in build_args.items():
                 command += [
                     '--build-arg', '{0}={1}'.format(
                         build_arg_name,

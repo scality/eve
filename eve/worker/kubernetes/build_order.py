@@ -42,7 +42,7 @@ class KubernetesPodBuildOrder(util.BaseDockerBuildOrder):
 
         images = self._worker.get('images', {})
         image_vars = {}
-        for (name, params) in images.iteritems():
+        for (name, params) in images.items():
             if isinstance(params, dict):
                 context = params.get('context')
                 if context is None or not isinstance(context, str):
@@ -57,7 +57,7 @@ class KubernetesPodBuildOrder(util.BaseDockerBuildOrder):
 
                 image_vars[name] = self._build_image(name, context, dockerfile)
 
-            elif isinstance(params, basestring):
+            elif isinstance(params, str):
                 image_vars[name] = self._build_image(name, params)
 
             else:

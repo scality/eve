@@ -122,7 +122,7 @@ class ExecuteTriggerStages(Trigger):
         for build_order in self._build_orders:
             # wait for properties from preliminary steps
             setprop_defers = []
-            for name, (value, source) in build_order.properties.iteritems():
+            for name, (value, source) in build_order.properties.items():
                 setprop_defer = self.build.render(value)
                 setprop_defer.addCallback(set_property,
                                           build_order,

@@ -13,6 +13,8 @@ class TestDockerBuild(unittest.TestCase):
         self.assertEquals(ctx.image, 'image')
         self.assertTrue(ctx.is_retry)
         self.assertFalse(ctx.isNewStyle())
+        # [2019-03-01] David: Not sure what purpose is serving the following
+        # test.
         self.assertTrue(ctx == ctx)  # __eq__ coverage
 
 
@@ -49,4 +51,6 @@ class TestDockerPush(unittest.TestCase):
             label='label', image='image', name='zippy')
         self.assertEquals(ctx.name, 'zippy')
         self.assertEquals(ctx.image, 'image')
+        # [2019-03-01] David: Not sure what purpose is serving the following
+        # test.
         self.assertTrue(ctx == ctx)  # __eq__ coverage

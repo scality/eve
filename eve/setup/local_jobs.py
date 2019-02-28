@@ -30,7 +30,7 @@ def local_jobs(workers):
     local_dirpath = path.join(getcwd(), util.env.LOCAL_JOBS_DIRPATH)
     builders = []
     scheds = []
-    print local_dirpath, path.isdir(local_dirpath)
+    print(local_dirpath, path.isdir(local_dirpath))
     if path.isdir(local_dirpath):
         for job_conf_file in next(walk(local_dirpath))[2]:
             filename = path.join(local_dirpath, job_conf_file)
@@ -60,7 +60,7 @@ def define_local_job(job_conf_file, workers, suffix):
     logger.debug('creating a new build factory for local job {job}',
                  job=job_conf_file)
     for step in conf['steps']:
-        step_type, params = next(step.iteritems())
+        step_type, params = next(iter(step.items()))
         logger.debug('adding step {step} with params: {params}',
                      step=step_type, params=params)
         factory.addStep(util.step_factory({}, step_type, **params))

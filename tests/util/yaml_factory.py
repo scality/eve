@@ -105,6 +105,6 @@ class LocalJobsYaml(YamlFactory):
                 }
             }],
             scheduler={'type': 'Periodic',
-                       'periodicBuildTimer': '5'})
+                       'periodicBuildTimer': 5})
         with open(file_, 'w') as fhandle:
             yaml.dump(data, fhandle, default_flow_style=False)
