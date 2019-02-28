@@ -100,7 +100,7 @@ class BuildbotDataAPI(object):
 
     def getw(self, route, get_params=None, retry=180, expected_count=1):
         """Wait for and return a given number of results from the REST API."""
-        for i in xrange(retry):
+        for i in range(retry):
             try:
                 res = self.get(route=route, get_params=get_params)
             except ConnectionError:
