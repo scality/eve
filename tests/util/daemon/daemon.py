@@ -127,7 +127,7 @@ class Daemon(object):
             delay (int): Number of seconds after which an exception is raised.
 
         """
-        for _ in xrange(delay):
+        for _ in range(delay):
             if self._status == 'stopping':
                 if self._process.returncode is None:
                     return
