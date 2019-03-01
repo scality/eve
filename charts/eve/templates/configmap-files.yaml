@@ -13,9 +13,6 @@ data:
   dashboards.yaml: |
 {{ .Values.eve.masterConf.ui.dashboards | indent 4 }}
   {{- end }}
-  {{- if not (eq .Values.eve.masterConf.builds.noNewBuild "") }}
-  no_new_build: " "
-  {{- end }}
   {{- if .Values.eve.masterConf.openstackWorkers.osMapping }}
   os_mapping.yaml: |
 {{ .Values.eve.masterConf.openstackWorkers.osMapping | indent 4 }}

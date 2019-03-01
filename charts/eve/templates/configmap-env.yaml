@@ -28,7 +28,6 @@ data:
   LOCAL_BUILDER_PREFIX: "local"
   LOCAL_JOBS_DIR_PATH: "none"
   LOCAL_SCHEDULER_PREFIX: "local"
-  NO_NEW_BUILD_FILE_PATH: "/root/conf/no_new_build"
   OPENSTACK_BUILDER_PREFIX: "openstack"
   OPENSTACK_SCHEDULER_PREFIX: "openstack"
   OS_SSH_KEY: "/root/conf-secret/os_id_rsa"

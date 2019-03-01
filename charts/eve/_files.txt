@@ -1,5 +1,4 @@
 eve.dockerHook.hookBinary
-eve.masterConf.builds.noNewBuild
 eve.masterConf.builds.stepPatcher
 eve.masterConf.dockerWorkers.ca
 eve.masterConf.dockerWorkers.cert
