@@ -196,6 +196,9 @@ class TestPublishCodeCoverage(unittest.TestCase):
         if self.codecov_io_server is None:
             return
 
+# The method build.getUrl() returns for some reason an url with:
+# - the builder id of the main builder, and not the virtual_builder id
+# - a buildid linked to the main builder as well, not with the virtual_build id
         self.codecov_io_server.assert_request_received_with(
             ('POST', '/upload/v4', {
                 'commit':

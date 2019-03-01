@@ -102,7 +102,7 @@ class Tests(unittest.TestCase):
             (u'trigger', u'triggered pre-merge')])
 
         # Check build
-        build = self.cluster.api.get_finished_build('docker-test_suffix')
+        build = self.cluster.api.get_finished_build('pre-merge')
         self.assertEqual(build['results'], SUCCESS)
         steps = self.cluster.api.get_build_steps(build)
         step_names_and_descriptions = [(step['name'], step['state_string'])

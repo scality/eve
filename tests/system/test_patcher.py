@@ -142,8 +142,7 @@ class TestPatcher(unittest.TestCase):
             self.assertEqual(buildset.result, 'success')
 
             # Check pre-merge
-            premerge_build = cluster.api.get_finished_build(
-                'local-test_suffix')
+            premerge_build = cluster.api.get_finished_build('pre-merge')
             premerge_steps = cluster.api.get_build_steps(premerge_build)
             step_names_and_descriptions = [(step['name'], step['state_string'])
                                            for step in premerge_steps]

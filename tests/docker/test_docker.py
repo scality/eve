@@ -391,7 +391,7 @@ class TestDockerCluster(unittest.TestCase):
 
             # Check pre-merge step
             premerge_build = cluster.api.get_finished_build(
-                'local-test_suffix')
+                'pre-merge')
             self.assertEqual(premerge_build['results'], SUCCESS)
             premerge_steps = cluster.api.get_build_steps(premerge_build)
             step_names_and_descriptions = [(step['name'], step['state_string'])
