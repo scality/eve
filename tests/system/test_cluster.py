@@ -97,7 +97,7 @@ class TestCluster(unittest.TestCase):
 
             # Check pre-merge
             premerge_build = cluster.api.get_finished_build(
-                'local-test_suffix')
+                'pre-merge')
             self.assertEqual(premerge_build['results'], SUCCESS)
             premerge_steps = cluster.api.get_build_steps(premerge_build)
             step_names_and_descriptions = [(step['name'], step['state_string'])
@@ -122,6 +122,39 @@ class TestCluster(unittest.TestCase):
                              'force build')
             self.assertEqual(properties['properties']['reason'][1],
                              'Force Build Form')
+
+    def test_virtual_builder(self):
+        """Test the virtual builder API.
+
+        Steps:
+            - Start a cluster with 01 frontend and 01 backend.
+            - Force a job.
+            - Wait for the build to end.
+            - Ensure we can use the virtual_builder API.
+            - Ensure the virtual_builder properties are well set.
+            - Stop it.
+
+        """
+        with Cluster() as cluster:
+            local_repo = cluster.clone()
+            local_repo.push()
+            cluster.api.force(branch=local_repo.branch)
+
+            # Wait for the build to finish
+            cluster.api.get_finished_build()
+            premerge_build = cluster.api.get_finished_build('pre-merge')
+            self.assertEqual(premerge_build['results'], SUCCESS)
+            # Check build properties
+            properties = cluster.api.get_build_properties(premerge_build)
+            tags = [
+                properties['git_host'][0],
+                properties['git_owner'][0],
+                properties['stage_name'][0],
+            ]
+
+            self.assertEqual(properties['virtual_builder_name'][0],
+                             'pre-merge')
+            self.assertEqual(properties['virtual_builder_tags'][0], tags)
 
     def test_index_lock_failure(self):
         """Test a simple build failure on a cluster due to index.lock.
@@ -316,8 +349,7 @@ class TestCluster(unittest.TestCase):
             check_prop('start_time')
             check_prop('workername')
 
-            master_build = cluster.api.get_finished_build(
-                'local-test_suffix')
+            master_build = cluster.api.get_finished_build('pre-merge')
             properties = cluster.api.get_build_properties(master_build)
             check_prop('artifacts_name')
             check_prop('artifacts_public_url')

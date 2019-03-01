@@ -55,6 +55,13 @@ class BaseBuildOrder(object):
                 self._stage_name, stage_name), 'BuildOrder'),
             'git_reference': (self.git_repo, 'BuildOrder'),
             'git_repo': (self.git_repo, 'BuildOrder'),
+            'virtual_builder_name': (self._stage_name, 'BuildOrder'),
+            'virtual_builder_tags': (
+                (self.properties.get('git_host')[0],
+                 self.properties.get('git_owner')[0],
+                 self._stage_name),
+                'BuildOrder'
+            ),
         })
 
 

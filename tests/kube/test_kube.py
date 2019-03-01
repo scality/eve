@@ -196,7 +196,7 @@ class TestKube(unittest.TestCase):
             self.assertEqual(buildset.result, 'success')
             # get the kube workername and resolve corresponding uuid
             # (repository name changes with every run of the test)
-            child_build = cluster.api.get_builds('kube_pod-test_suffix')[0]
+            child_build = cluster.api.get_builds('pre-merge')[0]
             props = cluster.api.get_build_properties(child_build)
             uuid = util.create_hash(props['repository'][0],
                                     'kw000-test_suffix')
@@ -277,7 +277,7 @@ class TestKube(unittest.TestCase):
             self.assertEqual(buildset.result, 'exception')
             # get the kube workername and resolve corresponding uuid
             # (repository name changes with every run of the test)
-            child_build = cluster.api.get_builds('kube_pod-test_suffix')[0]
+            child_build = cluster.api.get_builds('pre-merge')[0]
             props = cluster.api.get_build_properties(child_build)
             uuid = util.create_hash(props['repository'][0],
                                     'kw000-test_suffix')
@@ -308,7 +308,7 @@ class TestKube(unittest.TestCase):
             self.assertEqual(buildset.result, 'exception')
             # get the kube workername and resolve corresponding uuid
             # (repository name changes with every run of the test)
-            child_build = cluster.api.get_builds('kube_pod-test_suffix')[0]
+            child_build = cluster.api.get_builds('pre-merge')[0]
             props = cluster.api.get_build_properties(child_build)
             uuid = util.create_hash(props['repository'][0],
                                     'kw000-test_suffix')
@@ -341,7 +341,7 @@ class TestKube(unittest.TestCase):
             self.assertEqual(buildset.result, 'exception')
             # get the kube workername and resolve corresponding uuid
             # (repository name changes with every run of the test)
-            child_build = cluster.api.get_builds('kube_pod-test_suffix')[0]
+            child_build = cluster.api.get_builds('pre-merge')[0]
             props = cluster.api.get_build_properties(child_build)
             uuid = util.create_hash(props['repository'][0],
                                     'kw000-test_suffix')
