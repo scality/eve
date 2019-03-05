@@ -151,8 +151,8 @@ class BuildbotDataAPI(object):
             builds = self.get_builds(builder=builder) or []
             for build in builds:
                 prop_branch = build['properties'].get('branch')
-                if not branch or (prop_branch and
-                                  str(prop_branch[0]) == branch):
+                if not branch or (prop_branch
+                                  and str(prop_branch[0]) == branch):
                     the_build = build
                     break
             else:

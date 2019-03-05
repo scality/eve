@@ -110,14 +110,14 @@ class KubePodWorkerCannotSubstantiate(LatentWorkerCannotSubstantiate):
                 if container.ready:
                     continue
                 if container.state.waiting:
-                    msg = (container.state.waiting.message or
-                           container.state.waiting.reason)
+                    msg = (container.state.waiting.message
+                           or container.state.waiting.reason)
                     if msg:
                         error = '%s is waiting (%s)' % (container.name,
                                                         msg)
                 elif container.state.terminated:
-                    msg = (container.state.terminated.message or
-                           container.state.terminated.reason)
+                    msg = (container.state.terminated.message
+                           or container.state.terminated.reason)
                     if msg:
                         error = ('%s terminated with exit code \'%d\' (%s)' %
                                  (container.name,
@@ -343,23 +343,23 @@ class EveKubeLatentWorker(AbstractLatentWorker):
             resource_limit('cpu', limits, 'limits')
 
         # Enforce pod-wide limits
-        if (total['requests']['memory'] >
-                util.convert_to_bytes(self.max_memory)):
+        if (total['requests']['memory']
+                > util.convert_to_bytes(self.max_memory)):
             raise LatentWorkerCannotSubstantiate(
                 'Total memory requested for pod can\'t exceed %s!' %
                 self.max_memory)
-        if (total['limits']['memory'] >
-                util.convert_to_bytes(self.max_memory)):
+        if (total['limits']['memory']
+                > util.convert_to_bytes(self.max_memory)):
             raise LatentWorkerCannotSubstantiate(
                 'Total memory limit for pod can\'t exceed %s!' %
                 self.max_memory)
-        if (total['requests']['cpu'] >
-                util.convert_to_cpus(self.max_cpus)):
+        if (total['requests']['cpu']
+                > util.convert_to_cpus(self.max_cpus)):
             raise LatentWorkerCannotSubstantiate(
                 'Total cpu requested for pod can\'t exceed %s!' %
                 self.max_cpus)
-        if (total['limits']['cpu'] >
-                util.convert_to_cpus(self.max_cpus)):
+        if (total['limits']['cpu']
+                > util.convert_to_cpus(self.max_cpus)):
             raise LatentWorkerCannotSubstantiate(
                 'Total cpu limit for pod can\'t exceed %s!' %
                 self.max_cpus)
