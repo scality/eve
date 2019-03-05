@@ -23,7 +23,6 @@ import heatclient
 import heatclient.client
 from buildbot.interfaces import LatentWorkerCannotSubstantiate
 from buildbot.plugins import steps, util
-from buildbot.worker import AbstractWorker
 from buildbot.worker.latent import AbstractLatentWorker
 from heatclient.exc import HTTPBadRequest
 from keystoneauth1 import loading, session

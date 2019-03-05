@@ -93,8 +93,8 @@ class EveDockerLatentWorker(AbstractLatentWorker):
         ]
 
         if memory:
-            if (util.convert_to_bytes(memory) >
-                    util.convert_to_bytes(self.max_memory)):
+            if (util.convert_to_bytes(memory)
+                    > util.convert_to_bytes(self.max_memory)):
                 self.logger.error('Can not request %s RAM (max allowed %s).' %
                                   (memory, self.max_memory))
                 raise LatentWorkerCannotSubstantiate(

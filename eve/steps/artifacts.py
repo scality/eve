@@ -109,8 +109,8 @@ class SetArtifactsPublicURL(EvePropertyFromCommand):
             name='set the artifacts public url',
             command=[
                 'echo',
-                Interpolate(util.env.ARTIFACTS_PUBLIC_URL +
-                            '/builds/%(prop:artifacts_name)s'),
+                Interpolate(util.env.ARTIFACTS_PUBLIC_URL
+                            + '/builds/%(prop:artifacts_name)s'),
             ],
             hideStepIf=util.hideStepIfSuccess,
             property='artifacts_public_url',
@@ -298,9 +298,9 @@ class Upload(ShellCommand):
                 # case 1 : prefix is a pattern
                 if self.PREFIX_PATTERN_ELEMENTS.search(prefix):
                     path_pattern = re.compile(
-                        '^./' +
-                        link['path'].replace('*', '(.*)').replace('?', '(.)') +
-                        '$')
+                        '^./'
+                        + link['path'].replace('*', '(.*)').replace('?', '(.)')
+                        + '$')
                     links.update([
                         (path_pattern.sub(prefix, match), match)
                         for match in matches
