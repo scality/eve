@@ -55,6 +55,7 @@ class Cluster(object):
 
         self.vault = None
         if extra_conf.get('VAULT_IN_USE', None) == '1':
+            # pylint: disable=assignment-from-none
             self.vault = self.add_vault()
 
         self.registry = None

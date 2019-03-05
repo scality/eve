@@ -41,7 +41,6 @@ from buildbot.process.buildstep import BuildStep
 from buildbot.process.results import FAILURE, SKIPPED, SUCCESS, WARNINGS
 from buildbot.util import httpclientservice
 from twisted.internet import defer
-from twisted.internet.error import ConnectError
 from twisted.python import log
 
 try:
@@ -286,10 +285,7 @@ class CodecovIOPublication(PublicationBase):
         try:
             response = yield func(*args, **kwargs)
         except Exception as exc:  # pylint: disable=broad-except
-            if isinstance(exc, ConnectError):
-                reason = exc.message or exc
-            else:
-                reason = str(exc)
+            reason = str(exc)
             defer.returnValue((FAILURE, reason))
 
         content = yield response.content()
