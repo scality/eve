@@ -61,7 +61,9 @@ class CancelOldBuild(CancelCommand):
         # pylint: disable=anomalous-backslash-in-string
         super(CancelOldBuild, self).__init__(
             hideStepIf=util.hideStepIfSuccess,
+            # The following expression warns due to only one `\` character
+            # used, but this is actually voluntary.
             command=Interpolate(
-                '[ $(expr "{}" \< "%(prop:start_time)s") -eq 1 ]'.format(
+                '[ $(expr "{}" \< "%(prop:start_time)s") -eq 1 ]'.format(  # noqa: W605,E501
                     util.env.MASTER_START_TIME)),
             **kwargs)

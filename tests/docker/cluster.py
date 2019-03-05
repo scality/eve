@@ -54,8 +54,10 @@ class DockerizedCluster(Cluster):
             return self._ext_ip
         if platform.system() == 'Darwin':
             self._ext_ip = cmd(
+                # The following expression warns due to only one `\` character
+                # used, but this is actually voluntary.
                 # pylint: disable=anomalous-backslash-in-string
-                "ifconfig | grep -E '([0-9]{1,3}\.){3}[0-9]{1,3}'"
+                "ifconfig | grep -E '([0-9]{1,3}\.){3}[0-9]{1,3}'"  # noqa: W605, E501
                 " | grep -v 127.0.0.1"
                 " | awk '{ print $2 }' | cut -f2 -d:"
                 " | head -n1").strip()
