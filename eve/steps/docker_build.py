@@ -33,9 +33,9 @@ class DockerStep(MasterShellCommand):
         super(DockerStep, self).__init__(command, logEnviron=False, **kwargs)
 
     def __eq__(self, other):
-        return (isinstance(other, self.__class__) and
-                self.image == other.image and
-                self.label == other.label)
+        return (isinstance(other, self.__class__)
+                and self.image == other.image
+                and self.label == other.label)
 
 
 class DockerBuild(DockerStep):
@@ -60,8 +60,8 @@ class DockerBuild(DockerStep):
         'image',
     ]
 
-    def __init__(self, label, image, context_dir='.', dockerfile=None, is_retry=False,
-                 labels=None, build_args=None, **kwargs):
+    def __init__(self, label, image, context_dir='.', dockerfile=None,
+                 is_retry=False, labels=None, build_args=None, **kwargs):
         kwargs.setdefault('name',
                           '[{0}] build'.format(label)[0:49])
         self.is_retry = is_retry
@@ -108,8 +108,8 @@ class DockerBuild(DockerStep):
         defer.returnValue(result)
 
     def __eq__(self, other):
-        return (super(DockerBuild, self).__eq__(other) and
-                self.is_retry == other.is_retry)
+        return (super(DockerBuild, self).__eq__(other)
+                and self.is_retry == other.is_retry)
 
 
 class DockerCheckLocalImage(DockerStep):
@@ -169,8 +169,8 @@ class DockerComputeImageFingerprint(DockerStep):
                           '[{0}] fingerprint'.format(label)[:49])
         super(DockerComputeImageFingerprint, self).__init__(
             label, context_dir,
-            'tar -c --mtime="1990-02-11 00:00Z" --group=0 ' \
-            '--owner=0 --numeric-owner --sort=name --mode=0 . ' \
+            'tar -c --mtime="1990-02-11 00:00Z" --group=0 '
+            '--owner=0 --numeric-owner --sort=name --mode=0 . '
             '| sha256sum | cut -f 1 -d " "',
             workdir=context_dir, **kwargs
         )

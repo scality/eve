@@ -84,7 +84,7 @@ class ReadConfFromYaml(FileUpload):
                 defer.returnValue(FAILURE)
             else:
                 raise
-        except TypeError as error:
+        except TypeError:
             pass
 
         # Make sure yaml is properly formatted
