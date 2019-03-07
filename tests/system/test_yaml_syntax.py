@@ -27,7 +27,7 @@ class TestYamlSyntax(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.cluster = Cluster().start()
-        print cls.cluster.api.url
+        print(cls.cluster.api.url)
 
     @classmethod
     def tearDownClass(cls):
