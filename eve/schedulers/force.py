@@ -49,7 +49,7 @@ class EveForceScheduler(ForceScheduler):
                     stderr=subprocess.PIPE,
                 )
                 try:
-                    sourcestamp['revision'] = res.split()[0]
+                    sourcestamp['revision'] = res.split()[0].decode('utf-8')
                 except IndexError:
                     raise ValidationError("'%s' branch not found" %
                                           sourcestamp['branch'])
