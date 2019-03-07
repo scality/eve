@@ -76,7 +76,7 @@ class TestLocalJobs(unittest.TestCase):
 
         cluster = Cluster()
         for master_id in master_ids:
-            master = cluster._masters.values()[master_id]
+            master = list(cluster._masters.values())[master_id]
             master.add_conf_file(
                 yaml_data=PERIODIC_LOCAL_JOB,
                 filename='local2/sub/periodic.yml')
@@ -117,7 +117,7 @@ class TestLocalJobs(unittest.TestCase):
 
         """
         cluster = Cluster()
-        master = cluster._masters.values()[0]
+        master = list(cluster._masters.values())[0]
         master.conf['LOCAL_JOBS_DIRPATH'] = '/dev/null'
         with cluster:
             cluster.sanity_check()
@@ -167,7 +167,7 @@ class TestLocalJobs(unittest.TestCase):
         """Test that a nightly build is well registred. does not launch it."""
 
         cluster = Cluster()
-        master = cluster._masters.values()[0]
+        master = list(cluster._masters.values())[0]
         master.add_conf_file(
             yaml_data=NIGHTLY_LOCAL_JOB, filename='local2/sub/nightly.yml')
         master.conf['LOCAL_JOBS_DIRPATH'] = 'local2/sub'

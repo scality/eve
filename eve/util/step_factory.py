@@ -73,10 +73,6 @@ def step_factory(custom_steps, step_type, **params):
             params['auth'] = HTTPBasicAuth(
                 params['auth'][0], environ[pwd])
 
-    # Buildbot does not accept unicode step names
-    if 'name' in params and isinstance(params['name'], unicode):
-        params['name'] = params['name'].encode('utf-8')
-
     return _cls(**params)
 
 
