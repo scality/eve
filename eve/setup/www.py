@@ -99,6 +99,7 @@ def www():
         port = util.env.HTTP_PORT
     return {
         'port': port,
+        'url': util.env.EXTERNAL_URL,
         'plugins': {},
         'change_hook_dialects': {
             'bitbucket': True,
