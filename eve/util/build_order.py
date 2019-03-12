@@ -84,7 +84,7 @@ class BaseDockerBuildOrder(BaseBuildOrder):
         # image name is image_name + hash of path to avoid collisions
         basename = "{0}_{1}".format(
             image_name,
-            sha1(context_dir).hexdigest()[:4])
+            sha1(context_dir.encode('utf-8')).hexdigest()[:4])
 
         use_registry = bool(util.env.DOCKER_REGISTRY_URL)
 
