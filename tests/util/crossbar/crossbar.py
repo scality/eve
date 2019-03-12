@@ -26,7 +26,7 @@ from tests.util.daemon import Daemon
 
 class Crossbar(Daemon):
     start_success_msg = \
-        """Router "worker-001": transport 'transport-001' started"""
+        """Ok, Router worker001 configured"""
     _log = 'node.log'
     _start_cmd = ['crossbar', 'start', '--logtofile', '--cbdir', '.']
     _env = os.environ
