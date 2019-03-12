@@ -32,8 +32,8 @@ class DockerStep(MasterShellCommand):
         self.image = image
         super(DockerStep, self).__init__(command, logEnviron=False, **kwargs)
 
-    def __hash__(self):
-        return hash(self.image)
+    # def __hash__(self):
+    #     return hash(self.image.encode('utf-8'))
 
     def __eq__(self, other):
         return (isinstance(other, self.__class__) and

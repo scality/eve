@@ -16,8 +16,6 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor,
 # Boston, MA  02110-1301, USA.
 
-from collections import OrderedDict
-
 from buildbot.plugins import util
 from buildbot.process.buildstep import BuildStep
 from buildbot.process.properties import Properties
@@ -65,7 +63,7 @@ class TriggerStages(BuildStep):
     def run(self):
         conf = self.getProperty('conf')
 
-        preliminary_steps = OrderedDict()
+        preliminary_steps = []
         build_orders = []
 
         for stage_name in self.stage_names:
@@ -87,14 +85,14 @@ class TriggerStages(BuildStep):
             build_orders.append(build_order)
 
             for step in build_order.preliminary_steps:
-                preliminary_steps[step] = ''
+                preliminary_steps.append(step)
 
         self.build.addStepsAfterCurrentStep([
             ExecuteTriggerStages(
                 build_orders, **self._kwargs_for_exec_trigger_stages
             )
         ])
-        self.build.addStepsAfterCurrentStep(list(preliminary_steps))
+        self.build.addStepsAfterCurrentStep(preliminary_steps)
 
         return SUCCESS
 

@@ -14,7 +14,6 @@ class TestDockerBuild(unittest.TestCase):
         self.assertTrue(ctx.is_retry)
         self.assertFalse(ctx.isNewStyle())
         self.assertTrue(ctx == ctx)  # __eq__ coverage
-        self.assertTrue(hash(ctx) == hash(ctx))  # __eq__ coverage
 
 
 class TestDockerCheckLocalImage(unittest.TestCase):
@@ -51,4 +50,3 @@ class TestDockerPush(unittest.TestCase):
         self.assertEquals(ctx.name, 'zippy')
         self.assertEquals(ctx.image, 'image')
         self.assertTrue(ctx == ctx)  # __eq__ coverage
-        self.assertTrue(hash(ctx) == hash(ctx))  # __eq__ coverage
