@@ -33,11 +33,11 @@ apt-get install -y \
          libffi-dev \
          libmysqlclient-dev \
          libssl-dev \
-         python-dev \
-         python-pip
+         python3-dev \
+         python3-pip
 
-pip install pip==9.0.1
-pip install tox==2.3.2
+pip3 install pip==9.0.1
+pip3 install tox==2.3.2
 
 # install tooling for kubernetes tests
 wget https://storage.googleapis.com/kubernetes-release/release/v1.9.6/bin/linux/amd64/kubectl
