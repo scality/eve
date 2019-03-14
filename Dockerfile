@@ -11,9 +11,9 @@ RUN apt-get update && \
         libssl-dev \
         lsof \
         mysql-client \
-        python-dev \
-        python-pip \
-        python-psycopg2 \
+        python3-dev \
+        python3-pip \
+        python3-psycopg2 \
         telnet \
         vim.tiny && \
     rm -rf /var/lib/apt/lists/*
