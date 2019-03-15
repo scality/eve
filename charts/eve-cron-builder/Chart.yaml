@@ -1,5 +1,5 @@
 name: eve-cron-builder
-version: 1.0.0
+version: 1.0.1
 description: Launch periodically builds on Eve through the API.
 keywords:
 - Eve
