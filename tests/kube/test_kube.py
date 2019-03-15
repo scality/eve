@@ -16,6 +16,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor,
 # Boston, MA  02110-1301, USA.
 
+import codecs
 import time
 import unittest
 from os import pardir
@@ -317,9 +318,10 @@ class TestKube(unittest.TestCase):
             time.sleep(5)  # teardown runs in background
             self.assertEqual(cluster.get_config_map(
                 'fake-service-teardown-status').data['status'], '1')
-            self.assertEqual(cluster.get_secret(
-                uuid).data['kubeconfig'],
-                'somecredentials'.encode('base64')[:-1])
+            self.assertEqual(
+                cluster.get_secret(uuid).data['kubeconfig'],
+                codecs.encode(b'somecredentials', 'base64')[:-1]
+                .decode('utf-8'))
             cluster.delete_secret(uuid)
             cluster.delete_config_map('fake-service-init-status')
             cluster.delete_config_map('fake-service-teardown-status')

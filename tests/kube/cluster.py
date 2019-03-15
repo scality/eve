@@ -16,6 +16,8 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor,
 # Boston, MA  02110-1301, USA.
 
+import codecs
+
 try:
     from kubernetes import config as kube_config
     from kubernetes import client
@@ -46,7 +48,9 @@ class KubeCluster(Cluster):
             pass
 
         for key in data.keys():
-            data[key] = data[key].encode('base64')[:-1]
+            data[key] = codecs.encode(
+                data[key].encode('utf-8'), encoding='base64'
+            )[:-1].decode('utf-8')
 
         body = {
             'api_version': 'v1',
