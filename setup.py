@@ -20,9 +20,17 @@
 
 from os.path import abspath, dirname, join
 
-from pip.download import PipSession
-from pip.req import parse_requirements
 from setuptools import find_packages, setup
+
+# Besides not advised,
+# https://pip.pypa.io/en/stable/user_guide/#using-pip-from-your-program
+# That's the only sane way to parse requirements.txt
+try: # for pip >= 10
+    from pip._internal.download import PipSession
+    from pip._internal.req import parse_requirements
+except ImportError: # for pip <= 9.0.3
+    from pip.download import PipSession
+    from pip.req import parse_requirements
 
 CWD = dirname(abspath(__file__))
 
