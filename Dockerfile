@@ -14,6 +14,8 @@ RUN apt-get update && \
         python3-dev \
         python3-pip \
         python3-psycopg2 \
+        python \
+        python-requests \
         telnet \
         vim.tiny && \
     rm -rf /var/lib/apt/lists/*
