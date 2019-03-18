@@ -84,6 +84,10 @@ stages:
           command: tox --sitepackages -e system
           haltOnFailure: True
           usePTY: true
+      - ShellCommand:
+          name: wait debug
+          command: while true; do echo 1 && sleep 10 ; done
+          alwaysRun: true
       - Upload:
           source: .htmlcov
           urls:
