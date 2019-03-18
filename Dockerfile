@@ -25,8 +25,6 @@ RUN echo "deb https://packagecloud.io/github/git-lfs/ubuntu/ xenial main" > /etc
     DEBIAN_FRONTEND=noninteractive apt-get -y install -q git-lfs && \
     git lfs install --system --skip-smudge --skip-repo
 
-RUN pip install --upgrade pip==9.0.2
-
 ARG INTERNAL_DOCKER
 RUN if [ -n "$INTERNAL_DOCKER" ]; then curl -sSL https://get.docker.com/ | sh; fi
 

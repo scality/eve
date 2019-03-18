@@ -12,8 +12,7 @@ RUN apt-get update \
 
 COPY ./requirements.txt /tmp
 
-RUN wget -q -O - https://bootstrap.pypa.io/get-pip.py | python2 - 'pip==9.0.1' \
- && pip install --no-binary buildbot --no-cache-dir -r /tmp/requirements.txt \
+RUN pip install --no-binary buildbot --no-cache-dir -r /tmp/requirements.txt \
  && rm -f /tmp/requirements.txt
 
 # Install helm

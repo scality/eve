@@ -8,5 +8,6 @@ libtool
 build-essential
 python
 python-dev
+python-pip
 sudo
 wget
