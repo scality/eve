@@ -47,7 +47,7 @@ stages:
           retryFetch: True
       - ShellCommand:
           name: install eve
-          command: sudo pip install .
+          command: sudo pip3 install .
           haltOnFailure: True
       - ShellCommand:
           name: run static analysis tools
