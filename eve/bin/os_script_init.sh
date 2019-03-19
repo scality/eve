@@ -41,6 +41,9 @@ then
   if [ "$(rpm -q --queryformat '%{VERSION}' centos-release)" = "6" ]
   then
     twisted_version=15.4 # no more recent with python2.6 (Centos 6 only)
+    # buildbot > 0.9.12 requires a version of twisted that is not supported
+    # by python2.6
+    worker_version=0.9.12
   else
     twisted_version=16.4.0
   fi
