@@ -33,6 +33,7 @@ lmdb==0.93
 markupsafe==1.0
 mistune==0.8.3
 more-itertools==4.1.0
+mysql-python==1.2.5
 netaddr==0.7.19
 pathtools==0.1.2
 pluggy==0.6.0

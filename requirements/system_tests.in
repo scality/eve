@@ -3,6 +3,7 @@
 -c constraints.txt
 
 crossbar
+MySQL-python
 pytest
 pytest-cov
 pytest-xdist

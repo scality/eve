@@ -1,0 +1,6 @@
+# This file has been automatically generated, DO NOT EDIT!
+
+# Frozen requirements for "requirements/docker_image.in"
+
+mysql-python==1.2.5
+

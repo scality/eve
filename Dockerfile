@@ -31,10 +31,10 @@ RUN if [ -n "$INTERNAL_DOCKER" ]; then curl -sSL https://get.docker.com/ | sh; f
 WORKDIR /root/eve
 
 # Freezing requirements
-COPY requirements/build.txt /tmp/build.txt
+COPY requirements/build.txt requirements/docker_image.txt /tmp/
 RUN pip install -r /tmp/build.txt
 COPY requirements/base.txt /tmp/requirements.txt
-RUN pip install -r /tmp/requirements.txt
+RUN pip install -r /tmp/requirements.txt -r /tmp/docker_image.txt
 
 COPY . /opt/eve
 RUN pip install --no-deps /opt/eve

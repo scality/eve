@@ -7,7 +7,6 @@
 #
 -c constraints.txt
 
-MySQL-python                # used in production with a mysql database
 PyYAML                      # used by yaml_parser
 buildbot-worker             # used in workers setup
 buildbot_wsgi_dashboards    # used in www dashboards
