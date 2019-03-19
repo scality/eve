@@ -62,6 +62,10 @@ then
   adduser eve sudo
   echo "%sudo ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
   twisted_version=16.4.0
+  if [[ `lsb_release -sc` =~ ^(precise|wheezy)$ ]];
+  then
+    worker_version=1.7.0 # last version of buildbot with python2.7 support
+  fi
 else
   echo "Unsupported Operating System";
   exit 1;
