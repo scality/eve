@@ -5,3 +5,4 @@
 autoflake
 autopep8
 isort
+mock
