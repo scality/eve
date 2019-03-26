@@ -25,12 +25,12 @@ from tests.docker.registry import DockerizedRegistry
 from tests.docker.vault import DockerizedVault
 from tests.util.cluster import Cluster
 from tests.util.cmd import cmd
-from tests.util.githost_mock.githost_mock import GitHostMock
+from tests.docker.githost import DockerizedGitHostMock
 
 
 class DockerizedCluster(Cluster):
     _ext_ip = None
-    githost_class = GitHostMock
+    githost_class = DockerizedGitHostMock
     db_class = DockerizedMySQL
     vault_class = DockerizedVault
     crossbar_class = DockerizedCrossbar
@@ -64,5 +64,5 @@ class DockerizedCluster(Cluster):
             assert self._ext_ip, 'Not connected to the internet ?'
             return self._ext_ip
         else:
-            self._ext_ip = '172.17.0.1'  # Should work on Linux systems
+            self._ext_ip = '172.17.0.2'
         return self._ext_ip

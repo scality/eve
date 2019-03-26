@@ -1,0 +1,43 @@
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: build-pod
+spec:
+  containers:
+    - name: build-worker
+      image: '{{ images.agressor }}'
+      resources:
+        requests:
+          cpu: 500m
+          memory: 1Gi
+        limits:
+          cpu: 500m
+          memory: 1Gi
+      env:
+        - name: DOCKER_HOST
+          value: localhost
+      volumeMounts:
+        - name: worker-workspace
+          mountPath: /home/eve/
+    - name: dind-daemon
+      image: docker:18.09.2-dind
+      resources:
+        requests:
+          cpu: "1"
+          memory: 2Gi
+        limits:
+          cpu: "2"
+          memory: 2Gi
+      securityContext:
+        privileged: true
+      volumeMounts:
+        - name: docker-storage
+          mountPath: /var/lib/docker
+        - name: worker-workspace
+          mountPath: /home/eve/workspace
+  volumes:
+    - name: docker-storage
+      emptyDir: {}
+    - name: worker-workspace
+      emptyDir: {}
