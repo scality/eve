@@ -17,6 +17,17 @@ Release Notes
 
 .. towncrier release notes start
 
+Eve 1.5.0 (2019-03-27)
+======================
+
+Features
+--------
+
+- Implementing the buildbot concept of ``virtual_builder`` therefore improving the UI. (EVE-949)
+- Allow compatibility with pip>=10 (EVE-970)
+- Upgrading eve to Buildbot ``2.0.1`` and the base version of Python to ``3.6``. (EVE-970)
+
+
 Eve 1.4.5 (2019-02-28)
 ======================
 
