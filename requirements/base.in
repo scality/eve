@@ -12,6 +12,7 @@ PyYAML                      # used by yaml_parser
 buildbot-worker             # used in workers setup
 buildbot_wsgi_dashboards    # used in www dashboards
 buildbot-www                # used in www setup
+buildbot-grid-view          # used in www setup
 buildbot[tls]               # core technology
 flask                       # used in www dashboards
 jinja2                      # used by KubeLatentWorker

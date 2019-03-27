@@ -14,6 +14,7 @@ buildbot-pkg==2.0.1
 buildbot-worker==2.0.1
 buildbot-wsgi-dashboards==2.0.1
 buildbot-www==2.0.1
+buildbot-grid-view==2.0.1
 cachetools==3.1.0
 certifi==2018.11.29
 cffi==1.12.2
