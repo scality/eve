@@ -200,12 +200,14 @@ eve:
       ##
       maxStepDuration: "14400"
 
-      ## noNewBuild prevents any new build requests to run and wait in queue.
+      ## noNewBuildFilePath is the path where a file can be created to
+      ## prevent any new build requests to run and wait in queue.
       ##
-      ##   "" (default): build requests are processed.
-      ##   anything else: build requests stay in queue.
+      ##   "/root/no_new_build" (default): build requests are processed.
       ##
-      noNewBuild: ""
+
+      noNewBuildFilePath: "/root/no_new_build"
+
 
       ## stepPatcher contains directives for skipping specific steps, stages
       ## and branches.
