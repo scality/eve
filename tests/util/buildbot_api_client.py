@@ -253,8 +253,15 @@ class BuildbotDataAPI(object):
             http://docs.buildbot.net/latest/developer/rest.html#forcescheduler
 
         """
-        force_sched_name = self.getw('/forceschedulers')['name']
-        res = self.post('/forceschedulers/{}'.format(force_sched_name),
+        path = '/forceschedulers'
+        scheds = self.getw(path, expected_count=2)
+        force_sched_name = None
+        for sched in scheds:
+            sched_name = sched['name']
+            if sched_name != '__Janitor_force':
+                force_sched_name = sched_name
+                break
+        res = self.post('{}/{}'.format(path, force_sched_name),
                         'force', kwargs)
 
         buildset = BuildSet(api=self, id_=res[0])
