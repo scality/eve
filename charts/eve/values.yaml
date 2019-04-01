@@ -43,6 +43,30 @@ eve:
     workerCallbackFqdn: "backend-%d.eve"
 
   masterConf:
+    ## The buildbot janitor can be configured here
+    ##
+    janitor:
+      ## The day of the week to start a build, with Monday = 0.
+      ## This defaults to *, meaning every day of the week.
+      ##
+      janitorDay: '*'
+
+      ## The hour of the day on which to start the build, in 24-hour notation.
+      ##
+      janitorHour: 0
+
+      ## Whether you want to activate or deactivate to janitor
+      ##
+      janitorInUse: 1
+
+      ## The minute of the hour on which to start the build.
+      ##
+      janitorMinute: 0
+
+      ## The minimum time for which the log data should be maintained in days.
+      ##
+      janitorDayRetention: 120
+
     repository:
       ## gitHost is the hoster of the target repository.
       ##
