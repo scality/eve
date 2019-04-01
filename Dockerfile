@@ -34,7 +34,7 @@ WORKDIR /root/eve
 
 # Freezing requirements
 COPY requirements/build.txt /tmp/build.txt
-RUN pip install -r /tmp/build.txt
+RUN pip3 install -r /tmp/build.txt
 COPY requirements/base.txt /tmp/requirements.txt
 RUN pip3 install -r /tmp/requirements.txt
 
