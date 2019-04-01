@@ -60,31 +60,6 @@ class TestReadConfFromYamlExecution(steps.BuildStepMixin, unittest.TestCase):
     def testBasic(self):
         self.setupStep(SingleCommandYaml('exit 0'))
         self.expectOutcome(SUCCESS)
-        self.expectProperty('conf',
-                            {
-                                'version': '0.2',
-                                'branches': {
-                                    'default': {
-                                        'stage': 'pre-merge',
-                                    },
-                                },
-                                'stages': {
-                                    'pre-merge': {
-                                        'worker': {
-                                            'type': 'local',
-                                        },
-                                        'steps': [
-                                            {
-                                                'ShellCommand': {
-                                                    'command': 'exit 0',
-                                                    'env': {},
-                                                }
-                                            },
-                                        ],
-                                    },
-                                },
-                            },
-                            'ReadConfFromYaml')
         return self.runStep()
 
     def testUnsupportedFormatChar(self):

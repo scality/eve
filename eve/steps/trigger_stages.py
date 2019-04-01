@@ -29,9 +29,10 @@ from ..util.build_order import BaseBuildOrder
 from ..worker.docker.build_order import DockerBuildOrder
 from ..worker.kubernetes.build_order import KubernetesPodBuildOrder
 from ..worker.openstack_heat.build_order import HeatOpenStackBuildOrder
+from .base import ConfigurableStepMixin
 
 
-class TriggerStages(BuildStep):
+class TriggerStages(BuildStep, ConfigurableStepMixin):
     """Start a list of stages."""
 
     def __init__(self, stage_names, **kwargs_for_exec_trigger_stages):
@@ -63,8 +64,7 @@ class TriggerStages(BuildStep):
         super(TriggerStages, self).__init__(**kwargs)
 
     def run(self):
-        conf = self.getProperty('conf')
-
+        conf = self.getEveConfig()
         preliminary_steps = OrderedDict()
         build_orders = []
 
