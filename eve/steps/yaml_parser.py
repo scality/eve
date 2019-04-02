@@ -30,10 +30,11 @@ from packaging import version
 from twisted.internet import defer
 from twisted.logger import Logger
 
+from .base import ConfigurableStepMixin
 from .property import EveProperty, EvePropertyFromCommand
 
 
-class ReadConfFromYaml(FileUpload):
+class ReadConfFromYaml(FileUpload, ConfigurableStepMixin):
     """Load the YAML file to `conf` property.
 
     This step Reads the YAML file and converts it to a `conf` property which
@@ -63,6 +64,8 @@ class ReadConfFromYaml(FileUpload):
             self.addCompleteLog('stderr', 'Could not find %s' % self.yaml)
             defer.returnValue(result)
 
+        self.setProperty('conf_path', self.masterdest,
+                         'ReadConfFromYaml')
         raw_conf = open(self.masterdest).read()
         self.addCompleteLog(self.yaml, raw_conf)
 
@@ -89,7 +92,7 @@ class ReadConfFromYaml(FileUpload):
 
         # Make sure yaml is properly formatted
         try:
-            conf = yaml.load(raw_conf)
+            conf = self.getEveConfig()
         except yaml.YAMLError as error:
             self.addCompleteLog('stderr', 'Error in yaml file:\n%s' % error)
             defer.returnValue(FAILURE)
@@ -119,7 +122,6 @@ class ReadConfFromYaml(FileUpload):
             for branch_pattern in branch_patterns.split(','):
                 new_branches[branch_pattern.strip()] = branch_conf
         conf['branches'] = new_branches
-        self.setProperty('conf', conf, 'ReadConfFromYaml')
         self.setProperty('start_time', str(time.time()))
 
         # Use the given stage if any (forced build)
@@ -199,7 +201,7 @@ class ReadConfFromYaml(FileUpload):
         defer.returnValue(SUCCESS)
 
 
-class StepExtractor(BuildStep):
+class StepExtractor(BuildStep, ConfigurableStepMixin):
     """Extract and add the build steps to the current builder.
 
     This step extracts the build steps from the `conf` property and adds them
@@ -211,7 +213,7 @@ class StepExtractor(BuildStep):
     logger = Logger('eve.steps.StepExtractor')
 
     def run(self):
-        conf = self.getProperty('conf')
+        conf = self.getEveConfig()
         patcher_config = self.getProperty('patcher_config')
         patcher = util.Patcher(patcher_config)
 
@@ -224,7 +226,7 @@ class StepExtractor(BuildStep):
             self.build.addStepsAfterCurrentStep([bb_step])
             self.logger.debug('Add {step} with params: {params}',
                               step=step_type, params=params)
-        return defer.succeed(SUCCESS)
+        return SUCCESS
 
 
 class GetCommitShortVersion(EvePropertyFromCommand):

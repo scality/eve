@@ -506,3 +506,23 @@ class TestDockerCluster(unittest.TestCase):
             )
             buildset = cluster.api.force(branch=local_repo.branch)
             self.assertEqual(buildset.result, 'exception')
+
+    # Couldn't reproduce EVE-1013 with sqlite (system tests)
+    # so this tests is purposely setup in the docker testsuite
+    # as it actually communicates with a mysql database.
+    def test_big_yaml_file(self):
+        """Test a docker build with a big yaml file.
+
+        Steps:
+            - Setup a big yaml file.
+            - Force a build.
+            - Ensure that the build status is on 'success'.
+
+        """
+        with Cluster() as cluster:
+            local_repo = cluster.clone()
+            local_repo.push(
+                yaml=SingleCommandYaml('echo %s' % ('a' * 100000)))
+            cluster.sanity_check()
+            buildset = cluster.api.force(branch=local_repo.branch)
+            self.assertEqual(buildset.result, 'success')
