@@ -82,6 +82,13 @@ class HeatLatentWorker(AbstractLatentWorker):
         repository = build.getProperty('repository')
         uuid = util.create_hash(repository, self.name)
         build.setProperty("worker_uuid", uuid, "Build")
+        if build.getProperty('requirements.sh'):
+            build.addStepsAfterCurrentStep([steps.ShellCommand(
+                name='Install requirements',
+                command='sudo /tmp/script_requirements.sh',
+                haltOnFailure=True
+            )])
+
         build.addStepsAfterLastStep([steps.UnregisterRedhat(
             doStepIf=util.isRedhat,
             hideStepIf=util.hideStepIfSkipped
