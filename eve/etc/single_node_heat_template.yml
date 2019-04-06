@@ -152,7 +152,7 @@ resources:
                 cat << 'EOF2' | head -c -1 > /tmp/script_requirements.sh
                 $script_requirements
                 EOF2
-                chmod u+x /tmp/script_requirements.sh
+                chmod +x /tmp/script_requirements.sh
 
                 cat << 'EOF3' | head -c -1 > /tmp/script_start.sh
                 $script_start
@@ -202,7 +202,9 @@ resources:
                 fi
 
                 /tmp/script_init.sh "$worker_version"
-                retry /tmp/script_requirements.sh
+                # Removing requirements
+                # Remove this lines on review
+                # retry /tmp/script_requirements.sh
                 /tmp/script_start.sh \
                     "$master_fqdn" "$master_port" \
                     "$worker_name" "$worker_password"
