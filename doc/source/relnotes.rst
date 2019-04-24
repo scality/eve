@@ -17,6 +17,25 @@ Release Notes
 
 .. towncrier release notes start
 
+Eve 1.4.6 (2019-04-24)
+======================
+
+Features
+--------
+
+- Adding the possibility to setup Buildbot's Janitor in order to clean up old
+  logs. (EVE-1053)
+- Allow compatibility with pip>=10 (EVE-970)
+
+
+Bugfixes
+--------
+
+- Fix hard limit on ``main.yml`` config files. (EVE-1013)
+- Fix a typo that broke the configuration for Cron Builders with Github.
+  (EVE-1042)
+
+
 Eve 1.4.5 (2019-02-28)
 ======================
 
