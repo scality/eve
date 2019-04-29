@@ -106,17 +106,17 @@ stages:
           retryFetch: True
       - ShellCommand:
           name: run docker-compose build
-          command: HOME=/home/eve tox --sitepackages -e compose-build
+          command: HOME=/home/eve tox -e compose-build
           haltOnFailure: True
           usePTY: true
       - ShellCommand:
           name: run docker tests
-          command: HOME=/home/eve tox --sitepackages -e docker
+          command: HOME=/home/eve tox -e docker
           haltOnFailure: True
           usePTY: true
       - ShellCommand:
           name: run kube tests
-          command: HOME=/home/eve tox --sitepackages -e kube
+          command: HOME=/home/eve tox -e kube
           haltOnFailure: True
           usePTY: true
       - Upload:
