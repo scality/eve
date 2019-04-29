@@ -1,1 +1,0 @@
-Adding the possibility to setup Buildbot's Janitor in order to clean up old logs.
