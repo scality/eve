@@ -211,11 +211,11 @@ class TestKube(unittest.TestCase):
             cluster.delete_secret(uuid)
             # also check all pods are properly cleaned away
             with self.assertRaises(ApiException):
-                cluster.get_pod('worker-1-1-service-init')
+                cluster.get_pod('kw000-test-suffix-1-1-service-init')
             with self.assertRaises(ApiException):
-                cluster.get_pod('worker-1-1')
+                cluster.get_pod('kw000-test-suffix-1-1')
             with self.assertRaises(ApiException):
-                cluster.get_pod('worker-1-1-service-teardown')
+                cluster.get_pod('kw000-test-suffix-1-1-service-teardown')
             cluster.sanity_check()
 
             self.assertEqual(
@@ -293,11 +293,11 @@ class TestKube(unittest.TestCase):
             cluster.delete_config_map('fake-service-teardown-status')
             # also check all pods are properly cleaned away
             with self.assertRaises(ApiException):
-                cluster.get_pod('worker-1-1-service-init')
+                cluster.get_pod('kw000-test-suffix-1-1-service-init')
             with self.assertRaises(ApiException):
-                cluster.get_pod('worker-1-1')
+                cluster.get_pod('kw000-test-suffix-1-1')
             with self.assertRaises(ApiException):
-                cluster.get_pod('worker-1-1-service-teardown')
+                cluster.get_pod('kw000-test-suffix-1-1-service-teardown')
 
             # check what happens if service teardown fails
             cluster.create_secret('fake-service-data', {
