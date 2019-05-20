@@ -17,6 +17,16 @@ Release Notes
 
 .. towncrier release notes start
 
+Eve 1.5.2 (2019-05-20)
+======================
+
+Bugfixes
+--------
+
+- Rework ``kube_pod`` worker naming due to conflicts when triggering
+  multiple stage at the same time. (EVE-1064)
+
+
 Eve 1.5.1 (2019-05-16)
 ======================
 

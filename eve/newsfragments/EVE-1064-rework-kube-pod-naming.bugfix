@@ -1,2 +1,0 @@
-Rework ``kube_pod`` worker naming due to conflicts when triggering
-multiple stage at the same time.
