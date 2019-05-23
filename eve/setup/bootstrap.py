@@ -21,7 +21,7 @@ from os.path import dirname, isfile
 from buildbot.config import BuilderConfig
 from buildbot.plugins import steps, util
 from buildbot.process.factory import BuildFactory
-from buildbot.process.properties import Property
+from buildbot.process.properties import Interpolate, Property
 from buildbot.steps.shell import ShellCommand
 from buildbot.steps.source.git import Git
 from twisted.internet import defer
@@ -83,6 +83,14 @@ def bootstrap_builder(workers):
                  ' || echo 0.0.0'.format(yaml_dirpath)),
         hideStepIf=util.hideStepIfSuccess,
         property='product_version',
+        logEnviron=False))
+
+    bootstrap_factory.addStep(ShellCommand(
+        name='check the product version',
+        command=Interpolate(r'echo %(prop:product_version)s |'
+                            r' grep -qE "^[0-9]+(\.[0-9]+){1,3}$"'),
+        hideStepIf=util.hideStepIfSuccess,
+        haltOnFailure=True,
         logEnviron=False))
 
     # Read conf from yaml file

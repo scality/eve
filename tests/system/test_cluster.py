@@ -82,6 +82,8 @@ class TestCluster(unittest.TestCase):
                 (u'set the master_builddir property', u'Set'),
                 (u'get the product version',
                  u"property 'product_version' set"),
+                (u'check the product version',
+                 u"'echo 0.0.0 ...'"),
                 (u'read eve/main.yml', u'uploading main.yml'),
                 (u'get the commit short_revision',
                  u"property 'commit_short_revision' set"),
