@@ -26,13 +26,15 @@ from buildbot.test.fake.remotecommand import ExpectShell
 from buildbot.test.util import config, steps
 from twisted.trial import unittest
 
-from eve.steps.artifacts import GetArtifactsFromStage, Upload
+from eve.steps.artifacts import (GetArtifactsFromStage,
+                                 MalformedArtifactsNameProperty, Upload)
 
 
 class TestUpload(steps.BuildStepMixin, unittest.TestCase,
                  config.ConfigErrorsMixin):
     def setUp(self):
         util.env = util.load_env([
+            ('ARTIFACTS_PREFIX', 'prefix-'),
             ('OPENSTACK_BUILDER_NAME', 'openstack'),
         ])
         return self.setUpBuildStep()
@@ -43,8 +45,24 @@ class TestUpload(steps.BuildStepMixin, unittest.TestCase,
     def setupStep(self, *args, **kwargs):
         res = super(TestUpload, self).setupStep(*args, **kwargs)
         self.properties.setProperty('eve_api_version', '0.2', 'setUp')
-        self.properties.setProperty('artifacts_name', 'my_artifacts', 'setUp')
+        self.properties.setProperty('artifacts_name',
+                                    'githost:owner:repo:prefix-'
+                                    '0.0.0.0.r190101000000.1234567.'
+                                    'pre-merge.12345678', 'setUp')
+        self.properties.setProperty('product_version', '0.0.0', 'setUp')
         return res
+
+    def test_bad_artifacts_names(self):
+        self.setupStep(Upload(name='Upload',
+                              source='/absolute/path'))
+
+        self.properties.setProperty('artifacts_name',
+                                    'githost:owner:repo:prefix-bad-name',
+                                    'setUp')
+
+        self.expectException(MalformedArtifactsNameProperty)
+
+        return self.runStep()
 
     def test_arg_interpolate(self):
         self.setupStep(Upload(name='Upload',
@@ -59,7 +77,8 @@ class TestUpload(steps.BuildStepMixin, unittest.TestCase,
                 'echo tar successful. Calling curl... && '
                 'curl --progress-bar --verbose --max-time 3600 -T '
                 '../artifacts.tar.gz -X PUT '
-                'http://artifacts/upload/my_artifacts')
+                'http://artifacts/upload/githost:owner:repo:prefix-'
+                '0.0.0.0.r190101000000.1234567.pre-merge.12345678')
             + ExpectShell.log('stdio', stdout='Response Status: 201 Created')
             + 0)
         self.expectOutcome(result=SUCCESS)
@@ -78,7 +97,8 @@ class TestUpload(steps.BuildStepMixin, unittest.TestCase,
                 'echo tar successful. Calling curl... && '
                 'curl --progress-bar --verbose --max-time 3600 -T '
                 '../artifacts.tar.gz -X PUT '
-                'http://artifacts/upload/my_artifacts')
+                'http://artifacts/upload/githost:owner:repo:prefix-'
+                '0.0.0.0.r190101000000.1234567.pre-merge.12345678')
             + ExpectShell.log('stdio', stdout='Response Status: 201 Created')
             + 0)
         self.expectOutcome(result=SUCCESS)

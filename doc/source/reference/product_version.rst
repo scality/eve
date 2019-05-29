@@ -12,6 +12,7 @@ The file ``get_product_version.sh`` must:
 - be executable,
 - return a string representing the version of the product/repository on that
   branch.
+- the string must contain 2 to 4 numbers separated by a dot, and nothing else.
 
 If the script is not present, Eve will consider the product version is
 ``0.0.0``

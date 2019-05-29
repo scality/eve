@@ -51,6 +51,10 @@ def get_artifacts_name(buildnumber, stage_name):
     )
 
 
+class MalformedArtifactsNameProperty(Exception):
+    pass
+
+
 class GetArtifactsFromStage(EvePropertyFromCommand):
     """Get artifacts from another stage and store it in a property."""
 
@@ -211,6 +215,16 @@ class Upload(ShellCommand):
 
     @defer.inlineCallbacks
     def run(self):
+
+        eve_api_version = self.getProperty('eve_api_version')
+        if version.parse(eve_api_version) >= version.parse('0.2'):
+            artifacts_name_property = self.getProperty('artifacts_name')
+            regexp_staging = re.compile(
+                r'^((.*):)?%s[0-9]+(\.[0-9]+){1,3}\.r([0-9]{12})\.'
+                r'([0-9a-f]+)(\.(.*)\.([0-9]+))?$' % util.env.ARTIFACTS_PREFIX)
+            if not regexp_staging.match(artifacts_name_property):
+                raise MalformedArtifactsNameProperty
+
         result = yield super(Upload, self).run()
         if result == FAILURE:
             delay, repeats = self._retry
