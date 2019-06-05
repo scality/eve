@@ -24,7 +24,7 @@ from buildbot.www.authz import Authz, Forbidden
 from buildbot.www.authz.endpointmatchers import (AnyEndpointMatcher,
                                                  EndpointMatcherBase)
 from buildbot.www.authz.roles import RolesFromGroups, RolesFromUsername
-from buildbot.www.oauth2 import BitbucketAuth, GitHubAuth
+from buildbot.www.oauth2 import BitbucketAuth, GitHubAuth, GoogleAuth
 from twisted.internet import defer
 
 from eve.process.bootstrap import BootstrapMixin
@@ -114,6 +114,7 @@ def auth():
         auth_method = {
             'bitbucket': BitbucketAuth,
             'github': GitHubAuth,
+            'google': GoogleAuth,
         }[util.env.OAUTH2_PROVIDER.lower()]
         return auth_method(
             util.env.OAUTH2_CLIENT_ID,
