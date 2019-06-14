@@ -108,6 +108,10 @@ if __name__ == '__main__':
                         help='json data to send to the server',
                         metavar='JSON',
                         default='{}')
+    parser.add_argument('--payloadfile', '-f',
+                        help='json data file to send to the server',
+                        metavar='FILE',
+                        default='')
     parser.add_argument('endpoint',
                         help='api endpoint',
                         metavar='ENDPOINT')
@@ -120,8 +124,15 @@ if __name__ == '__main__':
         print('Dry run activated, the request was not executed')
         sys.exit(0)
     eve = EveClient(provider.token, args.base_url)
+    if args.payloadfile:
+        with open(args.payloadfile, "r") as fp:
+            jreq = json.load(fp)
+    else:
+        jreq = json.loads(args.payload)
+
     req = eve._request(args.httpmethod,
-                       args.endpoint,
-                       json.loads(args.payload),
-                       args.api_version)
+            args.endpoint,
+            jreq,
+            args.api_version)
+
     print(json.dumps(req))
