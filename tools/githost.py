@@ -113,7 +113,7 @@ class BitBucketProvider(BaseProvider):
                     excp.url, excp.reason, excp.code))
 
             res = res.read()
-            self._token = json.loads(res.read().decode("utf-8"))['access_token']
+            self._token = json.loads(res.decode("utf-8"))['access_token']
 
         return self._token
 
