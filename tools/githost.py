@@ -112,7 +112,8 @@ class BitBucketProvider(BaseProvider):
                 sys.exit('HTTP error: %s, %s (%s)' % (
                     excp.url, excp.reason, excp.code))
 
-            self._token = json.load(res)['access_token']
+            res = res.read()
+            self._token = json.loads(res.read().decode("utf-8"))['access_token']
 
         return self._token
 
