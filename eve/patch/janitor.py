@@ -41,16 +41,20 @@ def deleteOldLogChunks(self, older_than_timestamp):
             .order_by(model.steps.c.id.desc())
             .limit(1)
         )
-        stepid_max = res.fetchone()[0]
+        res_list = res.fetchone()
+        stepid_max = None
+        if res_list:
+            stepid_max = res_list[0]
         res.close()
 
         # UPDATE logs SET logs.type = 'd' WHERE logs.stepid <= stepid_max;
-        res = conn.execute(
-            model.logs.update()
-            .where(model.logs.c.stepid <= stepid_max)
-            .values(type='d')
-        )
-        res.close()
+        if stepid_max:
+            res = conn.execute(
+                model.logs.update()
+                .where(model.logs.c.stepid <= stepid_max)
+                .values(type='d')
+            )
+            res.close()
 
         # query all logs with type 'd' and delete their chunks.
         q = sa.select([model.logs.c.id])
