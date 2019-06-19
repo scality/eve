@@ -1,1 +1,0 @@
-Setup the requirements step on the Openstack worker as a ``ShellCommand``.

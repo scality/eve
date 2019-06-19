@@ -17,6 +17,15 @@ Release Notes
 
 .. towncrier release notes start
 
+Eve 1.5.3 (2019-06-19)
+======================
+
+Features
+--------
+
+- Setup the requirements step on the Openstack worker as a ``ShellCommand``. (EVE-1056)
+
+
 Eve 1.5.2 (2019-05-20)
 ======================
 
