@@ -25,6 +25,8 @@ Features
 
 - Apply the new janitor that will be available in buildbot > 2.3.1.
   (RELENG-3038)
+- Reporting bootstrap failures to githost
+  (EVE-1071)
 
 
 Bugfixes
