@@ -24,7 +24,7 @@ from tempfile import mktemp
 import yaml
 from buildbot.plugins import steps, util
 from buildbot.process.buildstep import BuildStep
-from buildbot.process.results import CANCELLED, FAILURE, SUCCESS
+from buildbot.process.results import FAILURE, SKIPPED, SUCCESS
 from buildbot.steps.transfer import FileUpload
 from packaging import version
 from twisted.internet import defer
@@ -152,7 +152,8 @@ class ReadConfFromYaml(FileUpload, ConfigurableStepMixin):
                     self.addCompleteLog(
                         'stderr',
                         'Branch <%s> not covered by yaml file' % branch)
-                    defer.returnValue(CANCELLED)
+                    self.build.results = SKIPPED
+                    defer.returnValue(SKIPPED)
 
         if 'bootstrap' in conf.get('stages', {}):
             self.addCompleteLog('stderr',

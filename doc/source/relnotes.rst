@@ -34,7 +34,8 @@ Bugfixes
 
 - Ensure that production_version and artifacts_name are correctly formatted.
   (EVE-1065)
-
+- Build status should be skipped when a branch is not covered by the CI.
+  (EVE-1076)
 
 Eve 1.4.6 (2019-04-24)
 ======================
