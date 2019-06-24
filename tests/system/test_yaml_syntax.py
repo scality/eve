@@ -47,11 +47,11 @@ class TestYamlSyntax(unittest.TestCase):
         self.assertEqual(buildset.result, 'failure')
 
     def test_skip_if_no_branch_in_yml(self):
-        """Test build cancelled when branch not covered by eve.yml."""
+        """Test build skipped when branch not covered by eve.yml."""
 
         self.local_repo.push(yaml=YamlFactory(branches={}, stages={}))
         buildset = self.cluster.api.force(branch=self.local_repo.branch)
-        self.assertEqual(buildset.result, 'cancelled')
+        self.assertEqual(buildset.buildrequest.build.result, 'skipped')
 
     def test_simple_failure(self):
         """Test that build fails if there is an 'exit 1' command in a step."""

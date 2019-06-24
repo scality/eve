@@ -41,10 +41,8 @@ class TopLevelBuildFilter(object):
         This overrides entirely Buildbot's default `filterBuilds`.
 
         Currently Eve only reports build statuses for the master
-        build (i.e. the top stage selected to run during bootstrap).
-
-        If the parent build is bootstrap: report build status (True)
-        If the parent build is something else (lower stage): block (False)
+        build (i.e. the top stage selected to run during bootstrap), and
+        the bootstrap build if the results is a failure.
 
         We identify the parent build by reading property `reason`, which
         contains the string "triggered by bootstrap" if and only if
@@ -54,6 +52,11 @@ class TopLevelBuildFilter(object):
             build: The build running the stage.
 
         """
+        results = build['results']
+        builder = build['builder']['name']
+        if (results not in (SUCCESS, None, RETRY)
+                and builder == 'bootstrap'):
+            return True
         return build['properties']['reason'][0].endswith(
             '(triggered by bootstrap)')
 

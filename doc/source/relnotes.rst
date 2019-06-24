@@ -31,6 +31,8 @@ Features
 
 - Apply the new janitor that will be available in buildbot > 2.3.1.
   (RELENG-3038)
+- Reporting bootstrap failures to githost
+  (EVE-1071)
 
 
 Bugfixes
@@ -38,7 +40,8 @@ Bugfixes
 
 - Ensure that production_version and artifacts_name are correctly formatted.
   (EVE-1065)
-
+- Build status should be skipped when a branch is not covered by the CI.
+  (EVE-1076)
 
 Eve 1.5.3 (2019-06-19)
 ======================
