@@ -48,8 +48,5 @@ chmod +x minikube
 mv minikube /usr/local/bin/
 
 minikube start --vm-driver none
-echo debug
-find / -name .minikube -type d
-chmod 777 -R /.minikube /.kube
-ln -s /.minikube /.kube/.minikube
-ln -s /.kube /home/eve/.kube
+chmod 777 -R /home/eve/.minikube /home/eve/.kube
+ln -s /home/eve/.minikube /home/eve/.kube/.minikube
