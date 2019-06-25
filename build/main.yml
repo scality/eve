@@ -119,6 +119,10 @@ stages:
           command: HOME=/home/eve tox -e kube
           haltOnFailure: True
           usePTY: true
+      - ShellCommand:
+          name: debug
+          command: sleep 3600
+          alwaysRun: True
       - Upload:
           source: .htmlcov
           urls:
