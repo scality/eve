@@ -47,11 +47,12 @@ def deleteOldLogChunks(self, older_than_timestamp):
             stepid_max = res_list[0]
         res.close()
 
-        # UPDATE logs SET logs.type = 'd' WHERE logs.stepid <= stepid_max;
+        # UPDATE logs SET logs.type = 'd' WHERE logs.stepid <= stepid_max AND type != 'd'; # noqa: E501
         if stepid_max:
             res = conn.execute(
                 model.logs.update()
-                .where(model.logs.c.stepid <= stepid_max)
+                .where(sa.and_(model.logs.c.stepid <= stepid_max,
+                               model.logs.c.type != 'd'))
                 .values(type='d')
             )
             res.close()
