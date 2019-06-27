@@ -47,7 +47,7 @@ curl -Lo minikube https://storage.googleapis.com/minikube/releases/v0.25.2/minik
 chmod +x minikube
 mv minikube /usr/local/bin/
 
-minikube start --vm-driver none
+HOME=/ minikube start --vm-driver none
 chmod 777 -R /.minikube /.kube
 ln -s /.minikube /.kube/.minikube
 ln -s /.kube /home/eve/.kube
