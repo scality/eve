@@ -17,6 +17,21 @@ Release Notes
 
 .. towncrier release notes start
 
+Eve 1.4.8 (2019-07-01)
+======================
+
+Features
+--------
+
+- Remove janitor expensive and useless write operations. (RELENG-3038)
+
+
+Bugfixes
+--------
+
+- Reverting bootstrap notifications. (EVE-1071)
+
+
 Eve 1.4.7 (2019-06-21)
 ======================
 
