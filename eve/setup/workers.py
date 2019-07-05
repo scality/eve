@@ -93,34 +93,52 @@ def kube_pod_workers():
     return workers
 
 
-def openstack_mapping(provider, field, value):
+def openstack_mapping(provider, field, value, region=None):
     logger = Logger('eve.setup.workers')
 
     mapping = {}
     mapping_path = util.env.OS_MAPPING_FILE_PATH
 
+    def error_openstack_mapping(err):
+        logger.error('An error occured while loading the mapping file at '
+                     '{path}: {err}', path=mapping_path, err=err)
+
+    if region:
+        provider_id = '{0}_{1}'.format(provider, region)
+    else:
+        provider_id = provider
     try:
         with open(mapping_path) as mapping_file:
             mapping = yaml.load(mapping_file.read())
     except (OSError, IOError, yaml.YAMLError) as err:
-        logger.error('An error occured while loading the mapping file at '
-                     '{path}: {err}', path=mapping_path, err=err)
+        error_openstack_mapping(err)
         return value
 
     try:
-        for chunk in mapping.get(provider, []):
+        provider_map = mapping[provider_id]
+    except KeyError:
+        try:
+            provider_map = mapping[provider]
+        except KeyError:
+            provider_map = []
+
+    for chunk in provider_map:
+        try:
             field_section = chunk.get(field, None)
+        except AttributeError as err:
+            error_openstack_mapping(err)
+            break
+        if not field_section:
+            continue
 
-            if field_section:
-                original_value = field_section.get('original_value', None)
-                new_value = field_section.get('new_value', None)
-
-                if original_value == value and new_value is not None:
-                    return new_value
-    except AttributeError as err:
-        logger.error('An error occured while parsing the mapping file at '
-                     '{path}: {err}', path=mapping_path, err=err)
-
+        try:
+            original_value = field_section['original_value']
+            new_value = field_section['new_value']
+        except (AttributeError, KeyError) as err:
+            error_openstack_mapping(err)
+            break
+        if original_value == value and new_value is not None:
+            return new_value
     return value
 
 
@@ -161,7 +179,8 @@ def openstack_heat_workers():
             openstack_mapping,
             provider=util.env.OS_PROVIDER,
             field="flavor",
-            value=Property('openstack_flavor')),
+            value=Property('openstack_flavor'),
+            region=util.env.OS_REGION_NAME),
         'image': Transform(
             openstack_mapping,
             provider=util.env.OS_PROVIDER,
