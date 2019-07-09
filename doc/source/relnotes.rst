@@ -17,7 +17,7 @@ Release Notes
 
 .. towncrier release notes start
 
-Eve 1.4.8 (2019-07-01)
+Eve 1.4.8 (2019-07-09)
 ======================
 
 Features
@@ -30,6 +30,8 @@ Bugfixes
 --------
 
 - Reverting bootstrap notifications. (EVE-1071)
+- Fix Debian-Wheezy worker setup after repository became unavailable.
+  (EVE-1078)
 
 
 Eve 1.4.7 (2019-06-21)
