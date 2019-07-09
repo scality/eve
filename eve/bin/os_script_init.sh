@@ -48,11 +48,24 @@ elif [ -f /etc/debian_version ]
 then
   echo "Ubuntu/Debian"
 
+  RELEASE="$(lsb_release -cs)"
+  if [ "${RELEASE}" = "wheezy" ]
+  then
+    echo "deb http://archive.debian.org/debian wheezy main" > /etc/apt/sources.list
+  fi
+
   retry apt-get update
 
   locale-gen en_US.UTF-8
   export LANG=en_US.utf8
 
+  if [ "${RELEASE}" = "wheezy" ]
+  then
+    # Downgrade libssl1.0.0 to be able to install python-dev
+    # (actually python 2.7 which depends on libssl-dev, which depends on an
+    # older version of libssl1.0.0, and thus cannot be installed otherwise)
+    retry apt-get install --yes --force-yes 'libssl1.0.0=1.0.1e-*'
+  fi
   retry apt-get install --yes git gcc python-dev python-setuptools libffi-dev python-pip
 
   adduser -u 1042 --home /home/eve --disabled-password --gecos "" eve
