@@ -32,7 +32,7 @@ then
   localedef -v -c -i en_US -f UTF-8 en_US.UTF-8 || true
   export LANG=en_US.utf8
 
-  retry yum -y install git gcc python-devel python-setuptools libffi-devel openssl-devel
+  retry yum -y install ca-certificates git gcc python-devel python-setuptools libffi-devel openssl-devel
   retry easy_install pip==9.0.3
 
   adduser -u 1042 --home-dir /home/eve eve
@@ -47,6 +47,7 @@ then
 elif [ -f /etc/debian_version ]
 then
   echo "Ubuntu/Debian"
+  export DEBIAN_FRONTEND=noninteractive
 
   RELEASE="$(lsb_release -cs)"
   if [ "${RELEASE}" = "wheezy" ]
@@ -66,12 +67,15 @@ then
     # older version of libssl1.0.0, and thus cannot be installed otherwise)
     retry apt-get install --yes --force-yes 'libssl1.0.0=1.0.1e-*'
   fi
+  retry apt-get install --yes ca-certificates -o Dpkg:Options::="--force-confnew"
   retry apt-get install --yes git gcc python-dev python-setuptools libffi-dev python-pip
 
   adduser -u 1042 --home /home/eve --disabled-password --gecos "" eve
   adduser eve sudo
   echo "%sudo ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
   twisted_version=16.4.0
+
+  unset DEBIAN_FRONTEND
 else
   echo "Unsupported Operating System";
   exit 1;
