@@ -32,8 +32,8 @@ def getPrevSuccessfulBuild(self, builderid, number, ssBuild):
                          ss['codebase']) for ss in ssBuild])
     while rv is None:
         # Get some recent successful builds on the same builder
-        prevBuilds = yield self._getRecentBuilds(whereclause=((tbl.c.builderid == builderid) &  # noqa: E501
-                                                              (tbl.c.number < number) &  # noqa: E501
+        prevBuilds = yield self._getRecentBuilds(whereclause=((tbl.c.builderid == builderid) &  # noqa: E501 W504
+                                                              (tbl.c.number < number) &  # noqa: E501 W504
                                                               (tbl.c.results == 0)),  # noqa: E501
                                                  offset=offset,
                                                  limit=increment)
