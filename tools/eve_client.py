@@ -102,7 +102,7 @@ class EveClient:
             res = opener.open(req)
         except HTTPError as excp:
             sys.exit('HTTP error: %s (%s)' % (excp.reason, excp.code))
-        return json.load(res)
+        return json.loads(res.read().decode("utf-8"))
 
     def builders(self):
         return self._request('GET', '/builders')['builders']
