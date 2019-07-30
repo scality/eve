@@ -50,7 +50,7 @@ def getPrevSuccessfulBuild(self, builderid, number, ssBuild):
                 break
         offset += increment
 
-    defer.returnValue(rv)
+    return rv
 
 
 def patch():
