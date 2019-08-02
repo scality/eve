@@ -1,1 +1,0 @@
-Add buildbot fix to send less SQL queries to the db server.
