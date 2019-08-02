@@ -17,6 +17,21 @@ Release Notes
 
 .. towncrier release notes start
 
+Eve 1.4.9 (2019-08-02)
+======================
+
+Features
+--------
+
+- Supporting file as payload on eve API client script. (EVE-1074)
+
+
+Bugfixes
+--------
+
+- Add buildbot fix to send less SQL queries to the db server. (EVE-1082)
+
+
 Eve 1.4.8 (2019-07-01)
 ======================
 
