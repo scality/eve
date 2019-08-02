@@ -17,7 +17,7 @@ Release Notes
 
 .. towncrier release notes start
 
-Eve 1.5.5 (2019-08-02)
+Eve 1.5.6 (2019-08-02)
 ======================
 
 Including changes from Eve 1.4.9
