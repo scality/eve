@@ -13,6 +13,7 @@ buildbot-worker             # used in workers setup
 buildbot_wsgi_dashboards    # used in www dashboards
 buildbot-www                # used in www setup
 buildbot[tls]               # core technology
+buildbot_profiler           # used in www plugins
 flask                       # used in www dashboards
 jinja2                      # used by KubeLatentWorker
 kubernetes                  # used by KubeLatentWorker
