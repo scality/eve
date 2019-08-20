@@ -63,6 +63,8 @@ class BaseBuildOrder(object):
                  self._stage_name),
                 'BuildOrder'
             ),
+            'simultaneous_builds': (
+                self._stage.get('simultaneous_builds'), 'BuildOrder'),
         })
 
 
