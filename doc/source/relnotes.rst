@@ -17,6 +17,15 @@ Release Notes
 
 .. towncrier release notes start
 
+Eve 1.5.7 (2019-08-20)
+======================
+
+Features
+--------
+
+- Bringing the ``simultaneous_builds`` parameter on a stage to let the user control the pipeline. (RELENG-2859)
+
+
 Eve 1.5.6 (2019-08-02)
 ======================
 
