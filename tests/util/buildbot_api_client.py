@@ -164,6 +164,15 @@ class BuildbotDataAPI(object):
                             'builder=%s, branch=%s' % (builder, branch))
         return the_build
 
+    def get_build_for_id(self, buildid):
+        return Build.find(
+            self,
+            get_params={
+                'buildid': buildid,
+                'property': '*'
+            }
+        )
+
     def get_finished_build(self, builder='bootstrap', branch=None, timeout=60):
         for _ in range(timeout):
             build = self.get_build(builder, branch, timeout)
