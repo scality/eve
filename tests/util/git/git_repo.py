@@ -19,9 +19,10 @@
 
 from __future__ import print_function
 
+import errno
 import shutil
 import tempfile
-from os import errno, mkdir
+from os import mkdir
 from os.path import basename, join
 from subprocess import CalledProcessError
 from uuid import uuid4
