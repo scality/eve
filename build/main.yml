@@ -8,15 +8,15 @@ branches:
 stages:
   pre-merge:
     worker: &xenial-worker
-      type: docker
-      path: build/workers/xenial
-      volumes:
-        - '/home/eve/workspace'
+      type: kube_pod
+      path: build/workers/xenial/pod.yaml
+      images:
+        worker: build/workers/xenial
     steps:
       - TriggerStages:
           name: trigger local and remote tests simultaneously
           stage_names:
-            - local tests
+            - local-tests
             - docker tests
           waitForFinish: True
           haltOnFailure: True
@@ -37,7 +37,7 @@ stages:
           source: build_status
           alwaysRun: True
 
-  local tests:
+  local-tests:
     worker: *xenial-worker
     steps:
       - Git:
