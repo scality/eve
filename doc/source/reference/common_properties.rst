@@ -41,3 +41,23 @@ even ``SetPropertyFromCommand``.
       The ``worker_uuid`` is unique enough so that it doesn't conflict with
       stages running in the same build or different one. They're generated
       from the buildbot worker name and the repository name.
+
+``simultaneous_builds``
+    Can be set at the the stage level, and this setting allows the user to control
+    the number of consecutive builds that can run at the same time. Per example it
+    it is useful for deployments to allow only one build at the time to run.
+
+    Usage:
+
+    .. code-block:: yaml
+
+        stages:
+          pre-merge:
+            # in this case only one build is allowed
+            simultaneous_builds: 1
+            worker:
+            # worker specs
+            # ...
+            steps:
+            # steps specs
+            # ..
