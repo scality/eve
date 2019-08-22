@@ -96,7 +96,7 @@ sqlparse==0.2.4
 stevedore==1.30.0
 tempita==0.5.2
 treq==18.6.0
-twisted==18.9.0
+twisted[tls]==19.7.0
 txaio==18.8.1
 urllib3==1.24.1
 warlock==1.3.0
