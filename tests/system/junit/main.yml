@@ -127,3 +127,69 @@ stages:
             mkdir output_16
             && cp reports/report_gollum_pass.xml output_16/
             && exit 1
+      - JUnitShellCommand:
+          name: test report paths with success
+          command: |
+            mkdir -p output_17
+            cp reports/report_gollum_pass.xml output_17
+          report_path:
+            - output_17/*.xml
+      - JUnitShellCommand:
+          name: test report paths with failure
+          command: |
+            mkdir -p output_18
+            cp reports/report_gollum_failures.xml output_18
+          report_path:
+            - output_18/*.xml
+      - JUnitShellCommand:
+          name: test report paths with success and failure
+          command: |
+            mkdir -p output_19/test1
+            cp reports/report_gollum_pass.xml output_19
+            cp reports/report_gollum_failures.xml output_19/test1/
+          report_path:
+            - output_19/*.xml
+            - output_19/test1/*.xml
+      - JUnitShellCommand:
+          name: test report paths with success and failure in same dir
+          command: |
+            mkdir -p output_20
+            cp reports/report_gollum_pass.xml output_20
+            cp reports/report_gollum_failures.xml output_20
+          report_path:
+            - output_20/*.xml
+      - JUnitShellCommand:
+          name: test report paths only uploading success
+          command: |
+            mkdir -p output_21
+            cp reports/report_gollum_pass.xml output_21
+            cp reports/report_gollum_failures.xml output_21
+          report_path:
+            - output_21/report_gollum_pass.xml
+      - JUnitShellCommand:
+          name: test report paths only uploading failure
+          command: |
+            mkdir -p output_22
+            cp reports/report_gollum_pass.xml output_22
+            cp reports/report_gollum_failures.xml output_22
+          report_path:
+            - output_22/report_gollum_failures.xml
+      - JUnitShellCommand:
+          name: test report paths without list
+          command: |
+            mkdir -p output_23
+            cp reports/report_gollum_pass.xml output_23
+          report_path:
+            output_23/report_gollum_pass.xml
+      - JUnitShellCommand:
+          name: test report paths with non existing file
+          command: |
+            mkdir -p output_24
+          report_path:
+            - output_24/nothing.xml
+      - JUnitShellCommand:
+          name: test report paths with non matching glob
+          command: |
+            mkdir -p output_25
+          report_path:
+            - output_25/*.noxml
