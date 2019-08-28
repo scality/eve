@@ -17,6 +17,15 @@ Release Notes
 
 .. towncrier release notes start
 
+Eve 1.4.10 (2019-08-28)
+=======================
+
+Bugfixes
+--------
+
+- Add report_path option to Junitshellcommand. (EVE-1085)
+
+
 Eve 1.4.9 (2019-08-02)
 ======================
 
