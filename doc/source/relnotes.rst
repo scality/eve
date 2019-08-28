@@ -17,6 +17,15 @@ Release Notes
 
 .. towncrier release notes start
 
+Eve 1.5.8 (2019-08-28)
+======================
+
+Bugfixes
+--------
+
+- Upgrading twisted to ``19.7.0`` to fix writeSequence errors. (EVE-1083)
+
+
 Eve 1.4.10 (2019-08-28)
 =======================
 
