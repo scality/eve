@@ -1,1 +1,0 @@
-Reverting new ``requirements.sh`` install and putting it back on the cloud init side.

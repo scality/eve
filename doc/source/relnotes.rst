@@ -17,6 +17,15 @@ Release Notes
 
 .. towncrier release notes start
 
+Eve 1.5.9 (2019-09-05)
+======================
+
+Bugfixes
+--------
+
+- Reverting new ``requirements.sh`` install and putting it back on the cloud init side. (EVE-1080)
+
+
 Eve 1.5.8 (2019-08-28)
 ======================
 
