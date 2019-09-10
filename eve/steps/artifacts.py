@@ -182,10 +182,10 @@ class Upload(ShellCommand):
         command = [
             ('if [ ! -n "$(find -L . -type f | head -1)" ]; then '
              'echo "No files here. Nothing to do."; exit 0; fi'),
-            'tar -chvzf ../artifacts.tar.gz .',
-            'echo tar successful. Calling curl...',
-            ('curl --progress-bar --verbose --max-time {} -T '
-             '../artifacts.tar.gz -X PUT http://artifacts/upload/{}').format(
+            ('find -L -type f -printf \'%P\0\' | '
+             'xargs -0 -n1 -I@ '
+             'curl --progress-bar --fail --verbose --max-time {} '
+             '-T \'@\' \'http://artifacts/upload/{}/@\'').format(
                 self._upload_max_time,
                 self.get_container())]
 
