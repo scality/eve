@@ -247,8 +247,9 @@ class Upload(ShellCommand):
         err = self.observer.getStderr()
         if not err and 'No files here. Nothing to do.' in out:
             return SUCCESS
-        elif 'Response Status: 201 Created' not in out:
-            return FAILURE
+        # rackspace specific code !
+        # elif 'Response Status: 201 Created' not in out:
+        #    return FAILURE
         return cmd.results()
 
     # regexp use to make the difference between simple link prefix and link
