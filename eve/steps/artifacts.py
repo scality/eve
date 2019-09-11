@@ -182,12 +182,10 @@ class Upload(ShellCommand):
         command = [
             ('if [ ! -n "$(find -L . -type f | head -1)" ]; then '
              'echo "No files here. Nothing to do."; exit 0; fi'),
-            ('find -L -type f -printf \'%P\0\' | '
-             'xargs -0 -n1 -I@ '
+            ('find -L -type f -printf \'%P\0\' | xargs -0 -n1 -I@ '
              'curl --progress-bar --fail --verbose --max-time {} '
              '-T \'@\' \'http://artifacts/upload/{}/@\'').format(
-                self._upload_max_time,
-                self.get_container())]
+                self._upload_max_time, self.get_container())]
 
         # compute configured urls
         links = []
