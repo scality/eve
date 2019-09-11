@@ -182,7 +182,7 @@ class Upload(ShellCommand):
         command = [
             ('if [ ! -n "$(find -L . -type f | head -1)" ]; then '
              'echo "No files here. Nothing to do."; exit 0; fi'),
-            ('find -L -type f -printf "%P\0" | '
+            ('find -L -type f -printf "%P\\0" | '
              'xargs -0 -n1 -P16 -I@ '
              'curl --fail --max-time {} -T "@" '
              '"http://artifacts/upload/{}/@"').format(
