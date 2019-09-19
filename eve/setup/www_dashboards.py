@@ -105,11 +105,21 @@ def link_dashboard(conf):
                       site_url=site_url,
                       token=token,
                       bordered='true' if border else 'false')
-        else:
+        elif conf['type'] == 'standard':
             url = '{site_url}' \
                   '#bordered={bordered}&titled=false'.format(
                       site_url=site_url,
                       bordered='true' if border else 'false')
+
+        elif conf['type'] == 'static':
+            content = None
+            # Because site_url was necessary anyways for all other types of
+            # dashboard, might as well reuse it instead of requiring a new
+            # attribute (yes, that might be a bit dirty).
+            filename = conf['site_url']
+            with open(filename) as content_file:
+                content = content_file.read()
+            return '<pre>{content}</pre>'.format(content=content)
 
         return '<iframe src="{url}" frameborder="{border}" ' \
                'width="{width}" height="{height}" ' \
@@ -136,7 +146,7 @@ def wsgi_dashboards():
     config = DashboardsConfig(util.env['DASHBOARDS_FILE_PATH'])
 
     for conf in config.iter():
-        if conf['type'] in ('standard', 'metabase'):
+        if conf['type'] in ('standard', 'metabase', 'static'):
             dashboard = link_dashboard(conf)
         else:
             logger.error(
