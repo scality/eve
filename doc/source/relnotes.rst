@@ -17,6 +17,16 @@ Release Notes
 
 .. towncrier release notes start
 
+Eve 1.5.10 (2019-09-24)
+=======================
+
+Features
+--------
+
+- Add a new type of menu item ('static') to dump the contents of a local file.
+  (RELENG-2975)
+
+
 Eve 1.5.9 (2019-09-05)
 ======================
 
