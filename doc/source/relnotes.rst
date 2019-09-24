@@ -35,6 +35,16 @@ Bugfixes
 - Upgrading twisted to ``19.7.0`` to fix writeSequence errors. (EVE-1083)
 
 
+Eve 1.4.11 (2019-09-20)
+=======================
+
+Features
+--------
+
+- Add a new type of menu item ('static') to dump the contents of a local file.
+  (RELENG-2975)
+
+
 Eve 1.4.10 (2019-08-28)
 =======================
 
