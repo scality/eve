@@ -18,6 +18,7 @@
 
 from hashlib import sha1
 from time import time
+from os.path import join
 
 import buildbot
 from buildbot.plugins import steps, util
@@ -85,8 +86,9 @@ class BaseDockerBuildOrder(BaseBuildOrder):
             self.properties['master_builddir'][0],
             context_dir,
         )
+        full_dockerfile_path = None
         if dockerfile:
-            dockerfile = '%s/build/%s' % (
+            full_dockerfile_path = '%s/build/%s' % (
                 self.properties['master_builddir'][0],
                 dockerfile,
             )
@@ -110,8 +112,12 @@ class BaseDockerBuildOrder(BaseBuildOrder):
             self.preliminary_steps.append(
                 steps.DockerComputeImageFingerprint(
                     label=basename,
-                    context_dir=full_context_dir,
-                    hideStepIf=util.hideStepIfSuccess))
+                    context_dir=context_dir,
+                    dockerfile=dockerfile,
+                    hideStepIf=util.hideStepIfSuccess,
+                    workdir=join(
+                        self.properties['master_builddir'][0], 'build')
+                ))
 
             image = Interpolate('{0}/{1}:%(prop:fingerprint_{1})s'.format(
                 util.env.DOCKER_REGISTRY_URL, basename))
@@ -137,7 +143,7 @@ class BaseDockerBuildOrder(BaseBuildOrder):
         common_args = {
             'label': basename,
             'image': image,
-            'dockerfile': dockerfile,
+            'dockerfile': full_dockerfile_path,
             'context_dir': full_context_dir,
             'build_args': {
                 'BUILDBOT_VERSION': buildbot.version
