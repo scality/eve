@@ -17,6 +17,15 @@ Release Notes
 
 .. towncrier release notes start
 
+Eve 1.5.11 (2019-10-08)
+=======================
+
+Bugfixes
+--------
+
+- Now when a Dockerfile is outside a Docker build context it is computed as well in the fingerprint. (EVE-1098)
+
+
 Eve 1.5.10 (2019-09-24)
 =======================
 

@@ -1,1 +1,0 @@
-Now when a Dockerfile is outside a Docker build context it is computed as well in the fingerprint.
