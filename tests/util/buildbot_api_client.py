@@ -263,11 +263,11 @@ class BuildbotDataAPI(object):
 
         """
         path = '/forceschedulers'
-        scheds = self.getw(path, expected_count=2)
+        scheds = self.getw(path, expected_count=3)
         force_sched_name = None
         for sched in scheds:
             sched_name = sched['name']
-            if sched_name != '__Janitor_force':
+            if sched_name != '__Janitor_force' and 'promote' not in sched_name:
                 force_sched_name = sched_name
                 break
         res = self.post('{}/{}'.format(path, force_sched_name),
