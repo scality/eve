@@ -20,7 +20,9 @@
 import unittest
 
 from tests.util.cluster import Cluster
-from tests.util.yaml_factory import RawYaml, SingleCommandYaml, YamlFactory
+from tests.util.yaml_factory import (
+    RawYaml, SingleCommandYaml, YamlFactory, PreMerge
+)
 
 
 class TestYamlSyntax(unittest.TestCase):
@@ -104,3 +106,95 @@ class TestYamlSyntax(unittest.TestCase):
         self.local_repo.push(yaml=YamlFactory(branches=branch, stages=stage))
         buildset = self.cluster.api.force(branch=self.local_repo.branch)
         self.assertEqual(buildset.result, 'failure')
+
+    def _check_build_and_last_step(self, steps, build_result='success',
+                                   last_step_attrs=None):
+        self.local_repo.push(yaml=PreMerge(steps=steps))
+
+        buildset = self.cluster.api.force(branch=self.local_repo.branch)
+        self.assertEqual(buildset.result, build_result)
+
+        last_step = (
+            buildset.buildrequest.build
+            .children[0].buildrequest.build
+            .steps[-1]
+        )
+        for attr, value in last_step_attrs.items():
+            self.assertEqual(getattr(last_step, attr, None), value)
+
+        return last_step
+
+    def test_boolean_attributes_from_properties(self):
+        """Check how one can, and cannot, use properties to set step args."""
+        example_values = {
+            True: ('yes', 'True'),  # more examples: 'Y', 'true', 'on', '1'
+            False: ('N', 'off'),  # more examples: 'no', 'False', '0'
+        }
+
+        def set_property(name, value):
+            return {
+                'SetPropertyFromCommand': {
+                    'name': 'Set {} prop'.format(name),
+                    'property': '{}'.format(name),
+                    'command': 'echo "{}"'.format(value),
+                }
+            }
+
+        def run_step(**kwargs):
+            return {
+                'ShellCommand': {
+                    'name': 'Run this step',
+                    'command': 'exit 0',
+                    **kwargs
+                }
+            }
+
+        for truthy, values in example_values.items():
+            for value in values:
+                steps = [
+                    set_property('someprop', value),
+                    run_step(doStepIf='%(prop:someprop)s'),
+                ]
+
+                self._check_build_and_last_step(
+                    steps,
+                    last_step_attrs={
+                        'result': 'success' if truthy else 'skipped'
+                    },
+                )
+
+        # Also works for hiding steps
+        for truthy in example_values:
+            steps = [
+                set_property('someprop', example_values[truthy][0]),
+                run_step(hideStepIf='%(prop:someprop)s'),
+            ]
+
+            self._check_build_and_last_step(
+                steps,
+                last_step_attrs={
+                    'result': 'success',
+                    'hidden': truthy,
+                },
+            )
+
+        # Check unsupported format
+        last_step = self._check_build_and_last_step(
+            [run_step(doStepIf='prefixed-%(prop:value)s')],
+            build_result='exception',
+            last_step_attrs={'result': 'exception'},
+        )
+
+        self.assertIn('Invalid format to cast as a boolean:',
+                      last_step.rawlog('err_text'))
+
+        # Check unsupported value
+        last_step = self._check_build_and_last_step(
+            [set_property('someprop', 'not-a-bool'),
+             run_step(doStepIf='%(prop:someprop)s')],
+            build_result='exception',
+            last_step_attrs={'result': 'exception'},
+        )
+
+        self.assertIn('Invalid value to cast as boolean: not-a-bool',
+                      last_step.rawlog('err_text'))
