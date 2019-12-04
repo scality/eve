@@ -17,6 +17,25 @@ Release Notes
 
 .. towncrier release notes start
 
+Eve 1.5.13 (2019-12-04)
+=======================
+
+Features
+--------
+
+- Add support for setting ``doStepIf`` and ``hideStepIf`` with build properties. (EVE-1104)
+
+
+Eve 1.5.12 (2019-12-04)
+=======================
+
+Bugfixes
+--------
+
+- We're poping all eve configuration from the environment to avoid them to be displayed in the UI. (EVE-1097)
+- Fixed Ubuntu bionic image spawn. (EVE-1103)
+
+
 Eve 1.5.11 (2019-10-08)
 =======================
 
