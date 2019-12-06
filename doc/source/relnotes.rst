@@ -17,6 +17,15 @@ Release Notes
 
 .. towncrier release notes start
 
+Eve 1.5.14 (2019-12-06)
+=======================
+
+Bugfixes
+--------
+
+- To ease up investigation on docker failures we are adding a new log to the worker. (EVE-1023)
+
+
 Eve 1.5.13 (2019-12-04)
 =======================
 
