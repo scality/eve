@@ -161,4 +161,9 @@ class EveDockerLatentWorker(AbstractLatentWorker):
         """
         cmd = ['docker'] + list(args)
         self.logger.debug('::RUNNING::{}'.format(' '.join(cmd)))
-        return check_output(cmd, stderr=STDOUT).strip()
+        try:
+            return check_output(cmd, stderr=STDOUT).strip()
+        except CalledProcessError as exp:
+            self.logger.error('::DOCKER CMD ERROR::{output}',
+                              output=exp.output.decode('utf-8'))
+            raise
