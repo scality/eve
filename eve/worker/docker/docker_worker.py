@@ -17,7 +17,6 @@
 # Boston, MA  02110-1301, USA.
 """Allow eve to use docker workers."""
 
-import re
 from subprocess import STDOUT, CalledProcessError, check_output
 
 from buildbot.interfaces import LatentWorkerCannotSubstantiate
@@ -42,8 +41,6 @@ class EveDockerLatentWorker(AbstractLatentWorker):
     logger = Logger('eve.workers.EveDockerLatentWorker')
     instance = None
 
-    docker_id_pattern = re.compile(r'^[0-9a-f]+$', flags=re.MULTILINE)
-
     def __init__(self, name, password, image, master_fqdn, pb_port,
                  max_memory, max_cpus, **kwargs):
         # pylint: disable=too-many-arguments
@@ -60,6 +57,7 @@ class EveDockerLatentWorker(AbstractLatentWorker):
     def start_instance(self, build):
         if self.instance is not None:
             raise ValueError('instance active')
+        self.instance = util.compute_instance_name(build)
         repository = build.getProperty('repository')
         uuid = util.create_hash(repository, self.name)
         build.setProperty("worker_uuid", uuid, "Build")
@@ -85,6 +83,7 @@ class EveDockerLatentWorker(AbstractLatentWorker):
 
         cmd = [
             'run',
+            '--name=%s' % self.instance,
             '--privileged',
             '--env', 'BUILDMASTER=%s' % self.master_fqdn,
             '--env', 'BUILDMASTER_PORT=%s' % self.pb_port,
@@ -116,14 +115,7 @@ class EveDockerLatentWorker(AbstractLatentWorker):
         cmd.append(image)
 
         try:
-            output = self.docker(*cmd)
-            matches = self.docker_id_pattern.findall(output.decode('utf-8'))
-            if not matches:
-                self.logger.debug('Failed to extract Container ID from output'
-                                  + ': "{}"'.format(output.decode('utf-8')))
-                raise CalledProcessError(
-                    cmd, "Cannot extract Container ID from output")
-            self.instance = matches[0]
+            self.docker(*cmd)
         except CalledProcessError:
             raise LatentWorkerCannotSubstantiate(
                 'Docker run: CMD failed to start or died shortly after'
