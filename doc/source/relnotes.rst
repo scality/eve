@@ -17,6 +17,15 @@ Release Notes
 
 .. towncrier release notes start
 
+Eve 1.5.15 (2019-12-11)
+=======================
+
+Bugfixes
+--------
+
+- Setting up a proper name on every docker container created so that we don't have to handle regex matching to figure it out. (EVE-1023)
+
+
 Eve 1.5.14 (2019-12-06)
 =======================
 

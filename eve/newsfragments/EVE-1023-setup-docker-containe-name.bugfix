@@ -1,1 +1,0 @@
-Setting up a proper name on every docker container created so that we don't have to handle regex matching to figure it out.
