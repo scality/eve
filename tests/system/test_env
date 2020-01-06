@@ -56,6 +56,7 @@ OS_WORKER_IN_USE=1
 PB_PORT=2345
 PROJECT_URL=test_project_url
 PROJECT_YAML=eve/main.yml
+PROLONG_SCHEDULER_NAME=test_prolong_scheduler_name
 PROMOTE_SCHEDULER_NAME=test_promote_scheduler_name
 SUFFIX=test_suffix
 TRY_PORT=3456

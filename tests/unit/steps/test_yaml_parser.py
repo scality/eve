@@ -28,6 +28,7 @@ class TestReadConfFromYamlExecution(steps.BuildStepMixin, unittest.TestCase):
             ('LOCAL_SCHEDULER_NAME', 'docker_scheduler'),
             ('OPENSTACK_SCHEDULER_NAME', 'openstack_scheduler'),
             ('PATCHER_FILE_PATH', ''),
+            ('PROLONG_SCHEDULER_NAME', 'prolongscheduler'),
             ('PROMOTE_SCHEDULER_NAME', 'promotescheduler'),
         ])
 
