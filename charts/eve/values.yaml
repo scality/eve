@@ -259,6 +259,10 @@ eve:
       ##
       artifactsPublicUrl: ""
 
+      ## artifactsVersionThreeInUse activate or deactivate the usage of UploadV3 for artifacts version 3
+      ##
+      artifactsVersionThreeInUse: 0
+
     localWorkers:
       ## maxLocalWorkers is the max number of simultaneous local workers.
       ##

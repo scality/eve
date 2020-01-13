@@ -17,6 +17,7 @@
 # Boston, MA  02110-1301, USA.
 """Steps allowing eve to interact with artifacts."""
 
+import abc
 import os
 import re
 from collections import defaultdict
@@ -135,8 +136,10 @@ class SetArtifactsPrivateURL(EvePropertyFromCommand):
             logEnviron=False)
 
 
-class Upload(ShellCommand):
-    """Upload files to artifacts."""
+class BaseUpload(ShellCommand):
+    """Base class to handle artifacts uploads."""
+
+    __metaclass__ = abc.ABCMeta
 
     renderables = [
         'source',
@@ -159,7 +162,7 @@ class Upload(ShellCommand):
                                        util.Transform(os.path.join,
                                                       'build',
                                                       source))
-        super(Upload, self).__init__(
+        super(BaseUpload, self).__init__(
             name=name,
             haltOnFailure=True,
             command=util.Transform(self.set_command, urls),
@@ -170,6 +173,12 @@ class Upload(ShellCommand):
                                                       wantStderr=True)
         self.addLogObserver('stdio', self.observer)
 
+    @property
+    @abc.abstractmethod
+    def upload_command(self):
+        """Return a string with the command to make an upload to Artifacts."""
+        return
+
     def get_container(self):
         eve_api_version = self.getProperty('eve_api_version')
         if version.parse(eve_api_version) >= version.parse('0.2'):
@@ -178,16 +187,7 @@ class Upload(ShellCommand):
             return util.env.ARTIFACTS_PREFIX + self.getProperty('build_id')
 
     def set_command(self, urls):
-
-        command = [
-            ('if [ ! -n "$(find -L . -type f | head -1)" ]; then '
-             'echo "No files here. Nothing to do."; exit 0; fi'),
-            'tar -chvzf ../artifacts.tar.gz .',
-            'echo tar successful. Calling curl...',
-            ('curl --progress-bar --verbose --max-time {} -T '
-             '../artifacts.tar.gz -X PUT http://artifacts/upload/{}').format(
-                self._upload_max_time,
-                self.get_container())]
+        command = self.upload_command
 
         # compute configured urls
         links = []
@@ -213,9 +213,8 @@ class Upload(ShellCommand):
 
         return ' && '.join(command)
 
-    @defer.inlineCallbacks
-    def run(self):
-
+    def check_artifacts_name(self):
+        """Check that artifacts name has not been overwritten."""
         eve_api_version = self.getProperty('eve_api_version')
         if version.parse(eve_api_version) >= version.parse('0.2'):
             artifacts_name_property = self.getProperty('artifacts_name')
@@ -224,33 +223,6 @@ class Upload(ShellCommand):
                 r'([0-9a-f]+)(\.(.*)\.([0-9]+))?$' % util.env.ARTIFACTS_PREFIX)
             if not regexp_staging.match(artifacts_name_property):
                 raise MalformedArtifactsNameProperty
-
-        result = yield super(Upload, self).run()
-        if result == FAILURE:
-            delay, repeats = self._retry
-            if repeats > 0:
-                # Wait for delay before retrying
-                sleep_df = defer.Deferred()
-                reactor.callLater(delay, sleep_df.callback, None)
-                yield sleep_df
-
-                # Schedule a retry after this step
-                self.build.addStepsAfterCurrentStep([self.__class__(
-                    source=self.source,
-                    urls=self._urls,
-                    retry=(delay, repeats - 1),
-                    **self._kwargs)])
-                defer.returnValue(SKIPPED)
-        defer.returnValue(result)
-
-    def evaluateCommand(self, cmd):  # NOQA flake8 to ignore camelCase
-        out = self.observer.getStdout()
-        err = self.observer.getStderr()
-        if not err and 'No files here. Nothing to do.' in out:
-            return SUCCESS
-        elif 'Response Status: 201 Created' not in out:
-            return FAILURE
-        return cmd.results()
 
     # regexp use to make the difference between simple link prefix and link
     # name patterns
@@ -331,3 +303,79 @@ class Upload(ShellCommand):
                     ])
 
         return sorted(links)
+
+
+class Upload(BaseUpload):
+    """Upload files to artifacts."""
+
+    @property
+    def upload_command(self):
+        return [
+            ('if [ ! -n "$(find -L . -type f | head -1)" ]; then '
+             'echo "No files here. Nothing to do."; exit 0; fi'),
+            'tar -chvzf ../artifacts.tar.gz .',
+            'echo tar successful. Calling curl...',
+            ('curl --progress-bar --verbose --max-time {} -T '
+             '../artifacts.tar.gz -X PUT http://artifacts/upload/{}').format(
+                self._upload_max_time,
+                self.get_container())]
+
+    @defer.inlineCallbacks
+    def run(self):
+        self.check_artifacts_name()
+        result = yield super(Upload, self).run()
+        if result == FAILURE:
+            delay, repeats = self._retry
+            if repeats > 0:
+                # Wait for delay before retrying
+                sleep_df = defer.Deferred()
+                reactor.callLater(delay, sleep_df.callback, None)
+                yield sleep_df
+
+                # Schedule a retry after this step
+                self.build.addStepsAfterCurrentStep([self.__class__(
+                    source=self.source,
+                    urls=self._urls,
+                    retry=(delay, repeats - 1),
+                    **self._kwargs)])
+                defer.returnValue(SKIPPED)
+        if util.env.ARTIFACTS_VERSION_THREE_IN_USE:
+            self.build.addStepsAfterCurrentStep([Uploadv3(
+                source=self.source,
+                urls=self._urls,
+                flunkOnFailure=False,
+                warnOnFailure=True,
+                **self._kwargs
+            )])
+        defer.returnValue(result)
+
+    def evaluateCommand(self, cmd):  # NOQA flake8 to ignore camelCase
+        out = self.observer.getStdout()
+        err = self.observer.getStderr()
+        if not err and 'No files here. Nothing to do.' in out:
+            return SUCCESS
+        elif 'Response Status: 201 Created' not in out:
+            return FAILURE
+        return cmd.results()
+
+
+class Uploadv3(BaseUpload):
+    """Upload files to artifacts version >= 3.
+
+    This class was created to cohexist Upload while we pla
+    """
+
+    @property
+    def upload_command(self):
+        return [
+            ('find -L -type f -printf "%P\\0" | '
+             'xargs --null --max-args=1 --verbose --max-procs=16 '
+             '--replace=@ curl --silent --fail --show-error --max-time {} '
+             '-T "@" "http://artifacts-v3/upload/{}/@"').format(
+                self._upload_max_time, self.get_container())]
+
+    @defer.inlineCallbacks
+    def run(self):
+        self.check_artifacts_name()
+        result = yield super(Uploadv3, self).run()
+        defer.returnValue(result)
