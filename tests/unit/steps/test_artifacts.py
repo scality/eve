@@ -27,7 +27,8 @@ from buildbot.test.util import config, steps
 from twisted.trial import unittest
 
 from eve.steps.artifacts import (GetArtifactsFromStage,
-                                 MalformedArtifactsNameProperty, Upload)
+                                 MalformedArtifactsNameProperty, Upload,
+                                 Uploadv3)
 
 
 class TestUpload(steps.BuildStepMixin, unittest.TestCase,
@@ -36,6 +37,7 @@ class TestUpload(steps.BuildStepMixin, unittest.TestCase,
         util.env = util.load_env([
             ('ARTIFACTS_PREFIX', 'prefix-'),
             ('OPENSTACK_BUILDER_NAME', 'openstack'),
+            ('ARTIFACTS_V3_IN_USE', 0),
         ])
         return self.setUpBuildStep()
 
@@ -101,6 +103,26 @@ class TestUpload(steps.BuildStepMixin, unittest.TestCase,
                 '0.0.0.0.r190101000000.1234567.pre-merge.12345678')
             + ExpectShell.log('stdio', stdout='Response Status: 201 Created')
             + 0)
+        self.expectOutcome(result=SUCCESS)
+        return self.runStep()
+
+    def test_artifacts_v3_upload(self):
+        self.setupStep(
+            Uploadv3(
+                name='Upload',
+                source='/absolute/path'
+        ))
+        self.expectCommands(
+            ExpectShell(
+                workdir='/absolute/path',
+                maxTime=3610,
+                command='find -L -type f -printf "%P\\0" | '
+                'xargs --null --max-args=1 --verbose --max-procs=16 --replace=@ '
+                'curl --silent --fail --show-error --max-time 3600 -T "@" "http://artifactsv3/upload/githost:owner:repo:prefix-0.0.0.0.r190101000000.1234567.pre-merge.12345678/@"'
+            )
+            + ExpectShell.log('stdio', stdout='Response Status: 201 Created')
+            + 0
+        )
         self.expectOutcome(result=SUCCESS)
         return self.runStep()
 

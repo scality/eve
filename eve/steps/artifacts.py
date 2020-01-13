@@ -177,9 +177,9 @@ class Upload(ShellCommand):
         else:
             return util.env.ARTIFACTS_PREFIX + self.getProperty('build_id')
 
-    def set_command(self, urls):
-
-        command = [
+    @property
+    def upload_command(self):
+        return [
             ('if [ ! -n "$(find -L . -type f | head -1)" ]; then '
              'echo "No files here. Nothing to do."; exit 0; fi'),
             'tar -chvzf ../artifacts.tar.gz .',
@@ -188,6 +188,9 @@ class Upload(ShellCommand):
              '../artifacts.tar.gz -X PUT http://artifacts/upload/{}').format(
                 self._upload_max_time,
                 self.get_container())]
+
+    def set_command(self, urls):
+        command = self.upload_command
 
         # compute configured urls
         links = []
@@ -213,9 +216,9 @@ class Upload(ShellCommand):
 
         return ' && '.join(command)
 
-    @defer.inlineCallbacks
-    def run(self):
 
+    def check_artifacts_name(self):
+        """Check that artifacts name has not been overwritten."""
         eve_api_version = self.getProperty('eve_api_version')
         if version.parse(eve_api_version) >= version.parse('0.2'):
             artifacts_name_property = self.getProperty('artifacts_name')
@@ -225,6 +228,10 @@ class Upload(ShellCommand):
             if not regexp_staging.match(artifacts_name_property):
                 raise MalformedArtifactsNameProperty
 
+
+    @defer.inlineCallbacks
+    def run(self):
+        self.check_artifacts_name()
         result = yield super(Upload, self).run()
         if result == FAILURE:
             delay, repeats = self._retry
@@ -241,6 +248,14 @@ class Upload(ShellCommand):
                     retry=(delay, repeats - 1),
                     **self._kwargs)])
                 defer.returnValue(SKIPPED)
+        if util.env.ARTIFACTS_V3_IN_USE:
+            self.build.addStepsAfterCurrentStep([Uploadv3(
+                source=self.source,
+                urls=self._urls,
+                flunkOnFailure=False,
+                warnOnFailure=True,
+                **self._kwargs
+            )])
         defer.returnValue(result)
 
     def evaluateCommand(self, cmd):  # NOQA flake8 to ignore camelCase
@@ -331,3 +346,31 @@ class Upload(ShellCommand):
                     ])
 
         return sorted(links)
+
+
+class Uploadv3(Upload):
+    """Upload files to artifacts version >= 3.
+
+    This class was created to cohexist Upload while we pla
+    """
+
+    @property
+    def upload_command(self):
+        return [('find -L -type f -printf "%P\\0" | '
+                'xargs --null --max-args=1 --verbose --max-procs=16 --replace=@ '
+                'curl --silent --fail --show-error --max-time {} -T "@" '
+                '"http://artifactsv3/upload/{}/@"').format(
+                self._upload_max_time, self.get_container())]
+
+    def evaluateCommand(self, cmd):  # NOQA flake8 to ignore camelCase
+        out = self.observer.getStdout()
+        err = self.observer.getStderr()
+        if not err and 'No files here. Nothing to do.' in out:
+            return SUCCESS
+        return cmd.results()
+
+    @defer.inlineCallbacks
+    def run(self):
+        self.check_artifacts_name()
+        result = yield super(ShellCommand, self).run()
+        defer.returnValue(result)

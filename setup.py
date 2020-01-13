@@ -90,6 +90,7 @@ setup(
             'TriggerStages=eve.steps.trigger_stages:TriggerStages',
             'UnregisterRedhat=eve.steps.redhat:UnregisterRedhat',
             'Upload=eve.steps.artifacts:Upload',
+            'Uploadv3=eve.steps.artifacts:Uploadv3',
         ],
         'buildbot.util': [
             'BaseBuildOrder=eve.util.build_order:BaseBuildOrder',
