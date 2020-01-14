@@ -40,7 +40,7 @@ class ConfigurableStepMixin():
             conf = os.path.expanduser(self.getProperty('conf_path'))
             with open(conf) as config_file:
                 config = yaml.load(config_file.read())
-                if type(config) is dict:
+                if isinstance(config, dict):
                     for key in implicit_config['stages']:
                         config['stages'][key] = implicit_config['stages'][key]
                 return config
