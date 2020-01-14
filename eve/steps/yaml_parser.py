@@ -190,7 +190,8 @@ class ReadConfFromYaml(FileUpload, ConfigurableStepMixin):
 
         # Read patcher conf and populate related properties
         scheduler = self.getProperty('scheduler')
-        if scheduler != util.env.FORCE_SCHEDULER_NAME:
+        if scheduler not in (util.env.FORCE_SCHEDULER_NAME,
+                             util.env.PROMOTE_SCHEDULER_NAME):
             self.build.addStepsAfterCurrentStep([
                 steps.PatcherConfig(
                     conf_path=util.env.PATCHER_FILE_PATH,

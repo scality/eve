@@ -32,6 +32,7 @@ data:
   OPENSTACK_SCHEDULER_PREFIX: "openstack"
   OS_SSH_KEY: "/root/conf-secret/os_id_rsa"
   PB_PORT: {{ .Values.deployment.ports.pb | quote }}
+  PROMOTE_SCHEDULER_NAME: "promote"
 
   {{- if gt (.Values.eve.project.mastersCount | int) 1 }}
   WAMP_REALM: "buildbot"

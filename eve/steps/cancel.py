@@ -44,6 +44,7 @@ class CancelNonTipBuild(CancelCommand):
         super(CancelNonTipBuild, self).__init__(
             command=Interpolate(
                 '[ "%(prop:revision)s" = "" ] '
+                '|| [ "%(prop:branch)s" = "HEAD" ]'
                 '|| [ "$(git ls-remote origin refs/heads/%(prop:branch)s'
                 ' | cut -f1)" = '
                 '"%(prop:revision)s" ]'),
