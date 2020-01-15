@@ -80,6 +80,39 @@ def force_scheduler():
     )
 
 
+def prolong_scheduler():
+    default_project = "%s/%s" % (
+        util.env.GIT_OWNER, util.env.GIT_SLUG)
+
+    return schedulers.EveForceScheduler(
+        name=util.env.PROLONG_SCHEDULER_NAME,
+        builderNames=[util.env.BOOTSTRAP_BUILDER_NAME],
+        reason=util.StringParameter(name='reason',
+                                    label='Reason',
+                                    default='start temporary promotion',
+                                    size=20),
+        properties=[util.FixedParameter(name='force_stage',
+                                        default='eve-prolong'),
+                    util.StringParameter(name='eve_prolongation_artifacts',
+                                         label='artifacts source',
+                                         default='',
+                                         size=20)],
+        codebases=[
+            util.CodebaseParameter(
+                '',
+                branch=util.FixedParameter(name='branch',
+                                           default='HEAD'),
+                revision=util.FixedParameter(name='revision',
+                                             default=''),
+                repository=util.FixedParameter(name='repository',
+                                               default=util.env.GIT_REPO),
+                project=util.FixedParameter(name='project',
+                                            default=default_project),
+            )
+        ]
+    )
+
+
 def promote_scheduler():
     default_project = "%s/%s" % (
         util.env.GIT_OWNER, util.env.GIT_SLUG)
