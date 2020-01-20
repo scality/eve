@@ -17,6 +17,18 @@ Release Notes
 
 .. towncrier release notes start
 
+Eve 1.6.0 (2020-01-20)
+======================
+
+Features
+--------
+
+- Adding the ability to simultaneously upload artifacts into version 2 and 3 at the same time. (EVE-1109)
+- Adding new step ``Uploadv3`` to handle artifacts version >= 3 upload. (EVE-1109)
+- Added temporary promotion button. (PIPDEP-827)
+- Added promotion button. (PIPDEP-829)
+
+
 Eve 1.5.15 (2019-12-11)
 =======================
 
