@@ -369,7 +369,7 @@ class Uploadv3(BaseUpload):
     def upload_command(self):
         return [
             ('find -L -type f -print0 | '
-             'sed -e "s:\(^\|\x0\)\./:\1:g" | '
+             'sed -e "s:\\(^\\|\\x0\\)\\./:\\1:g" | '
              'xargs -0 -n 1 -t -P 16 '
              '-I @ curl --silent --fail --show-error --max-time {} '
              '-T "@" "http://artifacts-v3/upload/{}/@"').format(
