@@ -17,6 +17,23 @@ Release Notes
 
 .. towncrier release notes start
 
+Eve 1.6.1 (2020-01-21)
+======================
+
+Features
+--------
+
+- Prefix UploadV3 step name with ``V3``. (EVE-1113)
+
+
+Bugfixes
+--------
+
+- Fixed nginx behaviour refusing an uri with two spaces. (EVE-1110)
+- Made find command compatible with busybox. (EVE-1111)
+- Modify xargs opts on Artifacts Upload Version 3 so that it is compatible with Alpine. (EVE-1112)
+
+
 Eve 1.6.0 (2020-01-20)
 ======================
 
