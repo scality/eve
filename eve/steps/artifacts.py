@@ -341,6 +341,7 @@ class Upload(BaseUpload):
                 defer.returnValue(SKIPPED)
         if util.env.ARTIFACTS_VERSION_THREE_IN_USE:
             self.build.addStepsAfterCurrentStep([Uploadv3(
+                name="V3 {name}".format(name=self.name),
                 source=self.source,
                 urls=self._urls,
                 flunkOnFailure=False,
