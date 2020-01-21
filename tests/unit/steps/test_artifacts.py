@@ -119,6 +119,7 @@ class TestUpload(steps.BuildStepMixin, unittest.TestCase,
                 maxTime=3610,
                 command='find -L -type f -print0 | '
                 'sed -e "s:\\(^\\|\\x0\\)\\./:\\1:g" | '
+                'sed -e "s: :%20:g" | '
                 'xargs -0 -n 1 -t -P 16 '
                 '-I @ curl --silent --fail --show-error '
                 '--max-time 3600 -T "@" '
