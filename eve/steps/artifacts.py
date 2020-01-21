@@ -369,8 +369,8 @@ class Uploadv3(BaseUpload):
     def upload_command(self):
         return [
             ('find -L -type f -printf "%P\\0" | '
-             'xargs --null --max-args=1 --verbose --max-procs=16 '
-             '--replace=@ curl --silent --fail --show-error --max-time {} '
+             'xargs -0 -n 1 -t -P 16 '
+             '-I @ curl --silent --fail --show-error --max-time {} '
              '-T "@" "http://artifacts-v3/upload/{}/@"').format(
                 self._upload_max_time, self.get_container())]
 
