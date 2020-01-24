@@ -85,6 +85,7 @@ setup(
             'SetArtifactsPublicURL=eve.steps.artifacts:SetArtifactsPublicURL',
             'SetBootstrapProperty=eve.steps.property:SetBootstrapProperty',
             'SetBootstrapPropertyFromCommand=eve.steps.property:SetBootstrapPropertyFromCommand',
+            'SetWorkerDistro=eve.steps.distro:SetWorkerDistro',
             'StepExtractor=eve.steps.yaml_parser:StepExtractor',
             'PatcherConfig=eve.steps.patcher:PatcherConfig',
             'TriggerStages=eve.steps.trigger_stages:TriggerStages',

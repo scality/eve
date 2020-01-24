@@ -61,6 +61,11 @@ class TestJunit(unittest.TestCase):
                 'success'
             ),
             (
+                u'Check worker OS distribution',
+                u'finished',
+                u'success'
+            ),
+            (
                 u'extract steps from yaml',
                 u'finished',
                 'success'

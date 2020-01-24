@@ -59,7 +59,12 @@ def triggerable_builder(builder_name, workers):
     factory.addStep(steps.CancelOldBuild(name='prevent unuseful restarts'))
     factory.addStep(steps.SetArtifactsPrivateURL(
         builder_name == util.env.OPENSTACK_BUILDER_NAME))
-
+    # Add property regarding linux OS distribution
+    factory.addStep(steps.SetWorkerDistro(
+        name='Check worker OS distribution',
+        hideStepIf=True,
+        flunkOnFailure=False
+    ))
     # Extract steps from conf
     factory.addStep(steps.StepExtractor(
         name='extract steps from yaml',
