@@ -368,14 +368,22 @@ class Uploadv3(BaseUpload):
 
     @property
     def upload_command(self):
+        distribution = self.getProperty('distribution_id')
+        xargs = "xargs -0 -n 1 -t"
+        # some alpine distribution do not support the -P option on xargs
+        if distribution != 'alpine':
+            xargs += " -P 16"
         return [
             ('find -L -type f -print0 | '
              'sed -e "s:\\(^\\|\\x0\\)\\./:\\1:g" | '
-             'xargs -0 -n 1 -t -P 16 '
-             '-I @ sh -c \'curl --silent --fail --show-error --max-time {} '
-             '-T "@" "http://artifacts-v3/upload/{}/"'
+             '{xargs} '
+             '-I @ sh -c \'curl --silent --fail --show-error '
+             '--max-time {upload_time} '
+             '-T "@" "http://artifacts-v3/upload/{container}/"'
              '$(echo "@" | sed -e "s: :%20:g")\'').format(
-                self._upload_max_time, self.get_container())]
+                xargs=xargs,
+                upload_time=self._upload_max_time,
+                container=self.get_container())]
 
     @defer.inlineCallbacks
     def run(self):
