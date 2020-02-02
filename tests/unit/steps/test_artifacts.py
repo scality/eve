@@ -120,11 +120,11 @@ class TestUpload(steps.BuildStepMixin, unittest.TestCase,
                 command='find -L -type f -print0 | '
                 'sed -e "s:\\(^\\|\\x0\\)\\./:\\1:g" | '
                 'xargs -0 -n 1 -t -P 16 '
-                '-I @ curl --silent --fail --show-error '
+                '-I @ sh -c \'curl --silent --fail --show-error '
                 '--max-time 3600 -T "@" '
                 '"http://artifacts-v3/upload/githost:owner:repo:prefix-'
                 '0.0.0.0.r190101000000.1234567.pre-merge.12345678/"'
-                '$(echo "@" | sed -e "s: :%20:g")'
+                '$(echo "@" | sed -e "s: :%20:g")\''
             )
             + 0
         )
