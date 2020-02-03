@@ -17,6 +17,22 @@ Release Notes
 
 .. towncrier release notes start
 
+Eve 1.6.2 (2020-02-03)
+======================
+
+Features
+--------
+
+- Created a new step ``SetWorkerDistro`` which is now implicitly called on each stage instantiation to identify the worker linux distribution and set new properties. (EVE-1112)
+
+
+Bugfixes
+--------
+
+- Fixed the space encoding in artifacts uploading. (EVE-1110)
+- Modifying xargs opts on ``UploadV3`` step depending on linux OS distribution. (EVE-1112)
+
+
 Eve 1.6.1 (2020-01-21)
 ======================
 
