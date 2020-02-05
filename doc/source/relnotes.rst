@@ -17,6 +17,15 @@ Release Notes
 
 .. towncrier release notes start
 
+Eve 1.6.3 (2020-02-05)
+======================
+
+Features
+--------
+
+- Use "artifacts-v3" service for promote and prolong operations. (EVE-1115)
+
+
 Eve 1.6.2 (2020-02-03)
 ======================
 
