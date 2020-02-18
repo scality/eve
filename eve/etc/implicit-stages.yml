@@ -37,7 +37,7 @@ stages:
             artifacts_prefix=`echo %(prop:eve_promotion_artifacts)s | sed -E 's/(^[^/]+\:)(dev\-|preprod\-|)(staging|prolonged)\-[0-9]+(\.[0-9]+){1,3}\.r[0-9]{12}\.[0-9a-f]+\.[^/]+\.[0-9]+$/\\1\\2/'`;
             artifacts_target=${artifacts_prefix}promoted-%(prop:eve_promotion_tag)s;
             echo "copying '%(prop:eve_promotion_artifacts)s' to '${artifacts_target}'";
-            curl http://artifacts-v3/copy/%(prop:eve_promotion_artifacts)s/${artifacts_target}/ | tee /tmp/%(prop:workername)s-promotion-output.log;
+            curl --silent http://artifacts/copy/%(prop:eve_promotion_artifacts)s/${artifacts_target}/ | tee /tmp/%(prop:workername)s-promotion-output.log;
           haltOnFailure: True
       - ShellCommand:
           name: check promotion result
@@ -58,7 +58,7 @@ stages:
           command: >
             artifacts_target=`echo %(prop:eve_prolongation_artifacts)s | sed -E 's/(^[^/]+\:)(dev\-|preprod\-|)staging(\-[0-9]+(\.[0-9]+){1,3}\.r[0-9]{12}\.[0-9a-f]+\.[^/]+\.[0-9]+)$/\\1\\2prolonged\\3/'`;
             echo "copying '%(prop:eve_prolongation_artifacts)s' to '${artifacts_target}'";
-            curl http://artifacts-v3/copy/%(prop:eve_prolongation_artifacts)s/${artifacts_target}/ | tee /tmp/%(prop:workername)s-prolong-output.log;
+            curl --silent http://artifacts/copy/%(prop:eve_prolongation_artifacts)s/${artifacts_target}/ | tee /tmp/%(prop:workername)s-prolong-output.log;
           haltOnFailure: True
       - ShellCommand:
           name: check promotion result
