@@ -17,6 +17,16 @@ Release Notes
 
 .. towncrier release notes start
 
+Eve 1.7.0 (2020-02-19)
+======================
+
+Features
+--------
+
+- ``Upload`` step is now using artifacts version >= 3 only. (EVE-1114)
+- Use "artifacts" service for promote and prolong operations. (RELENG-3593)
+
+
 Eve 1.6.3 (2020-02-05)
 ======================
 
