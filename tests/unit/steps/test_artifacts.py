@@ -37,7 +37,6 @@ class TestUpload(steps.BuildStepMixin, unittest.TestCase,
         util.env = util.load_env([
             ('ARTIFACTS_PREFIX', 'prefix-'),
             ('OPENSTACK_BUILDER_NAME', 'openstack'),
-            ('ARTIFACTS_VERSION_THREE_IN_USE', 0),
         ])
         return self.setUpBuildStep()
 
@@ -73,15 +72,15 @@ class TestUpload(steps.BuildStepMixin, unittest.TestCase,
             ExpectShell(
                 workdir='build/bar',
                 maxTime=3610,
-                command='if [ ! -n "$(find -L . -type f | head -1)" ]; then '
-                'echo "No files here. Nothing to do."; exit 0; fi && '
-                'tar -chvzf ../artifacts.tar.gz . && '
-                'echo tar successful. Calling curl... && '
-                'curl --progress-bar --verbose --max-time 3600 -T '
-                '../artifacts.tar.gz -X PUT '
-                'http://artifacts/upload/githost:owner:repo:prefix-'
-                '0.0.0.0.r190101000000.1234567.pre-merge.12345678')
-            + ExpectShell.log('stdio', stdout='Response Status: 201 Created')
+                command='find -L -type f -print0 | '
+                'sed -e "s:\\(^\\|\\x0\\)\\./:\\1:g" | '
+                'xargs -0 -n 1 -t -P 16 '
+                '-I @ sh -c \'curl --silent --fail --show-error '
+                '--max-time 3600 -T "@" '
+                '"http://artifacts/upload/githost:owner:repo:prefix-'
+                '0.0.0.0.r190101000000.1234567.pre-merge.12345678/"'
+                '$(echo "@" | sed -e "s: :%20:g")\''
+            )
             + 0)
         self.expectOutcome(result=SUCCESS)
         return self.runStep()
@@ -93,45 +92,20 @@ class TestUpload(steps.BuildStepMixin, unittest.TestCase,
             ExpectShell(
                 workdir='/absolute/path',
                 maxTime=3610,
-                command='if [ ! -n "$(find -L . -type f | head -1)" ]; then '
-                'echo "No files here. Nothing to do."; exit 0; fi && '
-                'tar -chvzf ../artifacts.tar.gz . && '
-                'echo tar successful. Calling curl... && '
-                'curl --progress-bar --verbose --max-time 3600 -T '
-                '../artifacts.tar.gz -X PUT '
-                'http://artifacts/upload/githost:owner:repo:prefix-'
-                '0.0.0.0.r190101000000.1234567.pre-merge.12345678')
-            + ExpectShell.log('stdio', stdout='Response Status: 201 Created')
-            + 0)
-        self.expectOutcome(result=SUCCESS)
-        return self.runStep()
-
-    def test_artifacts_v3_upload(self):
-        self.setupStep(
-            Uploadv3(
-                name='Upload',
-                source='/absolute/path'
-            )
-        )
-        self.expectCommands(
-            ExpectShell(
-                workdir='/absolute/path',
-                maxTime=3610,
                 command='find -L -type f -print0 | '
                 'sed -e "s:\\(^\\|\\x0\\)\\./:\\1:g" | '
                 'xargs -0 -n 1 -t -P 16 '
                 '-I @ sh -c \'curl --silent --fail --show-error '
                 '--max-time 3600 -T "@" '
-                '"http://artifacts-v3/upload/githost:owner:repo:prefix-'
+                '"http://artifacts/upload/githost:owner:repo:prefix-'
                 '0.0.0.0.r190101000000.1234567.pre-merge.12345678/"'
                 '$(echo "@" | sed -e "s: :%20:g")\''
             )
-            + 0
-        )
+            + 0)
         self.expectOutcome(result=SUCCESS)
         return self.runStep()
 
-    def test_artifacts_v3_upload_on_alpine(self):
+    def test_artifacts_upload_on_alpine(self):
         self.setupStep(
             Uploadv3(
                 name='Upload',
@@ -147,7 +121,7 @@ class TestUpload(steps.BuildStepMixin, unittest.TestCase,
                 'xargs -0 -n 1 -t '
                 '-I @ sh -c \'curl --silent --fail --show-error '
                 '--max-time 3600 -T "@" '
-                '"http://artifacts-v3/upload/githost:owner:repo:prefix-'
+                '"http://artifacts/upload/githost:owner:repo:prefix-'
                 '0.0.0.0.r190101000000.1234567.pre-merge.12345678/"'
                 '$(echo "@" | sed -e "s: :%20:g")\''
             )

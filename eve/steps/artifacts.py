@@ -17,7 +17,6 @@
 # Boston, MA  02110-1301, USA.
 """Steps allowing eve to interact with artifacts."""
 
-import abc
 import os
 import re
 from collections import defaultdict
@@ -25,7 +24,7 @@ from collections import defaultdict
 from buildbot.plugins import util
 from buildbot.process import logobserver
 from buildbot.process.properties import Interpolate
-from buildbot.process.results import FAILURE, SKIPPED, SUCCESS
+from buildbot.process.results import FAILURE, SKIPPED
 from buildbot.steps.shell import ShellCommand
 from packaging import version
 from twisted.internet import defer, reactor
@@ -136,10 +135,11 @@ class SetArtifactsPrivateURL(EvePropertyFromCommand):
             logEnviron=False)
 
 
-class BaseUpload(ShellCommand):
-    """Base class to handle artifacts uploads."""
+class Upload(ShellCommand):
+    """Upload class to handle artifacts uploads.
 
-    __metaclass__ = abc.ABCMeta
+    Compatible only with Artifacts version >= 3.
+    """
 
     renderables = [
         'source',
@@ -162,7 +162,7 @@ class BaseUpload(ShellCommand):
                                        util.Transform(os.path.join,
                                                       'build',
                                                       source))
-        super(BaseUpload, self).__init__(
+        super(Upload, self).__init__(
             name=name,
             haltOnFailure=True,
             command=util.Transform(self.set_command, urls),
@@ -174,10 +174,23 @@ class BaseUpload(ShellCommand):
         self.addLogObserver('stdio', self.observer)
 
     @property
-    @abc.abstractmethod
     def upload_command(self):
-        """Return a string with the command to make an upload to Artifacts."""
-        return
+        distribution = self.getProperty('distribution_id')
+        xargs = "xargs -0 -n 1 -t"
+        # some alpine distribution do not support the -P option on xargs
+        if distribution != 'alpine':
+            xargs += " -P 16"
+        return [
+            ('find -L -type f -print0 | '
+             'sed -e "s:\\(^\\|\\x0\\)\\./:\\1:g" | '
+             '{xargs} '
+             '-I @ sh -c \'curl --silent --fail --show-error '
+             '--max-time {upload_time} '
+             '-T "@" "http://artifacts/upload/{container}/"'
+             '$(echo "@" | sed -e "s: :%20:g")\'').format(
+                xargs=xargs,
+                upload_time=self._upload_max_time,
+                container=self.get_container())]
 
     def get_container(self):
         eve_api_version = self.getProperty('eve_api_version')
@@ -304,22 +317,6 @@ class BaseUpload(ShellCommand):
 
         return sorted(links)
 
-
-class Upload(BaseUpload):
-    """Upload files to artifacts."""
-
-    @property
-    def upload_command(self):
-        return [
-            ('if [ ! -n "$(find -L . -type f | head -1)" ]; then '
-             'echo "No files here. Nothing to do."; exit 0; fi'),
-            'tar -chvzf ../artifacts.tar.gz .',
-            'echo tar successful. Calling curl...',
-            ('curl --progress-bar --verbose --max-time {} -T '
-             '../artifacts.tar.gz -X PUT http://artifacts/upload/{}').format(
-                self._upload_max_time,
-                self.get_container())]
-
     @defer.inlineCallbacks
     def run(self):
         self.check_artifacts_name()
@@ -334,59 +331,14 @@ class Upload(BaseUpload):
 
                 # Schedule a retry after this step
                 self.build.addStepsAfterCurrentStep([self.__class__(
+                    name="[retry upload] {name}".format(name=self.name),
                     source=self.source,
                     urls=self._urls,
                     retry=(delay, repeats - 1),
                     **self._kwargs)])
                 defer.returnValue(SKIPPED)
-        if util.env.ARTIFACTS_VERSION_THREE_IN_USE:
-            self.build.addStepsAfterCurrentStep([Uploadv3(
-                name="V3 {name}".format(name=self.name),
-                source=self.source,
-                urls=self._urls,
-                flunkOnFailure=False,
-                warnOnFailure=True,
-                **self._kwargs
-            )])
         defer.returnValue(result)
 
-    def evaluateCommand(self, cmd):  # NOQA flake8 to ignore camelCase
-        out = self.observer.getStdout()
-        err = self.observer.getStderr()
-        if not err and 'No files here. Nothing to do.' in out:
-            return SUCCESS
-        elif 'Response Status: 201 Created' not in out:
-            return FAILURE
-        return cmd.results()
 
-
-class Uploadv3(BaseUpload):
-    """Upload files to artifacts version >= 3.
-
-    This class was created to cohexist Upload while we pla
-    """
-
-    @property
-    def upload_command(self):
-        distribution = self.getProperty('distribution_id')
-        xargs = "xargs -0 -n 1 -t"
-        # some alpine distribution do not support the -P option on xargs
-        if distribution != 'alpine':
-            xargs += " -P 16"
-        return [
-            ('find -L -type f -print0 | '
-             'sed -e "s:\\(^\\|\\x0\\)\\./:\\1:g" | '
-             '{xargs} '
-             '-I @ sh -c \'curl --silent --fail --show-error '
-             '--max-time {upload_time} '
-             '-T "@" "http://artifacts-v3/upload/{container}/"'
-             '$(echo "@" | sed -e "s: :%20:g")\'').format(
-                xargs=xargs,
-                upload_time=self._upload_max_time,
-                container=self.get_container())]
-
-    @defer.inlineCallbacks
-    def run(self):
-        self.check_artifacts_name()
-        result = yield super(Uploadv3, self).run()
-        defer.returnValue(result)
+# Alias for compatibility when steps explicitly call Uploadv3
+Uploadv3 = Upload
