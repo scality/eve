@@ -1,0 +1,1 @@
+Do not follow last success request on artifacts >= 3.0.0 as it's not required and not supported.

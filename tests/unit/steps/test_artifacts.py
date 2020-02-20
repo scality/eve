@@ -157,7 +157,6 @@ class TestGetArtifactsFromStage(steps.BuildStepMixin, unittest.TestCase):
                 ExpectShell(workdir='wkdir',
                             command=[
                                 'curl',
-                                '-L',
                                 '--fail',
                                 '-I',
                                 'http://artifacts/last_success/:::%s.r..%s' % (
