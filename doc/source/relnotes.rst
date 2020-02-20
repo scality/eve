@@ -17,6 +17,15 @@ Release Notes
 
 .. towncrier release notes start
 
+Eve 1.7.1 (2020-02-20)
+======================
+
+Bugfixes
+--------
+
+- Do not follow last success request on artifacts >= 3.0.0 as it's not required and not supported. (EVE-1119)
+
+
 Eve 1.7.0 (2020-02-19)
 ======================
 
