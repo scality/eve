@@ -84,9 +84,9 @@ class GetArtifactsFromStage(EvePropertyFromCommand):
         artifacts_name = 'fatal: unable to parse artifacts name'
         lines = self.observer.getStdout().splitlines()
         for line in lines:
-            reg = re.search('^Location: (https?://.*?)/builds/(.*)$', line)
+            reg = re.search('^Location: .*/download/([^/]+)/$', line)
             if reg:
-                artifacts_name = reg.group(2)
+                artifacts_name = reg.group(1)
                 break
 
         self.setProperty(self.property, str(artifacts_name),

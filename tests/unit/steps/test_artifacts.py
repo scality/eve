@@ -147,7 +147,8 @@ class TestGetArtifactsFromStage(steps.BuildStepMixin, unittest.TestCase):
         return self.tearDownBuildStep()
 
     def setupStep(self, stage='pre-merge', property='artifacts',
-                  expect_command=True, stdout='Location: http://a/builds/foo'):
+                  expect_command=True,
+                  stdout='Location: /artifacts/download/foo/'):
         super(TestGetArtifactsFromStage, self).setupStep(
             GetArtifactsFromStage(stage,
                                   property=property,
@@ -170,6 +171,15 @@ class TestGetArtifactsFromStage(steps.BuildStepMixin, unittest.TestCase):
         self.setupStep()
         self.expectOutcome(SUCCESS)
         self.expectProperty('artifacts', 'foo', 'GetArtifactsFromStage')
+        return self.runStep()
+
+    def testBasicArtifactsV3(self):
+        artifacts_name = 'githost:group:slug:staging-0.0.0.pre-merge.00094496'
+        self.setupStep(
+            stdout='Location: /artifacts/download/%s/' % artifacts_name)
+        self.expectOutcome(SUCCESS)
+        self.expectProperty(
+            'artifacts', artifacts_name, 'GetArtifactsFromStage')
         return self.runStep()
 
     def testSkipSetProperty(self):
