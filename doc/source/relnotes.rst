@@ -17,6 +17,15 @@ Release Notes
 
 .. towncrier release notes start
 
+Eve 1.7.1 (2020-02-21)
+======================
+
+Bugfixes
+--------
+
+- Rework ``GetArtifactsFromStage`` regex to support artifacts V3 response. (EVE-1120)
+
+
 Eve 1.7.0 (2020-02-19)
 ======================
 
