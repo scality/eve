@@ -331,7 +331,6 @@ class Upload(ShellCommand):
 
                 # Schedule a retry after this step
                 self.build.addStepsAfterCurrentStep([self.__class__(
-                    name="[retry upload] {name}".format(name=self.name),
                     source=self.source,
                     urls=self._urls,
                     retry=(delay, repeats - 1),
