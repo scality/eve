@@ -19,7 +19,7 @@ stages:
       - ShellCommand:
           name: check eve_promotion_tag property
           command: >
-            echo %(prop:eve_promotion_tag)s | grep -qE '^[^/\-]+$';
+            git tag -l | grep -E '^%(prop:eve_promotion_tag)s$' | grep -qE '^[^/\-]+$';
           haltOnFailure: True
       - ShellCommand:
           name: check tag and artifacts consistency
