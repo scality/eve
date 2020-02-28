@@ -21,7 +21,9 @@ from os import pardir
 from os.path import abspath, join
 from pprint import pprint
 
+from buildbot import version
 from buildbot.process.results import SUCCESS
+from buildbot.plugins import util
 from tests.docker.cluster import DockerizedCluster
 from tests.util.cmd import cmd
 from tests.util.yaml_factory import SingleCommandYaml
@@ -77,6 +79,10 @@ class Tests(unittest.TestCase):
             'bootstrap', timeout=180)
         self.assertEqual(bootstrap_build['results'], SUCCESS)
         bootstrap_steps = self.cluster.api.get_build_steps(bootstrap_build)
+        args_sha1 = util.hash_dict({'BUILDBOT_VERSION': version})
+        docker_step_prefix = '[ubuntu-xenial-ctxt_930a_{0}]'.format(
+            args_sha1.hexdigest()[:4]
+        )
         step_names_and_descriptions = [(step['name'], step['state_string'])
                                        for step in bootstrap_steps]
         self.assertEqual(step_names_and_descriptions, [
@@ -94,12 +100,12 @@ class Tests(unittest.TestCase):
             (u'set the artifacts public url', u"property 'artifacts_public_url' set"),  # noqa
             (u'get the API version', u'Set'),
             (u'prepare 1 stage(s)', u'finished'),
-            (u'[ubuntu-xenial-ctxt_930a] fingerprint', u"Ran"),  # noqa
-            (u'[ubuntu-xenial-ctxt_930a] look up', u"failed (1)"),  # noqa
-            (u'[ubuntu-xenial-ctxt_930a] pull', u"failed (1)"),  # noqa
-            (u'[ubuntu-xenial-ctxt_930a] build', u'Ran'),
-            (u'[ubuntu-xenial-ctxt_930a] build retry', u'Ran (skipped)'),
-            (u'[ubuntu-xenial-ctxt_930a] push', u'Ran'),
+            (u'%s fingerprint' % docker_step_prefix, u"Ran"),  # noqa
+            (u'%s look up' % docker_step_prefix, u"failed (1)"),  # noqa
+            (u'%s pull' % docker_step_prefix, u"failed (1)"),  # noqa
+            (u'%s build' % docker_step_prefix, u'Ran'),
+            (u'%s build retry' % docker_step_prefix, u'Ran (skipped)'),
+            (u'%s push' % docker_step_prefix, u'Ran'),
             (u'trigger', u'triggered pre-merge')])
 
         # Check build
@@ -150,12 +156,12 @@ class Tests(unittest.TestCase):
             (u'set the artifacts public url', u"property 'artifacts_public_url' set"),  # noqa
             (u'get the API version', u'Set'),
             (u'prepare 1 stage(s)', u'finished'),
-            (u'[ubuntu-xenial-ctxt_930a] fingerprint', u"Ran"),  # noqa
-            (u'[ubuntu-xenial-ctxt_930a] look up', u"Ran"),  # noqa
-            (u'[ubuntu-xenial-ctxt_930a] pull', u"Ran (skipped)"),  # noqa
-            (u'[ubuntu-xenial-ctxt_930a] build', u'Ran (skipped)'),
-            (u'[ubuntu-xenial-ctxt_930a] build retry', u'Ran (skipped)'),
-            (u'[ubuntu-xenial-ctxt_930a] push', u'Ran (skipped)'),
+            (u'%s fingerprint' % docker_step_prefix, u"Ran"),  # noqa
+            (u'%s look up' % docker_step_prefix, u"Ran"),  # noqa
+            (u'%s pull' % docker_step_prefix, u"Ran (skipped)"),  # noqa
+            (u'%s build' % docker_step_prefix, u'Ran (skipped)'),
+            (u'%s build retry' % docker_step_prefix, u'Ran (skipped)'),
+            (u'%s push' % docker_step_prefix, u'Ran (skipped)'),
             (u'trigger', u'triggered pre-merge')])
 
         # do the same build one last time, but erase the local image first
@@ -198,10 +204,10 @@ class Tests(unittest.TestCase):
             (u'set the artifacts public url', u"property 'artifacts_public_url' set"),  # noqa
             (u'get the API version', u'Set'),
             (u'prepare 1 stage(s)', u'finished'),
-            (u'[ubuntu-xenial-ctxt_930a] fingerprint', u"Ran"),  # noqa
-            (u'[ubuntu-xenial-ctxt_930a] look up', u"failed (1)"),  # noqa
-            (u'[ubuntu-xenial-ctxt_930a] pull', u"Ran"),  # noqa
-            (u'[ubuntu-xenial-ctxt_930a] build', u'Ran (skipped)'),
-            (u'[ubuntu-xenial-ctxt_930a] build retry', u'Ran (skipped)'),
-            (u'[ubuntu-xenial-ctxt_930a] push', u'Ran (skipped)'),
+            (u'%s fingerprint' % docker_step_prefix, u"Ran"),  # noqa
+            (u'%s look up' % docker_step_prefix, u"failed (1)"),  # noqa
+            (u'%s pull' % docker_step_prefix, u"Ran"),  # noqa
+            (u'%s build' % docker_step_prefix, u'Ran (skipped)'),
+            (u'%s build retry' % docker_step_prefix, u'Ran (skipped)'),
+            (u'%s push' % docker_step_prefix, u'Ran (skipped)'),
             (u'trigger', u'triggered pre-merge')])

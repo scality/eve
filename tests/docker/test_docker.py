@@ -21,7 +21,9 @@ import unittest
 from os import pardir
 from os.path import abspath, join
 
+from buildbot import version
 from buildbot.process.results import SUCCESS
+from buildbot.plugins import util
 from tests.docker.cluster import DockerizedCluster as Cluster
 from tests.util.yaml_factory import PreMerge, SingleCommandYaml
 
@@ -55,8 +57,11 @@ class TestDockerCluster(unittest.TestCase):
             self.assertEqual(buildset.result, 'failure')
             # Check that the failing build step is The good one
             fstep = buildset.buildrequest.build.first_failing_step
-            self.assertEqual(fstep.name,
-                             '[bad-ubuntu-xenial-ctxt_f532] build')
+            args_sha1 = util.hash_dict({'BUILDBOT_VERSION': version})
+            exp_step_name = '[bad-ubuntu-xenial-ctxt_f532_{0}] build'.format(
+                args_sha1.hexdigest()[:4]
+            )
+            self.assertEqual(fstep.name, exp_step_name)
             cluster.sanity_check()
 
     def test2_simple_failure_in_docker(self):
@@ -143,6 +148,45 @@ class TestDockerCluster(unittest.TestCase):
                                child_build.properties['workername'][0])
             self.assertEqual(child_build.properties['worker_uuid'][0],
                              hash)
+            cluster.sanity_check()
+
+    def test_build_args_docker(self):
+        """Test a docker worker with build args parameters.
+
+        Steps:
+            - Force a build with a docker worker and docker build args.
+            - Check that the argument was set.
+            - Check that the build succeeded.
+
+        """
+        with Cluster() as cluster:
+            local_repo = cluster.clone()
+            args = {
+                'ARG': 42,
+            }
+            local_repo.push(
+                yaml=PreMerge(
+                    steps=[
+                        {
+                            'ShellCommand': {
+                                'name': 'Ensure build arg was passed',
+                                'command': 'test $ARG = %s' % args['ARG']
+                            }
+                        },
+                    ],
+                    worker={
+                        'type': 'docker',
+                        'path': 'ubuntu-xenial-ctxt',
+                        'build_args': args
+                    }),
+                dirs=[
+                    abspath(
+                        join(__file__, pardir, 'contexts',
+                             'ubuntu-xenial-ctxt'))
+                ])
+            cluster.sanity_check()
+            buildset = cluster.api.force(branch=local_repo.branch)
+            self.assertEqual(buildset.result, 'success')
             cluster.sanity_check()
 
     @unittest.skip('Flaky, need to understand how this works')

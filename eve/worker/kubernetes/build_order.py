@@ -55,7 +55,11 @@ class KubernetesPodBuildOrder(util.BaseDockerBuildOrder):
                     raise ValueError(
                         'Incorrect arg dockerfile type in image definition.')
 
-                image_vars[name] = self._build_image(name, context, dockerfile)
+                # Proper build args type check is made inside _build_image
+                build_args = params.get('build_args', {})
+
+                image_vars[name] = self._build_image(
+                    name, context, dockerfile, build_args)
 
             elif isinstance(params, str):
                 image_vars[name] = self._build_image(name, params)

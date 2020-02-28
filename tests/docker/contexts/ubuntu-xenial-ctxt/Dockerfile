@@ -15,6 +15,9 @@ RUN /usr/local/bin/pip install buildbot-worker==${BUILDBOT_VERSION}
 RUN groupadd -r buildbot && useradd -r -g buildbot buildbot
 RUN mkdir /worker && chown buildbot:buildbot /worker
 
+# To ensure that we can send specific ARGS from the main.yml
+ARG ARG
+ENV ARG=${ARG}
 # Make ssh dir and add bitbucket to known_hosts
 RUN mkdir /root/.ssh/
 RUN /bin/echo -e "Host bitbucket.org\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
