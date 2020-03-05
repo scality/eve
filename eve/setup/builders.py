@@ -20,7 +20,6 @@ from buildbot.config import BuilderConfig
 from buildbot.plugins import steps, util
 from buildbot.process.factory import BuildFactory
 from buildbot.util.logger import Logger
-
 from twisted.internet import defer
 
 log = Logger()
@@ -48,6 +47,7 @@ def canStartBuild(builder, wfb, request):
             builderid=builderid,
             complete=False
         )
+        builds = [x for x in builds if x['results'] is None]
         running_builds = len(builds)
         log.debug('%d builds are running for %s' % (running_builds, name))
         return simultaneous_builds > running_builds
