@@ -48,6 +48,14 @@ class TestGitHostMock(TestCase):
         cmd('git add -A', cwd=clone_dir)
         cmd('git commit -m "add yaml file"', cwd=clone_dir)
         cmd('git push -u origin HEAD:mybranch', cwd=clone_dir)
-        self.assertIn('set up to track remote branch mybranch',
-                      cmd('git checkout mybranch', cwd=clone_dir))
+        output = cmd('git checkout mybranch', cwd=clone_dir)
+        # Check output from GitHostMock.
+        # To support development setups, it's easier to check for the various
+        # possible formats here.
+        # 1. This format was supported originally by git (quite an old format)
+        git_msg_origin = 'set up to track remote branch mybranch'
+        # 2. This format appeared in git v2.15.0 (note additional quotes)
+        git_msg_2_15 = 'set up to track remote branch \'mybranch\''
+        # Check that at least one matches.
+        assert git_msg_origin in output or git_msg_2_15 in output
         ghm.stop()

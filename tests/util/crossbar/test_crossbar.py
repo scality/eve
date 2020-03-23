@@ -34,7 +34,7 @@ class TestCrossbar(TestCase):
         """
         crossbar = Crossbar().start()
         self.assertIn(
-            """Router "worker-001": transport 'transport-001' started""",
+            """Ok, Router worker001 configured""",
             crossbar.loglines[-2])
 
         crossbar.stop()

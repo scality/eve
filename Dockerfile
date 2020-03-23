@@ -11,9 +11,11 @@ RUN apt-get update && \
         libssl-dev \
         lsof \
         mysql-client \
-        python-dev \
-        python-pip \
-        python-psycopg2 \
+        python3-dev \
+        python3-pip \
+        python3-psycopg2 \
+        python \
+        python-requests \
         telnet \
         vim.tiny && \
     rm -rf /var/lib/apt/lists/*
@@ -31,13 +33,11 @@ RUN if [ -n "$INTERNAL_DOCKER" ]; then curl -sSL https://get.docker.com/ | sh; f
 WORKDIR /root/eve
 
 # Freezing requirements
-COPY requirements/build.txt /tmp/build.txt
-RUN pip install -r /tmp/build.txt
 COPY requirements/base.txt /tmp/requirements.txt
-RUN pip install -r /tmp/requirements.txt
+RUN pip3 install -r /tmp/requirements.txt
 
 COPY . /opt/eve
-RUN pip install --no-deps /opt/eve
+RUN pip3 install --no-deps /opt/eve
 
 COPY eve/etc/master.cfg /root/eve
 COPY buildbot.tac /root/eve

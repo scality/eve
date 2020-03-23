@@ -16,6 +16,8 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor,
 # Boston, MA  02110-1301, USA.
 
+from os.path import abspath, dirname, join
+
 import os
 
 import yaml
@@ -26,10 +28,21 @@ class ConfigurableStepMixin():
 
     def getEveConfig(self):
         """Load Eve's config file on the master and returns the data."""
+        implicit_config = {}
+        try:
+            implicit_conf = join(dirname(dirname(abspath(__file__))),
+                                 'etc', 'implicit-stages.yml')
+            with open(implicit_conf) as config_file:
+                implicit_config = yaml.load(config_file.read())
+        except yaml.YAMLError:
+            raise
         try:
             conf = os.path.expanduser(self.getProperty('conf_path'))
             with open(conf) as config_file:
                 config = yaml.load(config_file.read())
+                if isinstance(config, dict):
+                    for key in implicit_config['stages']:
+                        config['stages'][key] = implicit_config['stages'][key]
                 return config
         except yaml.YAMLError:
             raise

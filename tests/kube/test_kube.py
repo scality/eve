@@ -16,6 +16,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor,
 # Boston, MA  02110-1301, USA.
 
+import codecs
 import time
 import unittest
 from os import pardir
@@ -196,7 +197,7 @@ class TestKube(unittest.TestCase):
             self.assertEqual(buildset.result, 'success')
             # get the kube workername and resolve corresponding uuid
             # (repository name changes with every run of the test)
-            child_build = cluster.api.get_builds('kube_pod-test_suffix')[0]
+            child_build = cluster.api.get_builds('pre-merge')[0]
             props = cluster.api.get_build_properties(child_build)
             uuid = util.create_hash(props['repository'][0],
                                     'kw000-test_suffix')
@@ -210,11 +211,11 @@ class TestKube(unittest.TestCase):
             cluster.delete_secret(uuid)
             # also check all pods are properly cleaned away
             with self.assertRaises(ApiException):
-                cluster.get_pod('worker-1-1-service-init')
+                cluster.get_pod('kw000-test-suffix-1-1-service-init')
             with self.assertRaises(ApiException):
-                cluster.get_pod('worker-1-1')
+                cluster.get_pod('kw000-test-suffix-1-1')
             with self.assertRaises(ApiException):
-                cluster.get_pod('worker-1-1-service-teardown')
+                cluster.get_pod('kw000-test-suffix-1-1-service-teardown')
             cluster.sanity_check()
 
             self.assertEqual(
@@ -277,7 +278,7 @@ class TestKube(unittest.TestCase):
             self.assertEqual(buildset.result, 'exception')
             # get the kube workername and resolve corresponding uuid
             # (repository name changes with every run of the test)
-            child_build = cluster.api.get_builds('kube_pod-test_suffix')[0]
+            child_build = cluster.api.get_builds('pod-worker-stage')[0]
             props = cluster.api.get_build_properties(child_build)
             uuid = util.create_hash(props['repository'][0],
                                     'kw000-test_suffix')
@@ -292,11 +293,11 @@ class TestKube(unittest.TestCase):
             cluster.delete_config_map('fake-service-teardown-status')
             # also check all pods are properly cleaned away
             with self.assertRaises(ApiException):
-                cluster.get_pod('worker-1-1-service-init')
+                cluster.get_pod('kw000-test-suffix-1-1-service-init')
             with self.assertRaises(ApiException):
-                cluster.get_pod('worker-1-1')
+                cluster.get_pod('kw000-test-suffix-1-1')
             with self.assertRaises(ApiException):
-                cluster.get_pod('worker-1-1-service-teardown')
+                cluster.get_pod('kw000-test-suffix-1-1-service-teardown')
 
             # check what happens if service teardown fails
             cluster.create_secret('fake-service-data', {
@@ -308,7 +309,7 @@ class TestKube(unittest.TestCase):
             self.assertEqual(buildset.result, 'exception')
             # get the kube workername and resolve corresponding uuid
             # (repository name changes with every run of the test)
-            child_build = cluster.api.get_builds('kube_pod-test_suffix')[0]
+            child_build = cluster.api.get_builds('pod-worker-stage')[0]
             props = cluster.api.get_build_properties(child_build)
             uuid = util.create_hash(props['repository'][0],
                                     'kw000-test_suffix')
@@ -317,9 +318,10 @@ class TestKube(unittest.TestCase):
             time.sleep(5)  # teardown runs in background
             self.assertEqual(cluster.get_config_map(
                 'fake-service-teardown-status').data['status'], '1')
-            self.assertEqual(cluster.get_secret(
-                uuid).data['kubeconfig'],
-                'somecredentials'.encode('base64')[:-1])
+            self.assertEqual(
+                cluster.get_secret(uuid).data['kubeconfig'],
+                codecs.encode(b'somecredentials', 'base64')[:-1]
+                .decode('utf-8'))
             cluster.delete_secret(uuid)
             cluster.delete_config_map('fake-service-init-status')
             cluster.delete_config_map('fake-service-teardown-status')
@@ -341,7 +343,7 @@ class TestKube(unittest.TestCase):
             self.assertEqual(buildset.result, 'exception')
             # get the kube workername and resolve corresponding uuid
             # (repository name changes with every run of the test)
-            child_build = cluster.api.get_builds('kube_pod-test_suffix')[0]
+            child_build = cluster.api.get_builds('pod-worker-stage')[0]
             props = cluster.api.get_build_properties(child_build)
             uuid = util.create_hash(props['repository'][0],
                                     'kw000-test_suffix')

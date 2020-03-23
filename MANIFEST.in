@@ -1,3 +1,4 @@
+include eve/etc/implicit-stages.yml
 include eve/etc/single_node_heat_template.yml
 include eve/bin/os_script_boot.sh
 include eve/bin/os_script_init.sh

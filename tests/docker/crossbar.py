@@ -31,13 +31,13 @@ class DockerizedCrossbar(Crossbar):
         """Create a crossbar conf and pulls the crossbar docker image."""
         conf = join(__file__, pardir, pardir, 'util', 'crossbar',
                     'crossbar.json')
-        cmd('docker pull crossbario/crossbar:cpy3-17.9.2')
+        cmd('docker pull crossbario/crossbar:cpy3-19.1.2')
         self._start_cmd = [
             'docker', 'run',
             '--name', self._name,
             '-p', '{}:10990'.format(self.port),
             '-v', '{}:/node/.crossbar/config.json'.format(conf),
-            'crossbario/crossbar:cpy3-17.9.2'
+            'crossbario/crossbar:cpy3-19.1.2'
         ]
 
     def _log(self):

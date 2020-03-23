@@ -43,7 +43,7 @@ def cmd(command, ignore_exception=False, cwd=None, wait=True, env=None):
     output = ''
     logger.info('COMMAND : %s', command)
     if env is not None:
-        for key, val in env.iteritems():
+        for key, val in env.items():
             os.environ[key] = val
     process = subprocess.Popen(
         command,
@@ -60,7 +60,7 @@ def cmd(command, ignore_exception=False, cwd=None, wait=True, env=None):
         nextline = process.stdout.readline()
         if nextline:
             logger.info(' │ %s', nextline.rstrip())
-            output += nextline
+            output += nextline.decode('utf-8')
         elif process.poll() is not None:
             break
 

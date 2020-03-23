@@ -39,7 +39,7 @@ class EveForceScheduler(ForceScheduler):
     @staticmethod
     @defer.inlineCallbacks
     def add_missing_revisions(sourcestamps):
-        for _, sourcestamp in sourcestamps.iteritems():
+        for _, sourcestamp in sourcestamps.items():
             if not sourcestamp['revision']:
                 # Retrieve revision from branch for sourcestamps without one
                 res = yield threads.deferToThread(
@@ -49,7 +49,7 @@ class EveForceScheduler(ForceScheduler):
                     stderr=subprocess.PIPE,
                 )
                 try:
-                    sourcestamp['revision'] = res.split()[0]
+                    sourcestamp['revision'] = res.split()[0].decode('utf-8')
                 except IndexError:
                     raise ValidationError("'%s' branch not found" %
                                           sourcestamp['branch'])

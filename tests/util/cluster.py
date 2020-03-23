@@ -55,6 +55,7 @@ class Cluster(object):
 
         self.vault = None
         if extra_conf.get('VAULT_IN_USE', None) == '1':
+            # pylint: disable=assignment-from-none
             self.vault = self.add_vault()
 
         self.registry = None
@@ -173,7 +174,7 @@ class Cluster(object):
                    self.external_ip, ports[0]))
 
         # apply requested personalisations
-        for entry, value in extra_conf.iteritems():
+        for entry, value in extra_conf.items():
             conf[entry] = value
 
         return conf
@@ -238,7 +239,7 @@ class Cluster(object):
     @property
     def first_master(self):
         """Return the first master of the cluster. Usually a frontend."""
-        return self._masters.values()[0]
+        return next(iter(self._masters.values()))
 
     @property
     def api(self):

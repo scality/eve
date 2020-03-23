@@ -61,6 +61,11 @@ class TestJunit(unittest.TestCase):
                 'success'
             ),
             (
+                u'Check worker OS distribution',
+                u'finished',
+                u'success'
+            ),
+            (
                 u'extract steps from yaml',
                 u'finished',
                 'success'
@@ -155,6 +160,51 @@ class TestJunit(unittest.TestCase):
                 u'undeclared report directory and a fail',
                 u'no test results found',
                 'failure'
+            ),
+            (
+                u'test report paths with success',
+                u'T:1 E:0 F:0 S:0',
+                'success'
+            ),
+            (
+                u'test report paths with failure',
+                u'FAIL: toto.tests.sample.test_sample.test_sample',
+                'failure'
+            ),
+            (
+                u'test report paths with success and failure',
+                u'FAIL: toto.tests.sample.test_sample.test_sample',
+                'failure'
+            ),
+            (
+                u'test report paths with success and failure in same',
+                u'FAIL: toto.tests.sample.test_sample.test_sample',
+                'failure'
+            ),
+            (
+                u'test report paths only uploading success',
+                u'T:1 E:0 F:0 S:0',
+                'success'
+            ),
+            (
+                u'test report paths only uploading failure',
+                u'FAIL: toto.tests.sample.test_sample.test_sample',
+                'failure'
+            ),
+            (
+                u'test report paths without list',
+                u'T:1 E:0 F:0 S:0',
+                'success'
+            ),
+            (
+                u'test report paths with non existing file',
+                u'no test results found',
+                'warnings'
+            ),
+            (
+                u'test report paths with non matching glob',
+                u'no test results found',
+                'warnings'
             )
         ]
 

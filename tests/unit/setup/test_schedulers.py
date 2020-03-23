@@ -26,6 +26,28 @@ class TestSetupSchedulers(unittest.TestCase):
         ])
         self.assertIsNotNone(eve.setup.schedulers.force_scheduler())
 
+    def test_prolong_scheduler(self):
+        util.env = util.load_env([
+            ('BOOTSTRAP_BUILDER_NAME', 'foo'),
+            ('FORCE_BUILD_PARAM_COUNT', '0', int),
+            ('GIT_OWNER', 'foo'),
+            ('GIT_REPO', 'blblbl'),
+            ('GIT_SLUG', 'bar'),
+            ('PROLONG_SCHEDULER_NAME', 'bar'),
+        ])
+        self.assertIsNotNone(eve.setup.schedulers.prolong_scheduler())
+
+    def test_promote_scheduler(self):
+        util.env = util.load_env([
+            ('BOOTSTRAP_BUILDER_NAME', 'foo'),
+            ('FORCE_BUILD_PARAM_COUNT', '0', int),
+            ('GIT_OWNER', 'foo'),
+            ('GIT_REPO', 'blblbl'),
+            ('GIT_SLUG', 'bar'),
+            ('PROMOTE_SCHEDULER_NAME', 'bar'),
+        ])
+        self.assertIsNotNone(eve.setup.schedulers.promote_scheduler())
+
     def test_try_scheduler(self):
         util.env = util.load_env([
             ('BOOTSTRAP_BUILDER_NAME', 'foo'),

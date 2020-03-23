@@ -23,18 +23,11 @@ Content:
 
 """
 
-try:
-    from http.server import BaseHTTPServer
-except ImportError:
-    import BaseHTTPServer
+from http.server import BaseHTTPRequestHandler, HTTPServer
 import threading
 import time
-import urllib
 
-try:
-    from urllib.parse import urlparse
-except ImportError:
-    import urlparse
+from urllib.parse import urlencode, urlparse, parse_qsl
 
 
 class _RequestRec(object):
@@ -53,12 +46,12 @@ class _RequestRec(object):
 
         """
         self.command = command.upper() if command else None
-        path_parts = urlparse.urlparse(path)
+        path_parts = urlparse(path)
         self.path = path_parts.path
-        self.query_params = dict(urlparse.parse_qsl(path_parts.query))
+        self.query_params = dict(parse_qsl(path_parts.query))
         self.headers = {
             key.lower(): value
-            for key, value in dict(headers).iteritems()
+            for key, value in dict(headers).items()
             if key.lower() not in self.ignore_headers
         }
 
@@ -71,7 +64,7 @@ class _RequestRec(object):
     def from_args(cls, command, path, query_params=None, headers=None):
         """Return `_RequestRec` instance from given arguments."""
         if query_params:
-            path = '{0}?{1}'.format(path, urllib.urlencode(query_params))
+            path = '{0}?{1}'.format(path, urlencode(query_params))
         return cls(command, path, headers)
 
     def __eq__(self, obj):
@@ -123,7 +116,7 @@ class _RequestRec(object):
             self.__repr_dict(self.headers, indent='  '))
 
 
-class _CodecovIORequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
+class _CodecovIORequestHandler(BaseHTTPRequestHandler):
     """HTTP handler of `CodecovIOMockServer`."""
 
     def do_POST(self):
@@ -133,7 +126,7 @@ class _CodecovIORequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         ``codecov.io`` response.
 
         """
-        url_parts = urlparse.urlparse(self.path)
+        url_parts = urlparse(self.path)
 
         if url_parts.path == '/upload/v4':
             self.send_response(200)
@@ -141,21 +134,21 @@ class _CodecovIORequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             self.send_header('Content-Type', 'text/plain')
             self.end_headers()
 
-            params = dict(urlparse.parse_qsl(url_parts.query))
+            params = dict(parse_qsl(url_parts.query))
             repository = params.get('slug', 'scality/fake_repository')
             commit = params.get('commit', '0' * 40)
 
             self.wfile.write(
                 'https://fake.codecov.io/bitbucket/{0}/commit/{1}\n'.format(
-                    repository, commit))
+                    repository, commit).encode('utf-8'))
 
             self.wfile.write('{0}/s3/fake_report.txt?{1}\n'.format(
                 self.server.url,
-                urllib.urlencode({
+                urlencode({
                     'AWSAccessKeyId': 'FAKEAWSACCESSKID',
                     'Expires': self.server.expires,
                     'Signature': 'FAKESIGNATURE',
-                }), ))
+                }), ).encode('utf-8'))
         else:
             self.send_response(404)
             self.end_headers()
@@ -167,7 +160,7 @@ class _CodecovIORequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             *200* HTTP status if the path wanted is */s3*, *404* otherwise.
 
         """
-        url_parts = urlparse.urlparse(self.path)
+        url_parts = urlparse(self.path)
 
         if url_parts.path.startswith('/s3'):
             self.send_response(200)
@@ -181,13 +174,13 @@ class _CodecovIORequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         Store the request received to verify the ``coecov.io`` handshake.
 
         """
-        ret = BaseHTTPServer.BaseHTTPRequestHandler.parse_request(self)
+        ret = BaseHTTPRequestHandler.parse_request(self)
         if ret:
             self.server.register_request_rec(self)
         return ret
 
 
-class CodecovIOMockServer(BaseHTTPServer.HTTPServer):
+class CodecovIOMockServer(HTTPServer):
     """Mock of ``codecov.io`` HTTP server.
 
     The goal of this HTTP server is to react like a real
@@ -203,8 +196,8 @@ class CodecovIOMockServer(BaseHTTPServer.HTTPServer):
             bind_address (str): Bind address of the TCP socket to use.
 
         """
-        BaseHTTPServer.HTTPServer.__init__(self, (bind_address, 0),
-                                           _CodecovIORequestHandler)
+        HTTPServer.__init__(self, (bind_address, 0),
+                            _CodecovIORequestHandler)
 
         self._th = None
 

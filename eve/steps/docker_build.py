@@ -32,13 +32,10 @@ class DockerStep(MasterShellCommand):
         self.image = image
         super(DockerStep, self).__init__(command, logEnviron=False, **kwargs)
 
-    def __hash__(self):
-        return hash(self.image)
-
     def __eq__(self, other):
-        return (isinstance(other, self.__class__) and
-                self.image == other.image and
-                self.label == other.label)
+        return (isinstance(other, self.__class__)
+                and self.image == other.image
+                and self.label == other.label)
 
 
 class DockerBuild(DockerStep):
@@ -63,8 +60,8 @@ class DockerBuild(DockerStep):
         'image',
     ]
 
-    def __init__(self, label, image, context_dir='.', dockerfile=None, is_retry=False,
-                 labels=None, build_args=None, **kwargs):
+    def __init__(self, label, image, context_dir='.', dockerfile=None,
+                 is_retry=False, labels=None, build_args=None, **kwargs):
         kwargs.setdefault('name',
                           '[{0}] build'.format(label)[0:49])
         self.is_retry = is_retry
@@ -74,13 +71,13 @@ class DockerBuild(DockerStep):
         command = ['docker', 'build', '--tag', image]
 
         if labels:
-            for label_name, label_value in labels.iteritems():
+            for label_name, label_value in labels.items():
                 command += ['--label', '{0}={1}'.format(
                     label_name, label_value
                 )]
 
         if build_args:
-            for build_arg_name, build_arg_value in build_args.iteritems():
+            for build_arg_name, build_arg_value in build_args.items():
                 command += [
                     '--build-arg', '{0}={1}'.format(
                         build_arg_name,
@@ -111,8 +108,8 @@ class DockerBuild(DockerStep):
         defer.returnValue(result)
 
     def __eq__(self, other):
-        return (super(DockerBuild, self).__eq__(other) and
-                self.is_retry == other.is_retry)
+        return (super(DockerBuild, self).__eq__(other)
+                and self.is_retry == other.is_retry)
 
 
 class DockerCheckLocalImage(DockerStep):
@@ -167,15 +164,22 @@ class DockerComputeImageFingerprint(DockerStep):
 
     """
 
-    def __init__(self, label, context_dir, **kwargs):
+    def __init__(self, label, context_dir, dockerfile=None, **kwargs):
         kwargs.setdefault('name',
                           '[{0}] fingerprint'.format(label)[:49])
+        command = (
+            'tar -c --mtime="1990-02-11 00:00Z" --group=0 '
+            '--owner=0 --numeric-owner --sort=name --mode=0 '
+            '{context_dir} {dockerfile} '
+            '| sha256sum | cut -f 1 -d " "'
+        ).format(
+            context_dir=context_dir,
+            dockerfile=str(dockerfile or '')
+        )
         super(DockerComputeImageFingerprint, self).__init__(
             label, context_dir,
-            'tar -c --mtime="1990-02-11 00:00Z" --group=0 ' \
-            '--owner=0 --numeric-owner --sort=name --mode=0 . ' \
-            '| sha256sum | cut -f 1 -d " "',
-            workdir=context_dir, **kwargs
+            command,
+            **kwargs
         )
         self.observer = logobserver.BufferLogObserver(wantStdout=True,
                                                       wantStderr=True)

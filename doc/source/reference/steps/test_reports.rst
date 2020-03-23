@@ -15,18 +15,42 @@ Parameters
 ++++++++++
 
 This step inherits from `ShellCommand`_ so it will work almost the same, but will
-add a single new parameter.
+add two new parameters.
 
 ``report_dir``
     The directory where the JUnit report is looked for.
 
-Example
-+++++++
+``report_path``
+    The file full paths where the JUnit reports are.
+
+Please note, those two parameters are mutually exclusive. Also, ``report_path``
+is preferred to ``report_dir`` for performance reasons.
+
+Examples
+++++++++
 
 .. code-block:: yaml
 
     - JUnitShellCommand:
         report_dir: build/tests/reports
+        name: execute tests
+        command: make test
+        haltOnFailure: True
+
+.. code-block:: yaml
+
+    - JUnitShellCommand:
+        report_path: build/tests/reports/output*.xml
+        name: execute tests
+        command: make test
+        haltOnFailure: True
+
+.. code-block:: yaml
+
+    - JUnitShellCommand:
+        report_path:
+          - build/tests/reports/output1.xml
+          - build/tests/reports/output2.xml
         name: execute tests
         command: make test
         haltOnFailure: True

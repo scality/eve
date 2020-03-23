@@ -44,6 +44,7 @@ class CancelNonTipBuild(CancelCommand):
         super(CancelNonTipBuild, self).__init__(
             command=Interpolate(
                 '[ "%(prop:revision)s" = "" ] '
+                '|| [ "%(prop:branch)s" = "HEAD" ]'
                 '|| [ "$(git ls-remote origin refs/heads/%(prop:branch)s'
                 ' | cut -f1)" = '
                 '"%(prop:revision)s" ]'),
@@ -61,7 +62,9 @@ class CancelOldBuild(CancelCommand):
         # pylint: disable=anomalous-backslash-in-string
         super(CancelOldBuild, self).__init__(
             hideStepIf=util.hideStepIfSuccess,
+            # The following expression warns due to only one `\` character
+            # used, but this is actually voluntary.
             command=Interpolate(
-                '[ $(expr "{}" \< "%(prop:start_time)s") -eq 1 ]'.format(
+                '[ $(expr "{}" \< "%(prop:start_time)s") -eq 1 ]'.format(  # noqa: W605,E501
                     util.env.MASTER_START_TIME)),
             **kwargs)

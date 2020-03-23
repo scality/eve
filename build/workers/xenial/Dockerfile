@@ -12,7 +12,7 @@ RUN apt-get update \
 
 COPY ./requirements.txt /tmp
 
-RUN pip install --no-binary buildbot --no-cache-dir -r /tmp/requirements.txt \
+RUN pip3 install --no-binary buildbot --no-cache-dir -r /tmp/requirements.txt \
  && rm -f /tmp/requirements.txt
 
 # Install helm
@@ -41,7 +41,7 @@ RUN mkdir -p /home/eve/workspace/ \
 # Run buildbot-worker on startup
 #
 ARG BUILDBOT_VERSION
-RUN sudo pip install buildbot-worker==$BUILDBOT_VERSION
+RUN sudo pip3 install buildbot-worker==$BUILDBOT_VERSION
 
 WORKDIR /home/eve/workspace
 CMD buildbot-worker create-worker . "$BUILDMASTER:$BUILDMASTER_PORT" "$WORKERNAME" "$WORKERPASS" \

@@ -16,8 +16,9 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor,
 # Boston, MA  02110-1301, USA.
 
+from distutils.util import strtobool
 from os import environ
-from re import finditer
+import re
 
 from buildbot.plugins import steps, util
 from buildbot.process.properties import Interpolate
@@ -51,7 +52,7 @@ def step_factory(custom_steps, step_type, **params):
         # This is an imperfect solution, as the interpolate
         # may resolve to a much longer string at build time.
         # (but the build would then fail)
-        interpolates = list(finditer(r'%\(.*?(\)s)', stepname))
+        interpolates = list(re.finditer(r'%\(.*?(\)s)', stepname))
         for interp in reversed(interpolates):
             if interp.start() < 50 and interp.end() >= 50:
                 stepname = stepname[:interp.start()]
@@ -73,14 +74,13 @@ def step_factory(custom_steps, step_type, **params):
             params['auth'] = HTTPBasicAuth(
                 params['auth'][0], environ[pwd])
 
-    # Buildbot does not accept unicode step names
-    if 'name' in params and isinstance(params['name'], unicode):
-        params['name'] = params['name'].encode('utf-8')
-
     return _cls(**params)
 
 
-def replace_with_interpolate(obj):
+BOOLEAN_PROPERTIES = {'doStepIf', 'hideStepIf'}
+
+
+def replace_with_interpolate(obj, key=None):
     """Interpolate nested %(prop:obj)s in step arguments.
 
     Read step arguments from the yaml file and replaces them with
@@ -90,10 +90,42 @@ def replace_with_interpolate(obj):
     """
 
     if isinstance(obj, dict):
-        return {k: replace_with_interpolate(v) for k, v in obj.items()}
+        return {k: replace_with_interpolate(v, key=k) for k, v in obj.items()}
     elif isinstance(obj, list):
         return [replace_with_interpolate(elem) for elem in obj]
-    elif isinstance(obj, basestring) and ('prop:' in obj or 'secret:' in obj):
+    elif isinstance(obj, str) and ('prop:' in obj or 'secret:' in obj):
+        if key in BOOLEAN_PROPERTIES:
+            return BooleanInterpolate(obj)
         return Interpolate(obj)
     else:
         return obj
+
+
+class BooleanInterpolate(Interpolate):
+    INTERPOLATION_REGEX = re.compile(r'^%\((prop|secret):[\w._-]*\)s$')
+
+    def __init__(self, fmtstring):
+        if not BooleanInterpolate.INTERPOLATION_REGEX.match(fmtstring):
+            raise ValueError(
+                "Invalid format to cast as a boolean: "
+                "please only use '%(prop|secret:...)s'"
+            )
+
+        super(BooleanInterpolate, self).__init__(fmtstring)
+
+    def getRenderingFor(self, build):
+        d = super(BooleanInterpolate, self).getRenderingFor(build)
+
+        @d.addCallback
+        def cast_as_bool(value):
+            def error_callable(*_):
+                raise ValueError(
+                    'Invalid value to cast as boolean: {}'.format(value)
+                )
+
+            try:
+                return bool(strtobool(value))
+            except ValueError:
+                return error_callable
+
+        return d

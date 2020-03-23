@@ -18,6 +18,7 @@
 
 from hashlib import sha1
 from time import time
+from os.path import join
 
 import buildbot
 from buildbot.plugins import steps, util
@@ -55,6 +56,16 @@ class BaseBuildOrder(object):
                 self._stage_name, stage_name), 'BuildOrder'),
             'git_reference': (self.git_repo, 'BuildOrder'),
             'git_repo': (self.git_repo, 'BuildOrder'),
+            'virtual_builder_name': (self._stage_name, 'BuildOrder'),
+            'virtual_builder_tags': (
+                (self.properties.get('git_host')[0],
+                 self.properties.get('git_owner')[0],
+                 self.properties.get('git_slug')[0],
+                 self._stage_name),
+                'BuildOrder'
+            ),
+            'simultaneous_builds': (
+                self._stage.get('simultaneous_builds'), 'BuildOrder'),
         })
 
 
@@ -75,8 +86,9 @@ class BaseDockerBuildOrder(BaseBuildOrder):
             self.properties['master_builddir'][0],
             context_dir,
         )
+        full_dockerfile_path = None
         if dockerfile:
-            dockerfile = '%s/build/%s' % (
+            full_dockerfile_path = '%s/build/%s' % (
                 self.properties['master_builddir'][0],
                 dockerfile,
             )
@@ -84,7 +96,7 @@ class BaseDockerBuildOrder(BaseBuildOrder):
         # image name is image_name + hash of path to avoid collisions
         basename = "{0}_{1}".format(
             image_name,
-            sha1(context_dir).hexdigest()[:4])
+            sha1(context_dir.encode('utf-8')).hexdigest()[:4])
 
         use_registry = bool(util.env.DOCKER_REGISTRY_URL)
 
@@ -100,8 +112,12 @@ class BaseDockerBuildOrder(BaseBuildOrder):
             self.preliminary_steps.append(
                 steps.DockerComputeImageFingerprint(
                     label=basename,
-                    context_dir=full_context_dir,
-                    hideStepIf=util.hideStepIfSuccess))
+                    context_dir=context_dir,
+                    dockerfile=dockerfile,
+                    hideStepIf=util.hideStepIfSuccess,
+                    workdir=join(
+                        self.properties['master_builddir'][0], 'build')
+                ))
 
             image = Interpolate('{0}/{1}:%(prop:fingerprint_{1})s'.format(
                 util.env.DOCKER_REGISTRY_URL, basename))
@@ -127,7 +143,7 @@ class BaseDockerBuildOrder(BaseBuildOrder):
         common_args = {
             'label': basename,
             'image': image,
-            'dockerfile': dockerfile,
+            'dockerfile': full_dockerfile_path,
             'context_dir': full_context_dir,
             'build_args': {
                 'BUILDBOT_VERSION': buildbot.version

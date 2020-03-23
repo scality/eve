@@ -33,7 +33,7 @@ def getChanges(self, request):
 
     """
     log.msg('Processing changes from bitbucket')
-    payload = json.loads(request.content.read())
+    payload = json.loads(request.content.read().decode('utf-8'))
     repo_url = payload['repository']['links']['html']['href']
     log.msg('repo_url:', repo_url)
     project = payload['repository']['project']['name']

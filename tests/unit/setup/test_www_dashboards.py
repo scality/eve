@@ -54,11 +54,11 @@ class TestDashboardsConfig(unittest.TestCase):
 
     @patch('eve.setup.www_dashboards.open')
     def test_dashboards_correct_yaml(self, mock_open):
-        data = yaml.dump(correct_data).decode('utf-8')
+        data = yaml.dump(correct_data)
         mock_open.return_value = StringIO(data)
         conf = DashboardsConfig('mock').iter()
 
-        dashboard = conf.next()
+        dashboard = next(conf)
         self.assertEqual(dashboard, {
             'type': 'metabase',
             'name': 'monitoring_1',
@@ -73,7 +73,7 @@ class TestDashboardsConfig(unittest.TestCase):
             'height': '100',
         })
 
-        dashboard = conf.next()
+        dashboard = next(conf)
         self.assertEqual(dashboard, {
             'type': 'metabase',
             'name': 'monitoring_2',
@@ -83,7 +83,7 @@ class TestDashboardsConfig(unittest.TestCase):
             'id': '1',
         })
 
-        dashboard = conf.next()
+        dashboard = next(conf)
         self.assertEqual(dashboard, {
             'type': 'unknown',
             'name': 'no_type',
@@ -111,7 +111,7 @@ class TestWsgiDashboards(unittest.TestCase):
             'order': 'mock_order',
             'icon': 'mock_icon',
         }
-        data = yaml.dump(correct_data).decode('utf-8')
+        data = yaml.dump(correct_data)
         mock_open.return_value = StringIO(data)
 
         ret = wsgi_dashboards()

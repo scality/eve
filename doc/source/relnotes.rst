@@ -17,6 +17,226 @@ Release Notes
 
 .. towncrier release notes start
 
+Eve 1.7.1 (2020-02-21)
+======================
+
+Bugfixes
+--------
+
+- Rework ``GetArtifactsFromStage`` regex to support artifacts V3 response. (EVE-1120)
+
+
+Eve 1.7.0 (2020-02-19)
+======================
+
+Features
+--------
+
+- ``Upload`` step is now using artifacts version >= 3 only. (EVE-1114)
+- Use "artifacts" service for promote and prolong operations. (RELENG-3593)
+
+
+Eve 1.6.3 (2020-02-05)
+======================
+
+Features
+--------
+
+- Use "artifacts-v3" service for promote and prolong operations. (EVE-1115)
+
+
+Eve 1.6.2 (2020-02-03)
+======================
+
+Features
+--------
+
+- Created a new step ``SetWorkerDistro`` which is now implicitly called on each stage instantiation to identify the worker linux distribution and set new properties. (EVE-1112)
+
+
+Bugfixes
+--------
+
+- Fixed the space encoding in artifacts uploading. (EVE-1110)
+- Modifying xargs opts on ``UploadV3`` step depending on linux OS distribution. (EVE-1112)
+
+
+Eve 1.6.1 (2020-01-21)
+======================
+
+Features
+--------
+
+- Prefix UploadV3 step name with ``V3``. (EVE-1113)
+
+
+Bugfixes
+--------
+
+- Fixed nginx behaviour refusing an uri with two spaces. (EVE-1110)
+- Made find command compatible with busybox. (EVE-1111)
+- Modify xargs opts on Artifacts Upload Version 3 so that it is compatible with Alpine. (EVE-1112)
+
+
+Eve 1.6.0 (2020-01-20)
+======================
+
+Features
+--------
+
+- Adding the ability to simultaneously upload artifacts into version 2 and 3 at the same time. (EVE-1109)
+- Adding new step ``Uploadv3`` to handle artifacts version >= 3 upload. (EVE-1109)
+- Added temporary promotion button. (PIPDEP-827)
+- Added promotion button. (PIPDEP-829)
+
+
+Eve 1.5.15 (2019-12-11)
+=======================
+
+Bugfixes
+--------
+
+- Setting up a proper name on every docker container created so that we don't have to handle regex matching to figure it out. (EVE-1023)
+
+
+Eve 1.5.14 (2019-12-06)
+=======================
+
+Bugfixes
+--------
+
+- To ease up investigation on docker failures we are adding a new log to the worker. (EVE-1023)
+
+
+Eve 1.5.13 (2019-12-04)
+=======================
+
+Features
+--------
+
+- Add support for setting ``doStepIf`` and ``hideStepIf`` with build properties. (EVE-1104)
+
+
+Eve 1.5.12 (2019-12-04)
+=======================
+
+Bugfixes
+--------
+
+- We're poping all eve configuration from the environment to avoid them to be displayed in the UI. (EVE-1097)
+- Fixed Ubuntu bionic image spawn. (EVE-1103)
+
+
+Eve 1.5.11 (2019-10-08)
+=======================
+
+Bugfixes
+--------
+
+- Now when a Dockerfile is outside a Docker build context it is computed as well in the fingerprint. (EVE-1098)
+
+
+Eve 1.5.10 (2019-09-24)
+=======================
+
+Features
+--------
+
+- Add a new type of menu item ('static') to dump the contents of a local file.
+  (RELENG-2975)
+
+
+Eve 1.5.9 (2019-09-05)
+======================
+
+Bugfixes
+--------
+
+- Reverting new ``requirements.sh`` install and putting it back on the cloud init side. (EVE-1080)
+
+
+Eve 1.5.8 (2019-08-28)
+======================
+
+Bugfixes
+--------
+
+- Upgrading twisted to ``19.7.0`` to fix writeSequence errors. (EVE-1083)
+
+
+Eve 1.4.11 (2019-09-20)
+=======================
+
+Features
+--------
+
+- Add a new type of menu item ('static') to dump the contents of a local file.
+  (RELENG-2975)
+
+
+Eve 1.4.10 (2019-08-28)
+=======================
+
+Bugfixes
+--------
+
+- Add report_path option to Junitshellcommand. (EVE-1085)
+
+
+Eve 1.5.7 (2019-08-20)
+======================
+
+Features
+--------
+
+- Bringing the ``simultaneous_builds`` parameter on a stage to let the user control the pipeline. (RELENG-2859)
+
+
+Eve 1.5.6 (2019-08-02)
+======================
+
+Including changes from Eve 1.4.9
+
+Eve 1.4.9 (2019-08-02)
+======================
+
+Features
+--------
+
+- Supporting file as payload on eve API client script. (EVE-1074)
+
+
+Bugfixes
+--------
+
+- Add buildbot fix to send less SQL queries to the db server. (EVE-1082)
+
+
+Eve 1.5.5 (2019-07-01)
+======================
+
+Including changes from Eve 1.4.8
+
+
+Eve 1.4.8 (2019-07-01)
+======================
+
+Features
+--------
+
+- Remove janitor expensive and useless write operations. (RELENG-3038)
+
+
+Bugfixes
+--------
+
+- Reverting bootstrap notifications. (EVE-1071)
+
+Eve 1.5.4 (2019-06-21)
+======================
+
+Including changes from Eve 1.4.7
+
 Eve 1.4.7 (2019-06-21)
 ======================
 
@@ -37,6 +257,31 @@ Bugfixes
 - Build status should be skipped when a branch is not covered by the CI.
   (EVE-1076)
 
+Eve 1.5.3 (2019-06-19)
+======================
+
+Features
+--------
+
+- Setup the requirements step on the Openstack worker as a ``ShellCommand``. (EVE-1056)
+
+
+Eve 1.5.2 (2019-05-20)
+======================
+
+Bugfixes
+--------
+
+- Rework ``kube_pod`` worker naming due to conflicts when triggering
+  multiple stage at the same time. (EVE-1064)
+
+
+Eve 1.5.1 (2019-05-16)
+======================
+
+Including changes from Eve 1.4.6
+
+
 Eve 1.4.6 (2019-04-24)
 ======================
 
@@ -54,6 +299,17 @@ Bugfixes
 - Fix hard limit on ``main.yml`` config files. (EVE-1013)
 - Fix a typo that broke the configuration for Cron Builders with Github.
   (EVE-1042)
+
+
+Eve 1.5.0 (2019-03-27)
+======================
+
+Features
+--------
+
+- Implementing the buildbot concept of ``virtual_builder`` therefore improving the UI. (EVE-949)
+- Allow compatibility with pip>=10 (EVE-970)
+- Upgrading eve to Buildbot ``2.0.1`` and the base version of Python to ``3.6``. (EVE-970)
 
 
 Eve 1.4.5 (2019-02-28)

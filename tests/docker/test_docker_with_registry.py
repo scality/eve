@@ -33,7 +33,7 @@ class Tests(unittest.TestCase):
         """Start a cluster including a local Docker registry."""
         conf = {'DOCKER_REGISTRY_URL': 'mock'}
         cls.cluster = DockerizedCluster(extra_conf=conf).start()
-        print 'API URL:', cls.cluster.api.api_url
+        print('API URL: {}'.format(cls.cluster.api.api_url))
         cls.cluster.sanity_check()
 
     @classmethod
@@ -103,7 +103,7 @@ class Tests(unittest.TestCase):
             (u'trigger', u'triggered pre-merge')])
 
         # Check build
-        build = self.cluster.api.get_finished_build('docker-test_suffix')
+        build = self.cluster.api.get_finished_build('pre-merge')
         self.assertEqual(build['results'], SUCCESS)
         steps = self.cluster.api.get_build_steps(build)
         step_names_and_descriptions = [(step['name'], step['state_string'])
@@ -112,6 +112,7 @@ class Tests(unittest.TestCase):
             (u'prevent unuseful restarts', u"'[ $(expr ...'"),
             (u'set the artifacts private url',
              u"property 'artifacts_private_url' set"),
+            (u'Check worker OS distribution', u'finished'),
             (u'extract steps from yaml', u'finished'),
             (u'shell', u"'exit 0'")])
 

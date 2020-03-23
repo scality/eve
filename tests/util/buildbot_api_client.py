@@ -100,7 +100,7 @@ class BuildbotDataAPI(object):
 
     def getw(self, route, get_params=None, retry=180, expected_count=1):
         """Wait for and return a given number of results from the REST API."""
-        for i in xrange(retry):
+        for i in range(retry):
             try:
                 res = self.get(route=route, get_params=get_params)
             except ConnectionError:
@@ -151,8 +151,8 @@ class BuildbotDataAPI(object):
             builds = self.get_builds(builder=builder) or []
             for build in builds:
                 prop_branch = build['properties'].get('branch')
-                if not branch or (prop_branch and
-                                  str(prop_branch[0]) == branch):
+                if not branch or (prop_branch
+                                  and str(prop_branch[0]) == branch):
                     the_build = build
                     break
             else:
@@ -163,6 +163,15 @@ class BuildbotDataAPI(object):
             raise Exception('unable to find build, '
                             'builder=%s, branch=%s' % (builder, branch))
         return the_build
+
+    def get_build_for_id(self, buildid):
+        return Build.find(
+            self,
+            get_params={
+                'buildid': buildid,
+                'property': '*'
+            }
+        )
 
     def get_finished_build(self, builder='bootstrap', branch=None, timeout=60):
         for _ in range(timeout):
@@ -254,11 +263,13 @@ class BuildbotDataAPI(object):
 
         """
         path = '/forceschedulers'
-        scheds = self.getw(path, expected_count=2)
+        scheds = self.getw(path, expected_count=4)
         force_sched_name = None
         for sched in scheds:
             sched_name = sched['name']
-            if sched_name != '__Janitor_force':
+            if (sched_name != '__Janitor_force'
+                    and 'prolong' not in sched_name
+                    and 'promote' not in sched_name):
                 force_sched_name = sched_name
                 break
         res = self.post('{}/{}'.format(path, force_sched_name),

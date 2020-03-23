@@ -1,0 +1,22 @@
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: worker
+spec:
+  containers:
+    - name: worker
+      image: "{{ images.worker }}"
+      resources:
+        requests:
+          cpu: "2"
+          memory: 4Gi
+        limits:
+          cpu: "4"
+          memory: 4Gi
+      volumeMounts:
+        - name: worker-workspace
+          mountPath: /home/eve/workspace
+  volumes:
+    - name: worker-workspace
+      emptyDir: {}

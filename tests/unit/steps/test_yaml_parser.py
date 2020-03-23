@@ -28,6 +28,8 @@ class TestReadConfFromYamlExecution(steps.BuildStepMixin, unittest.TestCase):
             ('LOCAL_SCHEDULER_NAME', 'docker_scheduler'),
             ('OPENSTACK_SCHEDULER_NAME', 'openstack_scheduler'),
             ('PATCHER_FILE_PATH', ''),
+            ('PROLONG_SCHEDULER_NAME', 'prolongscheduler'),
+            ('PROMOTE_SCHEDULER_NAME', 'promotescheduler'),
         ])
 
         return self.setUpBuildStep()
@@ -47,7 +49,7 @@ class TestReadConfFromYamlExecution(steps.BuildStepMixin, unittest.TestCase):
         self.expectCommands(
             Expect('uploadFile', dict(
                 workersrc='main.yml', workdir='wkdir',
-                blocksize=16384, maxsize=None, keepstamp=False,
+                blocksize=262144, maxsize=None, keepstamp=False,
                 writer=ExpectRemoteRef(remotetransfer.FileWriter)))
             + 0)
 
@@ -77,7 +79,7 @@ class TestReadConfFromYamlExecution(steps.BuildStepMixin, unittest.TestCase):
         self.expectLogfile('stderr',
                            'Error in yaml file:\n'
                            'mapping values are not allowed here\n'
-                           '  in "<string>", line 1, column 9:\n'
+                           '  in "<unicode string>", line 1, column 9:\n'
                            '    foo: bar: baz\n'
                            '            ^')
         return self.runStep()

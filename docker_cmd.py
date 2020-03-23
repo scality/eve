@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # Copyright 2017 Scality
 #
@@ -36,7 +36,7 @@ def _print(string):
 wamp_router_url = os.environ.get('WAMP_ROUTER_URL', '')
 if wamp_router_url:
     _print("pinging crossbar...")
-    for i in xrange(120):
+    for i in range(120):
         try:
             requests.get(wamp_router_url.replace('ws://', 'http://'))
             break
@@ -50,7 +50,7 @@ if wamp_router_url:
 _print("pinging database...")
 db_url = os.environ['DB_URL']
 sa = sqlalchemy.create_engine(db_url.split('?')[0])
-for i in xrange(120):
+for i in range(120):
     try:
         sa.execute('select 1;')
         break

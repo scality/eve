@@ -24,7 +24,7 @@ from collections import defaultdict
 from buildbot.plugins import util
 from buildbot.process import logobserver
 from buildbot.process.properties import Interpolate
-from buildbot.process.results import FAILURE, SKIPPED, SUCCESS
+from buildbot.process.results import FAILURE, SKIPPED
 from buildbot.steps.shell import ShellCommand
 from packaging import version
 from twisted.internet import defer, reactor
@@ -84,9 +84,9 @@ class GetArtifactsFromStage(EvePropertyFromCommand):
         artifacts_name = 'fatal: unable to parse artifacts name'
         lines = self.observer.getStdout().splitlines()
         for line in lines:
-            reg = re.search('^Location: (https?://.*?)/builds/(.*)$', line)
+            reg = re.search('^Location: .*/download/([^/]+)/$', line)
             if reg:
-                artifacts_name = reg.group(2)
+                artifacts_name = reg.group(1)
                 break
 
         self.setProperty(self.property, str(artifacts_name),
@@ -113,8 +113,8 @@ class SetArtifactsPublicURL(EvePropertyFromCommand):
             name='set the artifacts public url',
             command=[
                 'echo',
-                Interpolate(util.env.ARTIFACTS_PUBLIC_URL +
-                            '/builds/%(prop:artifacts_name)s'),
+                Interpolate(util.env.ARTIFACTS_PUBLIC_URL
+                            + '/builds/%(prop:artifacts_name)s'),
             ],
             hideStepIf=util.hideStepIfSuccess,
             property='artifacts_public_url',
@@ -136,7 +136,10 @@ class SetArtifactsPrivateURL(EvePropertyFromCommand):
 
 
 class Upload(ShellCommand):
-    """Upload files to artifacts."""
+    """Upload class to handle artifacts uploads.
+
+    Compatible only with Artifacts version >= 3.
+    """
 
     renderables = [
         'source',
@@ -170,6 +173,25 @@ class Upload(ShellCommand):
                                                       wantStderr=True)
         self.addLogObserver('stdio', self.observer)
 
+    @property
+    def upload_command(self):
+        distribution = self.getProperty('distribution_id')
+        xargs = "xargs -0 -n 1 -t"
+        # some alpine distribution do not support the -P option on xargs
+        if distribution != 'alpine':
+            xargs += " -P 16"
+        return [
+            ('find -L -type f -print0 | '
+             'sed -e "s:\\(^\\|\\x0\\)\\./:\\1:g" | '
+             '{xargs} '
+             '-I @ sh -c \'curl --silent --fail --show-error '
+             '--max-time {upload_time} '
+             '-T "@" "http://artifacts/upload/{container}/"'
+             '$(echo "@" | sed -e "s: :%20:g")\'').format(
+                xargs=xargs,
+                upload_time=self._upload_max_time,
+                container=self.get_container())]
+
     def get_container(self):
         eve_api_version = self.getProperty('eve_api_version')
         if version.parse(eve_api_version) >= version.parse('0.2'):
@@ -178,16 +200,7 @@ class Upload(ShellCommand):
             return util.env.ARTIFACTS_PREFIX + self.getProperty('build_id')
 
     def set_command(self, urls):
-
-        command = [
-            ('if [ ! -n "$(find -L . -type f | head -1)" ]; then '
-             'echo "No files here. Nothing to do."; exit 0; fi'),
-            'tar -chvzf ../artifacts.tar.gz .',
-            'echo tar successful. Calling curl...',
-            ('curl --progress-bar --verbose --max-time {} -T '
-             '../artifacts.tar.gz -X PUT http://artifacts/upload/{}').format(
-                self._upload_max_time,
-                self.get_container())]
+        command = self.upload_command
 
         # compute configured urls
         links = []
@@ -213,9 +226,8 @@ class Upload(ShellCommand):
 
         return ' && '.join(command)
 
-    @defer.inlineCallbacks
-    def run(self):
-
+    def check_artifacts_name(self):
+        """Check that artifacts name has not been overwritten."""
         eve_api_version = self.getProperty('eve_api_version')
         if version.parse(eve_api_version) >= version.parse('0.2'):
             artifacts_name_property = self.getProperty('artifacts_name')
@@ -224,33 +236,6 @@ class Upload(ShellCommand):
                 r'([0-9a-f]+)(\.(.*)\.([0-9]+))?$' % util.env.ARTIFACTS_PREFIX)
             if not regexp_staging.match(artifacts_name_property):
                 raise MalformedArtifactsNameProperty
-
-        result = yield super(Upload, self).run()
-        if result == FAILURE:
-            delay, repeats = self._retry
-            if repeats > 0:
-                # Wait for delay before retrying
-                sleep_df = defer.Deferred()
-                reactor.callLater(delay, sleep_df.callback, None)
-                yield sleep_df
-
-                # Schedule a retry after this step
-                self.build.addStepsAfterCurrentStep([self.__class__(
-                    source=self.source,
-                    urls=self._urls,
-                    retry=(delay, repeats - 1),
-                    **self._kwargs)])
-                defer.returnValue(SKIPPED)
-        defer.returnValue(result)
-
-    def evaluateCommand(self, cmd):  # NOQA flake8 to ignore camelCase
-        out = self.observer.getStdout()
-        err = self.observer.getStderr()
-        if not err and 'No files here. Nothing to do.' in out:
-            return SUCCESS
-        elif 'Response Status: 201 Created' not in out:
-            return FAILURE
-        return cmd.results()
 
     # regexp use to make the difference between simple link prefix and link
     # name patterns
@@ -312,9 +297,9 @@ class Upload(ShellCommand):
                 # case 1 : prefix is a pattern
                 if self.PREFIX_PATTERN_ELEMENTS.search(prefix):
                     path_pattern = re.compile(
-                        '^./' +
-                        link['path'].replace('*', '(.*)').replace('?', '(.)') +
-                        '$')
+                        '^./'
+                        + link['path'].replace('*', '(.*)').replace('?', '(.)')
+                        + '$')
                     links.update([
                         (path_pattern.sub(prefix, match), match)
                         for match in matches
@@ -331,3 +316,28 @@ class Upload(ShellCommand):
                     ])
 
         return sorted(links)
+
+    @defer.inlineCallbacks
+    def run(self):
+        self.check_artifacts_name()
+        result = yield super(Upload, self).run()
+        if result == FAILURE:
+            delay, repeats = self._retry
+            if repeats > 0:
+                # Wait for delay before retrying
+                sleep_df = defer.Deferred()
+                reactor.callLater(delay, sleep_df.callback, None)
+                yield sleep_df
+
+                # Schedule a retry after this step
+                self.build.addStepsAfterCurrentStep([self.__class__(
+                    source=self.source,
+                    urls=self._urls,
+                    retry=(delay, repeats - 1),
+                    **self._kwargs)])
+                defer.returnValue(SKIPPED)
+        defer.returnValue(result)
+
+
+# Alias for compatibility when steps explicitly call Uploadv3
+Uploadv3 = Upload

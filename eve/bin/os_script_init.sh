@@ -41,6 +41,9 @@ then
   if [ "$(rpm -q --queryformat '%{VERSION}' centos-release)" = "6" ]
   then
     twisted_version=15.4 # no more recent with python2.6 (Centos 6 only)
+    # buildbot > 0.9.12 requires a version of twisted that is not supported
+    # by python2.6
+    worker_version=0.9.12
   else
     twisted_version=16.4.0
   fi
@@ -53,12 +56,17 @@ then
   locale-gen en_US.UTF-8
   export LANG=en_US.utf8
 
+  export DEBIAN_FRONTEND=noninteractive
   retry apt-get install --yes git gcc python-dev python-setuptools libffi-dev python-pip
 
   adduser -u 1042 --home /home/eve --disabled-password --gecos "" eve
   adduser eve sudo
   echo "%sudo ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
   twisted_version=16.4.0
+  if [[ `lsb_release -sc` =~ ^(precise|wheezy)$ ]];
+  then
+    worker_version=1.7.0 # last version of buildbot with python2.7 support
+  fi
 else
   echo "Unsupported Operating System";
   exit 1;

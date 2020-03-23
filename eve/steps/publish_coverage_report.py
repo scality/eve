@@ -41,13 +41,9 @@ from buildbot.process.buildstep import BuildStep
 from buildbot.process.results import FAILURE, SKIPPED, SUCCESS, WARNINGS
 from buildbot.util import httpclientservice
 from twisted.internet import defer
-from twisted.internet.error import ConnectError
 from twisted.python import log
 
-try:
-    from urllib.parse import urlparse
-except ImportError:
-    import urlparse
+from urllib.parse import urlparse, parse_qsl
 
 
 @six.add_metaclass(abc.ABCMeta)
@@ -235,7 +231,7 @@ class CodecovIOPublication(PublicationBase):
             reports: List of code coverage report files.
 
         """
-        s3_url_parts = urlparse.urlparse(s3_url)
+        s3_url_parts = urlparse(s3_url.decode('utf-8'))
         s3_url_endpoint = '{0}://{1}'.format(
             s3_url_parts.scheme, s3_url_parts.netloc
         )
@@ -267,7 +263,7 @@ class CodecovIOPublication(PublicationBase):
             defer.returnValue((FAILURE, 'error', error))
 
         # Convert query string params into dict
-        params = dict(urlparse.parse_qsl(s3_url_parts.query))
+        params = dict(parse_qsl(s3_url_parts.query))
 
         (result, reason) = yield self.__send_request(
             http.put, s3_url_parts.path, data=data, params=params
@@ -286,10 +282,7 @@ class CodecovIOPublication(PublicationBase):
         try:
             response = yield func(*args, **kwargs)
         except Exception as exc:  # pylint: disable=broad-except
-            if isinstance(exc, ConnectError):
-                reason = exc.message or exc
-            else:
-                reason = str(exc)
+            reason = str(exc)
             defer.returnValue((FAILURE, reason))
 
         content = yield response.content()

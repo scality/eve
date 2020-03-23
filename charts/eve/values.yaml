@@ -623,7 +623,7 @@ image:
     tag: "1.0.9"
 
   crossbar:
-    tag: "cpy3-17.9.2"
+    tag: "cpy3-19.1.2"
 
   ## pullPolicy specifies the image pull policy
   ##

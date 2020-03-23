@@ -93,29 +93,6 @@ class TestPublishCodeCoverage(unittest.TestCase):
 
         self.cluster.stop()
 
-    def _get_publish_codecov_build(self, builder_name='test_docker_builder'):
-        """Search the build of the code coverage report publication step.
-
-        Args:
-            builder_name: Root builder name rather than bootstrap.
-
-        Returns:
-            None if no potential build else the build found.
-
-        """
-        builders = self.cluster.api.get(
-            'builders?name__contains={0}'.format(builder_name))
-        for builder in builders['builders']:
-            builds_url = 'builders/{0}/builds'.format(builder['builderid'])
-            builds = self.cluster.api.get(builds_url)
-            for build in builds['builds']:
-                steps = self.cluster.api.get(
-                    '{0}/{1}/steps?name__contains=coverage'.format(
-                        builds_url, build['number']))
-                if steps:
-                    return build
-        return None
-
     def test_codecovio_success(self):
         """Test PublishCoverageReport success.
 
@@ -196,6 +173,9 @@ class TestPublishCodeCoverage(unittest.TestCase):
         if self.codecov_io_server is None:
             return
 
+# The method build.getUrl() returns for some reason an url with:
+# - the builder id of the main builder, and not the virtual_builder id
+# - a buildid linked to the main builder as well, not with the virtual_build id
         self.codecov_io_server.assert_request_received_with(
             ('POST', '/upload/v4', {
                 'commit':

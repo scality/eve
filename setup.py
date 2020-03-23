@@ -85,11 +85,13 @@ setup(
             'SetArtifactsPublicURL=eve.steps.artifacts:SetArtifactsPublicURL',
             'SetBootstrapProperty=eve.steps.property:SetBootstrapProperty',
             'SetBootstrapPropertyFromCommand=eve.steps.property:SetBootstrapPropertyFromCommand',
+            'SetWorkerDistro=eve.steps.distro:SetWorkerDistro',
             'StepExtractor=eve.steps.yaml_parser:StepExtractor',
             'PatcherConfig=eve.steps.patcher:PatcherConfig',
             'TriggerStages=eve.steps.trigger_stages:TriggerStages',
             'UnregisterRedhat=eve.steps.redhat:UnregisterRedhat',
             'Upload=eve.steps.artifacts:Upload',
+            'Uploadv3=eve.steps.artifacts:Uploadv3',
         ],
         'buildbot.util': [
             'BaseBuildOrder=eve.util.build_order:BaseBuildOrder',
@@ -110,6 +112,7 @@ setup(
             'verify_docker_certificates=eve.util.docker:verify_docker_certificates',
             'replace_with_interpolate=eve.util.step_factory:replace_with_interpolate',
             'create_hash=eve.util.hash:create_hash',
+            'compute_instance_name=eve.util.worker:compute_instance_name',
         ],
         'buildbot.worker': [
             'EveDockerLatentWorker=eve.worker.docker.docker_worker:EveDockerLatentWorker',

@@ -87,7 +87,7 @@ class ReadConfFromYaml(FileUpload, ConfigurableStepMixin):
                 defer.returnValue(FAILURE)
             else:
                 raise
-        except TypeError as error:
+        except TypeError:
             pass
 
         # Make sure yaml is properly formatted
@@ -190,7 +190,9 @@ class ReadConfFromYaml(FileUpload, ConfigurableStepMixin):
 
         # Read patcher conf and populate related properties
         scheduler = self.getProperty('scheduler')
-        if scheduler != util.env.FORCE_SCHEDULER_NAME:
+        if scheduler not in (util.env.FORCE_SCHEDULER_NAME,
+                             util.env.PROLONG_SCHEDULER_NAME,
+                             util.env.PROMOTE_SCHEDULER_NAME):
             self.build.addStepsAfterCurrentStep([
                 steps.PatcherConfig(
                     conf_path=util.env.PATCHER_FILE_PATH,
@@ -221,7 +223,7 @@ class StepExtractor(BuildStep, ConfigurableStepMixin):
         stage_name = self.getProperty('stage_name')
         stage_conf = conf['stages'][stage_name]
         for step in reversed(stage_conf['steps']):
-            step_type, params = next(step.iteritems())
+            step_type, params = next(iter(step.items()))
             step_type, params = patcher.patch_step(step_type, params)
             bb_step = util.step_factory(globals(), step_type, **params)
             self.build.addStepsAfterCurrentStep([bb_step])

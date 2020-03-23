@@ -57,6 +57,7 @@ class EveDockerLatentWorker(AbstractLatentWorker):
     def start_instance(self, build):
         if self.instance is not None:
             raise ValueError('instance active')
+        self.instance = util.compute_instance_name(build)
         repository = build.getProperty('repository')
         uuid = util.create_hash(repository, self.name)
         build.setProperty("worker_uuid", uuid, "Build")
@@ -82,6 +83,7 @@ class EveDockerLatentWorker(AbstractLatentWorker):
 
         cmd = [
             'run',
+            '--name=%s' % self.instance,
             '--privileged',
             '--env', 'BUILDMASTER=%s' % self.master_fqdn,
             '--env', 'BUILDMASTER_PORT=%s' % self.pb_port,
@@ -93,8 +95,8 @@ class EveDockerLatentWorker(AbstractLatentWorker):
         ]
 
         if memory:
-            if (util.convert_to_bytes(memory) >
-                    util.convert_to_bytes(self.max_memory)):
+            if (util.convert_to_bytes(memory)
+                    > util.convert_to_bytes(self.max_memory)):
                 self.logger.error('Can not request %s RAM (max allowed %s).' %
                                   (memory, self.max_memory))
                 raise LatentWorkerCannotSubstantiate(
@@ -113,12 +115,11 @@ class EveDockerLatentWorker(AbstractLatentWorker):
         cmd.append(image)
 
         try:
-            self.instance = self.docker(*cmd)
+            self.docker(*cmd)
         except CalledProcessError:
             raise LatentWorkerCannotSubstantiate(
                 'Docker run: CMD failed to start or died shortly after'
             )
-
         self.logger.debug('Container created, Id: %s...' % self.instance)
         return [self.instance, image]
 
@@ -152,4 +153,9 @@ class EveDockerLatentWorker(AbstractLatentWorker):
         """
         cmd = ['docker'] + list(args)
         self.logger.debug('::RUNNING::{}'.format(' '.join(cmd)))
-        return check_output(cmd, stderr=STDOUT).strip()
+        try:
+            return check_output(cmd, stderr=STDOUT).strip()
+        except CalledProcessError as exp:
+            self.logger.error('::DOCKER CMD ERROR::{output}',
+                              output=exp.output.decode('utf-8'))
+            raise

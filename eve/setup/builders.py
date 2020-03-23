@@ -19,6 +19,39 @@
 from buildbot.config import BuilderConfig
 from buildbot.plugins import steps, util
 from buildbot.process.factory import BuildFactory
+from buildbot.util.logger import Logger
+
+from twisted.internet import defer
+
+log = Logger()
+
+
+@defer.inlineCallbacks
+def canStartBuild(builder, wfb, request):
+    """Ensure we can run simultaneous builds on a stage."""
+    log.debug('Checking if we can start...')
+    simultaneous_builds = request.properties.getProperty('simultaneous_builds')
+    if simultaneous_builds:
+        try:
+            simultaneous_builds = int(simultaneous_builds)
+        except ValueError:
+            # When the object can be casted into an int ignore the value
+            return True
+        log.debug('%d simultaneous builds are allowed' % simultaneous_builds)
+        name = request.properties.getProperty(
+            'virtual_builder_name',
+            builder.name
+        )
+        builderid = yield builder.getBuilderIdForName(name)
+        log.debug('Checking running builds for %s...' % name)
+        builds = yield builder.master.db.builds.getBuilds(
+            builderid=builderid,
+            complete=False
+        )
+        running_builds = len(builds)
+        log.debug('%d builds are running for %s' % (running_builds, name))
+        return simultaneous_builds > running_builds
+    return True
 
 
 def triggerable_builder(builder_name, workers):
@@ -26,7 +59,12 @@ def triggerable_builder(builder_name, workers):
     factory.addStep(steps.CancelOldBuild(name='prevent unuseful restarts'))
     factory.addStep(steps.SetArtifactsPrivateURL(
         builder_name == util.env.OPENSTACK_BUILDER_NAME))
-
+    # Add property regarding linux OS distribution
+    factory.addStep(steps.SetWorkerDistro(
+        name='Check worker OS distribution',
+        hideStepIf=True,
+        flunkOnFailure=False
+    ))
     # Extract steps from conf
     factory.addStep(steps.StepExtractor(
         name='extract steps from yaml',
@@ -37,4 +75,5 @@ def triggerable_builder(builder_name, workers):
         name=builder_name,
         workernames=[w.name for w in workers],
         factory=factory,
-        collapseRequests=False)
+        collapseRequests=False,
+        canStartBuild=canStartBuild)
