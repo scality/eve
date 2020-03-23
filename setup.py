@@ -110,6 +110,7 @@ setup(
             'verify_docker_certificates=eve.util.docker:verify_docker_certificates',
             'replace_with_interpolate=eve.util.step_factory:replace_with_interpolate',
             'create_hash=eve.util.hash:create_hash',
+            'compute_instance_name=eve.util.worker:compute_instance_name',
         ],
         'buildbot.worker': [
             'EveDockerLatentWorker=eve.worker.docker.docker_worker:EveDockerLatentWorker',

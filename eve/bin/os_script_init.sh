@@ -56,6 +56,7 @@ then
   locale-gen en_US.UTF-8
   export LANG=en_US.utf8
 
+  export DEBIAN_FRONTEND=noninteractive
   retry apt-get install --yes git gcc python-dev python-setuptools libffi-dev python-pip
 
   adduser -u 1042 --home /home/eve --disabled-password --gecos "" eve

@@ -17,6 +17,108 @@ Release Notes
 
 .. towncrier release notes start
 
+Eve 1.5.15 (2019-12-11)
+=======================
+
+Bugfixes
+--------
+
+- Setting up a proper name on every docker container created so that we don't have to handle regex matching to figure it out. (EVE-1023)
+
+
+Eve 1.5.14 (2019-12-06)
+=======================
+
+Bugfixes
+--------
+
+- To ease up investigation on docker failures we are adding a new log to the worker. (EVE-1023)
+
+
+Eve 1.5.13 (2019-12-04)
+=======================
+
+Features
+--------
+
+- Add support for setting ``doStepIf`` and ``hideStepIf`` with build properties. (EVE-1104)
+
+
+Eve 1.5.12 (2019-12-04)
+=======================
+
+Bugfixes
+--------
+
+- We're poping all eve configuration from the environment to avoid them to be displayed in the UI. (EVE-1097)
+- Fixed Ubuntu bionic image spawn. (EVE-1103)
+
+
+Eve 1.5.11 (2019-10-08)
+=======================
+
+Bugfixes
+--------
+
+- Now when a Dockerfile is outside a Docker build context it is computed as well in the fingerprint. (EVE-1098)
+
+
+Eve 1.5.10 (2019-09-24)
+=======================
+
+Features
+--------
+
+- Add a new type of menu item ('static') to dump the contents of a local file.
+  (RELENG-2975)
+
+
+Eve 1.5.9 (2019-09-05)
+======================
+
+Bugfixes
+--------
+
+- Reverting new ``requirements.sh`` install and putting it back on the cloud init side. (EVE-1080)
+
+
+Eve 1.5.8 (2019-08-28)
+======================
+
+Bugfixes
+--------
+
+- Upgrading twisted to ``19.7.0`` to fix writeSequence errors. (EVE-1083)
+
+
+Eve 1.4.11 (2019-09-20)
+=======================
+
+Features
+--------
+
+- Add a new type of menu item ('static') to dump the contents of a local file.
+  (RELENG-2975)
+
+
+Eve 1.4.10 (2019-08-28)
+=======================
+
+Bugfixes
+--------
+
+- Add report_path option to Junitshellcommand. (EVE-1085)
+
+
+Eve 1.5.7 (2019-08-20)
+======================
+
+Features
+--------
+
+- Bringing the ``simultaneous_builds`` parameter on a stage to let the user control the pipeline. (RELENG-2859)
+
+
 Eve 1.5.6 (2019-08-02)
 ======================
 

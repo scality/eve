@@ -281,15 +281,6 @@ class EveKubeLatentWorker(AbstractLatentWorker):
                 {'name': 'WORKERPASS', 'value': self.password},
             ])
 
-    def getWorkerName(self, build):
-        buildid = build.getProperty('buildnumber')
-        buildnumber = build.getProperty('bootstrap')
-        return '{name}-{buildnumber}-{buildid}'.format(
-            name=self.name.replace('_', '-'),
-            buildnumber=buildnumber,
-            buildid=buildid
-        )
-
     def add_common_worker_metadata(self, pod, build):
         """Add eve-related metadata to pod to easily identify them in kube."""
         buildid = build.getProperty('buildnumber')
@@ -297,7 +288,7 @@ class EveKubeLatentWorker(AbstractLatentWorker):
         stage_name = build.getProperty('stage_name')
 
         pod.setdefault('metadata', {}).setdefault('labels', {})
-        pod['metadata']['name'] = self.getWorkerName(build)
+        pod['metadata']['name'] = util.compute_instance_name(build)
         pod['metadata']['labels']['buildnumber'] = str(buildnumber)
         pod['metadata']['labels']['buildid'] = str(buildid)
         pod['metadata']['labels']['workername'] = self.name
@@ -424,7 +415,7 @@ class EveKubeLatentWorker(AbstractLatentWorker):
                 'service_data': self.service_data,
                 'service_requests': worker_service.get('requests', {}),
                 'uuid': uuid,
-                'worker_pod_name': self.getWorkerName(build),
+                'worker_pod_name': util.compute_instance_name(build),
             }
         )
         self.enforce_affinity_policy(self.service_pod)

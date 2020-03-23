@@ -164,15 +164,22 @@ class DockerComputeImageFingerprint(DockerStep):
 
     """
 
-    def __init__(self, label, context_dir, **kwargs):
+    def __init__(self, label, context_dir, dockerfile=None, **kwargs):
         kwargs.setdefault('name',
                           '[{0}] fingerprint'.format(label)[:49])
+        command = (
+            'tar -c --mtime="1990-02-11 00:00Z" --group=0 '
+            '--owner=0 --numeric-owner --sort=name --mode=0 '
+            '{context_dir} {dockerfile} '
+            '| sha256sum | cut -f 1 -d " "'
+        ).format(
+            context_dir=context_dir,
+            dockerfile=str(dockerfile or '')
+        )
         super(DockerComputeImageFingerprint, self).__init__(
             label, context_dir,
-            'tar -c --mtime="1990-02-11 00:00Z" --group=0 '
-            '--owner=0 --numeric-owner --sort=name --mode=0 . '
-            '| sha256sum | cut -f 1 -d " "',
-            workdir=context_dir, **kwargs
+            command,
+            **kwargs
         )
         self.observer = logobserver.BufferLogObserver(wantStdout=True,
                                                       wantStderr=True)

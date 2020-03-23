@@ -42,13 +42,10 @@ class Settings(dict):
             self.load(name, default, convert)
 
     def load(self, name, default, convert):
-        if default is None:
-            value = environ[name]
-        else:
-            value = environ.get(name, "")
+        try:
+            value = environ.pop(name, default)
             if value == "":
                 value = default
-        try:
             self[name] = convert(value)
         except ValueError as exc:
             raise ValueError('Cannot convert {}={} to an {}'.format(

@@ -21,6 +21,7 @@ import os
 from io import StringIO
 from xml.etree.ElementTree import ParseError
 
+from buildbot import config
 from buildbot.process.buildstep import CommandMixin
 from buildbot.process.results import FAILURE, SUCCESS, WARNINGS
 from buildbot.steps.shell import ShellCommand
@@ -58,11 +59,18 @@ class JUnitShellCommand(ShellCommand, CommandMixin, CompositeStepMixin):
     first_failure = None
     first_error = None
     name = 'junit_shell'
-    renderables = ['report_dir']
+    renderables = ['report_dir', 'report_path']
 
-    def __init__(self, report_dir=None, *args, **kwargs):
+    def __init__(self, report_dir=None, report_path=None, *args, **kwargs):
         super(JUnitShellCommand, self).__init__(*args, **kwargs)
         self.report_dir = report_dir
+        self.report_path = report_path
+        if self.report_dir and self.report_path:
+            config.error('Both report_dir and report_path are defined, '
+                         'please choose one')
+
+        if self.report_path is not None and isinstance(self.report_path, str):
+            self.report_path = [self.report_path]
 
     def evaluateCommand(self, cmd):  # NOQA flake8 to ignore camelCase
         """Return failure if the command failed, warning otherwise."""
@@ -78,29 +86,43 @@ class JUnitShellCommand(ShellCommand, CommandMixin, CompositeStepMixin):
         return SUCCESS
 
     @defer.inlineCallbacks
+    def getContent(self, paths):
+        contents = []
+        for path in paths:
+            files = yield self.runGlob(os.path.join(self.workdir, path))
+            if files:
+                contents.extend(files)
+        defer.returnValue(contents)
+
+    @defer.inlineCallbacks
     def commandComplete(self, cmd):  # flake8: noqa
-        if not self.report_dir:
+        junit_log = yield self.addLog('junit')
+        junit_log.addStdout('Starting the search for Junit reports\n')
+        contents = []
+        if not self.report_dir and not self.report_path:
             self.setup_warnings = True
             return
 
-        has_path = yield self.pathExists(
-            self.build.path_module.join(self.workdir, self.report_dir))
+        if self.report_dir is not None:
+            contents = yield self.getContent([os.path.join(self.report_dir,
+                                                           '*.xml')])
 
-        if not has_path:
-            self.setup_warnings = True
-            return
-
-        contents = yield self.runGlob(
-            os.path.join(self.workdir, self.report_dir, '*.xml'))
+        elif self.report_path:
+            contents = yield self.getContent(self.report_path)
 
         if not contents:
+            junit_log.addStdout('Found no files\n')
             self.setup_warnings = True
             return
 
         for report_file in contents:
+            junit_log.addStdout(
+                'Starting upload and parsing of file %s\n' %
+                os.path.basename(report_file))
             yield self.parse_report(report_file)
 
         if not self.total:
+            junit_log.addStdout('No test results found\n')
             self.setup_warnings = True
             return
 
