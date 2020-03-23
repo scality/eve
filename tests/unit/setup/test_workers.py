@@ -17,6 +17,13 @@ provider:
       new_value: bar
 """
 
+    mapping_v2_data = u"""
+provider_there:
+  - field:
+      original_value: foo
+      new_value: bar
+"""
+
     def test_local_workers(self):
         util.env = util.load_env([
             ('GIT_SLUG', 'slug'),
@@ -106,6 +113,17 @@ provider:
     def test_openstack_mapping_match(self, mock_open):
         mock_open.return_value = StringIO(self.mapping_data)
         res = eve.setup.workers.openstack_mapping('provider', 'field', 'foo')
+        self.assertEquals(res, 'bar')
+
+    @patch('eve.setup.workers.open')
+    def test_openstack_mapping_v2(self, mock_open):
+        mock_open.return_value = StringIO(self.mapping_data)
+        res = eve.setup.workers.openstack_mapping('provider', 'field', 'foo',
+                                                  region="there")
+        self.assertEquals(res, 'bar')
+        mock_open.return_value = StringIO(self.mapping_v2_data)
+        res = eve.setup.workers.openstack_mapping('provider', 'field', 'foo',
+                                                  region="there")
         self.assertEquals(res, 'bar')
 
     def test_openstack_worker_script_with_user_script(self):
