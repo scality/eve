@@ -14,7 +14,7 @@ stages:
       - ShellCommand:
           name: check eve_promotion_artifacts property
           command: >
-            echo %(prop:eve_promotion_artifacts)s | grep -qE '^[^/]+\:(dev\-|preprod\-|)(staging|prolonged)\-[0-9]+(\.[0-9]+){1,3}\.r[0-9]{12}\.[0-9a-f]+\.[^/]+\.[0-9]+$';
+            echo %(prop:eve_promotion_artifacts)s | grep -qE '^[^/]+\:(dev\-|preprod\-|)((staging|prolonged)\-[0-9]+(\.[0-9]+){1,3}\.r[0-9]{12}\.[0-9a-f]+\.[^/]+\.[0-9]+|promoted\-[^/\-]+)$';
           haltOnFailure: True
       - ShellCommand:
           name: check eve_promotion_tag property
@@ -24,7 +24,10 @@ stages:
       - ShellCommand:
           name: check tag and artifacts consistency
           command: >
-            artifacts_commit=`echo %(prop:eve_promotion_artifacts)s | sed -E 's/^[^/]+\:(dev\-|preprod\-|)(staging|prolonged)\-[0-9]+(\.[0-9]+){1,3}\.r[0-9]{12}\.([0-9a-f]+)\.[^/]+\.[0-9]+$/\\4/'`;
+            echo %(prop:eve_promotion_artifacts)s | grep -qE '^[^/]+\:(dev\-|preprod\-|)(staging|prolonged)\-[0-9]+(\.[0-9]+){1,3}\.r[0-9]{12}\.[0-9a-f]+\.[^/]+\.[0-9]+$'
+            && artifacts_commit=`echo %(prop:eve_promotion_artifacts)s | sed -E 's/^[^/]+\:(dev\-|preprod\-|)(staging|prolonged)\-[0-9]+(\.[0-9]+){1,3}\.r[0-9]{12}\.([0-9a-f]+)\.[^/]+\.[0-9]+$/\\4/'`;
+            echo %(prop:eve_promotion_artifacts)s | grep -qE '^[^/]+\:(dev\-|preprod\-|)promoted\-[^/\-]+$'
+            && artifacts_commit=`git rev-list -n 1 \`echo %(prop:eve_promotion_artifacts)s | sed -E 's/^[^/]+\:(dev\-|preprod\-|)promoted\-([^/\-]+)$/\\2/')\``;
             tag_commit=`git rev-list -n 1 %(prop:eve_promotion_tag)s`;
             case ${tag_commit} in
               ${artifacts_commit}*) exit 0;;
@@ -34,7 +37,10 @@ stages:
       - ShellCommand:
           name: promoting
           command: >
-            artifacts_prefix=`echo %(prop:eve_promotion_artifacts)s | sed -E 's/(^[^/]+\:)(dev\-|preprod\-|)(staging|prolonged)\-[0-9]+(\.[0-9]+){1,3}\.r[0-9]{12}\.[0-9a-f]+\.[^/]+\.[0-9]+$/\\1\\2/'`;
+            echo %(prop:eve_promotion_artifacts)s | grep -qE '^[^/]+\:(dev\-|preprod\-|)(staging|prolonged)\-[0-9]+(\.[0-9]+){1,3}\.r[0-9]{12}\.[0-9a-f]+\.[^/]+\.[0-9]+$'
+            && artifacts_prefix=`echo %(prop:eve_promotion_artifacts)s | sed -E 's/(^[^/]+\:)(dev\-|preprod\-|)(staging|prolonged)\-[0-9]+(\.[0-9]+){1,3}\.r[0-9]{12}\.[0-9a-f]+\.[^/]+\.[0-9]+$/\\1\\2/'`;
+            echo %(prop:eve_promotion_artifacts)s | grep -qE '^[^/]+\:(dev\-|preprod\-|)promoted\-[^/\-]+$'
+            && artifacts_prefix=`echo %(prop:eve_promotion_artifacts)s | sed -E 's/(^[^/]+\:)(dev\-|preprod\-|)promoted\-[^/\-]+$/\\1\\2/'`;
             artifacts_target=${artifacts_prefix}promoted-%(prop:eve_promotion_tag)s;
             echo "copying '%(prop:eve_promotion_artifacts)s' to '${artifacts_target}'";
             curl --silent http://artifacts/copy/%(prop:eve_promotion_artifacts)s/${artifacts_target}/ | tee /tmp/%(prop:workername)s-promotion-output.log;
