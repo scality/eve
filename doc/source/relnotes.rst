@@ -17,6 +17,22 @@ Release Notes
 
 .. towncrier release notes start
 
+Eve 1.7.2 (2020-03-25)
+======================
+
+Features
+--------
+
+- Allow to promote a promoted build. (EVE-1124)
+- Allow to define region based image mapping. Useful for scality.cloud (RELENG-2975)
+
+
+Bugfixes
+--------
+
+- Repair artifacts upload retry. (PIPDEP-866)
+
+
 Eve 1.7.1 (2020-02-21)
 ======================
 
