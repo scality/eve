@@ -68,6 +68,8 @@ class GetArtifactsFromStage(EvePropertyFromCommand):
                 'curl',
                 '-L',
                 '--fail',
+                '--silent',
+                '--show-error',
                 '-I',
                 Interpolate('http://artifacts/last_success/{}.{}'.format(
                             get_artifacts_base_name(),
@@ -75,9 +77,18 @@ class GetArtifactsFromStage(EvePropertyFromCommand):
             ],
             **kwargs
         )
+        self.observer = logobserver.BufferLogObserver(wantStdout=True,
+                                                      wantStderr=True)
+        self.addLogObserver('stdio', self.observer)
 
     def commandComplete(self, cmd):  # NOQA flake8 to ignore camelCase
         if cmd.didFail():
+            notfound = ('curl: (22) The requested URL returned error: '
+                        '404 Not Found')
+            if notfound in self.observer.getStderr():
+                self.stdio_log.addStderr('No artifacts found for this git '
+                                         'commit, this may mean they are '
+                                         'expired.\n')
             return
 
         # parse the response headers to get the container from redirection
