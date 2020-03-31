@@ -160,6 +160,8 @@ class TestGetArtifactsFromStage(steps.BuildStepMixin, unittest.TestCase):
                                 'curl',
                                 '-L',
                                 '--fail',
+                                '--silent',
+                                '--show-error',
                                 '-I',
                                 'http://artifacts/last_success/:::%s.r..%s' % (
                                     util.env.ARTIFACTS_PREFIX, stage)
