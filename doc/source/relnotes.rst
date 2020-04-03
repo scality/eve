@@ -17,6 +17,15 @@ Release Notes
 
 .. towncrier release notes start
 
+Eve 1.7.3 (2020-04-03)
+======================
+
+Features
+--------
+
+- Added explanation for 404 returned by last_success. (RELENG-3665)
+
+
 Eve 1.7.2 (2020-03-25)
 ======================
 
