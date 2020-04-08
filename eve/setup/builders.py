@@ -65,6 +65,15 @@ def triggerable_builder(builder_name, workers):
         hideStepIf=True,
         flunkOnFailure=False
     ))
+    # Add build properties
+    factory.addStep(steps.SetBuilderId(
+        name='Set the current builder id',
+        hideStepIf=True
+    ))
+    factory.addStep(steps.SetBuildUrl(
+        name='Set the current build url',
+        hideStepIf=True
+    ))
     # Extract steps from conf
     factory.addStep(steps.StepExtractor(
         name='extract steps from yaml',

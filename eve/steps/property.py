@@ -17,6 +17,7 @@
 # Boston, MA  02110-1301, USA.
 """Steps used to set overridable properties."""
 
+from buildbot.process.buildstep import BuildStep
 from buildbot.process.results import SKIPPED, SUCCESS
 from buildbot.steps.master import SetProperty
 from buildbot.steps.shell import SetPropertyFromCommand
@@ -77,3 +78,31 @@ class EveProperty(EvePropertyMixin, SetProperty):
 
 class EvePropertyFromCommand(EvePropertyMixin, SetPropertyFromCommand):
     pass
+
+
+class SetBuilderId(BuildStep):
+    """Set a property with the builder id of the current build."""
+
+    name = 'SetBuilderId'
+
+    @defer.inlineCallbacks
+    def run(self):
+        builderid = yield self.build.getBuilderId()
+        self.setProperty(
+            'builderid', builderid, 'SetBuilderId'
+        )
+        defer.returnValue(SUCCESS)
+
+
+class SetBuildUrl(BuildStep):
+    """Set the current build url in a property."""
+
+    name = 'SetBuildUrl'
+
+    @defer.inlineCallbacks
+    def run(self):
+        buildurl = yield self.build.getUrl()
+        self.setProperty(
+            'buildurl', buildurl, 'SetBuildUrl'
+        )
+        defer.returnValue(SUCCESS)

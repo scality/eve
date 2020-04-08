@@ -66,6 +66,16 @@ class TestJunit(unittest.TestCase):
                 u'success'
             ),
             (
+                u'Set the current builder id',
+                u'finished',
+                u'success'
+            ),
+            (
+                u'Set the current build url',
+                u'finished',
+                u'success'
+            ),
+            (
                 u'extract steps from yaml',
                 u'finished',
                 'success'

@@ -151,6 +151,8 @@ class TestPatcher(unittest.TestCase):
                 (u'set the artifacts private url',
                  u"property 'artifacts_private_url' set"),
                 (u'Check worker OS distribution', u'finished'),
+                (u'Set the current builder id', u'finished'),
+                (u'Set the current build url', u'finished'),
                 (u'extract steps from yaml', u'finished'),
                 (u'step1', u'Temporarily disabled (skipped)'),
                 (u'step2', u"'exit 0'"),
