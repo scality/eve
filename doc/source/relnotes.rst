@@ -17,6 +17,15 @@ Release Notes
 
 .. towncrier release notes start
 
+Eve 1.7.4 (2020-04-08)
+======================
+
+Features
+--------
+
+- Adding new properties ``builderid`` and ``buildurl`` which can be useful to find the build url. (EVE-1126)
+
+
 Eve 1.7.3 (2020-04-03)
 ======================
 
