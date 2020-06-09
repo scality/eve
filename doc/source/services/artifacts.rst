@@ -94,48 +94,6 @@ artifacts archival:
            && echo -n "SUCCESSFUL" > build_status/.final_status
 
 
-Permanent archival of related artifacts
----------------------------------------
-
-It is possible to include artifacts from other builds during the promotion
-of a container. If this is required, create a file named identically to the
-other's build artifacts in directory *build_status/.related_artifacts* at the
-root of artifacts. Combined with :ref:`the step GetArtifactsFromStage
-<GetArtifactsFromStage>`, we can create promoted artifacts which also include
-the latest SUCCESSFUL artifacts generated on that hash by another stage
-of the build.
-
-This is a useful feature when running various stages at different lifetimes
-of the repository (pre and post merge builds like in the example below for
-instance).
-
-.. code-block:: yaml
-   :caption: how to include other builds' artifacts in promoted artifacts
-
-   pre-merge:
-     steps:
-       # .... generate some pre-merge build artifacts here
-
-   post-merge:
-     steps:
-       # .... generate some post-merge build artifacts here
-
-       - GetArtifactsFromStage:
-           # fill in a property with the name
-           # of the latest successful pre-merge build artifacts
-           stage: stage1
-           property: premerge_artifacts
-
-       - ShellCommand:
-           # create a reference so that the pre-merge
-           # artifacts get promoted at the same time
-           # as the post-merge artifacts
-           name: save the pre-merge artifacts reference
-           command: >
-               mkdir -p build_status/.related_artifacts
-               && touch "build_status/.related_artifacts/%(prop:premerge_artifacts)s"
-
-
 Related build properties
 ------------------------
 
