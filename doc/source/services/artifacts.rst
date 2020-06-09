@@ -27,6 +27,13 @@ Create and upload artifacts
 
 To upload an artifact, store all the files you want to upload in a single
 directory (e.g. artifacts/).
+
+Eve additionally requires the following mandatory rule to be implemented
+for each repository that requires artifacts upload:
+
+- :ref:`the script get_product_version.sh<get_product_version>` *must* exist
+  and *must* return a string of 3 or 4 integers separated by dots.
+
 Then add an Upload step and give it the name of the folder, like below:
 
 .. code-block:: yaml
@@ -52,30 +59,19 @@ Then add an Upload step and give it the name of the folder, like below:
 Permanent archival
 ------------------
 
-Eve archives artifacts permanently, via a "promotion" mechanism, if the following
-conditions are met:
+Eve can archive artifacts permanently, via a promotion mechanism, with the
+following requirements:
+
+- a tag which does not contain the '/' character exists in the repository for
+  the commit hash of the build we want to promote.
 
 - a set of artifacts corresponding to a SUCCESSFUL build exists for the hash
   on which the tag points (this induces that promotion can only occur within
   14 days of the last successful build).
 
-- a tag exists in the repository in the format of 3 or 4 numbers separated by
-  a dot, and possibly followed by '_' and free text. The tag must be annoted
-  with the number of a build on that hash, with format '%<buildnumber>'. The
-  artifacts of that build will be archived.
-
-  Valid examples of tagging are:
-
-  - git tag -am '%1234' 7.8.9
-  - git tag -am '%1234' 7.8.9.10
-  - git tag -am '%1234' 7.8.9_label
-
 In order for this to work, this version of Eve additionally requires the
-following mandatory rules to be implemented for each repository that requires
+following mandatory rule to be implemented for each repository that requires
 artifacts archival:
-
-- :ref:`the script get_product_version.sh<get_product_version>` *must* exist
-  and *must* return a string of 3 or 4 integers separated by dots.
 
 - The finalized artifacts container *must* contain a file named
   `build_status/.final_status`, which contains the global status of the build
@@ -92,6 +88,13 @@ artifacts archival:
        command: >
            mkdir build_status
            && echo -n "SUCCESSFUL" > build_status/.final_status
+
+To launch a promotion, connect to the Eve web interface of your repository under
+"bootstrap" builders. Then, click on the "promote" button. You will have to give
+the name of the build artifacts you want to promote as you can see it listed under
+"/artifacts/builds/" in the web interface. You will also have to give the git tag.
+Eve will copy the builds artifacts under a new name suffixed by the tag. This
+copy will not be expired/deleted.
 
 
 Related build properties
