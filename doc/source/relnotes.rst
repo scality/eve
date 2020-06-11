@@ -17,6 +17,16 @@ Release Notes
 
 .. towncrier release notes start
 
+Eve 1.7.5 (2020-06-11)
+======================
+
+Features
+--------
+
+- Accept '-' character in promotion tag. (RELENG-3822)
+- Promotion doc updated to include artifacts v3 procedure. (EVE-1130)
+
+
 Eve 1.7.4 (2020-04-08)
 ======================
 
