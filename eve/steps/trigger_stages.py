@@ -54,11 +54,27 @@ class TriggerStages(BuildStep, ConfigurableStepMixin):
         kwargs_for_exec_trigger_stages.setdefault('waitForFinish', True)
         self._kwargs_for_exec_trigger_stages = kwargs_for_exec_trigger_stages
 
+        # kwargs_for_exec_trigger_stages holds all the parameter, but they're not sent to
+        # this class, but rather the ExecuteTriggerStages class.
+        #
+        # it works well when this step is supposed to run, as the ExecuteTriggerStages step takes the lead of
+        # holding all the step parameter.
+        # but in the case of the alwaysRun, this step is skipped and all this code is not executed
+
+        # I'd argue we duplicate the kwargs for the TriggerStages and the ExecuteTriggerStages
         kwargs = {
             'name': 'prepare {0} stage(s)'.format(len(self.stage_names)),
             'hideStepIf': util.hideStepIfSuccess,
             'haltOnFailure': True,
         }
+        # so we could do something like
+        # note that I don't even know if that works
+        # but my idea is to keep the value set above as default
+        kwargs.update(self._kwargs_for_exec_trigger_stages)
+        # Another option, which might be a little bit "safer"
+        # is to explicitly get the alwaysRun parameter from kwargs_for_exec_trigger_stages
+        # and add it in kwargs.
+
         super(TriggerStages, self).__init__(**kwargs)
 
     def run(self):
