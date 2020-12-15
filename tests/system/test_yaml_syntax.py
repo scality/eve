@@ -163,6 +163,20 @@ class TestYamlSyntax(unittest.TestCase):
                     },
                 )
 
+        # Test with property not set and default value
+        for truthy, values in example_values.items():
+            for value in values:
+                steps = [
+                    run_step(doStepIf='%(prop:someprop:-{})s'.format(value)),
+                ]
+
+                self._check_build_and_last_step(
+                    steps,
+                    last_step_attrs={
+                        'result': 'success' if truthy else 'skipped'
+                    },
+                )
+
         # Also works for hiding steps
         for truthy in example_values:
             steps = [
@@ -192,6 +206,16 @@ class TestYamlSyntax(unittest.TestCase):
         last_step = self._check_build_and_last_step(
             [set_property('someprop', 'not-a-bool'),
              run_step(doStepIf='%(prop:someprop)s')],
+            build_result='exception',
+            last_step_attrs={'result': 'exception'},
+        )
+
+        self.assertIn('Invalid value to cast as boolean: not-a-bool',
+                      last_step.rawlog('err_text'))
+
+        # Check unsupported default value
+        last_step = self._check_build_and_last_step(
+            [run_step(doStepIf='%(prop:someprop:-not-a-bool)s')],
             build_result='exception',
             last_step_attrs={'result': 'exception'},
         )

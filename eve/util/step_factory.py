@@ -102,7 +102,7 @@ def replace_with_interpolate(obj, key=None):
 
 
 class BooleanInterpolate(Interpolate):
-    INTERPOLATION_REGEX = re.compile(r'^%\((prop|secret):[\w._-]*\)s$')
+    INTERPOLATION_REGEX = re.compile(r'^%\((prop|secret):[\w._-]*(:-.*)?\)s$')
 
     def __init__(self, fmtstring):
         if not BooleanInterpolate.INTERPOLATION_REGEX.match(fmtstring):
