@@ -2,7 +2,7 @@
 
 # Frozen requirements for "requirements/freeze.in"
 
-buildbot-pkg==2.0.1
+buildbot-pkg==2.1.0
 click==7.0
 freeze-requirements==0.5.3
 mock==2.0.0
