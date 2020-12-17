@@ -17,6 +17,15 @@ Release Notes
 
 .. towncrier release notes start
 
+Eve 1.7.6 (2020-12-17)
+======================
+
+Features
+--------
+
+- Add support for default value in prop in "doStepIf". (EVE-1141)
+
+
 Eve 1.7.5 (2020-06-11)
 ======================
 
