@@ -74,5 +74,9 @@ fi
 
 # install twisted and buildbot
 retry sudo pip install --index-url=https://pypi.python.org/simple/ --upgrade pip==9.0.3
+# As idna >= 3.0 is no longer supported by python version lower than 3.4
+# and we still need to support python 2 for a little while
+# we are therefore pre installing idna on a version that matches buildbot-worker requirements
+retry sudo pip install idna==2.10
 retry sudo pip install twisted==$twisted_version
 retry sudo pip install buildbot-worker==$worker_version
