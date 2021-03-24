@@ -7,11 +7,11 @@ branches:
 
 stages:
   pre-merge:
-    worker: &xenial-worker
+    worker: &focal-worker
       type: kube_pod
-      path: build/workers/xenial/pod.yaml
+      path: build/workers/focal/pod.yaml
       images:
-        worker: build/workers/xenial
+        worker: build/workers/focal
     steps:
       - TriggerStages:
           name: trigger local and remote tests simultaneously
@@ -38,7 +38,7 @@ stages:
           alwaysRun: True
 
   local-tests:
-    worker: *xenial-worker
+    worker: *focal-worker
     steps:
       - Git:
           name: fetch source
@@ -76,8 +76,7 @@ stages:
           usePTY: true
       - ShellCommand:
           name: run system utils tests
-          command: tox --sitepackages -e testutil
-          haltOnFailure: True
+          command: tox -e testutil
           usePTY: true
       - ShellCommand:
           name: run system tests
@@ -95,7 +94,7 @@ stages:
   docker tests:
     worker:
       type: openstack
-      image: Ubuntu 16.04 LTS (Xenial Xerus) (PVHVM)
+      image: focal-server-cloudimg-amd64_2021-04-29
       flavor: general1-8
       path: build/workers/docker_tests
     steps:

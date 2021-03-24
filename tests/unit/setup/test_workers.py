@@ -31,7 +31,7 @@ provider_there:
             ('SUFFIX', '_foo')
         ])
         workers = eve.setup.workers.local_workers()
-        self.assertEquals(len(workers), 3)
+        self.assertEqual(len(workers), 3)
 
     def test_docker_workers(self):
         util.env = util.load_env([
@@ -46,7 +46,7 @@ provider_there:
             ('SUFFIX', '_foo'),
         ])
         workers = eve.setup.workers.docker_workers()
-        self.assertEquals(len(workers), 3)
+        self.assertEqual(len(workers), 3)
 
     def test_kube_pod_workers(self):
         util.env = util.load_env([
@@ -65,7 +65,7 @@ provider_there:
             ('SUFFIX', '_foo'),
         ])
         workers = eve.setup.workers.kube_pod_workers()
-        self.assertEquals(len(workers), 3)
+        self.assertEqual(len(workers), 3)
 
     @patch('eve.setup.workers.open')
     def test_openstack_mapping_nofile(self, mock_open):
@@ -75,11 +75,11 @@ provider_there:
 
         mock_open.side_effect = OSError
         res = eve.setup.workers.openstack_mapping('provider', 'field', 'foo')
-        self.assertEquals(res, 'foo')
+        self.assertEqual(res, 'foo')
 
         mock_open.side_effect = IOError
         res = eve.setup.workers.openstack_mapping('provider', 'field', 'foo')
-        self.assertEquals(res, 'foo')
+        self.assertEqual(res, 'foo')
 
     @patch('eve.setup.workers.open')
     def test_openstack_mapping_invalid_yaml(self, mock_open):
@@ -89,46 +89,46 @@ provider_there:
 
         mock_open.return_value = StringIO(u"not: 'yaml")
         res = eve.setup.workers.openstack_mapping('provider', 'field', 'foo')
-        self.assertEquals(res, 'foo')
+        self.assertEqual(res, 'foo')
 
     @patch('eve.setup.workers.open')
     def test_openstack_mapping_no_provider(self, mock_open):
         mock_open.return_value = StringIO(self.mapping_data)
         res = eve.setup.workers.openstack_mapping('nomatch', 'field', 'foo')
-        self.assertEquals(res, 'foo')
+        self.assertEqual(res, 'foo')
 
     @patch('eve.setup.workers.open')
     def test_openstack_mapping_no_field(self, mock_open):
         mock_open.return_value = StringIO(self.mapping_data)
         res = eve.setup.workers.openstack_mapping('provider', 'nomatch', 'foo')
-        self.assertEquals(res, 'foo')
+        self.assertEqual(res, 'foo')
 
     @patch('eve.setup.workers.open')
     def test_openstack_mapping_no_value(self, mock_open):
         mock_open.return_value = StringIO(self.mapping_data)
         res = eve.setup.workers.openstack_mapping('provider', 'field', 'baz')
-        self.assertEquals(res, 'baz')
+        self.assertEqual(res, 'baz')
 
     @patch('eve.setup.workers.open')
     def test_openstack_mapping_match(self, mock_open):
         mock_open.return_value = StringIO(self.mapping_data)
         res = eve.setup.workers.openstack_mapping('provider', 'field', 'foo')
-        self.assertEquals(res, 'bar')
+        self.assertEqual(res, 'bar')
 
     @patch('eve.setup.workers.open')
     def test_openstack_mapping_v2(self, mock_open):
         mock_open.return_value = StringIO(self.mapping_data)
         res = eve.setup.workers.openstack_mapping('provider', 'field', 'foo',
                                                   region="there")
-        self.assertEquals(res, 'bar')
+        self.assertEqual(res, 'bar')
         mock_open.return_value = StringIO(self.mapping_v2_data)
         res = eve.setup.workers.openstack_mapping('provider', 'field', 'foo',
                                                   region="there")
-        self.assertEquals(res, 'bar')
+        self.assertEqual(res, 'bar')
 
     def test_openstack_worker_script_with_user_script(self):
         res = eve.setup.workers.openstack_worker_script('path', 'user_data')
-        self.assertEquals(res, 'user_data')
+        self.assertEqual(res, 'user_data')
 
     @patch('eve.setup.workers.open')
     def test_openstack_worker_script_missing_default_file(self, mock_open):
@@ -145,7 +145,7 @@ provider_there:
     def test_openstack_worker_script_custom_script(self, mock_open):
         mock_open.return_value = StringIO(u"script contents")
         res = eve.setup.workers.openstack_worker_script('/path', '')
-        self.assertEquals(res, 'script contents')
+        self.assertEqual(res, 'script contents')
         mock_open.assert_called_once()
         self.assertEqual(mock_open.call_args_list[0][0][0], '/path')
 
@@ -181,4 +181,4 @@ provider_there:
             ('SUFFIX', '_foo'),
         ])
         workers = eve.setup.workers.openstack_heat_workers()
-        self.assertEquals(len(workers), 3)
+        self.assertEqual(len(workers), 3)

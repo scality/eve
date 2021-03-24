@@ -2,7 +2,7 @@
 #
 # to recreate frozen requirements:
 #
-#    $ pip install -U -r requirements.txt
+#    $ pip3 install -U -r requirements.txt
 #    $ tox -e freeze-requirements
 #
 -c constraints.txt
@@ -43,3 +43,6 @@ xunitparser                 # used by JunitShellCommand
 buildbot-pkg
 pydocstyle
 pyflakes
+
+importlib-metadata
+setuptools-scm

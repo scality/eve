@@ -7,10 +7,17 @@ buildbot-www==2.0.1
 buildbot==2.0.1
 buildbot_wsgi_dashboards==2.0.1
 
+# Buildbot deps
+sqlalchemy==1.2.17
+autobahn==21.3.1
 # Force a common version for components that are installed
 # by different requirements files in different versions
 idna==2.5
 pyflakes>=1.6.0
+certifi==2018.11.29
+babel==2.6.0
+urllib3==1.24.3
+chardet==3.0.4
 
 # pydocstyle 2.1.1 raises new errors
 # we will need a proper integration of the new version
@@ -19,5 +26,11 @@ pydocstyle==2.0.0
 # Ensure we have an up to date version of twisted
 twisted>=19.7.0
 
-# pip 20.0.2 contains a regression that breaks pip install of some modules
-pip==20.0.1
+# fix a syntax error with 6.0.1
+setuptools-scm==5.0.2
+
+# later version seems buggy
+importlib-metadata==3.10.1
+
+# Freezed kubernetes python client version
+kubernetes==8.0.1

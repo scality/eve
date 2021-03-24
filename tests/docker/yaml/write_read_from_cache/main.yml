@@ -6,7 +6,7 @@ stages:
   write:
     worker:
         type: docker
-        path: ubuntu-xenial-ctxt
+        path: ubuntu-focal-ctxt
         volumes:
           - 'testcache:/write'
     steps:
@@ -26,7 +26,7 @@ stages:
   read:
     worker:
         type: docker
-        path: ubuntu-xenial-ctxt
+        path: ubuntu-focal-ctxt
         volumes:
           - 'testcache:/read'
     steps:

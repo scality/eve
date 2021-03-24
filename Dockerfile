@@ -1,4 +1,4 @@
-FROM ubuntu:xenial
+FROM ubuntu:focal
 
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get -y install -q \
@@ -14,14 +14,13 @@ RUN apt-get update && \
         python3-dev \
         python3-pip \
         python3-psycopg2 \
-        python \
-        python-requests \
+        python3-requests \
         telnet \
         vim.tiny && \
     rm -rf /var/lib/apt/lists/*
 
 # Install git lfs
-RUN echo "deb https://packagecloud.io/github/git-lfs/ubuntu/ xenial main" > /etc/apt/sources.list.d/github_git-lfs.list && \
+RUN echo "deb https://packagecloud.io/github/git-lfs/ubuntu/ focal main" > /etc/apt/sources.list.d/github_git-lfs.list && \
     curl -sSL https://packagecloud.io/github/git-lfs/gpgkey | apt-key add - && \
     apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get -y install -q git-lfs && \
@@ -34,6 +33,7 @@ WORKDIR /root/eve
 
 # Freezing requirements
 COPY requirements/base.txt /tmp/requirements.txt
+RUN pip3 install --upgrade pip==21.0.1
 RUN pip3 install -r /tmp/requirements.txt
 
 COPY . /opt/eve

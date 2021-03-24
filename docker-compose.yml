@@ -12,7 +12,7 @@ services:
     environment:
       MASTER_MODE: frontend
       DB_URL: "mysql://eve:4m4zing@db:3306/buildbot_db?max_idle=300"
-      WAMP_ROUTER_URL: 'ws://crossbar:10990/ws'
+      WAMP_ROUTER_URL: 'ws://crossbar:8080/ws'
 
   backend:
     build: .
@@ -25,7 +25,7 @@ services:
     environment:
       MASTER_MODE: backend
       DB_URL: "mysql://eve:4m4zing@db:3306/buildbot_db?max_idle=300"
-      WAMP_ROUTER_URL: 'ws://crossbar:10990/ws'
+      WAMP_ROUTER_URL: 'ws://crossbar:8080/ws'
       EXTERNAL_PB_PORT: ${EXTERNAL_PB_PORT-9999}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock

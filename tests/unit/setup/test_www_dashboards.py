@@ -5,6 +5,7 @@ from __future__ import absolute_import
 from io import StringIO
 
 import yaml
+from buildbot.plugins import util
 from mock import patch
 from twisted.trial import unittest
 
@@ -91,19 +92,15 @@ class TestDashboardsConfig(unittest.TestCase):
 
 
 class TestWsgiDashboards(unittest.TestCase):
-    def mock_env():
-        return {
-            'DASHBOARDS_FILE_PATH': 'a_filename'
-        }
 
-    @patch('eve.setup.www_dashboards.util.env')
     @patch('eve.setup.www_dashboards.link_dashboard')
     @patch('eve.setup.www_dashboards.open')
     def test_wsgi_dashboards(self,
                              mock_open,
-                             mock_link_dashboard,
-                             mock_env):
-        mock_env.request.side_effect = self.mock_env
+                             mock_link_dashboard):
+        util.env = util.load_env([
+            ('DASHBOARDS_FILE_PATH', 'a_filename')
+        ])
         mock_link_dashboard.return_value = {
             'name': 'mock_name',
             'caption': 'mock_caption',

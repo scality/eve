@@ -10,7 +10,7 @@ import eve.setup.www
 class TestDenyRebuildIntermediateBuild(unittest.TestCase):
     def test_init(self):
         ctx = eve.setup.www.DenyRebuildIntermediateBuild('foo', role='*')
-        self.assertEquals(ctx.root_builder_name, 'foo')
+        self.assertEqual(ctx.root_builder_name, 'foo')
 
 
 class TestSetupWww(unittest.TestCase):
