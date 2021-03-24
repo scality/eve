@@ -1,11 +1,11 @@
 # CONSTRAINTS for all installs
 
 # fix version of buildbot
-buildbot-pkg==2.0.1
-buildbot-worker==2.0.1
-buildbot-www==2.0.1
-buildbot==2.0.1
-buildbot_wsgi_dashboards==2.0.1
+buildbot-pkg==2.7.0
+buildbot-worker==2.7.0
+buildbot-www==2.7.0
+buildbot==2.7.0
+buildbot_wsgi_dashboards==2.7.0
 
 # Force a common version for components that are installed
 # by different requirements files in different versions
