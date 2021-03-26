@@ -32,8 +32,18 @@ then
   localedef -v -c -i en_US -f UTF-8 en_US.UTF-8 || true
   export LANG=en_US.utf8
 
-  retry yum -y install git gcc python-devel python-setuptools libffi-devel openssl-devel
-  retry easy_install pip==9.0.3
+  retry yum -y install glibc-locale-source redhat-lsb-core
+  dist_major=$(lsb_release -sr | cut -d . -f 1)
+ 
+  retry yum -y install git gcc libffi-devel openssl-devel
+ 
+  if [ "$dist_major" == "8" ]; then
+    retry dnf -y install python2-devel python2-setuptools  
+    retry easy_install-2 pip==9.0.3
+  else
+    retry yum -y install python-devel python-setuptools
+    retry easy_install pip==9.0.3
+  fi
 
   adduser -u 1042 --home-dir /home/eve eve
   usermod -G wheel eve
