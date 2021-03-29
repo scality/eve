@@ -27,5 +27,5 @@ class TestSetupBuilders(unittest.TestCase):
     def test_triggerable_builder(self):
         builder_conf = eve.setup.builders.triggerable_builder(
             'foo', [DumbWorker(name='bar')])
-        self.assertEquals(builder_conf.name, 'foo')
-        self.assertEquals(builder_conf.workernames, ['bar'])
+        self.assertEqual(builder_conf.name, 'foo')
+        self.assertEqual(builder_conf.workernames, ['bar'])
