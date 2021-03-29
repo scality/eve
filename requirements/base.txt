@@ -88,6 +88,7 @@ rfc3986==1.2.0
 rsa==4.0
 service-identity==18.1.0
 setuptools==40.8.0
+setuptools-scm==5.0.2
 simplejson==3.16.0
 six==1.12.0
 snowballstemmer==1.2.1

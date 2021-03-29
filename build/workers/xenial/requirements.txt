@@ -131,6 +131,7 @@ sdnotify==0.3.2
 service-identity==18.1.0
 setproctitle==1.1.10
 setuptools==40.8.0
+setuptools-scm==5.0.2
 simplejson==3.16.0
 six==1.12.0
 snowballstemmer==1.2.1
