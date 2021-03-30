@@ -9,8 +9,8 @@ class TestCodecovIOPublication(unittest.TestCase):
     def test_init(self):
         ctx = eve.steps.publish_coverage_report.CodecovIOPublication(
             'repository', 'revision', 'branch', 'name', 'flags')
-        self.assertEquals(ctx.repository, 'repository')
-        self.assertEquals(ctx.revision, 'revision')
-        self.assertEquals(ctx.branch, 'branch')
-        self.assertEquals(ctx.name, 'name')
-        self.assertEquals(ctx.flags, 'flags')
+        self.assertEqual(ctx.repository, 'repository')
+        self.assertEqual(ctx.revision, 'revision')
+        self.assertEqual(ctx.branch, 'branch')
+        self.assertEqual(ctx.name, 'name')
+        self.assertEqual(ctx.flags, 'flags')

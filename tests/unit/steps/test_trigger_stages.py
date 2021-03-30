@@ -32,7 +32,7 @@ class TestTriggerStages(unittest.TestCase):
 
     def test_init(self):
         ctx = TriggerStages('stage_names')
-        self.assertEquals(ctx.stage_names, 'stage_names')
+        self.assertEqual(ctx.stage_names, 'stage_names')
 
 
 class TestExecuteTriggerStages(steps.BuildStepMixin, unittest.TestCase):
@@ -66,7 +66,7 @@ class TestExecuteTriggerStages(steps.BuildStepMixin, unittest.TestCase):
 
     def test_init(self):
         ctx = ExecuteTriggerStages('build_orders')
-        self.assertEquals(ctx._build_orders, 'build_orders')
+        self.assertEqual(ctx._build_orders, 'build_orders')
 
     def test_set_properties(self):
         self.setupStep(properties={'stage_name': ('because', 'here'),

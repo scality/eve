@@ -10,7 +10,7 @@ class TestDockerBuild(unittest.TestCase):
         ctx = eve.steps.docker_build.DockerBuild(
             'label', 'image', 'dockerfile', True,
             {'foo': 'bar'}, {'arg': 'val'})
-        self.assertEquals(ctx.image, 'image')
+        self.assertEqual(ctx.image, 'image')
         self.assertTrue(ctx.is_retry)
         self.assertFalse(ctx.isNewStyle())
         self.assertTrue(ctx == ctx)  # __eq__ coverage
@@ -20,33 +20,33 @@ class TestDockerCheckLocalImage(unittest.TestCase):
     def test_init(self):
         ctx = eve.steps.docker_build.DockerCheckLocalImage(
             label='label', image='image', name='zippy')
-        self.assertEquals(ctx.label, 'label')
+        self.assertEqual(ctx.label, 'label')
         self.assertFalse(ctx.isNewStyle())
-        self.assertEquals(ctx.name, 'zippy')
+        self.assertEqual(ctx.name, 'zippy')
 
 
 class DockerComputeImageFingerprint(unittest.TestCase):
     def test_init(self):
         ctx = eve.steps.docker_build.DockerComputeImageFingerprint(
             label='label', context_dir='/dummy', name='zippy')
-        self.assertEquals(ctx.label, 'label')
+        self.assertEqual(ctx.label, 'label')
         self.assertFalse(ctx.isNewStyle())
-        self.assertEquals(ctx.name, 'zippy')
+        self.assertEqual(ctx.name, 'zippy')
 
 
 class TestDockerPull(unittest.TestCase):
     def test_init(self):
         ctx = eve.steps.docker_build.DockerPull(
             label='label', image='image', name='zippy')
-        self.assertEquals(ctx.label, 'label')
+        self.assertEqual(ctx.label, 'label')
         self.assertFalse(ctx.isNewStyle())
-        self.assertEquals(ctx.name, 'zippy')
+        self.assertEqual(ctx.name, 'zippy')
 
 
 class TestDockerPush(unittest.TestCase):
     def test_init(self):
         ctx = eve.steps.docker_build.DockerBuild(
             label='label', image='image', name='zippy')
-        self.assertEquals(ctx.name, 'zippy')
-        self.assertEquals(ctx.image, 'image')
+        self.assertEqual(ctx.name, 'zippy')
+        self.assertEqual(ctx.image, 'image')
         self.assertTrue(ctx == ctx)  # __eq__ coverage
