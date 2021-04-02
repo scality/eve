@@ -40,7 +40,7 @@ jobs:
         run: |
           pip3 install tox tox-gh-actions wheel setuptools==45 setuptools-rust==0.11.6 pip==9.0.1
           pip3 install .
-      - name: Test with tox
+      - name: Test tox Docker
         run: tox -e docker
-      - name: Test with tox
+      - name: Test tox compose
         run: tox -e compose-build
