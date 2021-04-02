@@ -20,4 +20,4 @@ jobs:
         with:
           python-version: '2.x'
       - name: install deps
-        run: pip3 install .
+        run: pip2 install .
