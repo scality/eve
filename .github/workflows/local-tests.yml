@@ -36,7 +36,7 @@ jobs:
           vim.tiny
       - uses: actions/setup-python@v2
         with:
-          python-version: '3.x'
+          python-version: '3.6'
       - name: Install dependencies
         run: |
           pip3 install tox tox-gh-actions wheel setuptools==45 setuptools-rust==0.10.6 pip==9.0.1
