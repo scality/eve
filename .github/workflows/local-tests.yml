@@ -39,7 +39,7 @@ jobs:
           python-version: '3.x'
       - name: Install dependencies
         run: |
-          pip install pip=9.0.1
+          pip install pip==9.0.1
           pip3 install tox tox-gh-actions
           pip3 install .
       - name: Test with tox
