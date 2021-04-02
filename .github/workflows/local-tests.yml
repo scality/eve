@@ -31,7 +31,7 @@ jobs:
           python3-pip
           python3-psycopg2
           python
-          python-requests
+          python3-requests
           telnet
           vim.tiny
       - uses: actions/setup-python@v2
