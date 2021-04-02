@@ -39,10 +39,9 @@ jobs:
           python-version: '3.x'
       - name: Install dependencies
         run: |
-          pip3 install tox tox-gh-actions wheel setuptools-rust setuptools==45 pip==9.0.1
+          pip3 install tox tox-gh-actions wheel setuptools==45 setuptools-rust=0.10.6 pip==9.0.1
           pip3 install .
       - name: Test with tox
         run: tox -e docker
-
       - name: Test with tox
         run: tox -e compose-build
