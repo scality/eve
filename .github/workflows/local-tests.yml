@@ -20,10 +20,6 @@ jobs:
         with:
           python-version: '3.7'
       - name: Install dependencies
-        run: |
-          pip3 install pip==9.0.1
-          pip3 install tox tox-gh-actions
-          pip3 install wheel
-          pip3 install .
-      - name: Test with tox
-        run: tox
+        run: pip3 install tox tox-gh-actions
+      - run: tox -e compose-build
+      - run: tox -e docker
