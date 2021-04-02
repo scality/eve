@@ -34,6 +34,7 @@ jobs:
           python3-requests
           telnet
           vim.tiny
+          python3-setuptools
       - uses: actions/setup-python@v2
         with:
           python-version: '3.x'
