@@ -40,7 +40,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install pip==9.0.1
-          pip3 install tox tox-gh-actions
+          pip3 install tox tox-gh-actions wheel
           pip3 install .
       - name: Test with tox
         run: tox
