@@ -21,5 +21,5 @@ jobs:
           python-version: '3.7'
       - name: Install dependencies
         run: pip3 install tox tox-gh-actions
-      - run: tox -e compose-build
       - run: tox -e docker
+      - run: tox -e compose-build
