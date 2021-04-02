@@ -16,6 +16,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.6'
       - run: sudo apt-get update &&
           DEBIAN_FRONTEND=noninteractive sudo apt-get -y install -q
           apt-transport-https
@@ -30,13 +33,9 @@ jobs:
           python3-dev
           python3-pip
           python3-psycopg2
-          python
           python3-requests
           telnet
           vim.tiny
-      - uses: actions/setup-python@v2
-        with:
-          python-version: '3.6'
       - name: Install dependencies
         run: |
           pip3 install tox tox-gh-actions wheel setuptools==45 setuptools-rust==0.10.6 pip==9.0.1
