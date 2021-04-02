@@ -3,12 +3,12 @@ name: publish
 on:
   push:
     branches:
-      - 'user/*'
-      - 'feature/*'
-      - 'improvement/*'
-      - 'bugfix/*'
-      - 'w/*'
-      - 'q/*'
+      - 'user/**'
+      - 'feature/**'
+      - 'improvement/**'
+      - 'bugfix/**'
+      - 'w/**'
+      - 'q/**'
 
 
 jobs:
