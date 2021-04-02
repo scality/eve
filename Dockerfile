@@ -32,8 +32,6 @@ RUN if [ -n "$INTERNAL_DOCKER" ]; then curl -sSL https://get.docker.com/ | sh; f
 
 WORKDIR /root/eve
 
-RUN pip install pip=9.0.1
-
 # Freezing requirements
 COPY requirements/base.txt /tmp/requirements.txt
 RUN pip3 install -r /tmp/requirements.txt
