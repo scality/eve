@@ -19,12 +19,15 @@ jobs:
       - uses: actions/setup-python@v2
         with:
           python-version: '3.6'
+      - name: Install latest nightly
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: 1.14.0
       - run: sudo apt-get update &&
           DEBIAN_FRONTEND=noninteractive sudo apt-get -y install -q
           apt-transport-https
           build-essential
           curl
-          git
           libffi-dev
           libmysqlclient-dev
           libssl-dev
@@ -38,7 +41,8 @@ jobs:
           vim.tiny
       - name: Install dependencies
         run: |
-          pip3 install tox tox-gh-actions wheel setuptools==45 setuptools-rust==0.11.6 pip==9.0.1 buildbot==2.0.1
+          pip3 install --upgrade pip==10.0.1
+          pip3 install tox tox-gh-actions wheel setuptools==45
           pip3 install .
 #      - name: run static analysis tools
 #        run: tox --sitepackages -e lint
