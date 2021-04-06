@@ -22,7 +22,7 @@ jobs:
       - name: Install latest nightly
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: 1.14.0
+          toolchain: stable
       - run: sudo apt-get update &&
           DEBIAN_FRONTEND=noninteractive sudo apt-get -y install -q
           apt-transport-https
