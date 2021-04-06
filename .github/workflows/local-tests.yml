@@ -38,7 +38,7 @@ jobs:
           vim.tiny
       - name: Install dependencies
         run: |
-          pip3 install tox tox-gh-actions wheel setuptools==45 setuptools-rust==0.11.6 pip==9.0.1
+          pip3 install tox tox-gh-actions wheel setuptools==45 setuptools-rust==0.11.6 pip==9.0.1 buildbot=2.0.1
           pip3 install .
 #      - name: run static analysis tools
 #        run: tox --sitepackages -e lint
@@ -52,7 +52,7 @@ jobs:
         run: helm lint charts/eve-cron-builder
       - name: check helm packaging eve-doc
         run: helm lint charts/eve-doc
-      - name:  run unit tests
+      - name: run unit tests
         run: tox --sitepackages -e unit
       - name: run system utils tests
         run: tox --sitepackages -e testutil
