@@ -41,7 +41,7 @@ jobs:
           vim.tiny
       - name: Install dependencies
         run: |
-          pip3 install --upgrade pip==10.0.1
+          pip3 install pip==10.0.1
           pip3 install tox tox-gh-actions wheel setuptools==45
           pip3 install .
 #      - name: run static analysis tools
