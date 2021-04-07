@@ -3,3 +3,4 @@
 -c constraints.txt
 
 docker-compose
+pip
