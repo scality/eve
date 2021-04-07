@@ -3,6 +3,6 @@
 # Frozen requirements for "requirements/pydocstyle.in"
 
 pydocstyle==2.0.0
-six==1.12.0
-snowballstemmer==1.2.1
+six==1.15.0
+snowballstemmer==2.1.0
 

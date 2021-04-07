@@ -2,10 +2,11 @@
 
 # Frozen requirements for "requirements/relnotes.in"
 
-click==7.0
-incremental==17.5.0
-jinja2==2.10
+click==7.1.2
+click-default-group==1.2.2
+incremental==21.3.0
+jinja2==2.11.3
 markupsafe==1.1.1
-toml==0.10.0
-towncrier==19.2.0
+toml==0.10.2
+towncrier==21.3.0
 
