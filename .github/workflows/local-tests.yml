@@ -37,8 +37,8 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
-          context: build/worker/xenial
-          file: build/worker/xenial/actions.Dockerfile
+          context: build/workers/xenial
+          file: build/workers/xenial/actions.Dockerfile
           build-args: BUILDBOT_VERSION=2.0.1
           tags: "ghcr.io/scality/eve:${{ github.sha }}"
 
