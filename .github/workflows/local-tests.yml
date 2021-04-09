@@ -12,50 +12,59 @@ on:
 
 
 jobs:
-  docker:
+  publish:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - name: Set up Docker Buildk
+        uses: docker/setup-buildx-action@v1
+        with:
+          buildkitd-flags: --debug
+
+      - name: Login to Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          context: build/worker/xenial
+          file: build/worker/xenial/actions.Dockerfile
+          build-args: BUILDBOT_VERSION=2.0.1
+          tags: "ghcr.io/scality/eve:${{ github.sha }}"
+
+  tests:
+    runs-on: ubuntu-latest
+    container:
+      image: "ghcr.io/scality/eve:${{ github.sha }}"
+      options: --user=0
+    needs:
+      - publish
+    steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
-        with:
-          python-version: '3.6'
-      - name: Install latest nightly
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-      - run: sudo apt-get update &&
-          DEBIAN_FRONTEND=noninteractive sudo apt-get -y install -q
-          apt-transport-https
-          build-essential
-          curl
-          libffi-dev
-          libmysqlclient-dev
-          libssl-dev
-          lsof
-          mysql-client
-          python3-dev
-          python3-pip
-          python3-psycopg2
-          python3-requests
-          telnet
-          vim.tiny
-      - name: Install dependencies
-        run: |
-          python -m pip install pip==10.0.1
-          pip install tox tox-gh-actions wheel setuptools==45 buildbot==2.0.1
-          pip install .
-#      - name: run static analysis tools
-#        run: tox --sitepackages -e lint
-#      - name: Ensure the release notes compile
-#        run: tox --sitepackages -e relnotes -- test_version
-#      - name: Ensure the doc compiles
-#        run: tox --sitepackages -e doc
-#      - name: check helm packaging eve
-#        run: helm lint charts/eve
-#      - name: check helm packaging eve-cron-builder
-#        run: helm lint charts/eve-cron-builder
-#      - name: check helm packaging eve-doc
-#        run: helm lint charts/eve-doc
+      - name: install eve
+        run: pip3 install .
+      - name: run static analysis tools
+        run: tox --sitepackages -e lint
+      - name: Ensure the release notes compile
+        run: tox --sitepackages -e relnotes -- test_version
+      - name: Ensure the doc compiles
+        run: tox --sitepackages -e doc
+      - name: check helm packaging eve
+        run: helm lint charts/eve
+      - name: check helm packaging eve-cron-builder
+        run: helm lint charts/eve-cron-builder
+      - name: check helm packaging eve-doc
+        run: helm lint charts/eve-doc
       - name: run unit tests
         run: tox --sitepackages -e unit
       - name: run system utils tests
