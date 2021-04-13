@@ -71,3 +71,18 @@ jobs:
         run: tox --sitepackages -e testutil
       - name: run system tests
         run: tox --sitepackages -e system
+
+
+  docker_tests:
+    runs-on: ubuntu-latest
+    needs:
+      - publish
+    steps:
+      - uses: actions/checkout@v2
+      # TODO install dependencies here
+      - name: run docker-compose build
+        run: sudo su eve -c "tox -e compose-build"
+      - name: run docker tests
+        run: sudo su eve -c "tox -e docker"
+      - name: run kube tests
+        run: sudo su eve -c "tox -e kube"
