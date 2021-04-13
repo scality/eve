@@ -12,7 +12,9 @@ RUN apt-get update \
 
 COPY ./requirements.txt /tmp
 
-RUN pip3 install --no-binary buildbot --no-cache-dir -r /tmp/requirements.txt \
+# Needed for cryptography==3.4.7
+RUN pip3 install setuptools_rust
+RUN CRYPTOGRAPHY_DONT_BUILD_RUST=1 pip3 install --no-binary buildbot --no-cache-dir -r /tmp/requirements.txt \
  && rm -f /tmp/requirements.txt
 
 # Install helm

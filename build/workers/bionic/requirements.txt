@@ -20,7 +20,7 @@ buildbot-wsgi-dashboards==2.0.1
 buildbot-www==2.0.1
 cachetools==4.2.1
 cbor==1.0.0
-cbor2==5.2.0
+cbor2==4.1.2
 certifi==2020.12.5
 cffi==1.14.5
 chardet==4.0.0
