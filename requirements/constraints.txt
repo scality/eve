@@ -11,6 +11,9 @@ buildbot_wsgi_dashboards==2.0.1
 # by different requirements files in different versions
 idna==2.5
 pyflakes>=1.6.0
+certifi==2018.11.29
+babel==2.6.0
+urllib3==1.24.3
 
 # pydocstyle 2.1.1 raises new errors
 # we will need a proper integration of the new version
@@ -28,8 +31,5 @@ setuptools-scm==5.0.2
 # later versions of cbor2 did not install
 cbor2==4.1.2
 
-# freeze babel (different versions are computed in base.txt and documentation.txt)
-babel==2.6.0
-
-# freeze urllib3 (different versions are computed in base.txt and system_tests.txt)
-urllib3==1.24.3
+# freeze zlmdb to lower the requirement version on cbor2
+zlmdb==20.4.1
