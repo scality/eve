@@ -10,7 +10,7 @@ automat==20.2.0
 bcrypt==3.2.0
 bitstring==3.1.7
 cbor==1.0.0
-cbor2==5.2.0
+cbor2==4.1.2
 certifi==2020.12.5
 cffi==1.14.5
 chardet==4.0.0
@@ -26,7 +26,7 @@ hpack==3.0.0
 hyperframe==5.2.0
 hyperlink==21.0.0
 idna==2.5
-importlib-metadata==3.10.0
+importlib-metadata==3.10.1
 importlib-resources==5.1.2
 incremental==21.3.0
 iniconfig==1.1.1
@@ -64,7 +64,7 @@ requests==2.25.1
 sdnotify==0.3.2
 service-identity==18.1.0
 setproctitle==1.2.2
-setuptools==54.2.0
+setuptools==56.0.0
 six==1.15.0
 sortedcontainers==2.3.0
 toml==0.10.2

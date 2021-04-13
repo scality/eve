@@ -4,7 +4,7 @@
 
 apipkg==1.5
 appdirs==1.4.4
-astroid==2.5.2
+astroid==2.5.3
 attrs==20.3.0
 autobahn==21.2.1
 autoflake==1.4
@@ -34,7 +34,7 @@ coverage==5.5
 crossbar==21.1.1
 cryptography==3.4.7
 debtcollector==2.2.0
-decorator==5.0.5
+decorator==5.0.6
 distlib==0.3.1
 dogpile.cache==1.1.2
 execnet==1.8.0
@@ -43,14 +43,14 @@ flake8==3.9.0
 flask==1.1.2
 flatbuffers==1.12
 future==0.18.2
-google-auth==1.28.0
+google-auth==1.28.1
 greenlet==1.0.0
 h2==3.2.0
 hpack==3.0.0
 hyperframe==5.2.0
 hyperlink==21.0.0
 idna==2.5
-importlib-metadata==3.10.0
+importlib-metadata==3.10.1
 importlib-resources==5.1.2
 incremental==21.3.0
 iniconfig==1.1.1
@@ -131,12 +131,12 @@ rsa==4.7.2
 sdnotify==0.3.2
 service-identity==18.1.0
 setproctitle==1.2.2
-setuptools==54.2.0
+setuptools==56.0.0
 simplejson==3.17.2
 six==1.15.0
 snowballstemmer==2.1.0
 sortedcontainers==2.3.0
-sqlalchemy==1.4.6
+sqlalchemy==1.4.7
 sqlalchemy-migrate==0.13.0
 sqlparse==0.4.1
 stevedore==3.3.0
@@ -148,7 +148,7 @@ treq==21.1.0
 twisted==21.2.0
 txaio==21.2.1
 txtorcon==20.0.0
-typed-ast==1.4.2
+typed-ast==1.4.3
 typing-extensions==3.7.4.3
 u-msgpack-python==2.7.1
 urllib3==1.26.4
