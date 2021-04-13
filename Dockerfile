@@ -1,4 +1,4 @@
-FROM ubuntu:xenial
+FROM ubuntu:bionic
 
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get -y install -q \
@@ -21,7 +21,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # Install git lfs
-RUN echo "deb https://packagecloud.io/github/git-lfs/ubuntu/ xenial main" > /etc/apt/sources.list.d/github_git-lfs.list && \
+RUN echo "deb https://packagecloud.io/github/git-lfs/ubuntu/ bionic main" > /etc/apt/sources.list.d/github_git-lfs.list && \
     curl -sSL https://packagecloud.io/github/git-lfs/gpgkey | apt-key add - && \
     apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get -y install -q git-lfs && \

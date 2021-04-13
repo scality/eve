@@ -44,11 +44,11 @@ class TestDockerCluster(unittest.TestCase):
                 yaml=SingleCommandYaml(
                     'exit 0',
                     worker={'type': 'docker',
-                            'path': 'bad-ubuntu-xenial-ctxt'}),
+                            'path': 'bad-ubuntu-bionic-ctxt'}),
                 dirs=[
                     abspath(
                         join(__file__, pardir, 'contexts',
-                             'bad-ubuntu-xenial-ctxt'))
+                             'bad-ubuntu-bionic-ctxt'))
                 ])
             cluster.sanity_check()
             buildset = cluster.api.force(branch=local_repo.branch)
@@ -56,7 +56,7 @@ class TestDockerCluster(unittest.TestCase):
             # Check that the failing build step is The good one
             fstep = buildset.buildrequest.build.first_failing_step
             self.assertEqual(fstep.name,
-                             '[bad-ubuntu-xenial-ctxt_f532] build')
+                             '[bad-ubuntu-bionic-ctxt_f532] build')
             cluster.sanity_check()
 
     def test2_simple_failure_in_docker(self):
@@ -74,11 +74,11 @@ class TestDockerCluster(unittest.TestCase):
                 yaml=SingleCommandYaml(
                     'exit 1',
                     worker={'type': 'docker',
-                            'path': 'ubuntu-xenial-ctxt'}),
+                            'path': 'ubuntu-bionic-ctxt'}),
                 dirs=[
                     abspath(
                         join(__file__, pardir, 'contexts',
-                             'ubuntu-xenial-ctxt'))
+                             'ubuntu-bionic-ctxt'))
                 ])
             cluster.sanity_check()
             buildset = cluster.api.force(branch=local_repo.branch)
@@ -117,12 +117,12 @@ class TestDockerCluster(unittest.TestCase):
                     ],
                     worker={
                         'type': 'docker',
-                        'path': 'ubuntu-xenial-ctxt'
+                        'path': 'ubuntu-bionic-ctxt'
                     }),
                 dirs=[
                     abspath(
                         join(__file__, pardir, 'contexts',
-                             'ubuntu-xenial-ctxt'))
+                             'ubuntu-bionic-ctxt'))
                 ])
             cluster.sanity_check()
             buildset = cluster.api.force(branch=local_repo.branch)
@@ -164,12 +164,12 @@ class TestDockerCluster(unittest.TestCase):
                     }],
                     worker={
                         'type': 'docker',
-                        'path': 'ubuntu-xenial-with-docker-ctxt'
+                        'path': 'ubuntu-bionic-with-docker-ctxt'
                     }),
                 dirs=[
                     abspath(
                         join(__file__, pardir, 'contexts',
-                             'ubuntu-xenial-with-docker-ctxt'))
+                             'ubuntu-bionic-with-docker-ctxt'))
                 ])
 
             cluster.sanity_check()
@@ -267,12 +267,12 @@ class TestDockerCluster(unittest.TestCase):
                     'docker ps',
                     worker={
                         'type': 'docker',
-                        'path': 'ubuntu-xenial-with-docker-ctxt'
+                        'path': 'ubuntu-bionic-with-docker-ctxt'
                     }),
                 dirs=[
                     abspath(
                         join(__file__, pardir, 'contexts',
-                             'ubuntu-xenial-with-docker-ctxt'))
+                             'ubuntu-bionic-with-docker-ctxt'))
                 ])
             cluster.sanity_check()
             buildset = cluster.api.force(branch=local_repo.branch)
@@ -301,10 +301,10 @@ class TestDockerCluster(unittest.TestCase):
                 dirs=[
                     abspath(
                         join(__file__, pardir, 'contexts',
-                             'ubuntu-xenial-with-docker-ctxt')),
+                             'ubuntu-bionic-with-docker-ctxt')),
                     abspath(
                         join(__file__, pardir, 'contexts',
-                             'ubuntu-xenial-ctxt'))
+                             'ubuntu-bionic-ctxt'))
                 ])
 
             cluster.sanity_check()
@@ -326,10 +326,10 @@ class TestDockerCluster(unittest.TestCase):
                 dirs=[
                     abspath(
                         join(__file__, pardir, 'contexts',
-                             'ubuntu-xenial-with-docker-ctxt')),
+                             'ubuntu-bionic-with-docker-ctxt')),
                     abspath(
                         join(__file__, pardir, 'contexts',
-                             'ubuntu-xenial-ctxt'))
+                             'ubuntu-bionic-ctxt'))
                 ])
             cluster.sanity_check()
             buildset = cluster.api.force(branch=local_repo.branch)
@@ -356,7 +356,7 @@ class TestDockerCluster(unittest.TestCase):
                 dirs=[
                     abspath(
                         join(__file__, pardir, 'contexts',
-                             'ubuntu-xenial-ctxt'))
+                             'ubuntu-bionic-ctxt'))
                 ])
             buildset = cluster.api.force(branch=local_repo.branch)
             self.assertEqual(buildset.result, 'success')
@@ -422,7 +422,7 @@ class TestDockerCluster(unittest.TestCase):
         conf = {
             'DOCKER_HOOK_IN_USE': '1',
             'DOCKER_HOOK_VERSION': '1.2.3',
-            'DOCKER_HOOK_WORKERS': 'riri;ubuntu-xenial-with-docker-ctxt;plop',
+            'DOCKER_HOOK_WORKERS': 'riri;ubuntu-bionic-with-docker-ctxt;plop',
         }
         with Cluster(extra_conf=conf) as cluster:
             local_repo = cluster.clone()
@@ -431,12 +431,12 @@ class TestDockerCluster(unittest.TestCase):
                     'exit 0',
                     worker={
                         'type': 'docker',
-                        'path': 'ubuntu-xenial-with-docker-ctxt'
+                        'path': 'ubuntu-bionic-with-docker-ctxt'
                     }),
                 dirs=[
                     abspath(
                         join(__file__, pardir, 'contexts',
-                             'ubuntu-xenial-with-docker-ctxt'))
+                             'ubuntu-bionic-with-docker-ctxt'))
                 ])
             buildset = cluster.api.force(branch=local_repo.branch)
             self.assertEqual(buildset.result, 'success')
@@ -463,7 +463,7 @@ class TestDockerCluster(unittest.TestCase):
         conf = {
             'DOCKER_HOOK_IN_USE': '1',
             'DOCKER_HOOK_VERSION': '1.2.3',
-            'DOCKER_HOOK_WORKERS': 'ri;not-ubuntu-xenial-with-docker-ctxt;pl',
+            'DOCKER_HOOK_WORKERS': 'ri;not-ubuntu-bionic-with-docker-ctxt;pl',
         }
         with Cluster(extra_conf=conf) as cluster:
             local_repo = cluster.clone()
@@ -472,12 +472,12 @@ class TestDockerCluster(unittest.TestCase):
                     'exit 0',
                     worker={
                         'type': 'docker',
-                        'path': 'ubuntu-xenial-with-docker-ctxt'
+                        'path': 'ubuntu-bionic-with-docker-ctxt'
                     }),
                 dirs=[
                     abspath(
                         join(__file__, pardir, 'contexts',
-                             'ubuntu-xenial-with-docker-ctxt'))
+                             'ubuntu-bionic-with-docker-ctxt'))
                 ])
             buildset = cluster.api.force(branch=local_repo.branch)
             self.assertEqual(buildset.result, 'success')

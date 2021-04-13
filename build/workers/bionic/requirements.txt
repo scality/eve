@@ -1,6 +1,6 @@
 # This file has been automatically generated, DO NOT EDIT!
 
-# Frozen requirements for "build/workers/xenial/requirements.in"
+# Frozen requirements for "build/workers/bionic/requirements.in"
 
 apipkg==1.5
 appdirs==1.4.4

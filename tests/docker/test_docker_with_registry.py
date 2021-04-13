@@ -63,11 +63,11 @@ class Tests(unittest.TestCase):
             yaml=SingleCommandYaml(
                 'exit 0',
                 worker={'type': 'docker',
-                        'path': 'ubuntu-xenial-ctxt'}),
+                        'path': 'ubuntu-bionic-ctxt'}),
             dirs=[
                 abspath(
                     join(__file__, pardir, 'contexts',
-                         'ubuntu-xenial-ctxt'))
+                         'ubuntu-bionic-ctxt'))
             ])
         self.cluster.api.force(branch=local_repo.branch)
 
@@ -94,12 +94,12 @@ class Tests(unittest.TestCase):
             (u'set the artifacts public url', u"property 'artifacts_public_url' set"),  # noqa
             (u'get the API version', u'Set'),
             (u'prepare 1 stage(s)', u'finished'),
-            (u'[ubuntu-xenial-ctxt_930a] fingerprint', u"Ran"),  # noqa
-            (u'[ubuntu-xenial-ctxt_930a] look up', u"failed (1)"),  # noqa
-            (u'[ubuntu-xenial-ctxt_930a] pull', u"failed (1)"),  # noqa
-            (u'[ubuntu-xenial-ctxt_930a] build', u'Ran'),
-            (u'[ubuntu-xenial-ctxt_930a] build retry', u'Ran (skipped)'),
-            (u'[ubuntu-xenial-ctxt_930a] push', u'Ran'),
+            (u'[ubuntu-bionic-ctxt_930a] fingerprint', u"Ran"),  # noqa
+            (u'[ubuntu-bionic-ctxt_930a] look up', u"failed (1)"),  # noqa
+            (u'[ubuntu-bionic-ctxt_930a] pull', u"failed (1)"),  # noqa
+            (u'[ubuntu-bionic-ctxt_930a] build', u'Ran'),
+            (u'[ubuntu-bionic-ctxt_930a] build retry', u'Ran (skipped)'),
+            (u'[ubuntu-bionic-ctxt_930a] push', u'Ran'),
             (u'trigger', u'triggered pre-merge')])
 
         # Check build
@@ -152,12 +152,12 @@ class Tests(unittest.TestCase):
             (u'set the artifacts public url', u"property 'artifacts_public_url' set"),  # noqa
             (u'get the API version', u'Set'),
             (u'prepare 1 stage(s)', u'finished'),
-            (u'[ubuntu-xenial-ctxt_930a] fingerprint', u"Ran"),  # noqa
-            (u'[ubuntu-xenial-ctxt_930a] look up', u"Ran"),  # noqa
-            (u'[ubuntu-xenial-ctxt_930a] pull', u"Ran (skipped)"),  # noqa
-            (u'[ubuntu-xenial-ctxt_930a] build', u'Ran (skipped)'),
-            (u'[ubuntu-xenial-ctxt_930a] build retry', u'Ran (skipped)'),
-            (u'[ubuntu-xenial-ctxt_930a] push', u'Ran (skipped)'),
+            (u'[ubuntu-bionic-ctxt_930a] fingerprint', u"Ran"),  # noqa
+            (u'[ubuntu-bionic-ctxt_930a] look up', u"Ran"),  # noqa
+            (u'[ubuntu-bionic-ctxt_930a] pull', u"Ran (skipped)"),  # noqa
+            (u'[ubuntu-bionic-ctxt_930a] build', u'Ran (skipped)'),
+            (u'[ubuntu-bionic-ctxt_930a] build retry', u'Ran (skipped)'),
+            (u'[ubuntu-bionic-ctxt_930a] push', u'Ran (skipped)'),
             (u'trigger', u'triggered pre-merge')])
 
         # do the same build one last time, but erase the local image first
@@ -200,10 +200,10 @@ class Tests(unittest.TestCase):
             (u'set the artifacts public url', u"property 'artifacts_public_url' set"),  # noqa
             (u'get the API version', u'Set'),
             (u'prepare 1 stage(s)', u'finished'),
-            (u'[ubuntu-xenial-ctxt_930a] fingerprint', u"Ran"),  # noqa
-            (u'[ubuntu-xenial-ctxt_930a] look up', u"failed (1)"),  # noqa
-            (u'[ubuntu-xenial-ctxt_930a] pull', u"Ran"),  # noqa
-            (u'[ubuntu-xenial-ctxt_930a] build', u'Ran (skipped)'),
-            (u'[ubuntu-xenial-ctxt_930a] build retry', u'Ran (skipped)'),
-            (u'[ubuntu-xenial-ctxt_930a] push', u'Ran (skipped)'),
+            (u'[ubuntu-bionic-ctxt_930a] fingerprint', u"Ran"),  # noqa
+            (u'[ubuntu-bionic-ctxt_930a] look up', u"failed (1)"),  # noqa
+            (u'[ubuntu-bionic-ctxt_930a] pull', u"Ran"),  # noqa
+            (u'[ubuntu-bionic-ctxt_930a] build', u'Ran (skipped)'),
+            (u'[ubuntu-bionic-ctxt_930a] build retry', u'Ran (skipped)'),
+            (u'[ubuntu-bionic-ctxt_930a] push', u'Ran (skipped)'),
             (u'trigger', u'triggered pre-merge')])

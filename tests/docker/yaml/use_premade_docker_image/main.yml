@@ -6,7 +6,7 @@ stages:
   build-docker-image:
     worker:
         type: docker
-        path: ubuntu-xenial-with-docker-ctxt
+        path: ubuntu-bionic-with-docker-ctxt
     steps:
       - Git:
           name: git pull
@@ -19,7 +19,7 @@ stages:
             docker build \
               --tag mygreatimage \
               --build-arg BUILDBOT_VERSION=%(prop:buildbot_version)s \
-              ubuntu-xenial-ctxt/
+              ubuntu-bionic-ctxt/
       - TriggerStages:
           name: run-docker-image
           stage_names:
