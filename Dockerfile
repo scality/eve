@@ -34,9 +34,7 @@ WORKDIR /root/eve
 
 # Freezing requirements
 COPY requirements/base.txt /tmp/requirements.txt
-# Needed for cryptography==3.4.7
-RUN pip3 install setuptools_rust
-RUN CRYPTOGRAPHY_DONT_BUILD_RUST=1 pip3 install -r /tmp/requirements.txt
+RUN pip3 install -r /tmp/requirements.txt
 
 COPY . /opt/eve
 RUN pip3 install --no-deps /opt/eve

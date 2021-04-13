@@ -13,7 +13,7 @@ cbor==1.0.0
 cbor2==4.1.2
 certifi==2018.11.29
 cffi==1.14.5
-chardet==4.0.0
+chardet==3.0.4
 click==7.1.2
 constantly==15.1.0
 coverage==5.5
@@ -36,7 +36,7 @@ markupsafe==1.1.1
 mistune==0.8.4
 msgpack==1.0.2
 netaddr==0.8.0
-numpy==1.15.4
+numpy==1.19.5
 packaging==20.9
 passlib==1.7.4
 pluggy==0.13.1
@@ -79,6 +79,6 @@ urllib3==1.24.3
 watchdog==2.0.2
 werkzeug==1.0.1
 zipp==3.4.1
-zlmdb==20.4.1
+zlmdb==21.1.1
 zope.interface==5.3.0
 
