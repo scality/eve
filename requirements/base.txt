@@ -6,7 +6,7 @@ appdirs==1.4.4
 attrs==20.3.0
 autobahn==21.2.1
 automat==20.2.0
-babel==2.9.0
+babel==2.6.0
 buildbot==2.0.1
 buildbot-pkg==2.0.1
 buildbot-worker==2.0.1
@@ -98,7 +98,7 @@ treq==21.1.0
 twisted==21.2.0
 txaio==21.2.1
 typing-extensions==3.7.4.3
-urllib3==1.26.4
+urllib3==1.24.3
 wcwidth==0.2.5
 websocket-client==0.58.0
 werkzeug==1.0.1
