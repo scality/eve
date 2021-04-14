@@ -17,6 +17,15 @@ Release Notes
 
 .. towncrier release notes start
 
+Eve 1.7.7 (2021-04-14)
+======================
+
+Features
+--------
+
+- Fix buildbot-worker install for Centos8 OpenStack worker. (EVE-1149)
+
+
 Eve 1.7.6 (2020-12-17)
 ======================
 
