@@ -17,6 +17,15 @@ Release Notes
 
 .. towncrier release notes start
 
+Eve 1.7.8 (2021-04-15)
+======================
+
+Bugfixes
+--------
+
+- Fix doc image generation. (EVE-1154)
+
+
 Eve 1.7.7 (2021-04-14)
 ======================
 
