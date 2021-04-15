@@ -53,7 +53,7 @@ setup(
         'local_scheme': 'dirty-tag'
     },
     setup_requires=[
-        'setuptools_scm'
+        'setuptools_scm==5.0.2'
     ],
     entry_points={
         'console_scripts': [
