@@ -72,7 +72,8 @@ class BaseBuildOrder(object):
 class BaseDockerBuildOrder(BaseBuildOrder):
     """Base class representing a build using docker images."""
 
-    def _build_image(self, image_name, context_dir, dockerfile=None):
+    def _build_image(self, image_name, context_dir, dockerfile=None,
+                     build_args={}):
         """Ensure given docker image is available for worker.
 
         This method computes the fingerprint from the provided docker context
@@ -92,11 +93,24 @@ class BaseDockerBuildOrder(BaseBuildOrder):
                 self.properties['master_builddir'][0],
                 dockerfile,
             )
+        if not isinstance(build_args, dict):
+            raise ValueError('build_args must be of type dict')
 
-        # image name is image_name + hash of path to avoid collisions
-        basename = "{0}_{1}".format(
+        build_args.update({
+            'BUILDBOT_VERSION': buildbot.version
+        })
+
+        # image name is image_name + hash of path + build_args
+        # to avoid collisions and perform cache invalidation
+
+        # building up a sha1 over the dict build_args
+        build_args_sha1 = util.hash_dict(build_args)
+
+        basename = "{0}_{1}_{2}".format(
             image_name,
-            sha1(context_dir.encode('utf-8')).hexdigest()[:4])
+            sha1(context_dir.encode('utf-8')).hexdigest()[:4],
+            build_args_sha1.hexdigest()[:4],
+        )
 
         use_registry = bool(util.env.DOCKER_REGISTRY_URL)
 
@@ -145,9 +159,7 @@ class BaseDockerBuildOrder(BaseBuildOrder):
             'image': image,
             'dockerfile': full_dockerfile_path,
             'context_dir': full_context_dir,
-            'build_args': {
-                'BUILDBOT_VERSION': buildbot.version
-            },
+            'build_args': build_args,
             'labels': {
                 'eve.build.ts': '{0:.0f}'.format(time())
             }

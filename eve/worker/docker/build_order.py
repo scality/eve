@@ -56,8 +56,9 @@ class DockerBuildOrder(util.BaseDockerBuildOrder):
                     'DockerBuildOrder')
 
         dockerfile = self._worker.get('dockerfile', None)
+        build_args = self._worker.get('build_args', {})
         self.properties['docker_image'] = (
             self._build_image(path.basename(worker_path), worker_path,
-                              dockerfile),
+                              dockerfile, build_args),
             'DockerBuildOrder',
         )

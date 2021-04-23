@@ -107,6 +107,9 @@ Examples
        type: docker
        path: <path/to/docker/build/context:path>
        memory: <docker_max_memory:str>
+       # Optionally you can add build args
+       build_args:
+         COMPONENT_VERSION: 42
        volumes:
          - </path/to/volume:path>
      steps:
@@ -338,6 +341,9 @@ Examples
          my_image:
            context: <path/to/image/context:path>
            dockerfile: <path/to/dockerfile:filepath>
+           # you can also optionally add build args
+           build_args:
+             MY_BUILD_ARG: 42
          my_other_image: <path/to/other/image/context:path>
      steps:
        # ... describe steps here

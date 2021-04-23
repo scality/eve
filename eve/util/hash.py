@@ -16,7 +16,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor,
 # Boston, MA  02110-1301, USA.
 
-from hashlib import md5
+from hashlib import md5, sha1
 
 
 def create_hash(*args):
@@ -37,3 +37,13 @@ def create_hash(*args):
     for arg in args:
         m.update(str(arg).encode())
     return "e%s" % m.hexdigest()[:28]
+
+
+def hash_dict(dict_obj):
+    """Create a sha1 hash of a dict and return it."""
+    if not isinstance(dict_obj, dict):
+        raise ValueError('Parameter is not of type dict')
+    args_sha1 = sha1()
+    for key in sorted(dict_obj.keys()):
+        args_sha1.update((key + str(dict_obj[key])).encode('utf-8'))
+    return args_sha1
