@@ -1,5 +1,7 @@
 #!/bin/bash
 
+exec 3>&1 4>&2 >/var/log/cloud_init_init.log 2>&1
+
 worker_version=$1
 
 function retry {
