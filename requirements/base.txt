@@ -92,8 +92,6 @@ future==0.18.2
     #   buildbot-worker
 google-auth==1.30.0
     # via kubernetes
-greenlet==1.0.0
-    # via sqlalchemy
 hyperlink==21.0.0
     # via
     #   autobahn
@@ -342,7 +340,7 @@ snowballstemmer==2.1.0
     # via pydocstyle
 sqlalchemy-migrate==0.13.0
     # via buildbot
-sqlalchemy==1.4.7
+sqlalchemy==1.2.17
     # via
     #   -c requirements/constraints.txt
     #   buildbot
