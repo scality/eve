@@ -1,4 +1,4 @@
-FROM ubuntu:bionic
+FROM ubuntu:focal
 
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get -y install -q \
@@ -11,11 +11,16 @@ RUN apt-get update && \
         libssl-dev \
         lsof \
         mysql-client \
-        python3.8-dev \
+        python3-dev \
         python3-pip \
         python3-psycopg2 \
-        python \
-        python-requests \
+        # TODO: Python is no longer available in focal
+        # As I'm removing the package python dependency and the python-requests package in python2
+        # I believe we now need to make the following
+        # script compatible with python3 https://github.com/scality/docker-hook/blob/development/1.0/docker
+        # python \
+        # python-requests \
+        python3-requests \
         telnet \
         vim.tiny && \
     rm -rf /var/lib/apt/lists/*
@@ -34,11 +39,11 @@ WORKDIR /root/eve
 
 # Freezing requirements
 COPY requirements/base.txt /tmp/requirements.txt
-RUN python3.8 -m pip install --upgrade pip==21.0.1
-RUN python3.8 -m pip install -r /tmp/requirements.txt
+RUN pip3 install --upgrade pip==21.0.1
+RUN pip3 install -r /tmp/requirements.txt
 
 COPY . /opt/eve
-RUN python3.8 -m pip install --no-deps /opt/eve
+RUN pip3 install --no-deps /opt/eve
 
 COPY eve/etc/master.cfg /root/eve
 COPY buildbot.tac /root/eve
