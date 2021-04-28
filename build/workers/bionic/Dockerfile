@@ -16,10 +16,11 @@ RUN pip3 install --upgrade pip==21.1
 RUN pip3 install --no-binary buildbot --no-cache-dir -r /tmp/requirements.txt \
  && rm -f /tmp/requirements.txt
 
-# Install helm
-RUN curl https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get > \
- /tmp/get_helm.sh && bash /tmp/get_helm.sh
-
+# Install Helm
+ARG HELM_VERSION=3.5.4
+RUN curl -sSL https://get.helm.sh/helm-v${HELM_VERSION}-linux-amd64.tar.gz | tar -xvz \
+ && install linux-amd64/helm /usr/local/bin \
+ && rm -rf linux-amd64
 #
 # Add user eve
 #
