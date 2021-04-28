@@ -24,8 +24,9 @@ attrs==20.3.0
     #   service-identity
     #   treq
     #   twisted
-autobahn[asyncio,compress,encryption,scram,serialization,twisted]==21.2.1
+autobahn[asyncio,compress,encryption,scram,serialization,twisted]==21.3.1
     # via
+    #   -c build/workers/bionic/../../../requirements/constraints.txt
     #   buildbot
     #   crossbar
 autoflake==1.4
@@ -52,7 +53,7 @@ buildbot-www==2.0.1
     # via
     #   -c build/workers/bionic/../../../requirements/constraints.txt
     #   -r build/workers/bionic/../../../requirements/base.in
-buildbot[tls]==2.0.1
+buildbot==2.0.1
     # via
     #   -c build/workers/bionic/../../../requirements/constraints.txt
     #   -r build/workers/bionic/../../../requirements/base.in

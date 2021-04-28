@@ -13,8 +13,10 @@ attrs==20.3.0
     #   service-identity
     #   treq
     #   twisted
-autobahn==21.2.1
-    # via buildbot
+autobahn==21.3.1
+    # via
+    #   -c requirements/constraints.txt
+    #   buildbot
 automat==20.2.0
     # via twisted
 babel==2.6.0

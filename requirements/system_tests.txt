@@ -18,7 +18,9 @@ attrs==20.3.0
     #   treq
     #   twisted
 autobahn[asyncio,compress,encryption,scram,serialization,twisted]==21.3.1
-    # via crossbar
+    # via
+    #   -c requirements/constraints.txt
+    #   crossbar
 automat==20.2.0
     # via
     #   twisted
