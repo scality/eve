@@ -35,7 +35,7 @@ WORKDIR /root/eve
 # Freezing requirements
 COPY requirements/base.txt /tmp/requirements.txt
 RUN python3.8 -m pip install --upgrade pip==21.0.1
-RUN python3.8 -m pip install --verbose -r /tmp/requirements.txt
+RUN python3.8 -m pip install -r /tmp/requirements.txt
 
 COPY . /opt/eve
 RUN python3.8 -m pip install --no-deps /opt/eve
