@@ -40,7 +40,7 @@ xunitparser                 # used by JunitShellCommand
 #
 # ... unfortunately, now eve complains that the libraries are missing
 # upon boot! The truth is out there.
-buildbot-pkg
+# buildbot-pkg
 pip
 pydocstyle
 pyflakes
