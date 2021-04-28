@@ -34,7 +34,7 @@ WORKDIR /root/eve
 
 # Freezing requirements
 COPY requirements/base.txt /tmp/requirements.txt
-RUN pip3 install --upgrade pip==21.1
+RUN pip3 install --upgrade pip==21.0.1
 RUN pip3 install -r /tmp/requirements.txt
 
 COPY . /opt/eve

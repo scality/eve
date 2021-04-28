@@ -12,7 +12,7 @@ RUN apt-get update \
 
 COPY ./requirements.txt /tmp
 
-RUN pip3 install --upgrade pip==21.1
+RUN pip3 install --upgrade pip==21.0.1
 RUN pip3 install --no-binary buildbot --no-cache-dir -r /tmp/requirements.txt \
  && rm -f /tmp/requirements.txt
 

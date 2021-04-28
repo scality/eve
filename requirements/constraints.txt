@@ -24,7 +24,7 @@ pydocstyle==2.0.0
 twisted>=19.7.0
 
 # fix cryptography module install for latest versions
-pip==21.1
+pip==21.0.1
 
 # fix a syntax error with 6.0.1
 setuptools-scm==5.0.2
