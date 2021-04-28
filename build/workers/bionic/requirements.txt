@@ -53,7 +53,7 @@ buildbot-www==2.0.1
     # via
     #   -c build/workers/bionic/../../../requirements/constraints.txt
     #   -r build/workers/bionic/../../../requirements/base.in
-buildbot==2.0.1
+buildbot[tls]==2.0.1
     # via
     #   -c build/workers/bionic/../../../requirements/constraints.txt
     #   -r build/workers/bionic/../../../requirements/base.in

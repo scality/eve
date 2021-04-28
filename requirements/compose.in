@@ -1,6 +1,5 @@
 # ADDITIONAL Requirements for docker compose
 # check instruction on how to reproduce in base.in
--c constraints.txt
 
 docker-compose
 pip

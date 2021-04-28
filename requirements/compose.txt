@@ -8,19 +8,15 @@ attrs==20.3.0
     # via jsonschema
 bcrypt==3.2.0
     # via paramiko
-certifi==2018.11.29
-    # via
-    #   -c requirements/constraints.txt
-    #   requests
+certifi==2020.12.5
+    # via requests
 cffi==1.14.5
     # via
     #   bcrypt
     #   cryptography
     #   pynacl
-chardet==3.0.4
-    # via
-    #   -c requirements/constraints.txt
-    #   requests
+chardet==4.0.0
+    # via requests
 cryptography==3.4.7
     # via paramiko
 distro==1.5.0
@@ -33,10 +29,8 @@ dockerpty==0.4.1
     # via docker-compose
 docopt==0.6.2
     # via docker-compose
-idna==2.5
-    # via
-    #   -c requirements/constraints.txt
-    #   requests
+idna==2.10
+    # via requests
 jsonschema==3.2.0
     # via docker-compose
 paramiko==2.7.2
@@ -64,10 +58,8 @@ six==1.15.0
     #   websocket-client
 texttable==1.6.3
     # via docker-compose
-urllib3==1.24.3
-    # via
-    #   -c requirements/constraints.txt
-    #   requests
+urllib3==1.26.4
+    # via requests
 websocket-client==0.58.0
     # via
     #   docker
