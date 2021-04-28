@@ -2,7 +2,7 @@
 # check instruction on how to reproduce in base.in
 -c constraints.txt
 
-crossbar
+crossbar~=21.1
 pytest
 pytest-cov
 pytest-xdist
