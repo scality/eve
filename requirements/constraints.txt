@@ -7,6 +7,8 @@ buildbot-www==2.0.1
 buildbot==2.0.1
 buildbot_wsgi_dashboards==2.0.1
 
+# Buildbot deps
+sqlalchemy==1.4.7
 autobahn==21.3.1
 # Force a common version for components that are installed
 # by different requirements files in different versions

@@ -342,8 +342,9 @@ snowballstemmer==2.1.0
     # via pydocstyle
 sqlalchemy-migrate==0.13.0
     # via buildbot
-sqlalchemy==1.4.11
+sqlalchemy==1.4.7
     # via
+    #   -c requirements/constraints.txt
     #   buildbot
     #   sqlalchemy-migrate
 sqlparse==0.4.1
