@@ -2,11 +2,11 @@
 
 # Frozen requirements for "requirements/pylint.in"
 
-astroid==2.5.3
+astroid==2.5.6
 isort==5.8.0
 lazy-object-proxy==1.6.0
 mccabe==0.6.1
-pylint==2.7.4
+pylint==2.8.2
 toml==0.10.2
 typed-ast==1.4.3
 wrapt==1.12.1

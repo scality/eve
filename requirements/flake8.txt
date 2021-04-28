@@ -3,7 +3,7 @@
 # Frozen requirements for "requirements/flake8.in"
 
 flake8==3.9.1
-importlib-metadata==4.0.1
+importlib-metadata==3.10.1
 mccabe==0.6.1
 pycodestyle==2.7.0
 pyflakes==2.3.1

@@ -29,8 +29,11 @@ pip==19.3.1
 # fix a syntax error with 6.0.1
 setuptools-scm==5.0.2
 
+# later version seems buggy
+importlib-metadata==3.10.1
+
 # later versions of cbor2 did not install
-cbor2==4.1.2
+# cbor2==4.1.2
 
 # freeze zlmdb to lower the requirement version on cbor2
 # zlmdb==20.4.1
