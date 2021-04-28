@@ -34,7 +34,7 @@ class TestCrossbar(TestCase):
         """
         crossbar = Crossbar().start()
         self.assertIn(
-            """Ok, worker "Router worker001" configured and ready!""",
+            """Ok, local node configuration ran successfully.""",
             crossbar.loglines[-2])
 
         crossbar.stop()
