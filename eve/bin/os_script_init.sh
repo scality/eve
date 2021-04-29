@@ -1,5 +1,7 @@
 #!/bin/bash
 
+exec 3>&1 4>&2 >/var/log/custom_cloud_init_output.log 2>&1
+
 worker_version=$1
 
 function retry {
@@ -34,15 +36,13 @@ then
 
   retry yum -y install glibc-locale-source redhat-lsb-core
   dist_major=$(lsb_release -sr | cut -d . -f 1)
- 
+
   retry yum -y install git gcc libffi-devel openssl-devel
- 
+
   if [ "$dist_major" == "8" ]; then
-    retry dnf -y install python2-devel python2-setuptools  
-    retry easy_install-2 pip==9.0.3
+    retry dnf -y install python2-devel python2-setuptools
   else
     retry yum -y install python-devel python-setuptools
-    retry easy_install pip==9.0.3
   fi
 
   adduser -u 1042 --home-dir /home/eve eve
@@ -54,9 +54,15 @@ then
     # buildbot > 0.9.12 requires a version of twisted that is not supported
     # by python2.6
     worker_version=0.9.12
+    python_version=2.6
   else
     twisted_version=16.4.0
+    python_version=2.7
   fi
+
+  curl https://bootstrap.pypa.io/pip/${python_version}/get-pip.py -o get-pip.py
+  python get-pip.py pip==9.0.3
+
 elif [ -f /etc/debian_version ]
 then
   echo "Ubuntu/Debian"
