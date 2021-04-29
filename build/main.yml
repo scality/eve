@@ -76,8 +76,7 @@ stages:
           usePTY: true
       - ShellCommand:
           name: run system utils tests
-          command: tox --sitepackages -e testutil
-          haltOnFailure: True
+          command: tox -e testutil
           usePTY: true
       - ShellCommand:
           name: run system tests
