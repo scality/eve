@@ -3,6 +3,7 @@
 exec 3>&1 4>&2 >/var/log/custom_cloud_init_output.log 2>&1
 
 worker_version=$1
+python_pip_cmd=pip
 
 function retry {
   local n=1
@@ -76,6 +77,7 @@ then
   if [[ `lsb_release -sc` =~ ^(focal)$ ]];
   then
     python_pip_package=python3-pip
+    python_pip_cmd=pip3
   else
     python_pip_package=python-pip
   fi
@@ -95,6 +97,6 @@ else
 fi
 
 # install twisted and buildbot
-retry sudo pip install --index-url=https://pypi.python.org/simple/ --upgrade pip==9.0.3
-retry sudo pip install twisted==$twisted_version
-retry sudo pip install buildbot-worker==$worker_version
+retry sudo ${python_pip_cmd} install --index-url=https://pypi.python.org/simple/ --upgrade pip==9.0.3
+retry sudo ${python_pip_cmd} install twisted==$twisted_version
+retry sudo ${python_pip_cmd} install buildbot-worker==$worker_version
