@@ -4,7 +4,7 @@ exec 3>&1 4>&2 >/var/log/custom_cloud_init_output.log 2>&1
 
 worker_version=$1
 python_pip_cmd=pip
-
+pip_version=9.0.3
 function retry {
   local n=1
   local max=5
@@ -81,6 +81,7 @@ then
     python_pip_cmd=pip3
     twisted_version=20.3.0
     worker_version=2.7.0
+    pip_version=21.0.1
   else
     python_pip_package=python-pip
     python_pip_cmd=pip
@@ -101,6 +102,6 @@ else
 fi
 
 # install twisted and buildbot
-retry sudo ${python_pip_cmd} install --index-url=https://pypi.python.org/simple/ --upgrade pip==9.0.3
+retry sudo ${python_pip_cmd} install --index-url=https://pypi.python.org/simple/ --upgrade pip==${pip_version}
 retry sudo ${python_pip_cmd} install twisted==$twisted_version
 retry sudo ${python_pip_cmd} install buildbot-worker==$worker_version
