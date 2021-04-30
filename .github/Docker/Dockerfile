@@ -1,4 +1,4 @@
-FROM ubuntu:bionic
+FROM ubuntu:focal
 
 ENV HOME_BUILDBOT /var/lib/buildbot
 ENV PYTHON_PIP_VERSION 21.0.1
