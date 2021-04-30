@@ -36,16 +36,15 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v2
         with:
-          push: true
-          context: build/workers/xenial
-          file: build/workers/xenial/actions.Dockerfile
-          build-args: BUILDBOT_VERSION=2.0.1
+          push: false
+          context: .github/Docker
+          file: .github/Docker/Dockerfile
           tags: "ghcr.io/scality/eve:${{ github.sha }}"
 
   tests:
     runs-on: ubuntu-latest
     container:
-      image: "ghcr.io/scality/eve:${{ github.sha }}"
+      image: "ghcr.io/scality/eve:test"
       options: --user=0
     needs:
       - publish
@@ -75,14 +74,33 @@ jobs:
 
   docker_tests:
     runs-on: ubuntu-latest
-    needs:
-      - publish
+#    needs:
+#      - publish
     steps:
       - uses: actions/checkout@v2
-      # TODO install dependencies here
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.6'
+          architecture: 'x64'
+      - name: install deps
+        run: |
+          apt-get upgrade
+          apt-get --assume-yes update
+          apt-get install --no-install-recommends --assume-yes gcc
+          apt-get install --no-install-recommends --assume-yes tox \
+              libmysqlclient-dev \
+              python3-pip \
+              python3-pkg-resources \
+              python3-setuptools \
+              python-dev \
+              python-pip \
+              python-pkg-resources \
+              python-setuptools
+          python -m pip install --upgrade pip
+          pip install -r ./requirements.txt
       - name: run docker-compose build
-        run: sudo su eve -c "tox -e compose-build"
+        run: tox -e compose-build
       - name: run docker tests
-        run: sudo su eve -c "tox -e docker"
+        run: tox -e docker
       - name: run kube tests
-        run: sudo su eve -c "tox -e kube"
+        run: tox -e kube
