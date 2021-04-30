@@ -41,8 +41,10 @@ then
 
   if [ "$dist_major" == "8" ]; then
     retry dnf -y install python2-devel python2-setuptools
+    python_binary=/bin/python2
   else
     retry yum -y install python-devel python-setuptools
+    python_binary=/bin/python
   fi
 
   adduser -u 1042 --home-dir /home/eve eve
@@ -61,7 +63,7 @@ then
   fi
 
   curl https://bootstrap.pypa.io/pip/${python_version}/get-pip.py -o get-pip.py
-  python get-pip.py pip==9.0.3
+  ${python_binary} get-pip.py pip==9.0.3
 
 elif [ -f /etc/debian_version ]
 then
