@@ -1,3 +1,3 @@
 FROM ubuntu:focal
 
-CMD exit 1
+RUN exit 1
