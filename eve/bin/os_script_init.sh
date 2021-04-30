@@ -80,7 +80,7 @@ then
     python_pip_package=python3-pip
     python_pip_cmd=pip3
     twisted_version=20.3.0
-    worker_version=2.7.0
+    worker_version=3.1.1
     pip_version=21.0.1
   else
     python_pip_package=python-pip
