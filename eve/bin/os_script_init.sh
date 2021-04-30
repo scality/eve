@@ -73,7 +73,13 @@ then
   export LANG=en_US.utf8
 
   export DEBIAN_FRONTEND=noninteractive
-  retry apt-get install --yes git gcc python-dev python-setuptools libffi-dev python-pip
+  if [[ `lsb_release -sc` =~ ^(focal)$ ]];
+  then
+    python_pip_package=python3-pip
+  else
+    python_pip_package=python-pip
+  fi
+  retry apt-get install --yes git gcc python-dev python-setuptools libffi-dev ${python_pip_package}
 
   adduser -u 1042 --home /home/eve --disabled-password --gecos "" eve
   adduser eve sudo
