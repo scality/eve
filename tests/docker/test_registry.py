@@ -15,10 +15,10 @@ class TestDockerizedRegistry(unittest.TestCase):
         self.registry.stop()
 
     def test_start_stop(self):
-        cmd('docker pull ubuntu:xenial')
+        cmd('docker pull ubuntu:bionic')
         name = '{}:{}/test_registry_start_stop'.format(
             self.registry.external_ip, self.registry.port)
-        cmd('docker tag ubuntu:xenial {}'.format(name))
+        cmd('docker tag ubuntu:bionic {}'.format(name))
         cmd('docker push {}'.format(name))
         assert name in cmd('docker images')
         cmd('docker rmi {}'.format(name))

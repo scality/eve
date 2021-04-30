@@ -25,10 +25,15 @@ from setuptools import find_packages, setup
 # Besides not advised,
 # https://pip.pypa.io/en/stable/user_guide/#using-pip-from-your-program
 # That's the only sane way to parse requirements.txt
-try: # for pip >= 10
+import pip
+pip_major_version = int(pip.__version__.split(".")[0])
+if pip_major_version >= 20:
+    from pip._internal.network.session import PipSession
+    from pip._internal.req import parse_requirements
+elif pip_major_version >= 10:
     from pip._internal.download import PipSession
     from pip._internal.req import parse_requirements
-except ImportError: # for pip <= 9.0.3
+else:
     from pip.download import PipSession
     from pip.req import parse_requirements
 
@@ -38,9 +43,10 @@ CWD = dirname(abspath(__file__))
 def requires():
     reqs_file = join(CWD, 'requirements/base.in')
     reqs_install = parse_requirements(reqs_file, session=PipSession())
-
-    return [str(ir.req) for ir in reqs_install]
-
+    try:
+        return [str(ir.requirement) for ir in reqs_install]
+    except AttributeError:
+        return [str(ir.req) for ir in reqs_install]
 
 setup(
     name='eve',
@@ -53,7 +59,7 @@ setup(
         'local_scheme': 'dirty-tag'
     },
     setup_requires=[
-        'setuptools_scm'
+        'setuptools_scm==5.0.2'
     ],
     entry_points={
         'console_scripts': [

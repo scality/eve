@@ -1,3 +1,3 @@
-FROM ubuntu:xenial
+FROM ubuntu:bionic
 
 CMD exit 1

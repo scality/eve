@@ -2,6 +2,6 @@
 # check instruction on how to reproduce in base.in
 -c constraints.txt
 
-buildbot-pkg
+#buildbot-pkg
 freeze-requirements
 mock

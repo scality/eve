@@ -1,3 +1,3 @@
-FROM ubuntu:xenial
+FROM ubuntu:bionic
 
 RUN exit 1
