@@ -91,9 +91,8 @@ fi
 
 # install pip through get-pip
 curl https://bootstrap.pypa.io/pip/${python_version}/get-pip.py -o get-pip.py
-${python_binary} get-pip.py pip==9.0.3
+${python_binary} get-pip.py install
 
 # install twisted and buildbot
-retry sudo pip install --index-url=https://pypi.python.org/simple/ --upgrade pip==9.0.3
 retry sudo pip install twisted==$twisted_version
 retry sudo pip install buildbot-worker==$worker_version
