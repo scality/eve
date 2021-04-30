@@ -62,9 +62,6 @@ then
     python_version=2.7
   fi
 
-  curl https://bootstrap.pypa.io/pip/${python_version}/get-pip.py -o get-pip.py
-  ${python_binary} get-pip.py pip==9.0.3
-
 elif [ -f /etc/debian_version ]
 then
   echo "Ubuntu/Debian"
@@ -75,12 +72,14 @@ then
   export LANG=en_US.utf8
 
   export DEBIAN_FRONTEND=noninteractive
-  retry apt-get install --yes git gcc python-dev python-setuptools libffi-dev python-pip
+  retry apt-get install --yes git gcc python-dev python-setuptools libffi-dev
 
   adduser -u 1042 --home /home/eve --disabled-password --gecos "" eve
   adduser eve sudo
   echo "%sudo ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
   twisted_version=16.4.0
+  python_version=2.7
+  python_binary=/bin/python
   if [[ `lsb_release -sc` =~ ^(precise|wheezy)$ ]];
   then
     worker_version=1.7.0 # last version of buildbot with python2.7 support
@@ -89,6 +88,10 @@ else
   echo "Unsupported Operating System";
   exit 1;
 fi
+
+# install pip through get-pip
+curl https://bootstrap.pypa.io/pip/${python_version}/get-pip.py -o get-pip.py
+${python_binary} get-pip.py pip==9.0.3
 
 # install twisted and buildbot
 retry sudo pip install --index-url=https://pypi.python.org/simple/ --upgrade pip==9.0.3
