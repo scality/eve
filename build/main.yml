@@ -7,11 +7,11 @@ branches:
 
 stages:
   pre-merge:
-    worker: &bionic-worker
+    worker: &focal-worker
       type: kube_pod
-      path: build/workers/bionic/pod.yaml
+      path: build/workers/focal/pod.yaml
       images:
-        worker: build/workers/bionic
+        worker: build/workers/focal
     steps:
       - TriggerStages:
           name: trigger local and remote tests simultaneously
@@ -38,7 +38,7 @@ stages:
           alwaysRun: True
 
   local-tests:
-    worker: *bionic-worker
+    worker: *focal-worker
     steps:
       - Git:
           name: fetch source
@@ -94,7 +94,7 @@ stages:
   docker tests:
     worker:
       type: openstack
-      image: bionic-server-cloudimg-amd64_20181011.qcow2
+      image: focal-server-cloudimg-amd64_2021-04-29
       flavor: general1-8
       path: build/workers/docker_tests
     steps:
