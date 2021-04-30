@@ -74,19 +74,22 @@ then
   export LANG=en_US.utf8
 
   export DEBIAN_FRONTEND=noninteractive
+
   if [[ `lsb_release -sc` =~ ^(focal)$ ]];
   then
     python_pip_package=python3-pip
     python_pip_cmd=pip3
+    twisted_version=20.3.0
   else
     python_pip_package=python-pip
+    python_pip_cmd=pip
+    twisted_version=16.4.0
   fi
   retry apt-get install --yes git gcc python-dev python-setuptools libffi-dev ${python_pip_package}
 
   adduser -u 1042 --home /home/eve --disabled-password --gecos "" eve
   adduser eve sudo
   echo "%sudo ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
-  twisted_version=16.4.0
   if [[ `lsb_release -sc` =~ ^(precise|wheezy)$ ]];
   then
     worker_version=1.7.0 # last version of buildbot with python2.7 support
