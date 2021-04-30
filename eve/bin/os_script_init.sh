@@ -79,7 +79,7 @@ then
   echo "%sudo ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
   twisted_version=16.4.0
   python_version=2.7
-  python_binary=/bin/python
+  python_binary=/usr/bin/python
   if [[ `lsb_release -sc` =~ ^(precise|wheezy)$ ]];
   then
     worker_version=1.7.0 # last version of buildbot with python2.7 support
