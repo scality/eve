@@ -12,70 +12,68 @@ on:
 
 
 jobs:
-#  publish:
-#    runs-on: ubuntu-latest
-#    steps:
-#      - name: Checkout
-#        uses: actions/checkout@v2
-#
-#      - name: Set up QEMU
-#        uses: docker/setup-qemu-action@v1
-#
-#      - name: Set up Docker Buildk
-#        uses: docker/setup-buildx-action@v1
-#        with:
-#          buildkitd-flags: --debug
-#
-#      - name: Login to Registry
-#        uses: docker/login-action@v1
-#        with:
-#          registry: ghcr.io
-#          username: ${{ github.repository_owner }}
-#          password: ${{ secrets.GITHUB_TOKEN }}
-#
-#      - name: Build and push
-#        uses: docker/build-push-action@v2
-#        with:
-#          push: true
-#          context: .github/Docker
-#          file: .github/Docker/Dockerfile
-#          tags: "ghcr.io/scality/eve:${{ github.sha }}"
-#
-#  tests:
-#    runs-on: ubuntu-latest
-#    container:
-#      image: "ghcr.io/scality/eve:${{ github.sha }}"
-#      options: --user=0
-#    needs:
-#      - publish
-#    steps:
-#      - uses: actions/checkout@v2
-#      - name: install eve
-#        run: pip3 install .
-#      - name: run static analysis tools
-#        run: tox --sitepackages -e lint
-#      - name: Ensure the release notes compile
-#        run: tox --sitepackages -e relnotes -- test_version
-#      - name: Ensure the doc compiles
-#        run: tox --sitepackages -e doc
-#      - name: check helm packaging eve
-#        run: helm lint charts/eve
-#      - name: check helm packaging eve-cron-builder
-#        run: helm lint charts/eve-cron-builder
-#      - name: check helm packaging eve-doc
-#        run: helm lint charts/eve-doc
-#      - name: run unit tests
-#        run: tox --sitepackages -e unit
-#      - name: run system utils tests
-#        run: tox --sitepackages -e testutil
-#      - name: run system tests
-#        run: tox --sitepackages -e system
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - name: Set up Docker Buildk
+        uses: docker/setup-buildx-action@v1
+        with:
+          buildkitd-flags: --debug
+
+      - name: Login to Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          context: .github/Docker
+          file: .github/Docker/Dockerfile
+          tags: "ghcr.io/scality/eve:${{ github.sha }}"
+
+  tests:
+    runs-on: ubuntu-latest
+    container:
+      image: "ghcr.io/scality/eve:${{ github.sha }}"
+      options: --user=0
+    needs:
+      - publish
+    steps:
+      - uses: actions/checkout@v2
+      - name: install eve
+        run: pip3 install .
+      - name: run static analysis tools
+        run: tox --sitepackages -e lint
+      - name: Ensure the release notes compile
+        run: tox --sitepackages -e relnotes -- test_version
+      - name: Ensure the doc compiles
+        run: tox --sitepackages -e doc
+      - name: check helm packaging eve
+        run: helm lint charts/eve
+      - name: check helm packaging eve-cron-builder
+        run: helm lint charts/eve-cron-builder
+      - name: check helm packaging eve-doc
+        run: helm lint charts/eve-doc
+      - name: run unit tests
+        run: tox --sitepackages -e unit
+      - name: run system utils tests
+        run: tox --sitepackages -e testutil
+      - name: run system tests
+        run: tox --sitepackages -e system
 
 
   docker_tests:
     runs-on: ubuntu-latest
-#    needs:
-#      - publish
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
@@ -86,9 +84,9 @@ jobs:
         run: pip install docker-compose
       - name: install deps
         run: |
-          apt-get upgrade
-          apt-get --assume-yes update
-          apt-get install --no-install-recommends --assume-yes \
+          sudo apt-get upgrade
+          sudo apt-get --assume-yes update
+          sudo apt-get install --no-install-recommends --assume-yes \
           tox \
           wget \
           curl \
