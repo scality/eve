@@ -52,8 +52,8 @@ jobs:
       - uses: actions/checkout@v2
       - name: install eve
         run: pip3 install .
-      - name: run static analysis tools
-        run: tox --sitepackages -e lint
+#      - name: run static analysis tools
+#        run: tox --sitepackages -e lint
       - name: Ensure the release notes compile
         run: tox --sitepackages -e relnotes -- test_version
       - name: Ensure the doc compiles
@@ -74,30 +74,13 @@ jobs:
 
   docker_tests:
     runs-on: ubuntu-latest
+    container:
+      image: "ghcr.io/scality/eve:${{ github.sha }}"
+      options: --user=0
     needs:
       - publish
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
-        with:
-          python-version: '3.8'
-          architecture: 'x64'
-      - name: install deps
-        run: |
-          apt-get upgrade
-          apt-get --assume-yes update
-          apt-get install --no-install-recommends --assume-yes gcc
-          apt-get install --no-install-recommends --assume-yes tox \
-              libmysqlclient-dev \
-              python3-pip \
-              python3-pkg-resources \
-              python3-setuptools \
-              python-dev \
-              python-pip \
-              python-pkg-resources \
-              python-setuptools
-          python -m pip install --upgrade pip
-          pip install -r ./requirements.txt
       - name: run docker-compose build
         run: tox -e compose-build
       - name: run docker tests

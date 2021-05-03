@@ -17,6 +17,10 @@ Release Notes
 
 .. towncrier release notes start
 
+
+No significant changes.
+
+
 Eve 1.7.6 (2020-12-17)
 ======================
 
