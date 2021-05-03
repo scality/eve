@@ -7,7 +7,7 @@ worker_password=$4
 
 export LANG=en_US.utf8
 
-sudo -iu eve buildbot-worker create-worker --umask=022 \
+sudo -iu eve buildbot-worker create-worker --umask=22 \
                              /home/eve/worker \
                              ${master_fqdn}:${master_port} \
                              ${worker_name} \
