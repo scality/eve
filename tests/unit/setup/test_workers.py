@@ -161,7 +161,6 @@ provider_there:
             ('OS_MAPPING_FILE_PATH', 'foo'),
             ('OS_NETWORK_PRIVATE', 'foo'),
             ('OS_NETWORK_PUBLIC', 'foo'),
-            ('OS_NETWORK_SERVICE', 'foo'),
             ('OS_PASSWORD', 'bar'),
             ('OS_PROJECT_DOMAIN_ID', 'default'),
             ('OS_PROVIDER', 'foo'),

@@ -43,10 +43,6 @@ parameters:
     type: string
     label: Public network ID
     description: Public network to attach instance to.
-  network_service:
-    type: string
-    label: Service network ID
-    description: Service network to attach instance to.
   network_private:
     type: string
     label: Private network name or ID
@@ -106,7 +102,6 @@ resources:
       key_name: {get_param: key_name}
       networks:
         - network: {get_param: network_public}
-        - network: {get_param: network_service}
         - network: {get_param: network_private}
       config_drive: "true"
       user_data_format: RAW

@@ -192,7 +192,6 @@ def openstack_heat_workers():
         'master_port': util.env.EXTERNAL_PB_PORT,
         'network_private': util.env.OS_NETWORK_PRIVATE,
         'network_public': util.env.OS_NETWORK_PUBLIC,
-        'network_service': util.env.OS_NETWORK_SERVICE,
         'script_boot': Transform(
             openstack_worker_script,
             default_script_path=util.env.OS_SCRIPT_BOOT_FILE_PATH,

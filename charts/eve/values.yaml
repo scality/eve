@@ -378,7 +378,6 @@ eve:
       ##
       osNetworkPrivate: ""
       osNetworkPublic: ""
-      osNetworkService: ""
 
       ## osIdRsa will be deployed on VMs as the root SSH key.
       ##
