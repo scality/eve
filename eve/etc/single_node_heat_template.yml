@@ -160,7 +160,7 @@ resources:
                 chmod u+x /tmp/script_start.sh
 
                 # execute scripts
-                /tmp/script_boot.sh
+                . /tmp/script_boot.sh
 
                 # If it is a RedHat Server
                 if [[ -f /etc/redhat-release ]] \
