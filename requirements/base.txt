@@ -23,6 +23,10 @@ babel==2.6.0
     # via
     #   -c requirements/constraints.txt
     #   python-heatclient
+buildbot-pkg==2.0.1
+    # via
+    #   -c requirements/constraints.txt
+    #   -r requirements/base.in
 buildbot-worker==2.0.1
     # via
     #   -c requirements/constraints.txt
@@ -31,7 +35,7 @@ buildbot-www==2.0.1
     # via
     #   -c requirements/constraints.txt
     #   -r requirements/base.in
-buildbot[tls]==2.0.1
+buildbot==2.0.1
     # via
     #   -c requirements/constraints.txt
     #   -r requirements/base.in
@@ -104,6 +108,10 @@ idna==2.5
     #   hyperlink
     #   requests
     #   twisted
+importlib-metadata==3.10.1
+    # via
+    #   -c requirements/constraints.txt
+    #   -r requirements/base.in
 incremental==21.3.0
     # via
     #   treq
@@ -313,6 +321,10 @@ service-identity==18.1.0
     # via
     #   buildbot
     #   twisted
+setuptools-scm==5.0.2
+    # via
+    #   -c requirements/constraints.txt
+    #   -r requirements/base.in
 simplejson==3.17.2
     # via
     #   osc-lib
@@ -387,6 +399,8 @@ wrapt==1.12.1
     # via debtcollector
 xunitparser==1.3.3
     # via -r requirements/base.in
+zipp==3.4.1
+    # via importlib-metadata
 zope.interface==5.4.0
     # via
     #   buildbot
