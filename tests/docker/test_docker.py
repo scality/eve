@@ -56,7 +56,7 @@ class TestDockerCluster(unittest.TestCase):
             # Check that the failing build step is The good one
             fstep = buildset.buildrequest.build.first_failing_step
             self.assertEqual(fstep.name,
-                             '[bad-ubuntu-focal-ctxt_f532] build')
+                             '[bad-ubuntu-focal-ctxt_a47b] build')
             cluster.sanity_check()
 
     def test2_simple_failure_in_docker(self):
