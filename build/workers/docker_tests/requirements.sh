@@ -43,15 +43,15 @@ apt-get install -y \
 pip3 install pip==9.0.1
 pip3 install tox==2.3.2
 
-# install tooling for kubernetes tests
-wget https://storage.googleapis.com/kubernetes-release/release/v1.9.6/bin/linux/amd64/kubectl
-chmod +x ./kubectl
-mv ./kubectl /usr/local/bin/kubectl
-curl -Lo minikube https://storage.googleapis.com/minikube/releases/v0.25.2/minikube-linux-amd64
-chmod +x minikube
-mv minikube /usr/local/bin/
+# # install tooling for kubernetes tests
+# wget https://storage.googleapis.com/kubernetes-release/release/v1.9.6/bin/linux/amd64/kubectl
+# chmod +x ./kubectl
+# mv ./kubectl /usr/local/bin/kubectl
+# curl -Lo minikube https://storage.googleapis.com/minikube/releases/v0.25.2/minikube-linux-amd64
+# chmod +x minikube
+# mv minikube /usr/local/bin/
 
-HOME=/ minikube start --vm-driver none
-chmod 777 -R /.minikube /.kube
-ln -s /.minikube /.kube/.minikube
-ln -s /.kube /home/eve/.kube
+# HOME=/ minikube start --vm-driver none
+# chmod 777 -R /.minikube /.kube
+# ln -s /.minikube /.kube/.minikube
+# ln -s /.kube /home/eve/.kube
