@@ -35,7 +35,7 @@ class DockerizedCrossbar(Crossbar):
         self._start_cmd = [
             'docker', 'run',
             '--name', self._name,
-            '-p', '{}:10990'.format(self.port),
+            '-p', '{}:8080'.format(self.port),
             '-v', '{}:/node/.crossbar/config.json'.format(conf),
             'crossbario/crossbar:cpy-amd64-21.3.1'
         ]

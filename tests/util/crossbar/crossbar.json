@@ -1,5 +1,6 @@
 {
   "version": 2,
+  "$schema": "https://raw.githubusercontent.com/crossbario/crossbar/master/crossbar.json",
   "controller": {},
   "workers": [
     {
@@ -36,7 +37,7 @@
           "type": "universal",
           "endpoint": {
             "type": "tcp",
-            "port": 10990
+            "port": 8080
           },
           "rawsocket": {
           },
@@ -49,7 +50,7 @@
             "paths": {
               "/": {
                 "type": "static",
-                "directory": ".."
+                "directory": "../web"
               }
             }
           }
