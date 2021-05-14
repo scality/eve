@@ -43,15 +43,19 @@ apt-get install -y \
 pip3 install pip==9.0.1
 pip3 install tox==2.3.2
 
-# install tooling for kubernetes tests
-wget https://storage.googleapis.com/kubernetes-release/release/v1.9.6/bin/linux/amd64/kubectl
-chmod +x ./kubectl
-mv ./kubectl /usr/local/bin/kubectl
-curl -Lo minikube https://storage.googleapis.com/minikube/releases/v0.25.2/minikube-linux-amd64
-chmod +x minikube
-mv minikube /usr/local/bin/
 
-HOME=/ minikube start --vm-driver none
-chmod 777 -R /.minikube /.kube
-ln -s /.minikube /.kube/.minikube
-ln -s /.kube /home/eve/.kube
+# Install kubectl
+curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
+echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | tee /etc/apt/sources.list.d/kubernetes.list
+apt-get update && apt-get install -y kubectl
+
+# Install Kind
+curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.10.0/kind-linux-amd64
+chmod +x ./kind
+mv kind /usr/local/bin/
+# Create kind cluster
+kind create cluster
+# Setup Kind kubeconfig
+mkdir -p /home/eve/.kube
+kind get kubeconfig > /home/eve/.kube/config
+chown eve:eve /home/eve/.kube/config

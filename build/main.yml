@@ -124,6 +124,13 @@ stages:
           haltOnFailure: True
           usePTY: true
       - ShellCommand:
+          name: setup kind cluster
+          command: |
+            kubectl create role default --verb=get --verb=list --verb=watch --verb=update --verb=create --verb=delete --resource=pods --resource=secrets --resource=configmaps
+            kubectl create rolebinding default --role=default --serviceaccount=default:default
+            docker build -t fake-service:testing tests/kube/contexts/simple/fake-service
+            kind load docker-image fake-service:testing
+      - ShellCommand:
           name: run kube tests
           command: sudo su eve -c "tox -e kube"
           haltOnFailure: True
