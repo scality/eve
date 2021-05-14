@@ -17,8 +17,8 @@
 # Boston, MA  02110-1301, USA.
 
 from hashlib import sha1
-from time import time
 from os.path import join
+from time import time
 
 import buildbot
 from buildbot.plugins import steps, util

@@ -23,11 +23,10 @@ Content:
 
 """
 
-from http.server import BaseHTTPRequestHandler, HTTPServer
 import threading
 import time
-
-from urllib.parse import urlencode, urlparse, parse_qsl
+from http.server import BaseHTTPRequestHandler, HTTPServer
+from urllib.parse import parse_qsl, urlencode, urlparse
 
 
 class _RequestRec(object):

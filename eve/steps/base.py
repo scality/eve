@@ -16,9 +16,8 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor,
 # Boston, MA  02110-1301, USA.
 
-from os.path import abspath, dirname, join
-
 import os
+from os.path import abspath, dirname, join
 
 import yaml
 

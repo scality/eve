@@ -19,11 +19,12 @@
 import codecs
 
 try:
-    from kubernetes import config as kube_config
     from kubernetes import client
+    from kubernetes import config as kube_config
 except ImportError:
     client = None
 from kubernetes.client.rest import ApiException
+
 from tests.util.cluster import Cluster
 
 
@@ -42,6 +43,7 @@ class KubeCluster(Cluster):
 
     def create_secret(self, name, data):
         try:
+            # pylint: disable=too-many-function-args
             self.kube_client.CoreV1Api().delete_namespaced_secret(
                 name, 'default', self.kube_client.V1DeleteOptions())
         except ApiException:
@@ -63,6 +65,7 @@ class KubeCluster(Cluster):
 
     def delete_config_map(self, name):
         try:
+            # pylint: disable=too-many-function-args
             self.kube_client.CoreV1Api().delete_namespaced_config_map(
                 name, 'default', self.kube_client.V1DeleteOptions())
         except ApiException:
@@ -70,6 +73,7 @@ class KubeCluster(Cluster):
 
     def delete_secret(self, name):
         try:
+            # pylint: disable=too-many-function-args
             self.kube_client.CoreV1Api().delete_namespaced_secret(
                 name, 'default', self.kube_client.V1DeleteOptions())
         except ApiException:

@@ -9,10 +9,10 @@ from buildbot.process import remotetransfer
 from buildbot.process.results import FAILURE, SUCCESS
 from buildbot.test.fake.remotecommand import Expect, ExpectRemoteRef
 from buildbot.test.util import steps
-from tests.util.yaml_factory import RawYaml, SingleCommandYaml
 from twisted.trial import unittest
 
 from eve.steps import yaml_parser
+from tests.util.yaml_factory import RawYaml, SingleCommandYaml
 
 
 class TestReadConfFromYamlExecution(steps.BuildStepMixin, unittest.TestCase):

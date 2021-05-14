@@ -18,8 +18,8 @@
 """This test suite checks Docker build fingerprint behavior."""
 
 import unittest
-
 from tempfile import mkdtemp
+
 from tests.util.cluster import Cluster
 from tests.util.yaml_factory import PreMerge
 

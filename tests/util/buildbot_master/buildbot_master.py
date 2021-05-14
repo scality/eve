@@ -23,6 +23,7 @@ from os.path import join
 from shutil import copy
 
 import yaml
+
 from tests.util.buildbot_api_client import BuildbotDataAPI
 from tests.util.cmd import cmd
 from tests.util.daemon import Daemon

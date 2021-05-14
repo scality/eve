@@ -19,10 +19,11 @@
 
 """Testing canStartBuild method implemented in the builders config"""
 
-import unittest
 import os
 import time
+import unittest
 from tempfile import mkdtemp
+
 from buildbot.process.results import SUCCESS
 
 from tests.util.cluster import Cluster

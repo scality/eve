@@ -20,9 +20,8 @@
 import unittest
 
 from tests.util.cluster import Cluster
-from tests.util.yaml_factory import (
-    RawYaml, SingleCommandYaml, YamlFactory, PreMerge
-)
+from tests.util.yaml_factory import (PreMerge, RawYaml, SingleCommandYaml,
+                                     YamlFactory)
 
 
 class TestYamlSyntax(unittest.TestCase):

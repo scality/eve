@@ -20,7 +20,6 @@ from buildbot.config import BuilderConfig
 from buildbot.plugins import steps, util
 from buildbot.process.factory import BuildFactory
 from buildbot.util.logger import Logger
-
 from twisted.internet import defer
 
 log = Logger()

@@ -21,6 +21,7 @@ import os
 import unittest
 
 from buildbot.process.results import CANCELLED, SUCCESS
+
 from tests.util.cluster import Cluster
 from tests.util.yaml_factory import PreMerge, SingleCommandYaml
 

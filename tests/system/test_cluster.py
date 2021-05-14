@@ -19,6 +19,7 @@
 import unittest
 
 from buildbot.process.results import CANCELLED, FAILURE, SUCCESS
+
 from tests.util.cluster import Cluster
 from tests.util.yaml_factory import SingleCommandYaml, YamlFactory
 

@@ -22,10 +22,10 @@ from os import pardir
 from os.path import abspath, join
 
 from buildbot.process.results import SUCCESS
-from tests.docker.cluster import DockerizedCluster as Cluster
-from tests.util.yaml_factory import PreMerge, SingleCommandYaml
 
 from eve.util.hash import create_hash
+from tests.docker.cluster import DockerizedCluster as Cluster
+from tests.util.yaml_factory import PreMerge, SingleCommandYaml
 
 
 class TestDockerCluster(unittest.TestCase):

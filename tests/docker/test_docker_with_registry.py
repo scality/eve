@@ -22,6 +22,7 @@ from os.path import abspath, join
 from pprint import pprint
 
 from buildbot.process.results import SUCCESS
+
 from tests.docker.cluster import DockerizedCluster
 from tests.util.cmd import cmd
 from tests.util.yaml_factory import SingleCommandYaml

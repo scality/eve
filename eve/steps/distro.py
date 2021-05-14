@@ -17,10 +17,10 @@
 # Boston, MA  02110-1301, USA.import unittest
 
 from buildbot.process.buildstep import BuildStep
-from buildbot.steps.worker import CompositeStepMixin
 from buildbot.process.results import SUCCESS
-from twisted.logger import Logger
+from buildbot.steps.worker import CompositeStepMixin
 from twisted.internet import defer
+from twisted.logger import Logger
 
 """Step regarding distributions."""
 

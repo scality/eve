@@ -6,9 +6,9 @@ from collections import namedtuple
 from tempfile import mkdtemp, mktemp
 
 from buildbot.plugins import util
-from tests.util.yaml_factory import LocalJobsYaml
 
 import eve.setup.local_jobs
+from tests.util.yaml_factory import LocalJobsYaml
 
 DumbWorker = namedtuple('DumbWorker', ['name'])
 

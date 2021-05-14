@@ -17,6 +17,7 @@
 # Boston, MA  02110-1301, USA.
 
 import requests
+
 from tests.util.cmd import cmd
 from tests.util.daemon import Daemon
 

@@ -33,6 +33,7 @@ import os
 import shutil
 import stat
 import tempfile
+from urllib.parse import parse_qsl, urlparse
 
 import six
 from buildbot.plugins import util
@@ -42,8 +43,6 @@ from buildbot.process.results import FAILURE, SKIPPED, SUCCESS, WARNINGS
 from buildbot.util import httpclientservice
 from twisted.internet import defer
 from twisted.python import log
-
-from urllib.parse import urlparse, parse_qsl
 
 
 @six.add_metaclass(abc.ABCMeta)

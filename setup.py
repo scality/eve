@@ -20,12 +20,12 @@
 
 from os.path import abspath, dirname, join
 
-from setuptools import find_packages, setup
-
 # Besides not advised,
 # https://pip.pypa.io/en/stable/user_guide/#using-pip-from-your-program
 # That's the only sane way to parse requirements.txt
 import pip
+from setuptools import find_packages, setup
+
 pip_major_version = int(pip.__version__.split(".")[0])
 if pip_major_version >= 20:
     from pip._internal.network.session import PipSession

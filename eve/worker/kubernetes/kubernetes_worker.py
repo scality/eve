@@ -31,8 +31,8 @@ from twisted.internet import defer, threads
 from twisted.logger import Logger
 
 try:
-    from kubernetes import config as kube_config
     from kubernetes import client
+    from kubernetes import config as kube_config
     from kubernetes.client.rest import ApiException
 except ImportError:
     client = None
@@ -561,6 +561,7 @@ class EveKubeLatentWorker(AbstractLatentWorker):
         max_wait_time = 240
         duration = 0
         try:
+            # pylint: disable=too-many-function-args
             client.CoreV1Api().delete_namespaced_pod(name,
                                                      self.namespace,
                                                      client.V1DeleteOptions())
@@ -578,6 +579,7 @@ class EveKubeLatentWorker(AbstractLatentWorker):
 
             self.logger.info('max wait time reached forcing'
                              ' deletion of pod %s' % name)
+            # pylint: disable=too-many-function-args
             client.CoreV1Api().delete_namespaced_pod(
                 name,
                 self.namespace,

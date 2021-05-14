@@ -22,6 +22,7 @@ import unittest
 
 from buildbot.configurators.janitor import JANITOR_NAME
 from buildbot.process.results import SUCCESS
+
 from tests.util.cluster import Cluster
 
 
