@@ -103,6 +103,16 @@ stages:
           repourl: '%(prop:git_reference)s'
           shallow: True
           retryFetch: True
+      - ShellCommand: &docker_login
+          name: Login to docker registry
+          command: >
+            docker login
+            -u "${DOCKERHUB_LOGIN}"
+            -p "${DOCKERHUB_PASSWORD}"
+          usePTY: true
+          env:
+            DOCKERHUB_LOGIN: '%(secret:dockerhub_login)s'
+            DOCKERHUB_PASSWORD: '%(secret:dockerhub_password)s'
       - ShellCommand:
           name: run docker-compose build
           command: sudo su eve -c "tox -e compose-build"
