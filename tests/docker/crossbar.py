@@ -35,6 +35,7 @@ class DockerizedCrossbar(Crossbar):
         self._start_cmd = [
             'docker', 'run',
             '--name', self._name,
+            '--user=root', # Workaround for permission issue in CI
             '-p', '{}:8080'.format(self.port),
             '-v', '{}:/node/.crossbar/config.json'.format(conf),
             'crossbario/crossbar:cpy-amd64-21.3.1'
