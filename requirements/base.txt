@@ -25,23 +25,24 @@ babel==2.6.0
     # via
     #   -c requirements/constraints.txt
     #   python-heatclient
-buildbot-pkg==2.0.1
+buildbot-pkg==2.7.0
     # via
     #   -c requirements/constraints.txt
     #   -r requirements/base.in
-buildbot-worker==2.0.1
+buildbot-worker==2.7.0
     # via
     #   -c requirements/constraints.txt
     #   -r requirements/base.in
-buildbot-www==2.0.1
+buildbot-www==2.7.0
     # via
     #   -c requirements/constraints.txt
     #   -r requirements/base.in
-buildbot==2.0.1
+buildbot[tls]==2.7.0
     # via
     #   -c requirements/constraints.txt
     #   -r requirements/base.in
-buildbot_wsgi_dashboards==2.0.1
+    #   buildbot-www
+buildbot_wsgi_dashboards==2.7.0
     # via
     #   -c requirements/constraints.txt
     #   -r requirements/base.in
@@ -94,9 +95,7 @@ dogpile.cache==1.1.2
 flask==1.1.2
     # via -r requirements/base.in
 future==0.18.2
-    # via
-    #   buildbot
-    #   buildbot-worker
+    # via buildbot-worker
 google-auth==1.30.0
     # via kubernetes
 hyperlink==21.0.0
@@ -258,6 +257,8 @@ pyflakes==2.3.1
     # via
     #   -c requirements/constraints.txt
     #   -r requirements/base.in
+pyhamcrest==2.0.2
+    # via twisted
 pyjwt==2.1.0
     # via
     #   adal
@@ -355,7 +356,6 @@ six==1.15.0
     #   python-keystoneclient
     #   python-swiftclient
     #   sqlalchemy-migrate
-    #   treq
     #   websocket-client
 snowballstemmer==2.1.0
     # via pydocstyle
@@ -381,9 +381,11 @@ stevedore==3.3.0
     #   python-openstackclient
 tempita==0.5.2
     # via sqlalchemy-migrate
-treq==21.1.0
-    # via -r requirements/base.in
-twisted[tls]==21.2.0
+treq==21.5.0
+    # via
+    #   -c requirements/constraints.txt
+    #   -r requirements/base.in
+twisted[tls]==20.3.0
     # via
     #   -c requirements/constraints.txt
     #   buildbot
@@ -416,5 +418,4 @@ zope.interface==5.4.0
     #   twisted
 
 # The following packages are considered to be unsafe in a requirements file:
-# pip
 # setuptools

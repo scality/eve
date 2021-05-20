@@ -19,15 +19,18 @@
 from buildbot.process.results import SKIPPED, SUCCESS
 from buildbot.test.fake.remotecommand import ExpectShell
 from buildbot.test.util import steps
+from buildbot.test.util.misc import TestReactorMixin
 from twisted.trial import unittest
 
 from eve.steps.redhat import UnregisterRedhat
 from eve.util.redhat import isRedhat
 
 
-class TestUnregisterRedhat(steps.BuildStepMixin, unittest.TestCase):
+class TestUnregisterRedhat(steps.BuildStepMixin, TestReactorMixin,
+                           unittest.TestCase):
 
     def setUp(self):
+        self.setUpTestReactor()
         return self.setUpBuildStep()
 
     def tearDown(self):

@@ -81,6 +81,7 @@ class Tests(unittest.TestCase):
         step_names_and_descriptions = [(step['name'], step['state_string'])
                                        for step in bootstrap_steps]
         self.assertEqual(step_names_and_descriptions, [
+            (u'worker_preparation', u'worker ready'),
             (u'set the bootstrap build number', u'Set'),
             (u'check index.lock', u"'test ! ...'"),
             (u'checkout git branch', u'update'),
@@ -110,6 +111,7 @@ class Tests(unittest.TestCase):
         step_names_and_descriptions = [(step['name'], step['state_string'])
                                        for step in steps]
         self.assertEqual(step_names_and_descriptions, [
+            (u'worker_preparation', u'worker ready'),
             (u'prevent unuseful restarts', u"'[ $(expr ...'"),
             (u'set the artifacts private url',
              u"property 'artifacts_private_url' set"),
@@ -139,6 +141,7 @@ class Tests(unittest.TestCase):
         step_names_and_descriptions = [(step['name'], step['state_string'])
                                        for step in bootstrap_steps]
         self.assertEqual(step_names_and_descriptions, [
+            (u'worker_preparation', u'worker ready'),
             (u'set the bootstrap build number', u'Set'),
             (u'check index.lock', u"'test ! ...'"),
             (u'checkout git branch', u'update'),
@@ -187,6 +190,7 @@ class Tests(unittest.TestCase):
         step_names_and_descriptions = [(step['name'], step['state_string'])
                                        for step in bootstrap_steps]
         self.assertEqual(step_names_and_descriptions, [
+            (u'worker_preparation', u'worker ready'),
             (u'set the bootstrap build number', u'Set'),
             (u'check index.lock', u"'test ! ...'"),
             (u'checkout git branch', u'update'),

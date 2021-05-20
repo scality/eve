@@ -148,6 +148,7 @@ class TestPatcher(unittest.TestCase):
             step_names_and_descriptions = [(step['name'], step['state_string'])
                                            for step in premerge_steps]
             self.assertEqual(step_names_and_descriptions, [
+                (u'worker_preparation', u'worker ready'),
                 (u'prevent unuseful restarts', u"'[ $(expr ...'"),
                 (u'set the artifacts private url',
                  u"property 'artifacts_private_url' set"),

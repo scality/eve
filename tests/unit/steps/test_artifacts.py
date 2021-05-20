@@ -24,6 +24,7 @@ from buildbot.process.properties import Interpolate
 from buildbot.process.results import SKIPPED, SUCCESS
 from buildbot.test.fake.remotecommand import ExpectShell
 from buildbot.test.util import config, steps
+from buildbot.test.util.misc import TestReactorMixin
 from twisted.trial import unittest
 
 from eve.steps.artifacts import (GetArtifactsFromStage,
@@ -31,13 +32,14 @@ from eve.steps.artifacts import (GetArtifactsFromStage,
                                  Uploadv3)
 
 
-class TestUpload(steps.BuildStepMixin, unittest.TestCase,
+class TestUpload(steps.BuildStepMixin, TestReactorMixin, unittest.TestCase,
                  config.ConfigErrorsMixin):
     def setUp(self):
         util.env = util.load_env([
             ('ARTIFACTS_PREFIX', 'prefix-'),
             ('OPENSTACK_BUILDER_NAME', 'openstack'),
         ])
+        self.setUpTestReactor()
         return self.setUpBuildStep()
 
     def tearDown(self):
@@ -136,11 +138,13 @@ class TestUpload(steps.BuildStepMixin, unittest.TestCase,
         return self.runStep()
 
 
-class TestGetArtifactsFromStage(steps.BuildStepMixin, unittest.TestCase):
+class TestGetArtifactsFromStage(steps.BuildStepMixin, TestReactorMixin,
+                                unittest.TestCase):
     def setUp(self):
         util.env = util.load_env([
             ('ARTIFACTS_PREFIX', 'prefix'),
         ])
+        self.setUpTestReactor()
         return self.setUpBuildStep()
 
     def tearDown(self):

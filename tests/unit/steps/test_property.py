@@ -23,6 +23,7 @@ from buildbot.process.results import SKIPPED, SUCCESS
 from buildbot.test.fake import fakedb
 from buildbot.test.fake.remotecommand import ExpectShell
 from buildbot.test.util import steps
+from buildbot.test.util.misc import TestReactorMixin
 from twisted.trial import unittest
 
 from eve.steps.property import (EveProperty, EvePropertyFromCommand,
@@ -45,8 +46,10 @@ class TestBoostrapPropertyMixin(steps.BuildStepMixin):
         ])
 
 
-class TestSetBootstrapProperty(TestBoostrapPropertyMixin, unittest.TestCase):
+class TestSetBootstrapProperty(TestBoostrapPropertyMixin, TestReactorMixin,
+                               unittest.TestCase):
     def setUp(self):
+        self.setUpTestReactor()
         return self.setUpBuildStep()
 
     def tearDown(self):
@@ -68,8 +71,9 @@ class TestSetBootstrapProperty(TestBoostrapPropertyMixin, unittest.TestCase):
 
 
 class TestBootstrapPropertyFromCommand(TestBoostrapPropertyMixin,
-                                       unittest.TestCase):
+                                       TestReactorMixin, unittest.TestCase):
     def setUp(self):
+        self.setUpTestReactor()
         return self.setUpBuildStep()
 
     def tearDown(self):
@@ -97,8 +101,10 @@ class TestBootstrapPropertyFromCommand(TestBoostrapPropertyMixin,
         assert expected == self.master.db.builds.getBuildProperties(1).result
 
 
-class TestEveProperty(steps.BuildStepMixin, unittest.TestCase):
+class TestEveProperty(steps.BuildStepMixin, TestReactorMixin,
+                      unittest.TestCase):
     def setUp(self):
+        self.setUpTestReactor()
         return self.setUpBuildStep()
 
     def tearDown(self):
@@ -129,8 +135,10 @@ class TestEveProperty(steps.BuildStepMixin, unittest.TestCase):
         return self.runStep()
 
 
-class TestEvePropertyFromCommand(steps.BuildStepMixin, unittest.TestCase):
+class TestEvePropertyFromCommand(steps.BuildStepMixin, TestReactorMixin,
+                                 unittest.TestCase):
     def setUp(self):
+        self.setUpTestReactor()
         return self.setUpBuildStep()
 
     def tearDown(self):

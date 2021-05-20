@@ -9,13 +9,15 @@ from buildbot.process import remotetransfer
 from buildbot.process.results import FAILURE, SUCCESS
 from buildbot.test.fake.remotecommand import Expect, ExpectRemoteRef
 from buildbot.test.util import steps
+from buildbot.test.util.misc import TestReactorMixin
 from twisted.trial import unittest
 
 from eve.steps import yaml_parser
 from tests.util.yaml_factory import RawYaml, SingleCommandYaml
 
 
-class TestReadConfFromYamlExecution(steps.BuildStepMixin, unittest.TestCase):
+class TestReadConfFromYamlExecution(steps.BuildStepMixin, TestReactorMixin,
+                                    unittest.TestCase):
     def setUp(self):
         util.env = util.load_env([
             ('ARTIFACTS_PREFIX', 'prefix'),
@@ -31,7 +33,7 @@ class TestReadConfFromYamlExecution(steps.BuildStepMixin, unittest.TestCase):
             ('PROLONG_SCHEDULER_NAME', 'prolongscheduler'),
             ('PROMOTE_SCHEDULER_NAME', 'promotescheduler'),
         ])
-
+        self.setUpTestReactor()
         return self.setUpBuildStep()
 
     def tearDown(self):

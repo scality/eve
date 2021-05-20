@@ -75,6 +75,7 @@ class TestCluster(unittest.TestCase):
             step_names_and_descriptions = [(step['name'], step['state_string'])
                                            for step in bootstrap_steps]
             self.assertEqual(step_names_and_descriptions, [
+                (u'worker_preparation', u'worker ready'),
                 (u'set the bootstrap build number', u'Set'),
                 (u'check index.lock', u"'test ! ...'"),
                 (u'checkout git branch', u'update'),
@@ -106,6 +107,7 @@ class TestCluster(unittest.TestCase):
             step_names_and_descriptions = [(step['name'], step['state_string'])
                                            for step in premerge_steps]
             self.assertEqual(step_names_and_descriptions, [
+                (u'worker_preparation', u'worker ready'),
                 (u'prevent unuseful restarts', u"'[ $(expr ...'"),
                 (u'set the artifacts private url',
                  u"property 'artifacts_private_url' set"),
@@ -196,6 +198,7 @@ class TestCluster(unittest.TestCase):
             step_names_and_descriptions = [(step['name'], step['state_string'])
                                            for step in bootstrap_steps]
             self.assertEqual(step_names_and_descriptions, [
+                (u'worker_preparation', u'worker ready'),
                 (u'set the bootstrap build number', u'Set'),
                 (u'check index.lock', u"'test ! ...' (failure)")])
 
@@ -332,7 +335,7 @@ class TestCluster(unittest.TestCase):
             check_prop('artifacts_public_url')
             check_prop('bootstrap', 1, 'set the bootstrap build number')
             check_prop('branch', 'spam', 'Build')
-            check_prop('buildbot_version', '2.0.1')
+            check_prop('buildbot_version', '2.7.0')
             check_prop('builddir')
             check_prop('buildername', 'bootstrap', 'Builder')
             check_prop('buildnumber', 1, 'Build')
@@ -363,7 +366,7 @@ class TestCluster(unittest.TestCase):
             check_prop('bootstrap', 1, 'set the bootstrap build number')
             check_prop('bootstrap_reason', 'branch updated', 'BuildOrder')
             check_prop('branch', 'spam', 'Build')
-            check_prop('buildbot_version', '2.0.1')
+            check_prop('buildbot_version', '2.7.0')
             check_prop('builddir')
             check_prop('buildername', 'local-test_suffix', 'Builder')
             check_prop('buildnumber', 1, 'Build')

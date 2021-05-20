@@ -47,23 +47,24 @@ bcrypt==3.2.0
     # via crossbar
 bitstring==3.1.7
     # via crossbar
-buildbot-pkg==2.0.1
+buildbot-pkg==2.7.0
     # via
     #   -c build/workers/focal/../../../requirements/constraints.txt
     #   -r build/workers/focal/../../../requirements/base.in
-buildbot-worker==2.0.1
+buildbot-worker==2.7.0
     # via
     #   -c build/workers/focal/../../../requirements/constraints.txt
     #   -r build/workers/focal/../../../requirements/base.in
-buildbot-www==2.0.1
+buildbot-www==2.7.0
     # via
     #   -c build/workers/focal/../../../requirements/constraints.txt
     #   -r build/workers/focal/../../../requirements/base.in
-buildbot==2.0.1
+buildbot[tls]==2.7.0
     # via
     #   -c build/workers/focal/../../../requirements/constraints.txt
     #   -r build/workers/focal/../../../requirements/base.in
-buildbot_wsgi_dashboards==2.0.1
+    #   buildbot-www
+buildbot_wsgi_dashboards==2.7.0
     # via
     #   -c build/workers/focal/../../../requirements/constraints.txt
     #   -r build/workers/focal/../../../requirements/base.in
@@ -89,6 +90,7 @@ cffi==1.14.5
     #   bcrypt
     #   cryptography
     #   pynacl
+    #   zlmdb
 chardet==3.0.4
     # via
     #   -c build/workers/focal/../../../requirements/constraints.txt
@@ -110,14 +112,16 @@ cliff==3.7.0
 cmd2==1.5.0
     # via cliff
 colorama==0.4.4
-    # via cmd2
+    # via
+    #   cmd2
+    #   crossbar
 constantly==15.1.0
     # via
     #   crossbar
     #   twisted
 coverage==5.5
     # via pytest-cov
-crossbar==21.1.1
+crossbar==21.3.1
     # via -r build/workers/focal/../../../requirements/system_tests.in
 cryptography==3.4.7
     # via
@@ -158,9 +162,7 @@ flatbuffers==1.12
     #   autobahn
     #   zlmdb
 future==0.18.2
-    # via
-    #   buildbot
-    #   buildbot-worker
+    # via buildbot-worker
 google-auth==1.28.1
     # via kubernetes
 h2==3.2.0
@@ -186,7 +188,7 @@ importlib-metadata==3.10.1
     # via
     #   -c build/workers/focal/../../../requirements/constraints.txt
     #   -r build/workers/focal/../../../requirements/base.in
-importlib-resources==5.1.2
+importlib-resources==5.1.4
     # via crossbar
 incremental==21.3.0
     # via
@@ -272,7 +274,7 @@ netifaces==0.10.9
     #   -r build/workers/focal/../../../requirements/base.in
     #   openstacksdk
     #   oslo.utils
-numpy==1.19.5
+numpy==1.20.3
     # via zlmdb
 oauthlib==3.1.0
     # via requests-oauthlib
@@ -395,6 +397,8 @@ pyflakes==2.3.1
     #   flake8
 pygments==2.8.1
     # via crossbar
+pyhamcrest==2.0.2
+    # via twisted
 pyjwt==2.0.1
     # via
     #   adal
@@ -542,7 +546,6 @@ six==1.15.0
     #   python-swiftclient
     #   sqlalchemy-migrate
     #   tox
-    #   treq
     #   virtualenv
     #   websocket-client
 snowballstemmer==2.1.0
@@ -582,11 +585,12 @@ towncrier==21.3.0
     # via -r build/workers/focal/../../../requirements/relnotes.in
 tox==3.23.0
     # via -r build/workers/focal/requirements.in
-treq==21.1.0
+treq==21.5.0
     # via
+    #   -c build/workers/focal/../../../requirements/constraints.txt
     #   -r build/workers/focal/../../../requirements/base.in
     #   crossbar
-twisted[tls]==21.2.0
+twisted[tls]==20.3.0
     # via
     #   -c build/workers/focal/../../../requirements/constraints.txt
     #   autobahn
@@ -631,8 +635,10 @@ wrapt==1.12.1
 xunitparser==1.3.3
     # via -r build/workers/focal/../../../requirements/base.in
 zipp==3.4.1
-    # via importlib-metadata
-zlmdb==21.1.1
+    # via
+    #   importlib-metadata
+    #   importlib-resources
+zlmdb==21.2.1
     # via crossbar
 zope.interface==5.3.0
     # via
@@ -643,5 +649,4 @@ zope.interface==5.3.0
     #   txtorcon
 
 # The following packages are considered to be unsafe in a requirements file:
-# pip
 # setuptools

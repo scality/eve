@@ -51,6 +51,11 @@ class TestJunit(unittest.TestCase):
                    for step in child_build.steps]
         expected = [
             (
+                u'worker_preparation',
+                u'worker ready',
+                'success'
+            ),
+            (
                 u'prevent unuseful restarts',
                 u"'[ $(expr ...'",
                 'success'
