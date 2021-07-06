@@ -103,7 +103,7 @@ def link_dashboard(conf):
             url = '{site_url}/embed/dashboard/{token}' \
                   '#bordered={bordered}&titled=false'.format(
                       site_url=site_url,
-                      token=token.decode('utf-8'),
+                      token=token,
                       bordered='true' if border else 'false')
         elif conf['type'] == 'standard':
             url = '{site_url}' \
