@@ -1,0 +1,142 @@
+---
+name: pre-merge
+
+on:
+  push:
+    branches:
+      - 'user/**'
+      - 'feature/**'
+      - 'improvement/**'
+      - 'dependabot/**'
+      - 'bugfix/**'
+      - 'w/**'
+      - 'q/**'
+
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+      - name: Install deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y tox \
+            libffi-dev \
+            libmysqlclient-dev \
+            libssl-dev
+      - name: run static analysis tools
+        run: tox -e lint
+      - name: check helm packaging eve
+        run: helm lint charts/eve
+      - name: check helm packaging eve-cron-builder
+        run: helm lint charts/eve-cron-builder
+      - name: check helm packaging eve-doc
+        run: helm lint charts/eve-doc
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+      - name: Install deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y tox \
+            libffi-dev \
+            libmysqlclient-dev \
+            libssl-dev
+      - name: Ensure the release notes compile
+        run: tox -e relnotes -- test_version
+      - name: Ensure the doc compiles
+        run: tox -e doc
+  unit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+      - name: Install deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y tox \
+            libffi-dev \
+            libmysqlclient-dev \
+            libssl-dev
+      - name: run unit tests
+        run: tox -e unit
+      - name: run system utils tests
+        run: tox -e testutil
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+      - name: Install deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y tox \
+            libffi-dev \
+            libmysqlclient-dev \
+            libssl-dev
+      - name: run system tests
+        run: tox -e system
+
+  docker-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+      - name: Install deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y tox \
+            libffi-dev \
+            libmysqlclient-dev \
+            libssl-dev
+      - name: run docker-compose build
+        run: tox -e compose-build
+      - name: run docker tests
+        run: tox -e docker
+  kube-tests:
+    runs-on: [self-hosted, ubuntu, focal, large]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+      - name: Install deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y tox \
+            libffi-dev \
+            libmysqlclient-dev \
+            python3-pip \
+            libssl-dev
+      - name: Install docker
+        run: sudo ./.github/scripts/install-docker.sh
+      - name: Install kubectl
+        run: sudo ./.github/scripts/install-kubectl.sh
+      - uses: engineerd/setup-kind@v0.5.0
+      - name: Setup Kind cluster
+        run: |
+          kubectl create role default --verb=get --verb=list --verb=watch --verb=update --verb=create --verb=delete --resource=pods --resource=secrets --resource=configmaps
+          kubectl create rolebinding default --role=default --serviceaccount=default:default
+          docker build -t fake-service:testing tests/kube/contexts/simple/fake-service
+          kind load docker-image fake-service:testing
+      - name: run kube tests
+        run: tox -e kube
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        with:
+          limit-access-to-actor: true
+        if: ${{ failure() }}
