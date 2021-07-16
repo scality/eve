@@ -50,7 +50,7 @@ echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https:/
 apt-get update && apt-get install -y kubectl
 
 # Install Kind
-curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.10.0/kind-linux-amd64
+curl -Lo ./kind https://github.com/kubernetes-sigs/kind/releases/download/v0.10.0/kind-linux-amd64
 chmod +x ./kind
 mv kind /usr/local/bin/
 # Create kind cluster
