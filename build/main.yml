@@ -51,15 +51,15 @@ stages:
           haltOnFailure: True
       - ShellCommand:
           name: run static analysis tools
-          command: tox --sitepackages -e lint
+          command: tox -e lint
           usePTY: true
       - ShellCommand:
           name: Ensure the release notes compile
-          command: tox --sitepackages -e relnotes -- test_version
+          command: tox -e relnotes -- test_version
           usePTY: true
       - ShellCommand:
           name: Ensure the doc compiles
-          command: tox --sitepackages -e doc
+          command: tox -e doc
           usePTY: true
       - ShellCommand:
           name: check helm packaging eve
@@ -72,7 +72,7 @@ stages:
           command: helm lint charts/eve-doc
       - ShellCommand:
           name: run unit tests
-          command: tox --sitepackages -e unit
+          command: tox -e unit
           usePTY: true
       - ShellCommand:
           name: run system utils tests
@@ -80,7 +80,7 @@ stages:
           usePTY: true
       - ShellCommand:
           name: run system tests
-          command: tox --sitepackages -e system
+          command: tox -e system
           haltOnFailure: True
           usePTY: true
       - Upload:
