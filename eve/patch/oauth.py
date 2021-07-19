@@ -16,6 +16,8 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor,
 # Boston, MA  02110-1301, USA.
 
+from urllib.parse import parse_qs
+
 import buildbot
 import requests
 from buildbot.www import resource
@@ -60,9 +62,12 @@ def acceptToken(self, token):
 
 
 def createSessionFromToken(self, token):
+    access_token = token['access_token']
+    if isinstance(access_token, bytes):
+        access_token = access_token.decode('utf-8')
     s = requests.Session()
     s.headers = {
-        'Authorization': 'token ' + token['access_token'].decode('utf-8'),
+        'Authorization': 'token ' + access_token,
         'User-Agent': 'buildbot/{}'.format(buildbot.version),
     }
     s.verify = self.sslVerify
