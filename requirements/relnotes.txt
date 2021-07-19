@@ -4,12 +4,12 @@
 #
 #    tox -e pip-compile
 #
-click-default-group==1.2.2
-    # via towncrier
 click==7.1.2
     # via
     #   click-default-group
     #   towncrier
+click-default-group==1.2.2
+    # via towncrier
 incremental==21.3.0
     # via towncrier
 jinja2==2.11.3
@@ -19,4 +19,4 @@ markupsafe==1.1.1
 toml==0.10.2
     # via towncrier
 towncrier==21.3.0
-    # via -r requirements/relnotes.in
+    # via -r relnotes.in
