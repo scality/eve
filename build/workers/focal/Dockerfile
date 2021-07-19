@@ -10,11 +10,7 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/* \
     && rm -f /tmp/packages.list
 
-COPY ./requirements.txt /tmp
-
 RUN pip3 install --upgrade pip==21.0.1
-RUN pip3 install --no-binary buildbot --no-cache-dir -r /tmp/requirements.txt \
- && rm -f /tmp/requirements.txt
 
 # Install Helm
 ARG HELM_VERSION=3.5.4
@@ -35,14 +31,12 @@ RUN adduser -u 1042 --home /home/eve --disabled-password --gecos "" eve \
 
 USER eve
 
-RUN mkdir -p /home/eve/workspace/ \
-    && mkdir -p /home/eve/.ssh/ \
-    && /bin/echo -e "Host bitbucket.org\n\tStrictHostKeyChecking no\n" >> /home/eve/.ssh/config
+RUN mkdir -p /home/eve/workspace/
 
 #
 # Run buildbot-worker on startup
 #
-ARG BUILDBOT_VERSION
+ARG BUILDBOT_VERSION=2.7.0
 RUN sudo pip3 install buildbot-worker==$BUILDBOT_VERSION
 
 WORKDIR /home/eve/workspace
