@@ -58,6 +58,12 @@ settings:
     ##
     reason: "cronjob"
 
+    ## buildbot properties
+    ##
+    ##   defaults to "none".
+    ##
+    properties: {}
+
   ## cronJobSchedule defines the frequency of the job.
   ##
   cronJobSchedule: "@daily"

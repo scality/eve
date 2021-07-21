@@ -37,7 +37,7 @@ spec:
             - '--httpmethod'
             - 'post'
             - '--payload'
-            - '{"branch":"{{ required "branch is required." .Values.settings.job.branch }}","reason":"{{ required "reason is required." .Values.settings.job.reason }}","force_stage":"{{ .Values.settings.job.stage }}"}'
+            - '{"branch":"{{ required "branch is required." .Values.settings.job.branch }}","reason":"{{ required "reason is required." .Values.settings.job.reason }}","force_stage":"{{ .Values.settings.job.stage }}"{{- $idx := 0  }}{{- range $k, $v := .Values.settings.job.properties }}{{- $idxstr := printf "%02d" $idx }},"prop{{ $idxstr }}_name":"{{ $k }}","prop{{ $idxstr }}_value":"{{ $v }}"{{- $idx = add $idx 1 }}{{- end }}}'
             - '/forceschedulers/force'
           {{- with .Values.deployment.nodeSelector }}
           nodeSelector:
