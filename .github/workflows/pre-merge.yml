@@ -22,12 +22,7 @@ jobs:
         with:
           python-version: '3.8'
       - name: Install deps
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y tox \
-            libffi-dev \
-            libmysqlclient-dev \
-            libssl-dev
+        uses: ./.github/actions/install-deps
       - name: run static analysis tools
         run: tox -e lint
       - name: check helm packaging eve
@@ -44,12 +39,7 @@ jobs:
         with:
           python-version: '3.8'
       - name: Install deps
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y tox \
-            libffi-dev \
-            libmysqlclient-dev \
-            libssl-dev
+        uses: ./.github/actions/install-deps
       - name: Ensure the release notes compile
         run: tox -e relnotes -- test_version
       - name: Ensure the doc compiles
@@ -62,12 +52,7 @@ jobs:
         with:
           python-version: '3.8'
       - name: Install deps
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y tox \
-            libffi-dev \
-            libmysqlclient-dev \
-            libssl-dev
+        uses: ./.github/actions/install-deps
       - name: run unit tests
         run: tox -e unit
       - name: run system utils tests
@@ -80,12 +65,7 @@ jobs:
         with:
           python-version: '3.8'
       - name: Install deps
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y tox \
-            libffi-dev \
-            libmysqlclient-dev \
-            libssl-dev
+        uses: ./.github/actions/install-deps
       - name: run system tests
         run: tox -e system
 
@@ -97,12 +77,7 @@ jobs:
         with:
           python-version: '3.8'
       - name: Install deps
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y tox \
-            libffi-dev \
-            libmysqlclient-dev \
-            libssl-dev
+        uses: ./.github/actions/install-deps
       - name: run docker-compose build
         run: tox -e compose-build
       - name: run docker tests
@@ -115,17 +90,11 @@ jobs:
         with:
           python-version: '3.8'
       - name: Install deps
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y tox \
-            libffi-dev \
-            libmysqlclient-dev \
-            python3-pip \
-            libssl-dev
+        uses: ./.github/actions/install-deps
       - name: Install docker
-        run: sudo ./.github/scripts/install-docker.sh
+        uses: ./.github/actions/install-docker
       - name: Install kubectl
-        run: sudo ./.github/scripts/install-kubectl.sh
+        uses: ./.github/actions/install-kubectl
       - uses: engineerd/setup-kind@v0.5.0
       - name: Setup Kind cluster
         run: |
@@ -135,8 +104,3 @@ jobs:
           kind load docker-image fake-service:testing
       - name: run kube tests
         run: tox -e kube
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-        with:
-          limit-access-to-actor: true
-        if: ${{ failure() }}

@@ -1,0 +1,15 @@
+---
+name: 'Install CI dependencies'
+description: 'Install the CI dependencies required to run test jobs'
+runs:
+  using: "composite"
+  steps:
+    - name: Install deps
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y tox \
+          libffi-dev \
+          libmysqlclient-dev \
+          python3-pip \
+          libssl-dev
+      shell: bash
