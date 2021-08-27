@@ -1,0 +1,16 @@
+---
+name: 'Install Kubectl'
+description: 'Install Kubectl'
+runs:
+  using: "composite"
+  steps:
+    - name: Setup repository
+      run: |
+        sudo curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
+        echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+      shell: bash
+    - name: Install kubectl
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y kubectl
+      shell: bash
