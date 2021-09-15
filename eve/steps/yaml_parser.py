@@ -267,9 +267,9 @@ class GetCommitShortVersion(EvePropertyFromCommand):
                 commit_short_revision = reg.group(1)
                 break
 
-        self.setProperty(self.property, str(commit_short_revision),
+        self.setProperty(self.property, str(commit_short_revision + 'FOO'),
                          'GetCommitShortVersion')
-        self.property_changes[self.property] = commit_short_revision
+        self.property_changes[self.property] = commit_short_revision + 'FOO'
 
 
 class GetCommitTimestamp(EvePropertyFromCommand):
