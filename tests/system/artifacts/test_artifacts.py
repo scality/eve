@@ -52,7 +52,8 @@ class TestArtifacts(unittest.TestCase):
         child_build = child_buildsets[0].buildrequest.build
         self.assertEqual(child_build.result, 'success')
 
-        short_hash = self.local_repo.cmd('git rev-parse --short HEAD')
+        short_hash = self.local_repo.cmd('git rev-parse HEAD')
+        short_hash = short_hash[0:10]
         timestamp = self.local_repo.cmd('git log -1 --format=%cd '
                                         '--date="format-local:%y%m%d%H%M%S"')
 
