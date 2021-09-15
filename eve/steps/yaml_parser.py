@@ -16,6 +16,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor,
 # Boston, MA  02110-1301, USA.
 
+import re
 import time
 from collections import defaultdict
 from fnmatch import fnmatch
@@ -23,6 +24,7 @@ from tempfile import mktemp
 
 import yaml
 from buildbot.plugins import steps, util
+from buildbot.process import logobserver
 from buildbot.process.buildstep import BuildStep
 from buildbot.process.results import FAILURE, SKIPPED, SUCCESS
 from buildbot.steps.transfer import FileUpload
@@ -240,13 +242,34 @@ class GetCommitShortVersion(EvePropertyFromCommand):
                 'git',
                 'rev-parse',
                 '--verify',
-                '--short',
+                '--short=10',
                 branch,
             ],
             hideStepIf=util.hideStepIfSuccess,
             property='commit_short_revision',
             haltOnFailure=True,
             logEnviron=False)
+
+        self.observer = logobserver.BufferLogObserver(wantStdout=True,
+                                                      wantStderr=True)
+        self.addLogObserver('stdio', self.observer)
+
+    def commandComplete(self, cmd):  # NOQA flake8 to ignore camelCase
+        if cmd.didFail():
+            self.stdio_log.addStderr('Unable to get commit short revision\n')
+            return
+
+        commit_short_revision = ''
+        lines = self.observer.getStdout().splitlines()
+        for line in lines:
+            reg = re.search('^([0-9a-f]{10})[0-9a-f]*$', line)
+            if reg:
+                commit_short_revision = reg.group(1)
+                break
+
+        self.setProperty(self.property, str(commit_short_revision),
+                         'GetCommitShortVersion')
+        self.property_changes[self.property] = commit_short_revision
 
 
 class GetCommitTimestamp(EvePropertyFromCommand):
