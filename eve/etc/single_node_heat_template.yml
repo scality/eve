@@ -173,19 +173,19 @@ resources:
                     if [[ -n "$REDHAT_ORG" \
                           && -n "$REDHAT_ACTIVATIONKEY" ]]; then
                         subscription-manager register \
-                            --org="$REDHAT_ORG" \
-                            --activationkey="$REDHAT_ACTIVATIONKEY"
+                            --org=$REDHAT_ORG \
+                            --activationkey=$REDHAT_ACTIVATIONKEY
                     elif [[ -n "$REDHAT_USERNAME" \
                             && -n "$REDHAT_PASSWORD" ]]; then
                         register_cmd=(
                             subscription-manager register
-                            --username="$REDHAT_USERNAME"
-                            --password="$REDHAT_PASSWORD"
+                            --username=$REDHAT_USERNAME
+                            --password=$REDHAT_PASSWORD
                         )
                         if [[ -n "$REDHAT_POOL" ]]; then
                             "${register_cmd[@]}"
                             subscription-manager attach \
-                                --pool="$redhat_pool"
+                                --pool=$redhat_pool
                         else
                            register_cmd+=(--auto-attach)
                             "${register_cmd[@]}"
