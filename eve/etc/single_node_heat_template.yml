@@ -170,6 +170,9 @@ resources:
                     export REDHAT_POOL="$redhat_pool"
                     export REDHAT_ORG="$redhat_org"
                     export REDHAT_ACTIVATIONKEY="$redhat_activationkey"
+                    echo ENV DUMP START
+                    env | grep REDHAT
+                    echo ENV DUMP STOP
                     if [[ -n "$REDHAT_ORG" \
                           && -n "$REDHAT_ACTIVATIONKEY" ]]; then
                         subscription-manager register \
