@@ -159,12 +159,10 @@ resources:
                 EOF3
                 chmod u+x /tmp/script_start.sh
 
-                # execute scripts
-                . /tmp/script_boot.sh
-
                 # If it is a RedHat Server
                 if [[ -f /etc/redhat-release ]] \
                   && rpm -qa | grep -qE '^redhat-release.+'; then
+                    output=$(ifdown eth0 && sleep 5 && ifup eth0)||output=$(dhclient -r eth0 && sleep 5 && dhclient eth0)
                     export REDHAT_USERNAME="$redhat_username"
                     export REDHAT_PASSWORD="$redhat_password"
                     export REDHAT_POOL="$redhat_pool"
@@ -204,6 +202,8 @@ resources:
                     fi
                 fi
 
+                # execute scripts
+                . /tmp/script_boot.sh
                 /tmp/script_init.sh "$worker_version"
                 retry /tmp/script_requirements.sh
                 /tmp/script_start.sh \
