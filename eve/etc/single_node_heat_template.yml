@@ -114,7 +114,7 @@ resources:
         str_replace:
           template: |
                 #!/bin/bash
-                set -o xtrace -o errexit -o nounset -o pipefail
+                set -o xtrace -o errexit -o nounset
 
                 function retry {
                   local n=1
