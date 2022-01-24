@@ -119,7 +119,7 @@ resources:
                 function retry {
                   local n=1
                   local max=5
-                  local delay=30
+                  local delay=1
                   echo "Running this command with retry ($max attempts, $delay seconds delay):"
                   echo "'$@'"
                   while true; do
