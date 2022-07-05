@@ -19,7 +19,7 @@ attrs==20.3.0
     #   twisted
 autobahn[asyncio,compress,encryption,scram,serialization,twisted]==21.3.1
     # via
-    #   -c requirements/constraints.txt
+    #   -c constraints.txt
     #   crossbar
 automat==20.2.0
     # via
@@ -29,17 +29,17 @@ bcrypt==3.2.0
     # via crossbar
 bitstring==3.1.7
     # via crossbar
-cbor2==5.2.0
-    # via
-    #   autobahn
-    #   zlmdb
 cbor==1.0.0
     # via
     #   autobahn
     #   crossbar
+cbor2==5.2.0
+    # via
+    #   autobahn
+    #   zlmdb
 certifi==2018.11.29
     # via
-    #   -c requirements/constraints.txt
+    #   -c constraints.txt
     #   requests
 cffi==1.14.5
     # via
@@ -51,7 +51,7 @@ cffi==1.14.5
     #   zlmdb
 chardet==3.0.4
     # via
-    #   -c requirements/constraints.txt
+    #   -c constraints.txt
     #   requests
 click==7.1.2
     # via
@@ -66,7 +66,7 @@ constantly==15.1.0
 coverage==5.5
     # via pytest-cov
 crossbar==21.3.1
-    # via -r requirements/system_tests.in
+    # via -r system_tests.in
 cryptography==3.4.7
     # via
     #   autobahn
@@ -93,7 +93,7 @@ hyperlink==21.0.0
     #   twisted
 idna==2.5
     # via
-    #   -c requirements/constraints.txt
+    #   -c constraints.txt
     #   crossbar
     #   hyperlink
     #   requests
@@ -136,22 +136,22 @@ priority==1.3.0
     # via crossbar
 psutil==5.8.0
     # via crossbar
-py-ubjson==0.16.1
-    # via
-    #   autobahn
-    #   crossbar
 py==1.10.0
     # via
     #   pytest
     #   pytest-forked
-pyasn1-modules==0.2.8
+py-ubjson==0.16.1
     # via
+    #   autobahn
     #   crossbar
-    #   service-identity
 pyasn1==0.4.8
     # via
     #   crossbar
     #   pyasn1-modules
+    #   service-identity
+pyasn1-modules==0.2.8
+    # via
+    #   crossbar
     #   service-identity
 pycparser==2.20
     # via cffi
@@ -175,20 +175,20 @@ pyqrcode==1.2.1
     # via
     #   autobahn
     #   crossbar
-pytest-cov==2.11.1
-    # via -r requirements/system_tests.in
-pytest-forked==1.3.0
-    # via pytest-xdist
-pytest-xdist==2.2.1
-    # via -r requirements/system_tests.in
 pytest==6.2.3
     # via
-    #   -r requirements/system_tests.in
+    #   -r system_tests.in
     #   pytest-cov
     #   pytest-forked
     #   pytest-xdist
+pytest-cov==2.11.1
+    # via -r system_tests.in
+pytest-forked==1.3.0
+    # via pytest-xdist
+pytest-xdist==2.2.1
+    # via -r system_tests.in
 python-dotenv==0.17.0
-    # via -r requirements/system_tests.in
+    # via -r system_tests.in
 python-snappy==0.6.0
     # via autobahn
 pytrie==0.4.0
@@ -197,12 +197,12 @@ pytrie==0.4.0
     #   crossbar
 pyyaml==5.4.1
     # via
-    #   -r requirements/system_tests.in
+    #   -r system_tests.in
     #   crossbar
     #   zlmdb
 requests==2.25.1
     # via
-    #   -r requirements/system_tests.in
+    #   -r system_tests.in
     #   treq
 sdnotify==0.3.2
     # via crossbar
@@ -226,11 +226,11 @@ toml==0.10.2
     # via pytest
 treq==21.5.0
     # via
-    #   -c requirements/constraints.txt
+    #   -c constraints.txt
     #   crossbar
 twisted[tls]==20.3.0
     # via
-    #   -c requirements/constraints.txt
+    #   -c constraints.txt
     #   autobahn
     #   treq
     #   txtorcon
@@ -243,22 +243,20 @@ txtorcon==20.0.0
     # via crossbar
 u-msgpack-python==2.7.1
     # via crossbar
-ujson==4.0.2
+ujson==5.4.0
     # via autobahn
 urllib3==1.24.3
     # via
-    #   -c requirements/constraints.txt
+    #   -c constraints.txt
     #   crossbar
     #   requests
 watchdog==2.0.3
     # via crossbar
 werkzeug==1.0.1
     # via crossbar
-zipp==3.4.1
-    # via importlib-resources
 zlmdb==21.2.1
     # via crossbar
-zope.interface==5.4.0
+zope-interface==5.4.0
     # via
     #   autobahn
     #   crossbar
