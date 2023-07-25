@@ -14,7 +14,7 @@ autobahn==21.3.1
 # by different requirements files in different versions
 idna==2.5
 pyflakes>=1.6.0
-certifi==2018.11.29
+certifi==2023.7.22
 babel==2.6.0
 urllib3==1.24.3
 chardet==3.0.4
