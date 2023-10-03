@@ -16,7 +16,7 @@ idna==2.5
 pyflakes>=1.6.0
 certifi==2018.11.29
 babel==2.6.0
-urllib3==1.24.3
+urllib3==1.26.17
 chardet==3.0.4
 treq==21.5.0
 
